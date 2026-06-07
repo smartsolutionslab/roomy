@@ -1,0 +1,32 @@
+# Prettier owns formatting for the JS/TS workspace (docs/coding-standards/typescript.md):
+# TypeScript/JavaScript source and the Nx/TS workspace config that goes with it.
+# Everything outside that workspace is owned elsewhere and is ignored here so a
+# tooling-setup change stays surgical (issue #10):
+#   - prose docs (Markdown) are authored by hand, not machine-formatted;
+#   - the .NET side (apps/apphost, **/bin, **/obj) is governed by .editorconfig +
+#     `dotnet format`, not Prettier;
+#   - Spec Kit (.specify/) and specs/ are tool- and human-authored content.
+
+# Build output and caches
+dist/
+out-tsc/
+tmp/
+coverage/
+.angular/
+.nx/
+
+# Dependencies and lockfiles (lockfile format is owned by pnpm)
+node_modules/
+pnpm-lock.yaml
+
+# .NET side — owned by .editorconfig + dotnet format, not Prettier
+apps/apphost/
+**/bin/
+**/obj/
+
+# Spec Kit tooling and spec content
+.specify/
+specs/
+
+# Prose documentation — hand-authored, not machine-formatted
+**/*.md

@@ -1,25 +1,90 @@
 import nx from '@nx/eslint-plugin';
 import tseslint from 'typescript-eslint';
+import importPlugin from 'eslint-plugin-import';
+import prettier from 'eslint-config-prettier';
 
 /**
  * Root ESLint flat config.
  *
- * Scope (issue #7): the Nx module-boundary rule only. This encodes the
- * Clean Architecture dependency rule and bounded-context isolation
- * (ADR-0002, ADR-0003) as tag-based dependency constraints. The full
- * Angular/TypeScript style ruleset (import ordering, no-unused, Prettier)
- * is intentionally deferred to issue #10.
+ * Layered scope:
+ *  - issue #7 added the Nx module-boundary rule (the Clean Architecture
+ *    dependency rule + bounded-context isolation, ADR-0002/0003) as
+ *    tag-based dependency constraints. That rule is preserved verbatim below.
+ *  - issue #10 adds the workspace TypeScript/JS correctness ruleset
+ *    (typescript-eslint recommended, import ordering, no-unused) and wires
+ *    `eslint-config-prettier` last so ESLint and Prettier do not fight over
+ *    formatting (Prettier is the source of truth — docs/coding-standards/typescript.md).
+ *
+ * Angular-specific linting (`angular-eslint`) is intentionally deferred to
+ * issue #23, which introduces the Angular app — those rules require an app to
+ * lint and would be inert (or misconfigured) before it exists.
  */
 export default [
   ...nx.configs['flat/base'],
-  // Parse TypeScript so the boundary rule can resolve TS imports. No style
-  // rules here — the full lint ruleset is issue #10.
+  // Ignore generated/build artefacts so they are never linted.
+  {
+    ignores: [
+      '**/dist',
+      '**/out-tsc',
+      '**/tmp',
+      '**/coverage',
+      '**/node_modules',
+      '**/.angular',
+      '**/.nx',
+      '**/bin',
+      '**/obj',
+    ],
+  },
+  // TypeScript correctness ruleset (issue #10). typescript-eslint recommended
+  // rules encode the standards in docs/coding-standards/typescript.md.
+  ...tseslint.configs.recommended.map((config) => ({
+    ...config,
+    files: ['**/*.ts', '**/*.tsx'],
+  })),
+  // Parse TypeScript so the boundary rule and TS rules can resolve TS imports.
   {
     files: ['**/*.ts', '**/*.tsx'],
+    plugins: {
+      import: importPlugin,
+    },
     languageOptions: {
       parser: tseslint.parser,
     },
+    settings: {
+      'import/resolver': {
+        typescript: true,
+        node: true,
+      },
+    },
+    rules: {
+      // No `any` — use `unknown` and narrow; an inline justification is required
+      // for the rare sanctioned case (typescript.md).
+      '@typescript-eslint/no-explicit-any': 'error',
+      // No non-null assertion (`!`) to bypass null checks (typescript.md).
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      // No unused imports/vars; allow an explicit `_`-prefixed throwaway.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      // Named exports only; no default exports (typescript.md).
+      'import/no-default-export': 'error',
+      // Import ordering via ESLint (typescript.md): groups separated and sorted.
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
+      // No duplicate imports of the same module.
+      'import/no-duplicates': 'error',
+    },
   },
+  // --- Nx module boundaries (issue #7 — DO NOT weaken) ---------------------
+  // Encodes the Clean Architecture dependency rule and bounded-context
+  // isolation (ADR-0002, ADR-0003) as tag-based dependency constraints.
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
@@ -38,11 +103,7 @@ export default [
             // application depends only on domain (and util).
             {
               sourceTag: 'type:application',
-              onlyDependOnLibsWithTags: [
-                'type:application',
-                'type:domain',
-                'type:util',
-              ],
+              onlyDependOnLibsWithTags: ['type:application', 'type:domain', 'type:util'],
             },
             // infrastructure depends inward (application, domain) and util.
             {
@@ -81,10 +142,7 @@ export default [
             },
             {
               sourceTag: 'context:organization',
-              onlyDependOnLibsWithTags: [
-                'context:organization',
-                'context:shared',
-              ],
+              onlyDependOnLibsWithTags: ['context:organization', 'context:shared'],
             },
             {
               sourceTag: 'context:attendance',
@@ -100,4 +158,15 @@ export default [
       ],
     },
   },
+  // Config files (this flat config, etc.) are ESM modules that legitimately use
+  // a default export; exempt them from the named-exports-only rule.
+  {
+    files: ['**/*.config.{js,mjs,cjs,ts}', 'eslint.config.mjs'],
+    rules: {
+      'import/no-default-export': 'off',
+    },
+  },
+  // Prettier compatibility — MUST be last so it disables every formatting rule
+  // that would conflict with Prettier (the formatting source of truth).
+  prettier,
 ];
