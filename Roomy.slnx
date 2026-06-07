@@ -14,4 +14,8 @@
   <Folder Name="/libs/shared-kernel/tests/">
     <Project Path="libs/shared-kernel/tests/Roomy.SharedKernel.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/architecture/">
+    <Project Path="tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj" />
+  </Folder>
 </Solution>
