@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/apps/" />
+  <Folder Name="/apps/apphost/">
+    <Project Path="apps/apphost/Roomy.AppHost.csproj" />
+  </Folder>
+  <Folder Name="/libs/" />
+  <Folder Name="/libs/service-defaults/">
+    <Project Path="libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+  </Folder>
+</Solution>
