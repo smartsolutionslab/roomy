@@ -1,0 +1,87 @@
+namespace SmartSolutionsLab.Roomy.SharedKernel.Results;
+
+public enum ErrorType
+{
+    Validation,
+    NotFound,
+    Conflict,
+    Unauthorized,
+    Forbidden,
+    Unexpected,
+}
+
+public sealed record Error(string Code, string Message, ErrorType Type = ErrorType.Unexpected)
+{
+    public static Error Validation(string code, string message) => new(code, message, ErrorType.Validation);
+    public static Error NotFound(string code, string message) => new(code, message, ErrorType.NotFound);
+    public static Error Conflict(string code, string message) => new(code, message, ErrorType.Conflict);
+    public static Error Unauthorized(string code, string message) => new(code, message, ErrorType.Unauthorized);
+    public static Error Forbidden(string code, string message) => new(code, message, ErrorType.Forbidden);
+}
+
+public readonly struct Result
+{
+    private Result(bool isSuccess, Error? error)
+    {
+        IsSuccess = isSuccess;
+        this.error = error;
+    }
+
+    private readonly Error? error;
+
+    public bool IsSuccess { get; }
+
+    public bool IsFailure => !IsSuccess;
+
+    public Error Error =>
+        IsFailure ? error! : throw new InvalidOperationException("A successful result has no error.");
+
+    public static Result Success() => new(true, null);
+
+    public static Result Failure(Error error) => new(false, error);
+
+    public static Result<T> Success<T>(T value) => Result<T>.Success(value);
+
+    public static Result<T> Failure<T>(Error error) => Result<T>.Failure(error);
+
+    // Lets a use case write `return error;` instead of `return Result.Failure(error);`.
+    public static implicit operator Result(Error error) => Failure(error);
+
+    public TResult Match<TResult>(Func<TResult> onSuccess, Func<Error, TResult> onFailure) =>
+        IsSuccess ? onSuccess() : onFailure(Error);
+}
+
+public readonly struct Result<T>
+{
+    private Result(bool isSuccess, T? value, Error? error)
+    {
+        IsSuccess = isSuccess;
+        this.value = value;
+        this.error = error;
+    }
+
+    private readonly T? value;
+    private readonly Error? error;
+
+    public bool IsSuccess { get; }
+
+    public bool IsFailure => !IsSuccess;
+
+    public T Value =>
+        IsSuccess ? value! : throw new InvalidOperationException("A failed result has no value.");
+
+    public Error Error =>
+        IsFailure ? error! : throw new InvalidOperationException("A successful result has no error.");
+
+    public static Result<T> Success(T value) => new(true, value, null);
+
+    public static Result<T> Failure(Error error) => new(false, default, error);
+
+    // Ergonomic returns: `return value;` and `return error;` from a Result<T>-returning method.
+    public static implicit operator Result<T>(T value) => Success(value);
+
+    public static implicit operator Result<T>(Error error) => Failure(error);
+
+    public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<Error, TResult> onFailure) =>
+        IsSuccess ? onSuccess(Value) : onFailure(Error);
+}
