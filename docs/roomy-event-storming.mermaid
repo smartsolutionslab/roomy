@@ -1,0 +1,75 @@
+flowchart TB
+    subgraph IAM["Identity &amp; Access"]
+        direction LR
+        aAdmin1["Admin"]:::actor
+        cRegUser["RegisterUser"]:::command
+        agUser["User"]:::aggregate
+        eUserReg["UserRegistered"]:::event
+        aAnyUser["Admin / Employee"]:::actor
+        cLogin["LogIn"]:::command
+        eLoggedIn["UserLoggedIn (audit)"]:::event
+        aAdmin1 --> cRegUser --> agUser --> eUserReg
+        aAnyUser --> cLogin --> agUser --> eLoggedIn
+    end
+
+    subgraph ORG["Organization — Admin only (Company seeded)"]
+        direction LR
+        aAdmin2["Admin"]:::actor
+        cOpen["OpenOffice"]:::command
+        cRename["RenameOffice"]:::command
+        cReloc["RelocateOffice"]:::command
+        cAddRoom["AddRoom (with places)"]:::command
+        cRenRoom["RenameRoom"]:::command
+        cHire["HireEmployee"]:::command
+        agOffice["Office (with Rooms)"]:::aggregate
+        agEmp["Employee"]:::aggregate
+        eOpened["OfficeOpened"]:::event
+        eRenamed["OfficeRenamed"]:::event
+        eRelocated["OfficeRelocated"]:::event
+        eRoomAdded["RoomAdded"]:::event
+        eRoomRenamed["RoomRenamed"]:::event
+        eHired["EmployeeHired"]:::event
+        aAdmin2 --> cOpen --> agOffice --> eOpened
+        aAdmin2 --> cRename --> agOffice --> eRenamed
+        aAdmin2 --> cReloc --> agOffice --> eRelocated
+        aAdmin2 --> cAddRoom --> agOffice --> eRoomAdded
+        aAdmin2 --> cRenRoom --> agOffice --> eRoomRenamed
+        aAdmin2 --> cHire --> agEmp --> eHired
+    end
+
+    subgraph ATT["Attendance — CORE (AttendanceDay = CompanyId + Date)"]
+        direction LR
+        aEmp["Employee / Admin"]:::actor
+        cReserve["ReserveAttendance (a place in a Room)"]:::command
+        cCancel["CancelReservation"]:::command
+        agDay["AttendanceDay"]:::aggregate
+        eReserved["AttendanceReserved"]:::event
+        eCancelled["ReservationCancelled"]:::event
+        aEmp --> cReserve --> agDay --> eReserved
+        aEmp --> cCancel --> agDay --> eCancelled
+    end
+
+    subgraph POST["Post-MVP"]
+        direction LR
+        cCapRoom["ChangeRoomCapacity"]:::command
+        eCapChg["RoomCapacityChanged"]:::event
+        pEvict["Policy: on reduction trim future days LIFO"]:::policy
+        eEvicted["ReservationEvicted"]:::event
+        cCapRoom --> eCapChg -.-> pEvict -.-> eEvicted
+    end
+
+    pHire["Policy: on HireEmployee provision the User (orchestrated)"]:::policy
+    rmOcc["Occupancy (Read Model)<br/>per Room (3/8) + Office rollup (12/30)"]:::readmodel
+
+    cHire -.-> pHire -.-> cRegUser
+    eReserved -.-> rmOcc
+    eCancelled -.-> rmOcc
+    eRoomAdded -.-> rmOcc
+    eOpened -.-> rmOcc
+
+    classDef actor fill:#FFF2CC,stroke:#BF9000,color:#000
+    classDef command fill:#5B9BD5,stroke:#2E5E8C,color:#fff
+    classDef aggregate fill:#FFD966,stroke:#BF9000,color:#000
+    classDef event fill:#ED7D31,stroke:#B5651D,color:#fff
+    classDef policy fill:#B084CC,stroke:#7030A0,color:#fff
+    classDef readmodel fill:#A9D18E,stroke:#548235,color:#000

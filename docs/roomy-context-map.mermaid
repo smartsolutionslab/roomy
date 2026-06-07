@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph IAM["Identity &amp; Access — generic"]
+        User["User (Aggregate)<br/>UserId, Email, PasswordHash, Role<br/>DefaultAdmin (seed)"]
+    end
+
+    subgraph ORG["Organization — supporting (master data, Admin-managed)"]
+        Company["Company (Aggregate)<br/>organizational root"]
+        Office["Office (Aggregate root)<br/>Name, Location<br/>contains Rooms"]
+        Room["Room (Entity in Office)<br/>Name, Capacity (places)"]
+        Employee["Employee (Aggregate)<br/>refs CompanyId, refs UserId"]
+    end
+
+    subgraph ATT["Attendance — CORE"]
+        AttendanceDay["AttendanceDay (Aggregate)<br/>Identity = CompanyId + Date<br/>Inv: per Room at most its Capacity<br/>Inv: per Employee at most 1 reservation per day<br/>today/future only; eviction post-MVP"]
+        Reservation["Reservation (Entity)<br/>EmployeeId, RoomId"]
+        Occupancy["Occupancy (Read Model)<br/>per Room (e.g. 3/8) + Office rollup (e.g. 12/30)"]
+    end
+
+    Employee -->|"assigned to"| Company
+    Office -->|"belongs to"| Company
+    Office -->|"contains"| Room
+    Employee -->|"1:1, created together"| User
+    AttendanceDay -->|"scoped by"| Company
+    AttendanceDay -->|"contains"| Reservation
+    Reservation -->|"references"| Employee
+    Reservation -->|"references"| Room
+    AttendanceDay -->|"capacity from"| Room
+    Occupancy -.->|"projects"| AttendanceDay
