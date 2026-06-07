@@ -1,0 +1,14 @@
+# Normalize line endings: the repo stores LF, matching `end_of_line = lf` in
+# .editorconfig and `dotnet format`. Git checks files out with LF on every platform
+# so the working tree agrees with the format gate regardless of core.autocrlf.
+* text=auto eol=lf
+
+# Binary files git must never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
