@@ -11,15 +11,19 @@
     "nx": "nx",
     "lint": "nx run-many -t lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "@nx/eslint": "22.7.5",
     "@nx/eslint-plugin": "22.7.5",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
     "nx": "^22.7.5",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
