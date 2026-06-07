@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
-using Xunit;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests.Results;
 
