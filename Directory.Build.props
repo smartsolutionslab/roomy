@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Repo-wide MSBuild defaults inherited by every .NET project under the repository root.
+    Encodes the mandated build settings from docs/coding-standards/csharp.md (#8).
+    Per-project RootNamespace / AssemblyName / TargetFramework overrides remain in each csproj.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy</RootNamespace>
+  </PropertyGroup>
+
+</Project>
