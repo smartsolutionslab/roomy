@@ -182,6 +182,15 @@ lint failures (ADR-0002/0003). The .NET side mirrors this with architecture test
 
 > ESLint here is scoped to the boundary rule only; the full lint/format ruleset is #10.
 
+**Architecture tests (`tests/architecture`).** The .NET counterpart enforces the same
+dependency rule (plus "no MediatR" / no-framework-in-core) via NetArchTest. Its
+convention-based rules inspect every *loaded* `SmartSolutionsLab.Roomy.*` assembly, and an
+assembly is only loaded if `Roomy.ArchitectureTests` references it. **When you create a
+context, you MUST add its `domain`/`application`/`infrastructure` projects as
+`ProjectReference`s to `Roomy.ArchitectureTests`** — otherwise its layers are never
+inspected and the rules pass *vacuously* (green but enforcing nothing). Adding the
+reference is part of creating a context. See `tests/architecture/README.md`.
+
 ---
 
 ## The work loop (spec-driven, test-first)
