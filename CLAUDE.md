@@ -111,10 +111,29 @@ roomy/
    └─ architecture/              # NetArchTest rules enforcing the dependency rule
 ```
 
-**FILL IN — bounded contexts.** Replace `<context>` with the real model. Likely
-candidates for this domain (confirm against your model): `attendance` / `planning`,
-`spaces` (offices, floors, desks), `org` (teams, membership), `identity`. List the
-confirmed contexts here so agents pick the right home for new code.
+**Bounded contexts (confirmed).** The model has **three** contexts — three independently
+deployable services under ADR-0014. Pick the right home for new code from this list; the
+`specs/` folder has four *feature* specs, but a feature is not a context (see the note on
+occupancy below).
+
+| Context (tag / folder) | Subdomain | Owns (aggregates / read models) | Feature spec(s) |
+|---|---|---|---|
+| `identity` — Identity & Access | Generic | `User` (email + password, roles: Employee base + Administrator elevation), seeded `DefaultAdmin` | `001-identity-access` |
+| `organization` — Organization | Supporting (master data, admin-managed) | `Company` (seeded root), `Office` (name, location), `Room` (name, capacity), `Employee` (refs `CompanyId`, refs `UserId`) | `002-office-management` |
+| `attendance` — Attendance | **Core** | `AttendanceDay` aggregate (identity = `CompanyId` + `Date`; consistency boundary for no-overbooking and one-reservation-per-employee-per-day), `Reservation` entity, **`Occupancy` read model** (per-room + office rollup) | `003-attendance`, `004-occupancy` |
+
+Hosts are `apps/identity-api`, `apps/organization-api`, `apps/attendance-api`; feature
+libs follow `@roomy/<context>-<type>` (ADR-0016).
+
+- **Occupancy is not a fourth service.** `004-occupancy` is a read model / projection that
+  lives inside the **attendance** context. Its office rollup needs `Room`/`Office` capacity
+  from **organization**, fed in by integration events (`OfficeOpened`, `RoomAdded`) per
+  ADR-0005/0014 — never by a cross-service join.
+- **User ↔ Employee is a 1:1 across `identity` and `organization`**, provisioned by a saga
+  (eventual consistency, ADR-0014). The orchestration direction and consistency model are
+  recorded in **ADR-0025** — read it before touching account/employee creation.
+- **The `AttendanceDay` aggregate spans the whole company's day** by design; the trade-off
+  and rejected alternatives are recorded in **ADR-0026**.
 
 ---
 
