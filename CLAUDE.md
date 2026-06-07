@@ -242,3 +242,8 @@ conventions changed · no unjustified suppressions or skipped tests.
 
 When you change a convention or make an architectural call, update the relevant file in
 the same change. Documentation drift is a defect.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
