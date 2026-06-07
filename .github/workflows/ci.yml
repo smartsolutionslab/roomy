@@ -1,0 +1,107 @@
+name: CI
+
+# Runs the documented gate suite (CLAUDE.md "Quality gates") on every PR into
+# `main` and on every push to `main`. These checks are what branch protection (#16)
+# will require. Coverage thresholds (#14) and the NetArchTest architecture project
+# (#13) are out of scope here and land in their own issues.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# A new push to a PR branch cancels its in-flight run; pushes to main never cancel.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # .NET gate suite: restore, build with warnings-as-errors, test, and verify
+  # formatting. The SDK version comes from global.json (10.0.300, latestFeature).
+  dotnet:
+    name: .NET gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Roomy.slnx
+
+      - name: Build (warnings as errors)
+        run: dotnet build Roomy.slnx --configuration Release --no-restore -warnaserror
+
+      - name: Test
+        run: dotnet test Roomy.slnx --configuration Release --no-build
+
+      - name: Verify formatting
+        run: dotnet format Roomy.slnx --verify-no-changes
+
+  # JS/TS gate suite via Nx. nx-set-shas computes the affected base/head; on PRs
+  # that is the merge base with the PR's base branch, on push to main it is the
+  # last successful commit on main. Targets that a project does not define (test,
+  # build are not present yet) are simply skipped by Nx.
+  nx:
+    name: Nx affected gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so nx-set-shas can resolve the affected base SHA.
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Derive affected SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Lint, test, build affected projects
+        run: pnpm nx affected -t lint test build
+
+  # Conventional Commits check across the PR's commit range (issue #11 config).
+  # Only meaningful on pull_request, where a base and head SHA bound the range.
+  commitlint:
+    name: Conventional Commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # All commits in the PR range must be present to lint each of them.
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint commit range
+        run: >
+          pnpm exec commitlint
+          --from ${{ github.event.pull_request.base.sha }}
+          --to ${{ github.event.pull_request.head.sha }}
+          --verbose
