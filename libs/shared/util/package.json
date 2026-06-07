@@ -9,6 +9,9 @@
     ".": "./src/index.ts"
   },
   "nx": {
-    "tags": ["type:util", "context:shared"]
+    "tags": [
+      "type:util",
+      "context:shared"
+    ]
   }
 }
