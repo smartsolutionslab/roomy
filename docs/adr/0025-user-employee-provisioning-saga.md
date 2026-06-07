@@ -1,6 +1,6 @@
 # 0025. User/Employee provisioning across Identity and Organization
 
-- **Status:** Proposed <!-- direction decided (Option A); → Accepted on merge -->
+- **Status:** Accepted
 - **Date:** 2026-06-07
 - **Deciders:** Heiko Weiß
 
