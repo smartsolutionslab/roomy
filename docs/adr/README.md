@@ -53,3 +53,5 @@ ADRs are written **before** the implementing code, not after.
 | [0022](0022-testing-strategy.md) | Testing strategy: TDD pyramid, coverage as a diagnostic, mutation testing, Playwright e2e, contract tests | Accepted |
 | [0023](0023-ai-posture-and-mcp-server.md) | AI posture: product features deferred, architecture AI-ready, MCP server for agent access | Accepted |
 | [0024](0024-frontend-localization-accessibility.md) | Frontend baselines: localization (Transloco, DE + EN) and WCAG 2.2 AA accessibility | Accepted |
+| [0025](0025-user-employee-provisioning-saga.md) | User/Employee provisioning across Identity and Organization | Proposed |
+| [0026](0026-attendanceday-aggregate-granularity.md) | AttendanceDay aggregate granularity (CompanyId + Date) | Proposed |
