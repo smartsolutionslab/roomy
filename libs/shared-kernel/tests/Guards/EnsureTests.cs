@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
-using Xunit;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests.Guards;
 
