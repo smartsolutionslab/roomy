@@ -32,11 +32,11 @@ As a user, I want to log in with my email and password, so that I can use roomy 
    - THEN access is denied
    - AND the response does not reveal whether the account exists
 
-4. **Administrator creates an employee account**
-   - GIVEN an administrator
-   - WHEN they create an account with the Employee role and set an initial password
+4. **An employee account is provisioned**
+   - GIVEN an administrator hires an employee (the organization-led `HireEmployee` saga, ADR-0025)
+   - WHEN the account is provisioned with the Employee role and an initial password
    - THEN the account exists with the Employee role
-   - AND that person can log in with their email and the initial password
+   - AND that person can log in with their email and the initial password once provisioning completes (eventual consistency, ADR-0025)
 
 5. **Administrator creates another administrator**
    - GIVEN an administrator
@@ -77,7 +77,7 @@ As a user, I want to log in with my email and password, so that I can use roomy 
 - **FR-003:** The system MUST authenticate a user by email and password before granting access.
 - **FR-004:** The system MUST be seeded on initialization with a DefaultAdmin account whose credentials come from configuration (not hard-coded in source), so the system can be administered from first use.
 - **FR-005:** An administrator MUST be able to create new accounts and choose whether an account additionally holds the Administrator role.
-- **FR-006:** When creating an account, the administrator MUST set an initial password; the new user can then log in with their email and that password.
+- **FR-006:** When an account is provisioned (via the organization-led `HireEmployee` saga, ADR-0025), an initial password MUST be set; the new user can then log in with their email and that password once provisioning has completed (eventual consistency — login need not be available synchronously with the hiring action).
 - **FR-007:** A user without the Administrator role MUST NOT be able to create or manage accounts.
 - **FR-008:** The system MUST reject authentication with invalid credentials and MUST NOT reveal whether the account exists.
 - **FR-009:** Account email addresses MUST be unique across the system.
@@ -91,14 +91,14 @@ As a user, I want to log in with my email and password, so that I can use roomy 
 - **DefaultAdmin** — the seeded initial administrator account, configured externally, that exists before any other account is created.
 
 ## Resolved Decisions
-- Authentication mechanism: **email + password** (custom login); no SSO/OIDC in the MVP.
-- Account creation flow: the administrator sets an **initial password**; an invite / self-set flow is deferred.
-- DefaultAdmin: credentials come from **configuration**, not hard-coded; no forced password change in the MVP (recommended, not required).
+- Authentication mechanism: **email + password via Keycloak** (self-hosted OIDC) behind the YARP BFF — no tokens in the SPA (ADR-0013). No external/social identity provider in the MVP. The identity context manages accounts and roles and provisions the corresponding Keycloak user; Keycloak owns credential verification.
+- Account creation flow: provisioning is the **organization-led `HireEmployee` saga** (ADR-0025); an initial password is set; an invite / self-set flow is deferred.
+- DefaultAdmin: seeded into Keycloak from **configuration**, not hard-coded; no forced password change in the MVP (recommended, not required).
 - Password policy: **minimum length 8**, no complexity rules.
 - Administrator vs. Employee: an administrator **is also an employee** (has an employee record and plans attendance); Administrator is an elevation, not a separate account type.
 
 ## Out of Scope (this feature)
-- SSO / OIDC, two-factor authentication, account lockout, and session-timeout policy.
+- External/social identity providers (federated SSO), two-factor authentication, account lockout, and session-timeout policy. (OIDC itself is in scope via Keycloak, ADR-0013.)
 - Self-service password reset and change-own-password.
 - Invite / self-set initial-password flow (deferred).
 - Forced password change on first login.
