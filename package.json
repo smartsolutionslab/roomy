@@ -11,10 +11,16 @@
     "nx": "nx"
   },
   "devDependencies": {
+    "@nx/eslint": "22.7.5",
+    "@nx/eslint-plugin": "22.7.5",
+    "eslint": "^9.39.4",
     "nx": "^22.7.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["nx"]
+    "onlyBuiltDependencies": [
+      "nx"
+    ]
   }
 }

@@ -160,6 +160,28 @@ libs follow `@roomy/<context>-<type>` (ADR-0016).
 - **YARP is the only public entry point.** Context APIs are internal; the gateway/BFF
   composes them for the Angular app.
 
+### Nx tag taxonomy (module boundaries)
+
+Every Nx project carries two tags — one `type:*` (layer) and one `context:*` (bounded
+context). `@nx/enforce-module-boundaries` (`eslint.config.mjs`) turns the rules above into
+lint failures (ADR-0002/0003). The .NET side mirrors this with architecture tests (#13).
+
+| Tag axis | Values |
+|---|---|
+| `type:*` | `domain` · `application` · `infrastructure` · `app` · `util` |
+| `context:*` | `identity` · `organization` · `attendance` · `shared` |
+
+`depConstraints` (encoded in `eslint.config.mjs`):
+
+- **Layer (dependency rule):** `domain` → `domain`, `util`; `application` → `application`,
+  `domain`, `util`; `infrastructure` → `infrastructure`, `application`, `domain`, `util`;
+  `app` (composition root) → any layer; `util` → `util` only.
+- **Context isolation:** each `context:*` may depend only on its own context and
+  `context:shared`; `context:shared` depends only on `context:shared`. Cross-context flow
+  is by ID + integration events, never by importing another context's libs.
+
+> ESLint here is scoped to the boundary rule only; the full lint/format ruleset is #10.
+
 ---
 
 ## The work loop (spec-driven, test-first)
