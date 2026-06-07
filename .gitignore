@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# Roomy — monorepo .gitignore (.NET + Angular/Nx + pnpm)
+# ---------------------------------------------------------------------------
+
+# --- .NET / C# ---
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+*.user
+*.suo
+.vs/
+TestResults/
+[Tt]est[Rr]esults/
+coverage/
+*.coverage
+*.coveragexml
+project.lock.json
+
+# --- Node / Angular / Nx ---
+node_modules/
+dist/
+tmp/
+out-tsc/
+.angular/
+.nx/cache
+.nx/workspace-data
+*.tsbuildinfo
+
+# --- pnpm (do not use npm/yarn) ---
+# lockfile IS committed: pnpm-lock.yaml
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+*.local
+
+# --- Agent folders (may hold credentials/tokens — keep machine-local out) ---
+.claude/settings.local.json
+.specify/extensions/.registry
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
