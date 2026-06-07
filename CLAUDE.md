@@ -244,6 +244,7 @@ When you change a convention or make an architectural call, update the relevant 
 the same change. Documentation drift is a defect.
 
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+Active feature plan: `specs/001-identity-access/plan.md` (with `research.md`,
+`data-model.md`, `contracts/`, `quickstart.md`). For technologies, project structure,
+and other important details for the current slice, read that plan and its design artifacts.
 <!-- SPECKIT END -->
