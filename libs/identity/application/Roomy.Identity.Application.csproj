@@ -8,6 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="../domain/Roomy.Identity.Domain.csproj" />
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <!-- Owned dispatch + integration-event ports (ICommand/ICommandHandler/IIntegrationEventPublisher), ADR-0005. -->
+    <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
+    <!-- This context's published language: the events RegisterUser emits (ADR-0031). -->
+    <ProjectReference Include="../contracts/Roomy.Contracts.Identity.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,6 +11,8 @@
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
     <!-- The shared EF Core baseline: RoomyDbContext, snake_case naming, Npgsql registration (ADR-0012). -->
     <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- Organization's published language, consumed at the messaging edge: EmployeeHired (ADR-0031). -->
+    <ProjectReference Include="../../organization/contracts/Roomy.Contracts.Organization.csproj" />
   </ItemGroup>
 
   <ItemGroup>
