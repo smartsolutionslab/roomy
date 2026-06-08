@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+    <!-- The host under test — its DefaultAdmin seeding is exercised against the real database. -->
+    <ProjectReference Include="../../apps/identity-api/Roomy.Identity.Api.csproj" />
     <!-- The minimal test app hosts the Aspire testing builder boots as entry points: Postgres for the
          persistence tests, Keycloak for the admin-adapter tests. -->
     <ProjectReference Include="../identity-integration-apphost/Roomy.Identity.TestAppHost.csproj" />

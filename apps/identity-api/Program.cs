@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
@@ -43,6 +44,21 @@ builder.AddRoomyMessaging(new MessagingOptions
     ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
         ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
 });
+
+// Seed the DefaultAdmin at startup so the system is administrable from first run (FR-004, research
+// R4). The seeder is idempotent, so it is safe on every restart.
+var defaultAdmin = builder.Configuration.GetSection(DefaultAdminOptions.SectionName);
+builder.Services.AddSingleton(new DefaultAdminOptions
+{
+    Email = defaultAdmin["Email"]
+        ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:Email'."),
+    DisplayName = defaultAdmin["DisplayName"]
+        ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:DisplayName'."),
+    InitialPassword = defaultAdmin["InitialPassword"]
+        ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
+});
+builder.Services.AddScoped<DefaultAdminSeeder>();
+builder.Services.AddHostedService<DefaultAdminSeederHostedService>();
 
 var app = builder.Build();
 
