@@ -251,6 +251,9 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   are GUIDv7 branded types named `…Identifier` (never `…Id`) with implicit `Guid` conversions
   for EF Core. Value objects implement `IValueObject`; aggregate roots `IAggregate`, other
   entities `IEntity` (markers in `shared-kernel`).
+- **No nullable returns on repositories/services** — a contract never returns `T?` to mean
+  "not found": a fetch that may miss returns `Result<T>` (`Error.NotFound`), a presence check
+  returns `Task<bool>` (`ExistsBy…`). The caller handles absence explicitly.
 - **Guard with `Ensure`, not `ArgumentNullException`** — lean on NRT; keep runtime guards
   only at trust boundaries and write them `Ensure.That(x).IsNotNull()`, never
   `ArgumentNullException.ThrowIfNull(...)` / the `ThrowIf*` helpers.
