@@ -3,6 +3,12 @@
   <Folder Name="/apps/apphost/">
     <Project Path="apps/apphost/Roomy.AppHost.csproj" />
   </Folder>
+  <Folder Name="/apps/gateway/">
+    <Project Path="apps/gateway/Roomy.Gateway.csproj" />
+  </Folder>
+  <Folder Name="/apps/gateway/tests/">
+    <Project Path="apps/gateway/tests/Roomy.Gateway.Tests.csproj" />
+  </Folder>
   <Folder Name="/libs/" />
   <Folder Name="/libs/application-contracts/">
     <Project Path="libs/application-contracts/src/Roomy.Application.Contracts.csproj" />

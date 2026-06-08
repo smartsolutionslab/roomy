@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Gateway</RootNamespace>
+    <AssemblyName>Roomy.Gateway</AssemblyName>
+    <UserSecretsId>roomy-gateway-bff</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The Web SDK globs **/*.cs; the sibling test project owns its own sources. -->
+    <Compile Remove="tests/**/*.cs" />
+    <Content Remove="tests/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      The BFF security pattern (ADR-0013): the OpenID Connect handler runs the server-side
+      auth-code flow against Keycloak; cookies hold the session. The handler ships as a
+      separate package (not in the Microsoft.AspNetCore.App shared framework); 10.0.0 tracks
+      the SDK (global.json 10.0.300).
+    -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0" />
+
+    <!--
+      YARP is the reverse proxy that makes the gateway the single public entry point
+      (ADR-0006/0018). 2.3.0 is the latest GA line that restores and builds on net10.0;
+      the .NET 10 wave of YARP (a 2.4 preview) is not GA, so we pin the stable 2.x.
+    -->
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+  </ItemGroup>
+
+</Project>
