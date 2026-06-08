@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Application;
+using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
@@ -41,6 +44,18 @@ public static class IdentityInfrastructureServiceCollectionExtensions
         services.AddSingleton(options);
         services.AddHttpClient<IIdentityProviderPort, KeycloakIdentityProvider>(
             httpClient => httpClient.BaseAddress = baseAddress);
+
+        return services;
+    }
+
+    // Registers the identity use cases behind their owned command-handler ports (ADR-0005). The
+    // EmployeeHired consumer (discovered by Wolverine) resolves RegisterUser through this binding to run
+    // the provisioning step (ADR-0025). TimeProvider stamps the published events and is the seam that
+    // keeps their timestamps testable.
+    public static IServiceCollection AddIdentityUseCases(this IServiceCollection services)
+    {
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<ICommandHandler<RegisterUser>, RegisterUserHandler>();
 
         return services;
     }

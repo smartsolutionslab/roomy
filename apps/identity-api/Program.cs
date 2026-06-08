@@ -8,6 +8,7 @@ using SmartSolutionsLab.Roomy.Identity.Api.Hosting;
 using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
+using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,16 +52,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
+// The provisioning use cases (US3, ADR-0025), bound to their owned command-handler ports — the
+// EmployeeHired consumer resolves RegisterUser through these.
+builder.Services.AddIdentityUseCases();
+
 // Wolverine's durable transactional outbox/inbox over the identity database, with RabbitMQ as the
 // default transport (ADR-0005/0012/0015). The outbox shares the database with the User write so a
-// published integration event commits atomically with the aggregate.
-builder.AddRoomyMessaging(new MessagingOptions
-{
-    Transport = MessagingTransport.RabbitMq,
-    PostgresConnectionString = identityConnectionString,
-    ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-        ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
-});
+// published integration event commits atomically with the aggregate. The identity infrastructure
+// assembly is scanned for consumers so EmployeeHired (organization's published language) is handled.
+builder.AddRoomyMessaging(
+    new MessagingOptions
+    {
+        Transport = MessagingTransport.RabbitMq,
+        PostgresConnectionString = identityConnectionString,
+        ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
+            ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+    },
+    typeof(EmployeeHiredConsumer).Assembly);
 
 // Seed the DefaultAdmin at startup so the system is administrable from first run (FR-004, research
 // R4). The seeder is idempotent, so it is safe on every restart.

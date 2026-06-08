@@ -29,11 +29,22 @@ public sealed class User : IAggregate
     public bool IsEmployee => true;
     public bool IsAdministrator => Role.IsAdministrator;
 
-    // Registers a new account in the Provisioning state. The Keycloak link and Active status follow
-    // once provisioning succeeds (Activate). The value objects carry their own invariants, and the
-    // Role guarantees the Employee baseline, so there is nothing further to guard here.
+    // Registers a new account in the Provisioning state with a freshly minted identity (e.g. the
+    // seeded DefaultAdmin, which has no upstream correlation). The Keycloak link and Active status
+    // follow once provisioning succeeds (Activate). The value objects carry their own invariants, and
+    // the Role guarantees the Employee baseline, so there is nothing further to guard here.
     public static User Register(Email email, DisplayName displayName, Role role) =>
-        new(UserIdentifier.New(), email, displayName, role);
+        Register(UserIdentifier.New(), email, displayName, role);
+
+    // Registers a new account under a pre-allocated identity. The provisioning saga mints the UserId
+    // as the correlation key for the 1:1 User<->Employee link (ADR-0025), so registration honours it
+    // rather than generating its own.
+    public static User Register(
+        UserIdentifier identifier,
+        Email email,
+        DisplayName displayName,
+        Role role) =>
+        new(identifier, email, displayName, role);
 
     // Completes provisioning: links the Keycloak subject and makes the account loginable. Only a
     // Provisioning account can be activated.

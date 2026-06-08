@@ -30,6 +30,23 @@ public sealed class UserTests
     }
 
     [Fact]
+    public void Register_with_an_identifier_uses_the_supplied_identifier()
+    {
+        // The provisioning saga pre-allocates the UserId as the correlation key for the 1:1
+        // User<->Employee link (ADR-0025), so registration must honour it rather than mint a new one.
+        var identifier = UserIdentifier.New();
+
+        var user = User.Register(
+            identifier,
+            Email.From("alan@example.com"),
+            DisplayName.From("Alan Turing"),
+            Role.Employee);
+
+        user.Identifier.ShouldBe(identifier);
+        user.Status.ShouldBe(UserStatus.Provisioning);
+    }
+
+    [Fact]
     public void Register_as_administrator_is_an_administrator_and_still_an_employee()
     {
         var user = User.Register(

@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="../../libs/identity/domain/Roomy.Identity.Domain.csproj" />
+    <!-- Use-case tests (RegisterUser) and the events it publishes (ADR-0031). -->
+    <ProjectReference Include="../../libs/identity/application/Roomy.Identity.Application.csproj" />
+    <ProjectReference Include="../../libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>

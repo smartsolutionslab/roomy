@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Application;
+using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
@@ -30,5 +32,18 @@ public sealed class IdentityInfrastructureRegistrationTests
         scope.ServiceProvider.GetRequiredService<IUserRepository>().ShouldBeOfType<UserRepository>();
         scope.ServiceProvider.GetRequiredService<IIdentityProviderPort>()
             .ShouldBeOfType<KeycloakIdentityProvider>();
+    }
+
+    [Fact]
+    public void Binds_the_register_user_command_handler()
+    {
+        var services = new ServiceCollection();
+
+        services.AddIdentityUseCases();
+
+        var registration = services
+            .Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<RegisterUser>));
+        registration.ImplementationType.ShouldBe(typeof(RegisterUserHandler));
+        registration.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 }
