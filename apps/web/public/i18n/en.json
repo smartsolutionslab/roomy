@@ -1,0 +1,14 @@
+{
+  "shell": {
+    "skipToContent": "Skip to main content",
+    "appName": "Roomy",
+    "tagline": "Plan who is in which office, on which day.",
+    "languageLabel": "Language",
+    "languageEnglish": "English",
+    "languageGerman": "German"
+  },
+  "home": {
+    "title": "Welcome to Roomy",
+    "intro": "Coordinate office attendance across your teams and spaces."
+  }
+}

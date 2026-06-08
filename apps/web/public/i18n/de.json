@@ -1,0 +1,14 @@
+{
+  "shell": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "appName": "Roomy",
+    "tagline": "Planen Sie, wer an welchem Tag in welchem Büro ist.",
+    "languageLabel": "Sprache",
+    "languageEnglish": "Englisch",
+    "languageGerman": "Deutsch"
+  },
+  "home": {
+    "title": "Willkommen bei Roomy",
+    "intro": "Koordinieren Sie die Büroanwesenheit über Ihre Teams und Räume hinweg."
+  }
+}

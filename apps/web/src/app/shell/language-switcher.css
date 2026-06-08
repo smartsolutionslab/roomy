@@ -1,0 +1,32 @@
+.language-switcher__list {
+  display: flex;
+  gap: var(--roomy-space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.language-switcher__option {
+  padding: var(--roomy-space-xs) var(--roomy-space-sm);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-sm);
+  background: var(--roomy-color-surface);
+  color: var(--roomy-color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.language-switcher__option:hover {
+  border-color: var(--roomy-color-accent);
+}
+
+.language-switcher__option:focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: var(--roomy-focus-outline-offset);
+}
+
+.language-switcher__option--active {
+  border-color: var(--roomy-color-accent);
+  background: var(--roomy-color-accent);
+  color: var(--roomy-color-on-accent);
+}

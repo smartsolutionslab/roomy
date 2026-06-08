@@ -1,0 +1,19 @@
+<ng-container *transloco="let translate">
+  <a class="app__skip-link" href="#main-content">{{ translate('shell.skipToContent') }}</a>
+
+  <header class="app__header">
+    <div class="app__branding">
+      <span class="app__name">{{ translate('shell.appName') }}</span>
+      <span class="app__tagline">{{ translate('shell.tagline') }}</span>
+    </div>
+    <roomy-language-switcher />
+  </header>
+
+  <main id="main-content" class="app__main" tabindex="-1">
+    <router-outlet />
+  </main>
+
+  <footer class="app__footer">
+    <small>{{ translate('shell.appName') }}</small>
+  </footer>
+</ng-container>

@@ -1,0 +1,21 @@
+<nav
+  *transloco="let translate"
+  class="language-switcher"
+  [attr.aria-label]="translate('shell.languageLabel')"
+>
+  <ul class="language-switcher__list">
+    @for (language of languages; track language) {
+    <li>
+      <button
+        type="button"
+        class="language-switcher__option"
+        [class.language-switcher__option--active]="activeLanguage() === language"
+        [attr.aria-pressed]="activeLanguage() === language"
+        (click)="selectLanguage(language)"
+      >
+        {{ translate('shell.language' + (language === 'de' ? 'German' : 'English')) }}
+      </button>
+    </li>
+    }
+  </ul>
+</nav>
