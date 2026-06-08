@@ -36,8 +36,10 @@ public sealed class PostgresDatabaseFixture : IAsyncLifetime
         connectionString = await application.GetConnectionStringAsync(DatabaseResourceName, readiness.Token)
             ?? throw new InvalidOperationException("The Postgres resource produced no connection string.");
 
+        // Build the schema by applying the EF migrations, not EnsureCreated, so these tests also
+        // validate that the InitialCreate migration produces the mapped schema.
         await using var context = CreateContext();
-        await context.Database.EnsureCreatedAsync(readiness.Token);
+        await context.Database.MigrateAsync(readiness.Token);
     }
 
     public IdentityDbContext CreateContext()
