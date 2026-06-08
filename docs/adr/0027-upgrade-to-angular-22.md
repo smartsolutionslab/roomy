@@ -78,10 +78,9 @@ so the documentation does not drift.
 - Recurring six-month upkeep is now the baseline cadence.
 
 **Follow-ups**
-- **Unwind the override:** when `@nx/angular` publishes a release whose peer range admits
-  `@angular/build@22`, bump `@nx/*` to it, run `nx migrate`, and delete the
-  `peerDependencyRules` override. Track this as the trigger to return the workspace to a
-  fully supported state.
+- **Unwind the override** (tracked in #81): when `@nx/angular` publishes a release whose
+  peer range admits `@angular/build@22`, bump `@nx/*` to it, run `nx migrate`, and delete
+  the `peerDependencyRules` override to return the workspace to a fully supported state.
 - Evaluate Signal Forms vs. Reactive Forms for form-bearing features in their own slices
   (ADR-0020 validation policy still applies).
 - Revisit the Resource API for data-access libraries when the BFF client lands.
