@@ -1,14 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using SmartSolutionsLab.Roomy.Infrastructure.Persistence.Outbox;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 
 /// <summary>
 /// The EF Core baseline every per-service database derives from (ADR-0012, ADR-0014:
 /// database-per-service). It carries the cross-cutting persistence concerns that are identical for
-/// every context — the transactional <see cref="Outbox.OutboxMessage"/> table and the snake_case
-/// naming policy — so a context's own <c>DbContext</c> adds only its aggregates and read models.
+/// every context — currently the snake_case naming policy — so a context's own <c>DbContext</c>
+/// adds only its aggregates and read models.
 /// </summary>
+/// <remarks>
+/// The transactional outbox is <em>not</em> a table this baseline owns: Wolverine's durable
+/// transactional outbox/inbox provides it (ADR-0005, ADR-0012:76), enrolled at the composition root
+/// against this context's transaction. The earlier hand-rolled <c>OutboxMessage</c> table (#19) was
+/// retired when Wolverine took the outbox over (#20).
+/// </remarks>
 public abstract class RoomyDbContext : DbContext
 {
     protected RoomyDbContext(DbContextOptions options)
@@ -16,16 +21,11 @@ public abstract class RoomyDbContext : DbContext
     {
     }
 
-    /// <summary>The transactional outbox shared by every Roomy service database.</summary>
-    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 
         ConfigureContext(modelBuilder);
 
@@ -33,9 +33,8 @@ public abstract class RoomyDbContext : DbContext
     }
 
     /// <summary>
-    /// Override to add a context's own entity configurations. Called after the shared outbox is
-    /// mapped and <em>before</em> the snake_case policy is applied, so context tables are renamed
-    /// consistently too.
+    /// Override to add a context's own entity configurations. Called <em>before</em> the snake_case
+    /// policy is applied, so context tables are renamed consistently too.
     /// </summary>
     protected virtual void ConfigureContext(ModelBuilder modelBuilder)
     {

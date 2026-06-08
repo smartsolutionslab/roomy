@@ -1,13 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
-using SmartSolutionsLab.Roomy.Infrastructure.Persistence.Outbox;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EfCore;
 
 /// <summary>
-/// Asserts the EF model the baseline produces (ADR-0012): the events and outbox tables exist, are
+/// Asserts the EF model the baseline produces (ADR-0012): the events table exists and is
 /// snake_cased, the events table is keyed by the global sequence, and the unique
 /// <c>(stream_id, version)</c> index — the optimistic-concurrency guard — is present and unique.
 /// </summary>
@@ -26,14 +25,6 @@ public sealed class EventStoreModelTests
         var entity = BuildModel().FindEntityType(typeof(StoredEvent));
 
         Assert.Equal("events", entity!.GetTableName());
-    }
-
-    [Fact]
-    public void Outbox_table_is_snake_cased()
-    {
-        var entity = BuildModel().FindEntityType(typeof(OutboxMessage));
-
-        Assert.Equal("outbox_messages", entity!.GetTableName());
     }
 
     [Fact]
