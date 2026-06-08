@@ -23,8 +23,6 @@ public abstract class RoomyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        ArgumentNullException.ThrowIfNull(modelBuilder);
-
         base.OnModelCreating(modelBuilder);
 
         ConfigureContext(modelBuilder);

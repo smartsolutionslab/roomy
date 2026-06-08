@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 
@@ -17,8 +18,6 @@ public static class SnakeCaseNamingConvention
     /// </summary>
     public static void Apply(ModelBuilder modelBuilder)
     {
-        ArgumentNullException.ThrowIfNull(modelBuilder);
-
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             var tableName = entity.GetTableName();
@@ -69,7 +68,7 @@ public static class SnakeCaseNamingConvention
     /// </summary>
     public static string ToSnakeCase(string name)
     {
-        ArgumentException.ThrowIfNullOrEmpty(name);
+        Ensure.That(name).IsNotEmpty();
 
         var builder = new StringBuilder(name.Length + 8);
 

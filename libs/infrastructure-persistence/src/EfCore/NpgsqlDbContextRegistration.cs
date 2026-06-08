@@ -22,7 +22,7 @@ public static class NpgsqlDbContextRegistration
         string connectionString)
         where TContext : RoomyDbContext
     {
-        ArgumentNullException.ThrowIfNull(services);
+        Ensure.That((IServiceCollection?)services).IsNotNull();
         Ensure.That(connectionString).IsNotNullOrWhiteSpace();
 
         services.AddDbContext<TContext>(options =>
