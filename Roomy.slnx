@@ -55,4 +55,10 @@
   <Folder Name="/tests/identity/">
     <Project Path="tests/identity/Roomy.Identity.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/identity-integration/">
+    <Project Path="tests/identity-integration/Roomy.Identity.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/identity-integration-apphost/">
+    <Project Path="tests/identity-integration-apphost/Roomy.Identity.TestAppHost.csproj" />
+  </Folder>
 </Solution>
