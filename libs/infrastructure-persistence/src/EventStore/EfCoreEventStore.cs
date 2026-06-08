@@ -11,9 +11,9 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 /// </summary>
 /// <remarks>
 /// This is the v1 skeleton: it appends and replays. It does <em>not</em> own a transaction — the
-/// caller commits events, outbox, and inline projections together via the context's
-/// <c>SaveChanges</c>, keeping them atomic in one Postgres transaction (ADR-0012). Snapshots and
-/// async catch-up projections are deferred.
+/// caller commits events, Wolverine's durable outbox records, and inline projections together via
+/// the context's <c>SaveChanges</c>, keeping them atomic in one Postgres transaction (ADR-0012,
+/// ADR-0005). Snapshots and async catch-up projections are deferred.
 /// </remarks>
 public sealed class EfCoreEventStore : IEventStore
 {

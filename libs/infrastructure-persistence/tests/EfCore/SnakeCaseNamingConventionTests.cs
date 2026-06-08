@@ -8,7 +8,6 @@ public sealed class SnakeCaseNamingConventionTests
     [InlineData("StreamId", "stream_id")]
     [InlineData("GlobalSequence", "global_sequence")]
     [InlineData("Events", "events")]
-    [InlineData("OutboxMessages", "outbox_messages")]
     [InlineData("OccurredOnUtc", "occurred_on_utc")]
     [InlineData("ID", "id")]
     [InlineData("HTTPServer", "http_server")]
