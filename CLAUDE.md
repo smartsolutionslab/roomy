@@ -105,7 +105,8 @@ roomy/
 │  ├─ <context>/
 │  │  ├─ domain/                  # entities, aggregates, value objects, domain events  (no infra deps)
 │  │  ├─ application/             # use cases, handlers, ports
-│  │  └─ infrastructure/          # persistence, messaging, external adapters
+│  │  ├─ infrastructure/          # persistence, messaging, external adapters
+│  │  └─ contracts/              # this context's published integration events  (ADR-0031)
 │  └─ shared-kernel/              # only truly shared, stable primitives
 └─ tests/
    └─ architecture/              # NetArchTest rules enforcing the dependency rule
@@ -147,7 +148,13 @@ libs follow `@roomy/<context>-<type>` (ADR-0016).
   intra-context reactions.
 - **Cross-context communication is by ID and integration events only.** Never
   reference another context's aggregate type directly. Cross-context flows go through
-  Wolverine integration events with the transactional outbox/inbox.
+  Wolverine integration events with the transactional outbox/inbox. Each context owns the
+  events it **publishes** in a `libs/<context>/contracts` library (its *published
+  language*); consumers reference the producer's contracts library only. Contracts live
+  under the neutral `SmartSolutionsLab.Roomy.Contracts.<OwningContext>` namespace
+  (`context:shared`) and carry IDs/primitives, never domain value objects (ADR-0031). The
+  wire event is mapped to an internal command at the infrastructure edge, so `application`
+  never references another context's contracts.
 - **Each context is an independently deployable service with its own database**
   (microservices, ADR-0014). No shared database, no cross-service joins or direct DB
   access; services integrate only through async integration events. No distributed

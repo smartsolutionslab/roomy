@@ -55,3 +55,4 @@ ADRs are written **before** the implementing code, not after.
 | [0024](0024-frontend-localization-accessibility.md) | Frontend baselines: localization (Transloco, DE + EN) and WCAG 2.2 AA accessibility | Accepted |
 | [0025](0025-user-employee-provisioning-saga.md) | User/Employee provisioning across Identity and Organization | Proposed |
 | [0026](0026-attendanceday-aggregate-granularity.md) | AttendanceDay aggregate granularity (CompanyId + Date) | Proposed |
+| [0031](0031-integration-event-contract-strategy.md) | Integration-event contract strategy: per-context published language | Proposed |
