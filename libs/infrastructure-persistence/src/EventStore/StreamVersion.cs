@@ -22,7 +22,7 @@ public readonly record struct StreamVersion
     /// <summary>Creates a version from a non-negative number.</summary>
     public static StreamVersion From(int value)
     {
-        Ensure.That(value).Satisfies(static v => v >= 0, "Stream version must not be negative.");
+        Ensure.That(value).Satisfies(static version => version >= 0, "Stream version must not be negative.");
         return new StreamVersion(value);
     }
 
