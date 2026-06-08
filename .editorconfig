@@ -311,3 +311,8 @@ dotnet_naming_rule.locals_and_parameters_are_camel_case.severity = warning
 dotnet_naming_rule.local_functions_are_pascal_case.symbols = local_functions
 dotnet_naming_rule.local_functions_are_pascal_case.style = pascal_case
 dotnet_naming_rule.local_functions_are_pascal_case.severity = warning
+
+# EF Core migrations are tool-scaffolded. Treat them as generated code so the style analyzers and
+# `dotnet format` leave them as EF emits them (block-scoped namespaces, #nullable disable, etc.).
+[**/Migrations/*.cs]
+generated_code = true

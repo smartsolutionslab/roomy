@@ -7,11 +7,21 @@
 
   <ItemGroup>
     <!--
-      The identity context host (ADR-0014). This is the composition root: the context's
-      application/infrastructure layers are wired in here as the slices that need them land
-      (T009-T012). For now it stands up with the shared service defaults and a health endpoint.
+      The identity context host (ADR-0014). This is the composition root: it wires the context's
+      infrastructure adapters (EF Core persistence + the Keycloak provider) and the Wolverine
+      messaging backbone behind the shared service defaults, and exposes the health endpoints.
     -->
     <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core design-time tooling: used only by `dotnet ef` against the design-time factory. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
