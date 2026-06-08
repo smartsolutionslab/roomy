@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
+import { SessionService } from './session/session.service';
 import { LanguageSwitcher } from './shell/language-switcher';
 
 @Component({
@@ -16,10 +17,15 @@ import { LanguageSwitcher } from './shell/language-switcher';
 export class App {
   private readonly document = inject(DOCUMENT);
   private readonly transloco = inject(TranslocoService);
+  private readonly session = inject(SessionService);
+
+  protected readonly currentUser = this.session.currentUser;
 
   constructor() {
     this.transloco.langChanges$
       .pipe(takeUntilDestroyed())
       .subscribe((language) => this.document.documentElement.setAttribute('lang', language));
+
+    this.session.load();
   }
 }
