@@ -5,7 +5,10 @@
     "tagline": "Planen Sie, wer an welchem Tag in welchem Büro ist.",
     "languageLabel": "Sprache",
     "languageEnglish": "Englisch",
-    "languageGerman": "Deutsch"
+    "languageGerman": "Deutsch",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "signedInAs": "Angemeldet als {{name}}"
   },
   "home": {
     "title": "Willkommen bei Roomy",

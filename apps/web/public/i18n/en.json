@@ -5,7 +5,10 @@
     "tagline": "Plan who is in which office, on which day.",
     "languageLabel": "Language",
     "languageEnglish": "English",
-    "languageGerman": "German"
+    "languageGerman": "German",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as {{name}}"
   },
   "home": {
     "title": "Welcome to Roomy",

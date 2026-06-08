@@ -6,6 +6,16 @@
       <span class="app__name">{{ translate('shell.appName') }}</span>
       <span class="app__tagline">{{ translate('shell.tagline') }}</span>
     </div>
+    <div class="app__session">
+      @if (currentUser(); as user) {
+      <span class="app__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
+      <form class="app__signout" method="post" action="/bff/logout">
+        <button type="submit">{{ translate('shell.signOut') }}</button>
+      </form>
+      } @else {
+      <a class="app__signin" href="/bff/login?returnUrl=/">{{ translate('shell.signIn') }}</a>
+      }
+    </div>
     <roomy-language-switcher />
   </header>
 

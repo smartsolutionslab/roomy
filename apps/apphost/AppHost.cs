@@ -58,6 +58,18 @@ var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, admi
     .WithRealmImport("../gateway/keycloak")
     .WithLifetime(ContainerLifetime.Persistent);
 
+// --- Angular SPA (ADR-0030) --------------------------------------------------------
+// The gateway is the single browser-facing origin; it proxies the non-API routes to this
+// Angular dev server (hot reload in dev). Hosted via core Aspire AddExecutable — the NodeJs
+// hosting integration still lags the 13.x line (ADR-0030, ADR-0027). A fixed dev port keeps
+// the gateway's proxy target and the OIDC redirect URIs stable.
+builder.AddExecutable(
+        "web",
+        OperatingSystem.IsWindows() ? "pnpm.cmd" : "pnpm",
+        "../..",
+        "nx", "serve", "web", "--port", "4200", "--host", "127.0.0.1")
+    .WithHttpEndpoint(port: 4200, targetPort: 4200, isProxied: false);
+
 // --- YARP gateway / BFF (ADR-0013, ADR-0018) ---------------------------------------
 // The single public entry point. It is the confidential OIDC client (BFF security
 // pattern): it holds the session server-side, hands the browser only a cookie, and
