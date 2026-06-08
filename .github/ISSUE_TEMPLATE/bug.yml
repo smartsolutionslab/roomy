@@ -1,0 +1,41 @@
+name: Bug
+description: Something behaves incorrectly. A fix starts with a failing test that reproduces it.
+title: "bug: <short summary>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        "Fix X" means "write a test that reproduces X, then make it green" (see `CLAUDE.md`).
+        Give enough detail to reproduce.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The observed, incorrect behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Affected area / bounded context, environment, versions, logs, screenshots.
+    validations:
+      required: false
