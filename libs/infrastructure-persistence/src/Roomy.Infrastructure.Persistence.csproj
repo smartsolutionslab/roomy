@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Infrastructure.Persistence</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Infrastructure.Persistence</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      EF Core 10 (GA) is the persistence baseline (ADR-0012). The matching Npgsql provider for
+      EF 10 is the GA 10.0.x line; the 11.x provider targets the EF 11 preview (net11.0) and is
+      deliberately not used here.
+    -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+  </ItemGroup>
+
+</Project>

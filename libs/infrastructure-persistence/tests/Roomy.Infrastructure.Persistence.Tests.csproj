@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../src/Roomy.Infrastructure.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      SQLite is the Docker-free relational provider used for the unit tests: it exercises the real
+      EF model, the unique (stream_id, version) index, and append/replay end to end without a
+      PostgreSQL server. Postgres-only behaviour (jsonb storage, bigserial identity) is verified by
+      Docker-backed integration tests, which are out of this Docker-less environment's reach.
+    -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
