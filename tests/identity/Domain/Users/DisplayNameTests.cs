@@ -20,17 +20,17 @@ public sealed class DisplayNameTests
     }
 
     [Fact]
-    public void TryFrom_returns_the_trimmed_name()
+    public void TryParse_returns_the_trimmed_name()
     {
-        DisplayName.TryFrom("  Ada  ").ShouldBe(DisplayName.From("Ada"));
+        DisplayName.TryParse("  Ada  ").ShouldBe(DisplayName.From("Ada"));
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void TryFrom_returns_null_for_blank_input(string candidate)
+    public void TryParse_returns_null_for_blank_input(string candidate)
     {
-        DisplayName.TryFrom(candidate).ShouldBeNull();
+        DisplayName.TryParse(candidate).ShouldBeNull();
     }
 
     [Fact]

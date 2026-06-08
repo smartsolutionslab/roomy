@@ -10,10 +10,10 @@ public readonly record struct KeycloakSubjectIdentifier : IValueObject
     public Guid Value { get; private init; }
 
     public static KeycloakSubjectIdentifier From(Guid value) =>
-        TryFrom(value)
+        TryParse(value)
         ?? throw new ArgumentException("KeycloakSubjectIdentifier must not be empty.", nameof(value));
 
-    public static KeycloakSubjectIdentifier? TryFrom(Guid value)
+    public static KeycloakSubjectIdentifier? TryParse(Guid value)
     {
         if (value == Guid.Empty) return null;
         return new() { Value = value };

@@ -20,17 +20,17 @@ public sealed class KeycloakSubjectIdentifierTests
     }
 
     [Fact]
-    public void TryFrom_returns_null_for_the_empty_guid()
+    public void TryParse_returns_null_for_the_empty_guid()
     {
-        KeycloakSubjectIdentifier.TryFrom(Guid.Empty).ShouldBeNull();
+        KeycloakSubjectIdentifier.TryParse(Guid.Empty).ShouldBeNull();
     }
 
     [Fact]
-    public void TryFrom_returns_the_identifier_for_a_valid_value()
+    public void TryParse_returns_the_identifier_for_a_valid_value()
     {
         var value = Guid.NewGuid();
 
-        KeycloakSubjectIdentifier.TryFrom(value).ShouldBe(KeycloakSubjectIdentifier.From(value));
+        KeycloakSubjectIdentifier.TryParse(value).ShouldBe(KeycloakSubjectIdentifier.From(value));
     }
 
     [Fact]

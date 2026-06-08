@@ -60,8 +60,8 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   where appropriate — and implement the `IValueObject` marker (`shared-kernel`). Enums are
   inherently value types and are exempt.
 - Value objects are created through a validating factory: **`From(raw)`** throws on invalid
-  input and **`TryFrom(raw)`** returns the value object or `null` (never throws); `From` is
-  simply `TryFrom(raw) ?? throw`. Value objects **composed** of several values use **`Of(…)`**
+  input and **`TryParse(raw)`** returns the value object or `null` (never throws); `From` is
+  simply `TryParse(raw) ?? throw`. Value objects **composed** of several values use **`Of(…)`**
   / **`TryOf(…)`** instead. (Behavioural value objects with their own domain factories — e.g.
   `Role.Employee` — and enums take no parse factory.)
 - **Identifiers** are branded GUID value objects generated with `Guid.CreateVersion7()`

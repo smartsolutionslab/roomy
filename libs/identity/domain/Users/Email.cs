@@ -13,9 +13,9 @@ public sealed partial record Email : IValueObject
     private Email(string value) => Value = value;
 
     public static Email From(string value) =>
-        TryFrom(value) ?? throw new ArgumentException("Email is not a valid address.", nameof(value));
+        TryParse(value) ?? throw new ArgumentException("Email is not a valid address.", nameof(value));
 
-    public static Email? TryFrom(string value)
+    public static Email? TryParse(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
 
