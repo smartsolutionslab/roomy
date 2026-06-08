@@ -4,6 +4,9 @@
     <Project Path="apps/apphost/Roomy.AppHost.csproj" />
   </Folder>
   <Folder Name="/libs/" />
+  <Folder Name="/libs/application-contracts/">
+    <Project Path="libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
+  </Folder>
   <Folder Name="/libs/service-defaults/">
     <Project Path="libs/service-defaults/Roomy.ServiceDefaults.csproj" />
   </Folder>
