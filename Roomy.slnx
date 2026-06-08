@@ -52,4 +52,7 @@
   <Folder Name="/tests/architecture/">
     <Project Path="tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj" />
   </Folder>
+  <Folder Name="/tests/identity/">
+    <Project Path="tests/identity/Roomy.Identity.Tests.csproj" />
+  </Folder>
 </Solution>

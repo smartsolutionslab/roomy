@@ -42,9 +42,9 @@ description: "Task list for Identity & Access (001)"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 [P] Write architecture tests (NetArchTest) in `tests/architecture/IdentityArchitectureTests.cs`: `domain` depends on nothing; `application` depends only on `domain`; no MediatR; no framework types (Wolverine/EF/ASP.NET) in `domain`/`application`. (RED — guards all later code.)
-- [ ] T005 [P] Write failing unit tests for value objects in `tests/identity/Domain/ValueObjects/` — `Email` (valid/normalized/equality), `UserId`, `DisplayName`, `Role` (Employee base + Administrator elevation), `KeycloakSubjectId`, `UserStatus`.
-- [ ] T006 [P] Implement the value objects in `libs/identity/domain/ValueObjects/` (invariants via `Ensure.That(...)`) to make T005 pass.
+- [x] T004 [P] Architecture rules for `identity`: covered by the existing convention-based suite (`LayerDependencyConventionTests`, `NoMediatRTests`), which now **actively enforces** the identity `domain` (no longer dormant) since the value objects exist — domain depends on nothing but the shared kernel, no framework/MediatR. No separate `IdentityArchitectureTests.cs` is needed.
+- [x] T005 [P] Failing unit tests for value objects in `tests/identity/Domain/ValueObjects/` — `UserId`, `KeycloakSubjectId`, `Email` (normalized/validated/equality), `DisplayName`, `Role` (Employee base + Administrator elevation). `UserStatus` is a closed enum with no behaviour to unit-test (its `Provisioning → Active` transition is an aggregate invariant, T007-T008). 24 tests, RED-verified before T006.
+- [x] T006 [P] Value objects implemented in `libs/identity/domain/ValueObjects/` (invariants via `Ensure.That(...)`); branded-GUID ids, normalized `Email`, `Role` elevation. T005 green.
 - [ ] T007 Write failing unit tests for the `User` aggregate invariants in `tests/identity/Domain/UserTests.cs` — email uniqueness guard, every user holds Employee role, `Provisioning → Active` transition.
 - [ ] T008 Implement the `User` aggregate (identity, fields, invariants; no story behaviours yet) in `libs/identity/domain/User.cs` to pass T007.
 - [ ] T009 Define application ports and owned dispatch in `libs/identity/application/` — `IUserRepository`, `IIdentityProviderPort` (Keycloak), `IIntegrationEventPublisher`, command/query handler abstractions (no MediatR).
