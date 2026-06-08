@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
@@ -26,9 +27,16 @@ public static class MessagingServiceCollectionExtensions
     /// </summary>
     /// <param name="builder">The host application builder (composition root).</param>
     /// <param name="options">The resolved messaging options (transport + connection strings).</param>
+    /// <param name="handlerAssemblies">
+    /// Assemblies Wolverine should scan for message handlers/consumers (e.g. a context's
+    /// infrastructure assembly that consumes another context's integration events). Wolverine always
+    /// scans the entry assembly; a context's consumers live in its own assembly, so they are included
+    /// here. Optional — pass none for a publish-only host.
+    /// </param>
     public static IHostApplicationBuilder AddRoomyMessaging(
         this IHostApplicationBuilder builder,
-        MessagingOptions options)
+        MessagingOptions options,
+        params Assembly[] handlerAssemblies)
     {
         Ensure.That((IHostApplicationBuilder?)builder).IsNotNull();
         Ensure.That((MessagingOptions?)options).IsNotNull();
@@ -45,6 +53,11 @@ public static class MessagingServiceCollectionExtensions
             wolverine.Policies.AutoApplyTransactions();
             wolverine.Policies.UseDurableOutboxOnAllSendingEndpoints();
             wolverine.Policies.UseDurableInboxOnAllListeners();
+
+            foreach (var handlerAssembly in handlerAssemblies)
+            {
+                wolverine.Discovery.IncludeAssembly(handlerAssembly);
+            }
 
             ConfigureTransport(wolverine, options);
         });
