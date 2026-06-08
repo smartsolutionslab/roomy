@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__aspire__list_console_logs",
+      "mcp__aspire__list_resources",
+      "mcp__aspire__list_apphosts"
+    ]
+  }
+}
