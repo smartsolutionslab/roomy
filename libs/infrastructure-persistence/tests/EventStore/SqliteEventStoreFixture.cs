@@ -6,9 +6,10 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
 
 /// <summary>
 /// Spins up an isolated, file-less SQLite database (kept alive by an open in-memory connection) and
-/// creates the schema from the EF model. Lets the event-store tests run against a real relational
-/// provider with a real unique index — and therefore real optimistic-concurrency enforcement — with
-/// no Docker or external server.
+/// creates the schema from the EF model. Lets the event-store tests run append/replay and the
+/// in-code version check against a real relational provider with a real unique index, with no Docker
+/// or external server. It does not reproduce a true concurrent write race — the DB-level
+/// unique-violation guard (Postgres 23505) is covered by a Testcontainers test (#67).
 /// </summary>
 internal sealed class SqliteEventStoreFixture : IDisposable
 {
