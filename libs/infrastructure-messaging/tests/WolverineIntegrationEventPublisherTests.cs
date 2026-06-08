@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using Wolverine;
 using Wolverine.Tracking;
@@ -38,7 +39,7 @@ public sealed class WolverineIntegrationEventPublisherTests
             .ExecuteAndWaitAsync(_ => publisher.PublishAsync(integrationEvent, CancellationToken.None));
 
         var published = session.Sent.SingleMessage<TestIntegrationEvent>();
-        Assert.Equal(integrationEvent, published);
+        published.ShouldBe(integrationEvent);
     }
 
     [Fact]
@@ -47,7 +48,7 @@ public sealed class WolverineIntegrationEventPublisherTests
         using var host = await StartHostAsync();
         var publisher = new WolverineIntegrationEventPublisher(host.Services.GetRequiredService<IMessageBus>());
 
-        await Assert.ThrowsAsync<ArgumentNullException>(
+        await Should.ThrowAsync<ArgumentNullException>(
             () => publisher.PublishAsync(null!, CancellationToken.None));
     }
 
@@ -59,13 +60,13 @@ public sealed class WolverineIntegrationEventPublisherTests
         using var cancelled = new CancellationTokenSource();
         await cancelled.CancelAsync();
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        await Should.ThrowAsync<OperationCanceledException>(
             () => publisher.PublishAsync(new TestIntegrationEvent(Guid.NewGuid()), cancelled.Token));
     }
 
     [Fact]
     public void Constructor_throws_when_the_bus_is_null()
     {
-        Assert.Throws<ArgumentNullException>(() => new WolverineIntegrationEventPublisher(null!));
+        Should.Throw<ArgumentNullException>(() => new WolverineIntegrationEventPublisher(null!));
     }
 }

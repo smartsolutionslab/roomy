@@ -1,3 +1,4 @@
+using Shouldly;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
@@ -17,7 +18,7 @@ public sealed class JsonEventSerializerTests
 
         var serialized = serializer.Serialize(new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8)));
 
-        Assert.Equal("desk-booked", serialized.TypeName);
+        serialized.TypeName.ShouldBe("desk-booked");
     }
 
     [Fact]
@@ -29,7 +30,7 @@ public sealed class JsonEventSerializerTests
         var serialized = serializer.Serialize(original);
         var restored = serializer.Deserialize(serialized.TypeName, serialized.Payload);
 
-        Assert.Equal(original, restored);
+        restored.ShouldBe(original);
     }
 
     [Fact]
@@ -37,6 +38,6 @@ public sealed class JsonEventSerializerTests
     {
         var serializer = CreateSerializer();
 
-        Assert.Throws<UnknownEventTypeException>(() => serializer.Deserialize("unknown", "{}"));
+        Should.Throw<UnknownEventTypeException>(() => serializer.Deserialize("unknown", "{}"));
     }
 }

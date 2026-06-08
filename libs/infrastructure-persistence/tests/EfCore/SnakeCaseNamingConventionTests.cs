@@ -1,3 +1,4 @@
+using Shouldly;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EfCore;
@@ -13,18 +14,18 @@ public sealed class SnakeCaseNamingConventionTests
     [InlineData("HTTPServer", "http_server")]
     public void Converts_pascal_case_to_snake_case(string input, string expected)
     {
-        Assert.Equal(expected, SnakeCaseNamingConvention.ToSnakeCase(input));
+        SnakeCaseNamingConvention.ToSnakeCase(input).ShouldBe(expected);
     }
 
     [Fact]
     public void Leaves_existing_underscores_intact()
     {
-        Assert.Equal("ux_events_stream_id_version", SnakeCaseNamingConvention.ToSnakeCase("UX_Events_StreamId_Version"));
+        SnakeCaseNamingConvention.ToSnakeCase("UX_Events_StreamId_Version").ShouldBe("ux_events_stream_id_version");
     }
 
     [Fact]
     public void Throws_for_an_empty_name()
     {
-        Assert.Throws<ArgumentException>(() => SnakeCaseNamingConvention.ToSnakeCase(string.Empty));
+        Should.Throw<ArgumentException>(() => SnakeCaseNamingConvention.ToSnakeCase(string.Empty));
     }
 }

@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -22,9 +23,7 @@ public sealed class InfrastructureMessagingConventionTests
     [Fact]
     public void InfrastructureMessaging_is_discovered_by_the_convention_rule_set()
     {
-        Assert.Contains(
-            RoomyAssemblies.All,
-            assembly => assembly == ArchitectureConventions.InfrastructureMessagingAssembly);
+        RoomyAssemblies.All.ShouldContain(ArchitectureConventions.InfrastructureMessagingAssembly);
     }
 
     [Fact]
@@ -35,8 +34,7 @@ public sealed class InfrastructureMessagingConventionTests
             .NotHaveDependencyOn("MediatR")
             .GetResult();
 
-        Assert.True(
-            result.IsSuccessful,
+        result.IsSuccessful.ShouldBeTrue(
             SharedKernelPurityTests.FailureMessage(
                 "messaging infrastructure must not depend on MediatR (ADR-0005)",
                 result));
@@ -54,6 +52,6 @@ public sealed class InfrastructureMessagingConventionTests
             .HaveDependencyOn("Wolverine")
             .GetTypes();
 
-        Assert.NotEmpty(dependsOnWolverine);
+        dependsOnWolverine.ShouldNotBeEmpty();
     }
 }

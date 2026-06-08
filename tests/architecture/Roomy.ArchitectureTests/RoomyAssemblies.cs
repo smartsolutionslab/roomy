@@ -58,8 +58,8 @@ internal static class RoomyAssemblies
         }
 
         return seen.Values
-            .Where(a => a != Assembly.GetExecutingAssembly())
-            .OrderBy(a => a.GetName().Name, StringComparer.Ordinal)
+            .Where(assembly => assembly != Assembly.GetExecutingAssembly())
+            .OrderBy(assembly => assembly.GetName().Name, StringComparer.Ordinal)
             .ToArray();
 
         void Enqueue(Assembly assembly)

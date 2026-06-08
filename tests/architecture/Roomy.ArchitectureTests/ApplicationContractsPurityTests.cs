@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -19,8 +20,7 @@ public sealed class ApplicationContractsPurityTests
             .NotHaveDependencyOnAny(ArchitectureConventions.ForbiddenFrameworkNamespaces)
             .GetResult();
 
-        Assert.True(
-            result.IsSuccessful,
+        result.IsSuccessful.ShouldBeTrue(
             SharedKernelPurityTests.FailureMessage(
                 "application contracts must not depend on MediatR, Wolverine, EF Core, ASP.NET Core, or YARP",
                 result));
@@ -29,8 +29,6 @@ public sealed class ApplicationContractsPurityTests
     [Fact]
     public void ApplicationContracts_is_discovered_by_the_convention_rule_set()
     {
-        Assert.Contains(
-            RoomyAssemblies.All,
-            assembly => assembly == ArchitectureConventions.ApplicationContractsAssembly);
+        RoomyAssemblies.All.ShouldContain(ArchitectureConventions.ApplicationContractsAssembly);
     }
 }

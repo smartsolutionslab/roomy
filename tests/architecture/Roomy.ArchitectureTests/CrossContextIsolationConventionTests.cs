@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -43,8 +44,7 @@ public sealed class CrossContextIsolationConventionTests
                     .HaveDependencyOnAny(otherContextNamespaces)
                     .GetResult();
 
-                Assert.True(
-                    result.IsSuccessful,
+                result.IsSuccessful.ShouldBeTrue(
                     SharedKernelPurityTests.FailureMessage(
                         $"context '{context}' must not reference another context's types",
                         result));
@@ -54,8 +54,8 @@ public sealed class CrossContextIsolationConventionTests
         if (inspectedContextTypes == 0)
         {
             // DORMANT: no context assemblies present yet; rule is wired for when they arrive.
-            Assert.True(
-                true,
+            inspectedContextTypes.ShouldBe(
+                0,
                 "Forward-looking cross-context isolation rule is dormant: 0 context types found "
                 + $"across {RoomyAssemblies.All.Count} Roomy assembly(ies).");
         }

@@ -1,3 +1,4 @@
+using Shouldly;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
@@ -11,7 +12,7 @@ public sealed class EventTypeRegistryTests
             .Register<DeskBooked>("desk-booked")
             .Build();
 
-        Assert.Equal("desk-booked", registry.GetName(typeof(DeskBooked)));
+        registry.GetName(typeof(DeskBooked)).ShouldBe("desk-booked");
     }
 
     [Fact]
@@ -21,7 +22,7 @@ public sealed class EventTypeRegistryTests
             .Register<DeskBooked>("desk-booked")
             .Build();
 
-        Assert.Equal(typeof(DeskBooked), registry.Resolve("desk-booked"));
+        registry.Resolve("desk-booked").ShouldBe(typeof(DeskBooked));
     }
 
     [Fact]
@@ -29,7 +30,7 @@ public sealed class EventTypeRegistryTests
     {
         var registry = EventTypeRegistry.Create().Build();
 
-        Assert.Throws<UnknownEventTypeException>(() => registry.GetName(typeof(DeskBooked)));
+        Should.Throw<UnknownEventTypeException>(() => registry.GetName(typeof(DeskBooked)));
     }
 
     [Fact]
@@ -37,7 +38,7 @@ public sealed class EventTypeRegistryTests
     {
         var registry = EventTypeRegistry.Create().Build();
 
-        Assert.Throws<UnknownEventTypeException>(() => registry.Resolve("unknown"));
+        Should.Throw<UnknownEventTypeException>(() => registry.Resolve("unknown"));
     }
 
     [Fact]
@@ -45,7 +46,7 @@ public sealed class EventTypeRegistryTests
     {
         var builder = EventTypeRegistry.Create().Register<DeskBooked>("desk-booked");
 
-        Assert.Throws<ArgumentException>(() => builder.Register<DeskBooked>("other-name"));
+        Should.Throw<ArgumentException>(() => builder.Register<DeskBooked>("other-name"));
     }
 
     [Fact]
@@ -53,6 +54,6 @@ public sealed class EventTypeRegistryTests
     {
         var builder = EventTypeRegistry.Create().Register<DeskBooked>("desk-booked");
 
-        Assert.Throws<ArgumentException>(() => builder.Register<DeskReleased>("desk-booked"));
+        Should.Throw<ArgumentException>(() => builder.Register<DeskReleased>("desk-booked"));
     }
 }
