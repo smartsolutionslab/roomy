@@ -29,6 +29,10 @@ specific conventions (test naming, AAA, builders, runners) live in
 Contract tests are what let the e2e layer stay thin: they catch integration breakage
 cheaply at the seams, so e2e is reserved for genuine end-to-end journeys.
 
+**Assertions.** .NET tests assert with **Shouldly** (free, MIT) — `actual.ShouldBe(expected)`,
+`Should.Throw<T>(...)` — for readable failures, not raw xUnit `Assert.*`. FluentAssertions v8
+is a paid commercial license and is **not** used. TS/Angular tests use Vitest's built-in `expect`.
+
 ## E2e (Playwright)
 
 - **Thin and critical-path only** — e.g. log in → book a desk → see attendance. Not

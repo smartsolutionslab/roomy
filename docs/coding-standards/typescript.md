@@ -22,6 +22,8 @@ are tool-enforced). Frontend feature libraries mirror the backend bounded contex
 - Signals are named for the value they hold (`count`, not `countSignal`).
 - Observables carry a `$` suffix (`users$`) — only where RxJS is actually used.
 - Names reveal intent; this takes priority over comments.
+- No single-letter or shortcut names, **including lambda / callback / array-method
+  parameters** (`storedEvent`, not `e` / `x` / `s`).
 
 ## Types
 
@@ -65,14 +67,19 @@ catch.
 ## Comments & documentation
 
 - Same policy as C#: only when needed, *why* not *what*, rename rather than comment.
-- JSDoc only on the exported public API of shared libraries.
+- JSDoc only on the exported public API of shared libraries; no ceremonial JSDoc that
+  merely echoes a name. Default to no comment.
 - No commented-out code; `// TODO:` references a tracking issue.
 
 ## Functions & modules
 
-- Small, focused, pure where possible; early returns.
+- Small, focused, pure where possible; early returns. A single-statement guard may be one
+  line (`if (!user) return;` / `if (invalid) throw new Error(...)`); braces for multi-line bodies.
 - No boolean behaviour-switch parameter — use an options object or separate functions.
 - Named exports only; no default exports.
+- One public type per file (one Angular component / directive / service / store per file),
+  the file named for it with its role suffix. Closely-related generic overloads of the same
+  concept may share a file (mirrors the C# rule).
 - Each library exposes a single public entry (`index.ts`); no deep imports into another
   library's internals. ⚙
 
