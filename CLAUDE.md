@@ -246,6 +246,11 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   lambda/LINQ parameters.
 - **No primitive obsession** — domain concepts are types, not raw primitives: C# value
   objects (invariants enforced with `Ensure.That(...)`) and TypeScript branded types.
+- **Domain modelling** — organize the domain **by aggregate** (a folder + namespace per
+  aggregate holds the root, its value objects, **and its repository interface**). Identifiers
+  are GUIDv7 branded types named `…Identifier` (never `…Id`) with implicit `Guid` conversions
+  for EF Core. Value objects implement `IValueObject`; aggregate roots `IAggregate`, other
+  entities `IEntity` (markers in `shared-kernel`).
 - **Guard with `Ensure`, not `ArgumentNullException`** — lean on NRT; keep runtime guards
   only at trust boundaries and write them `Ensure.That(x).IsNotNull()`, never
   `ArgumentNullException.ThrowIfNull(...)` / the `ThrowIf*` helpers.

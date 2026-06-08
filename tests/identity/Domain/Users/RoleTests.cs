@@ -1,7 +1,7 @@
 using Shouldly;
-using SmartSolutionsLab.Roomy.Identity.Domain.ValueObjects;
+using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
-namespace SmartSolutionsLab.Roomy.Identity.Tests.Domain.ValueObjects;
+namespace SmartSolutionsLab.Roomy.Identity.Tests.Domain.Users;
 
 public sealed class RoleTests
 {

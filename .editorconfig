@@ -218,8 +218,9 @@ csharp_space_before_open_square_brackets = false
 csharp_space_between_empty_square_brackets = false
 csharp_space_between_square_brackets = false
 
-# Wrapping.
-csharp_preserve_single_line_statements = false
+# Wrapping. Keep single-statement guards on one line (`if (x) return;`); `prefer_braces =
+# when_multiline` then requires braces for any body that spans two or more lines.
+csharp_preserve_single_line_statements = true
 csharp_preserve_single_line_blocks = true
 
 #### Naming conventions ####
