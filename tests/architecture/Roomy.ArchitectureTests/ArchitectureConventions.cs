@@ -1,4 +1,5 @@
 using System.Reflection;
+using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
@@ -46,4 +47,11 @@ internal static class ArchitectureConventions
     /// inspection without depending on reflection-by-name (which a typo could silently break).
     /// </summary>
     internal static Assembly SharedKernelAssembly => typeof(Ensure).Assembly;
+
+    /// <summary>
+    /// A live anchor type inside the owned application-contracts assembly. Referencing it by type
+    /// forces the assembly to load so the convention rules genuinely inspect it (#18, ADR-0005),
+    /// rather than relying on it happening to be loaded.
+    /// </summary>
+    internal static Assembly ApplicationContractsAssembly => typeof(IIntegrationEventPublisher).Assembly;
 }

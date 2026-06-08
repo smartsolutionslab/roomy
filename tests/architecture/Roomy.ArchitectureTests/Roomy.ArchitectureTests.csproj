@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../../libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
     <ProjectReference Include="../../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
   </ItemGroup>
 
