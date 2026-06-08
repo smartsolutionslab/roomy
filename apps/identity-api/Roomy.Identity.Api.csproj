@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Identity.Api</RootNamespace>
+    <AssemblyName>Roomy.Identity.Api</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The identity context host (ADR-0014). This is the composition root: the context's
+      application/infrastructure layers are wired in here as the slices that need them land
+      (T009-T012). For now it stands up with the shared service defaults and a health endpoint.
+    -->
+    <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

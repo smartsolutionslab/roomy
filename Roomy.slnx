@@ -9,9 +9,22 @@
   <Folder Name="/apps/gateway/tests/">
     <Project Path="apps/gateway/tests/Roomy.Gateway.Tests.csproj" />
   </Folder>
+  <Folder Name="/apps/identity-api/">
+    <Project Path="apps/identity-api/Roomy.Identity.Api.csproj" />
+  </Folder>
   <Folder Name="/libs/" />
   <Folder Name="/libs/application-contracts/">
     <Project Path="libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/libs/identity/" />
+  <Folder Name="/libs/identity/domain/">
+    <Project Path="libs/identity/domain/Roomy.Identity.Domain.csproj" />
+  </Folder>
+  <Folder Name="/libs/identity/application/">
+    <Project Path="libs/identity/application/Roomy.Identity.Application.csproj" />
+  </Folder>
+  <Folder Name="/libs/identity/infrastructure/">
+    <Project Path="libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/libs/infrastructure-messaging/src/">
     <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
