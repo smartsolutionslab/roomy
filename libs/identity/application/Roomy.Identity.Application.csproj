@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Identity.Application</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Identity.Application</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../domain/Roomy.Identity.Domain.csproj" />
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

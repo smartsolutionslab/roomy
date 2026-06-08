@@ -8,6 +8,14 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
+    <!--
+      The identity context layers (#13, CLAUDE.md): referenced so the convention-based rules
+      genuinely load and inspect them. Without this the layer rules would pass vacuously for
+      identity. The layers are empty today; the conventions activate as types are added.
+    -->
+    <ProjectReference Include="../../../libs/identity/domain/Roomy.Identity.Domain.csproj" />
+    <ProjectReference Include="../../../libs/identity/application/Roomy.Identity.Application.csproj" />
+    <ProjectReference Include="../../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="../../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />

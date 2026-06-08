@@ -32,9 +32,9 @@ description: "Task list for Identity & Access (001)"
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Create the identity context structure — `libs/identity/domain`, `libs/identity/application`, `libs/identity/infrastructure`, host `apps/identity-api`, test projects `tests/identity` and `tests/architecture` — and add them to the .NET solution and Nx workspace.
-- [ ] T002 [P] Add Nx tags + module-boundary rules for `identity` (enforce domain←application←infrastructure) in the workspace lint config.
-- [ ] T003 [P] Add `Directory.Build.props` settings inheritance for the new projects (nullable on, warnings-as-errors, root namespace `SmartSolutionsLab.Roomy.Identity`).
+- [x] T001 Create the identity context structure — `libs/identity/domain`, `libs/identity/application`, `libs/identity/infrastructure`, host `apps/identity-api`, and the `tests/architecture` wiring — added to `Roomy.slnx`. (`tests/identity` is created in the first Phase 2 slice alongside its initial tests, to avoid an empty test project.)
+- [x] T002 [P] Boundary enforcement for `identity`: the .NET side is the convention-based architecture tests, which now load and inspect the identity `domain`/`application`/`infrastructure` assemblies (referenced from `Roomy.ArchitectureTests`). The Nx/`eslint` boundary rules cover the JS/TS frontend libs only; the `context:identity` tag is added when the first identity feature lib lands.
+- [x] T003 [P] `Directory.Build.props` inheritance confirmed for the new projects (net10.0, nullable on, warnings-as-errors); per-project root namespace `SmartSolutionsLab.Roomy.Identity.*` set in each csproj.
 
 ---
 
