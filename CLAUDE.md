@@ -241,9 +241,17 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
 `docs/coding-standards/typescript.md`. The load-bearing highlights, repeated here:
 
 - **Names reveal intent; comments only when needed** — a comment explains *why*, never
-  *what*. If you need a comment to explain *what*, rename instead.
+  *what*; if you need one to explain *what*, rename instead. Default to **no comment**; no
+  ceremonial XML/JSDoc that echoes a name. No abbreviations or single-letter names, including
+  lambda/LINQ parameters.
 - **No primitive obsession** — domain concepts are types, not raw primitives: C# value
   objects (invariants enforced with `Ensure.That(...)`) and TypeScript branded types.
+- **Guard with `Ensure`, not `ArgumentNullException`** — lean on NRT; keep runtime guards
+  only at trust boundaries and write them `Ensure.That(x).IsNotNull()`, never
+  `ArgumentNullException.ThrowIfNull(...)` / the `ThrowIf*` helpers.
+- **One type per file** (a generic + non-generic overload of one concept may share a file);
+  a single-statement guard clause may be one line without braces (`if (x) return;`).
+- **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`.
 - **No framework in `domain`/`application`** — owned abstractions only (ADR-0005).
 - **C#:** root namespace `SmartSolutionsLab.Roomy` · file-scoped namespaces · `nullable`
   on · warnings-as-errors · async all the way with `CancellationToken` · constructor

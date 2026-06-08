@@ -10,7 +10,9 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - Target .NET 10, latest C# language version.
 - `Nullable` enabled solution-wide; nullable warnings are errors.
 - Warnings treated as errors; .NET analyzers at the latest analysis level.
-- File-scoped namespaces. One top-level type per file; file name matches the type.
+- File-scoped namespaces. One top-level type per file; the file name matches the type. Sole
+  exception: a non-generic type and the generic overload of the same concept may share a file
+  (e.g. `ICommand` + `ICommand<TResult>`, `ICommandHandler<T>` + `ICommandHandler<T, TResult>`).
 - **Root namespace `SmartSolutionsLab.Roomy`** (pattern `SmartSolutionsLab.{ProjectName}`);
   per-project namespaces extend it following the folder structure, e.g.
   `SmartSolutionsLab.Roomy.SharedKernel.Guards`. Set via `<RootNamespace>` in
@@ -30,6 +32,8 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - Booleans read as predicates: `Is…`, `Has…`, `Can…`, `Should…`.
 - No abbreviations, no Hungarian notation. Names reveal intent — this is the primary
   documentation mechanism and takes priority over comments.
+- No single-letter or shortcut names anywhere, **including lambda and LINQ parameters**:
+  write `storedEvent` / `reservation`, never `e` / `x` / `s`.
 - Avoid grab-bag names (`Manager`, `Helper`, `Util`, `Service` with no object); name by
   responsibility.
 
@@ -41,6 +45,9 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - No commented-out code — that is what version control is for.
 - XML doc comments only on public, reusable API surface (e.g. `shared-kernel`); not on
   internal domain types whose names already carry the meaning.
+- No ceremonial or boilerplate comments/XML docs that merely echo a type or member name.
+  Most code needs no comment at all; default to none and add one only when the *why* is
+  non-obvious. A wall of `<summary>` on self-explanatory members is noise, not documentation.
 - `// TODO:` must reference a tracking issue.
 
 ## Domain modeling (DDD)
@@ -74,6 +81,10 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   the type system cannot express — a string that must be non-empty, a value in range, a
   trust-boundary value that must be non-null — not to re-check non-nullable references
   internally.
+- Prefer `Ensure.That(x).IsNotNull()` / `.IsNotNullOrWhiteSpace()` over the built-in
+  `ArgumentNullException.ThrowIfNull(...)` / `ArgumentException.ThrowIfNullOrWhiteSpace(...)`
+  for the boundary checks we keep — one consistent guard vocabulary. Scattered `ThrowIf*`
+  calls and internal `ArgumentNullException` guards on NRT-checked references are not our style.
 - Express "may be absent" with `T?`, not with `null` smuggled through a non-nullable
   type. Never return `null` for a collection — return empty.
 - Invariant violations and programmer errors throw (via `Ensure`); infrastructure faults
@@ -128,13 +139,18 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - TDD: tests precede implementation (ADR-0009).
 - Test names state behaviour (`Method_state_expectedResult` or a sentence).
 - Arrange–Act–Assert; one logical assertion per test.
+- Assertions use **Shouldly** (`actual.ShouldBe(expected)`, `Should.Throw<T>(...)`) for
+  readable failures — not raw xUnit `Assert.*`.
 - No control flow or logic in tests; use builders for test data.
 - `domain`/`application` tests are pure and fast; `infrastructure` is covered by
   integration tests (Testcontainers).
 
 ## Formatting ⚙ (`.editorconfig` is the source of truth)
 
-- 4-space indentation; Allman braces; braces always, even for single statements.
+- 4-space indentation; Allman braces. Braces are required for any multi-line body; a
+  single-statement **guard clause** may be written on one line without braces —
+  `if (condition) return;` or `if (condition) throw new SomeException();`. Nothing else
+  goes brace-less.
 - ~120-column soft limit.
 - `var` when the type is obvious from the right-hand side; explicit type otherwise.
 - Trailing commas in multiline initializers.
