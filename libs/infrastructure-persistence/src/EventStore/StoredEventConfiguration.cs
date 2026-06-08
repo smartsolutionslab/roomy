@@ -23,8 +23,6 @@ public sealed class StoredEventConfiguration : IEntityTypeConfiguration<StoredEv
 
     public void Configure(EntityTypeBuilder<StoredEvent> builder)
     {
-        ArgumentNullException.ThrowIfNull(builder);
-
         builder.ToTable(TableName);
 
         builder.HasKey(storedEvent => storedEvent.GlobalSequence);

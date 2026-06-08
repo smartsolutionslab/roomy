@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
+using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
 using Wolverine.Postgresql;
@@ -29,9 +30,9 @@ public static class MessagingServiceCollectionExtensions
         this IHostApplicationBuilder builder,
         MessagingOptions options)
     {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentNullException.ThrowIfNull(options);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.PostgresConnectionString);
+        Ensure.That((IHostApplicationBuilder?)builder).IsNotNull();
+        Ensure.That((MessagingOptions?)options).IsNotNull();
+        var postgresConnectionString = Ensure.That(options.PostgresConnectionString).IsNotNullOrWhiteSpace().Value;
 
         builder.UseWolverine(wolverine =>
         {
@@ -39,7 +40,7 @@ public static class MessagingServiceCollectionExtensions
             // RoomyDbContext: the publish is captured in the outbox within the EF transaction, so it
             // commits atomically with the aggregate write and is relayed at-least-once thereafter
             // (ADR-0012:76). The inbox gives idempotent, dedup'd delivery (ADR-0015).
-            wolverine.PersistMessagesWithPostgresql(options.PostgresConnectionString);
+            wolverine.PersistMessagesWithPostgresql(postgresConnectionString);
             wolverine.UseEntityFrameworkCoreTransactions();
             wolverine.Policies.AutoApplyTransactions();
             wolverine.Policies.UseDurableOutboxOnAllSendingEndpoints();
@@ -63,8 +64,8 @@ public static class MessagingServiceCollectionExtensions
         switch (options.Transport)
         {
             case MessagingTransport.RabbitMq:
-                ArgumentException.ThrowIfNullOrWhiteSpace(options.ConnectionString);
-                wolverine.UseRabbitMq(new Uri(options.ConnectionString))
+                var connectionString = Ensure.That(options.ConnectionString).IsNotNullOrWhiteSpace().Value;
+                wolverine.UseRabbitMq(new Uri(connectionString))
                     .AutoProvision();
                 break;
 

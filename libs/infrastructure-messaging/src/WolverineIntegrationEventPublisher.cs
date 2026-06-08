@@ -1,4 +1,5 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
+using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 using Wolverine;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging;
@@ -14,12 +15,11 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 /// </summary>
 public sealed class WolverineIntegrationEventPublisher(IMessageBus messageBus) : IIntegrationEventPublisher
 {
-    private readonly IMessageBus messageBus = messageBus
-        ?? throw new ArgumentNullException(nameof(messageBus));
+    private readonly IMessageBus messageBus = Ensure.That((IMessageBus?)messageBus).IsNotNull().Value;
 
     public async Task PublishAsync(IIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
+        Ensure.That((IIntegrationEvent?)integrationEvent).IsNotNull();
 
         cancellationToken.ThrowIfCancellationRequested();
 

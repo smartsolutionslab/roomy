@@ -16,13 +16,10 @@ public abstract class EventStoreDbContext : EfCore.RoomyDbContext
     {
     }
 
-    /// <summary>The append-only event log for this context's aggregates.</summary>
     public DbSet<StoredEvent> Events => Set<StoredEvent>();
 
     protected override void ConfigureContext(ModelBuilder modelBuilder)
     {
-        ArgumentNullException.ThrowIfNull(modelBuilder);
-
         base.ConfigureContext(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new StoredEventConfiguration());

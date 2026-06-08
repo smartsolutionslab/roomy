@@ -21,12 +21,11 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
         this.typesByName = typesByName;
     }
 
-    /// <summary>Starts building a registry.</summary>
     public static Builder Create() => new();
 
     public string GetName(Type eventType)
     {
-        ArgumentNullException.ThrowIfNull(eventType);
+        Ensure.That((Type?)eventType).IsNotNull();
 
         return namesByType.TryGetValue(eventType, out var name)
             ? name
@@ -44,13 +43,11 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
                 $"Event type name '{eventTypeName}' is not registered in the event-type registry.");
     }
 
-    /// <summary>Accumulates registrations and produces an immutable <see cref="EventTypeRegistry"/>.</summary>
     public sealed class Builder
     {
         private readonly Dictionary<Type, string> namesByType = [];
         private readonly Dictionary<string, Type> typesByName = new(StringComparer.Ordinal);
 
-        /// <summary>Registers a CLR event type under a stable persisted name.</summary>
         /// <exception cref="ArgumentException">The type or name is already registered.</exception>
         public Builder Register<TEvent>(string persistedName)
         {
@@ -74,7 +71,6 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
             return this;
         }
 
-        /// <summary>Builds the immutable registry.</summary>
         public EventTypeRegistry Build() =>
             new(
                 new Dictionary<Type, string>(namesByType),

@@ -28,10 +28,6 @@ public sealed class EfCoreEventStore : IEventStore
         IEventSerializer serializer,
         TimeProvider timeProvider)
     {
-        ArgumentNullException.ThrowIfNull(dbContext);
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(timeProvider);
-
         this.dbContext = dbContext;
         this.serializer = serializer;
         this.timeProvider = timeProvider;
@@ -44,9 +40,6 @@ public sealed class EfCoreEventStore : IEventStore
         EventMetadata metadata,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(events);
-        ArgumentNullException.ThrowIfNull(metadata);
-
         if (events.Count == 0)
         {
             return;

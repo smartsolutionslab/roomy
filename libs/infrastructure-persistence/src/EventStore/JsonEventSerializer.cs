@@ -15,16 +15,12 @@ public sealed class JsonEventSerializer : IEventSerializer
 
     public JsonEventSerializer(IEventTypeRegistry typeRegistry, JsonSerializerOptions? serializerOptions = null)
     {
-        ArgumentNullException.ThrowIfNull(typeRegistry);
-
         this.typeRegistry = typeRegistry;
         this.serializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
     }
 
     public SerializedEvent Serialize(object @event)
     {
-        ArgumentNullException.ThrowIfNull(@event);
-
         var typeName = typeRegistry.GetName(@event.GetType());
         var payload = JsonSerializer.Serialize(@event, @event.GetType(), serializerOptions);
 
@@ -34,7 +30,6 @@ public sealed class JsonEventSerializer : IEventSerializer
     public object Deserialize(string eventTypeName, string payload)
     {
         Ensure.That(eventTypeName).IsNotNullOrWhiteSpace();
-        ArgumentNullException.ThrowIfNull(payload);
 
         var eventType = typeRegistry.Resolve(eventTypeName);
 
