@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
@@ -22,17 +24,31 @@ builder.Services.AddIdentityPersistence(identityConnectionString);
 var keycloak = builder.Configuration.GetSection("Keycloak");
 var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
     ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
+var keycloakRealm = keycloak["Realm"] ?? "roomy";
 
 builder.Services.AddKeycloakIdentityProvider(
     keycloakBaseAddress,
     new KeycloakAdminOptions
     {
-        Realm = keycloak["Realm"] ?? "roomy",
+        Realm = keycloakRealm,
         AdminUsername = keycloak["AdminUsername"]
             ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
         AdminPassword = keycloak["AdminPassword"]
             ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
     });
+
+// The identity API is internal — reached only through the BFF, which forwards the Keycloak access
+// token (ADR-0013). Validate it as a JWT bearer against the realm; the BFF owns login/session. The
+// audience is not validated (the gateway gates access, and a Keycloak token's audience varies by
+// client), but the issuer/realm must match.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+    });
+builder.Services.AddAuthorization();
 
 // Wolverine's durable transactional outbox/inbox over the identity database, with RabbitMQ as the
 // default transport (ADR-0005/0012/0015). The outbox shares the database with the User write so a
@@ -63,5 +79,10 @@ builder.Services.AddHostedService<DefaultAdminSeederHostedService>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapAccountEndpoints();
 
 app.Run();
