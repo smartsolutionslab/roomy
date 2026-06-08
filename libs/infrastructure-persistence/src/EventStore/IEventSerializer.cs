@@ -13,6 +13,3 @@ public interface IEventSerializer
     /// <summary>Reconstructs an event instance from its persisted type name and payload.</summary>
     object Deserialize(string eventTypeName, string payload);
 }
-
-/// <summary>The persisted form of an event: its stable type name and serialized payload.</summary>
-public readonly record struct SerializedEvent(string TypeName, string Payload);
