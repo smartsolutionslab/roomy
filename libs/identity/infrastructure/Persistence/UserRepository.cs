@@ -24,6 +24,21 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
         return user;
     }
 
+    public async Task<Result<User>> GetByKeycloakSubjectAsync(
+        KeycloakSubjectIdentifier subject,
+        CancellationToken cancellationToken)
+    {
+        var user = await context.Users
+            .SingleOrDefaultAsync(candidate => candidate.KeycloakSubjectIdentifier == subject, cancellationToken);
+
+        if (user is null)
+        {
+            return Error.NotFound("user.not_found", $"No user is linked to Keycloak subject '{subject}'.");
+        }
+
+        return user;
+    }
+
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
         context.Users.AnyAsync(user => user.Email == email, cancellationToken);
 

@@ -11,6 +11,10 @@ public interface IUserRepository
 {
     Task<Result<User>> GetByIdentifierAsync(UserIdentifier identifier, CancellationToken cancellationToken);
 
+    Task<Result<User>> GetByKeycloakSubjectAsync(
+        KeycloakSubjectIdentifier subject,
+        CancellationToken cancellationToken);
+
     Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken);
 
     Task AddAsync(User user, CancellationToken cancellationToken);
