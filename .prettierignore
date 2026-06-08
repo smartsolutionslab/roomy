@@ -30,3 +30,5 @@ specs/
 
 # Prose documentation — hand-authored, not machine-formatted
 **/*.md
+
+.angular
