@@ -38,7 +38,7 @@ public sealed class SharedKernelPurityTests
             FailureMessage("MediatR is forbidden in the core (ADR-0005)", result));
     }
 
-    internal static string FailureMessage(string rule, TestResult result)
+    internal static string FailureMessage(string rule, NetArchTest.Rules.TestResult result)
     {
         var offenders = result.FailingTypeNames is { Count: > 0 }
             ? string.Join(", ", result.FailingTypeNames)
