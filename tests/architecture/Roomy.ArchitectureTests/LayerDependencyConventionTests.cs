@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -84,8 +85,7 @@ public sealed class LayerDependencyConventionTests
 
             var result = rule(predicate).GetResult();
 
-            Assert.True(
-                result.IsSuccessful,
+            result.IsSuccessful.ShouldBeTrue(
                 SharedKernelPurityTests.FailureMessage(description, result));
         }
 
@@ -94,8 +94,8 @@ public sealed class LayerDependencyConventionTests
             // DORMANT: no types match this layer convention yet (context projects not added).
             // The rule is wired and will enforce automatically once they exist. We assert the
             // dormant state explicitly rather than letting a vacuous pass look like coverage.
-            Assert.True(
-                true,
+            matchedTypes.ShouldBe(
+                0,
                 $"Forward-looking convention '{description}' is dormant: 0 types match "
                 + $"'{layerSegment}' across {RoomyAssemblies.All.Count} Roomy assembly(ies).");
         }

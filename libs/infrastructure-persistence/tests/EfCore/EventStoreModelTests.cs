@@ -1,15 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Shouldly;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EfCore;
 
-/// <summary>
-/// Asserts the EF model the baseline produces (ADR-0012): the events table exists and is
-/// snake_cased, the events table is keyed by the global sequence, and the unique
-/// <c>(stream_id, version)</c> index — the optimistic-concurrency guard — is present and unique.
-/// </summary>
 public sealed class EventStoreModelTests
 {
     private static IModel BuildModel()
@@ -24,7 +20,7 @@ public sealed class EventStoreModelTests
     {
         var entity = BuildModel().FindEntityType(typeof(StoredEvent));
 
-        Assert.Equal("events", entity!.GetTableName());
+        entity!.GetTableName().ShouldBe("events");
     }
 
     [Fact]
@@ -32,9 +28,10 @@ public sealed class EventStoreModelTests
     {
         var entity = BuildModel().FindEntityType(typeof(StoredEvent))!;
 
-        Assert.Contains("stream_id", entity.GetProperties().Select(p => p.GetColumnName()));
-        Assert.Contains("global_sequence", entity.GetProperties().Select(p => p.GetColumnName()));
-        Assert.Contains("occurred_on_utc", entity.GetProperties().Select(p => p.GetColumnName()));
+        var columnNames = entity.GetProperties().Select(property => property.GetColumnName()).ToArray();
+        columnNames.ShouldContain("stream_id");
+        columnNames.ShouldContain("global_sequence");
+        columnNames.ShouldContain("occurred_on_utc");
     }
 
     [Fact]
@@ -44,7 +41,7 @@ public sealed class EventStoreModelTests
 
         var primaryKey = entity.FindPrimaryKey()!;
 
-        Assert.Equal(nameof(StoredEvent.GlobalSequence), Assert.Single(primaryKey.Properties).Name);
+        primaryKey.Properties.ShouldHaveSingleItem().Name.ShouldBe(nameof(StoredEvent.GlobalSequence));
     }
 
     [Fact]
@@ -52,9 +49,10 @@ public sealed class EventStoreModelTests
     {
         var entity = BuildModel().FindEntityType(typeof(StoredEvent))!;
 
-        var index = entity.GetIndexes().Single(i =>
-            i.Properties.Select(p => p.Name).SequenceEqual([nameof(StoredEvent.StreamId), nameof(StoredEvent.Version)]));
+        var index = entity.GetIndexes().Single(candidate =>
+            candidate.Properties.Select(property => property.Name)
+                .SequenceEqual([nameof(StoredEvent.StreamId), nameof(StoredEvent.Version)]));
 
-        Assert.True(index.IsUnique);
+        index.IsUnique.ShouldBeTrue();
     }
 }

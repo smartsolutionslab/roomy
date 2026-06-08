@@ -1,3 +1,4 @@
+using Shouldly;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests.Guards;
@@ -9,7 +10,7 @@ public class EnsureTests
     {
         var result = Ensure.That("Munich").IsNotEmpty();
 
-        Assert.Equal("Munich", result.Value);
+        result.Value.ShouldBe("Munich");
     }
 
     [Theory]
@@ -17,13 +18,41 @@ public class EnsureTests
     [InlineData(null)]
     public void IsNotEmpty_throws_for_empty_or_null(string? value)
     {
-        Assert.Throws<ArgumentException>(() => Ensure.That(value!).IsNotEmpty());
+        Should.Throw<ArgumentException>(() => Ensure.That(value).IsNotEmpty());
     }
 
     [Fact]
     public void IsNotNullOrWhiteSpace_throws_for_whitespace()
     {
-        Assert.Throws<ArgumentException>(() => Ensure.That("   ").IsNotNullOrWhiteSpace());
+        Should.Throw<ArgumentException>(() => Ensure.That("   ").IsNotNullOrWhiteSpace());
+    }
+
+    [Fact]
+    public void IsNotNullOrWhiteSpace_returns_the_non_null_value()
+    {
+        string? maybeNull = "desk-42";
+
+        var result = Ensure.That(maybeNull).IsNotNullOrWhiteSpace();
+
+        result.Value.ShouldBe("desk-42");
+    }
+
+    [Fact]
+    public void IsNotNull_returns_the_non_null_reference()
+    {
+        string? maybeNull = "ada";
+
+        var result = Ensure.That(maybeNull).IsNotNull();
+
+        result.Value.ShouldBe("ada");
+    }
+
+    [Fact]
+    public void IsNotNull_throws_for_a_null_reference()
+    {
+        string? maybeNull = null;
+
+        Should.Throw<ArgumentNullException>(() => Ensure.That(maybeNull).IsNotNull());
     }
 
     [Fact]
@@ -31,30 +60,30 @@ public class EnsureTests
     {
         var customerName = string.Empty;
 
-        var exception = Assert.Throws<ArgumentException>(
+        var exception = Should.Throw<ArgumentException>(
             () => Ensure.That(customerName).IsNotEmpty());
 
-        Assert.Equal(nameof(customerName), exception.ParamName);
+        exception.ParamName.ShouldBe(nameof(customerName));
     }
 
     [Fact]
     public void IsPositive_throws_for_zero_or_negative()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => Ensure.That(0).IsPositive());
+        Should.Throw<ArgumentOutOfRangeException>(() => Ensure.That(0).IsPositive());
     }
 
     [Fact]
     public void Satisfies_throws_when_the_predicate_fails()
     {
-        Assert.Throws<ArgumentException>(
+        Should.Throw<ArgumentException>(
             () => Ensure.That(3).Satisfies(value => value > 10, "Value must exceed 10."));
     }
 
     [Fact]
-    public void Guards_chain_and_return_the_value()
+    public void Guards_return_the_value()
     {
-        var result = Ensure.That("desk-42").IsNotEmpty().IsNotNullOrWhiteSpace();
+        var result = Ensure.That("desk-42").IsNotNullOrWhiteSpace();
 
-        Assert.Equal("desk-42", result.Value);
+        result.Value.ShouldBe("desk-42");
     }
 }

@@ -1,15 +1,8 @@
+using Shouldly;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
 
-/// <summary>
-/// Behavioural tests for the hand-rolled event store against a real (SQLite) relational provider,
-/// covering the issue #19 Done criteria: append + load-by-replay works, and a stale expected
-/// version is rejected by the in-code version check. The unique <c>(stream_id, version)</c> index
-/// is created from the EF model, but these tests do not reproduce a true concurrent write race —
-/// that DB-level guard (Postgres SQLSTATE 23505) is covered by a Testcontainers test on PostgreSQL
-/// (#67); SQLite cannot reproduce it (ADR-0012).
-/// </summary>
 public sealed class EfCoreEventStoreTests
 {
     private static readonly IEventSerializer serializer = new JsonEventSerializer(
@@ -38,18 +31,11 @@ public sealed class EfCoreEventStoreTests
             var store = fixture.CreateEventStore(context, serializer);
             var stream = await store.ReadStreamAsync(streamId, CancellationToken.None);
 
-            Assert.Collection(
-                stream,
-                first =>
-                {
-                    Assert.Equal(1, first.Version.Value);
-                    Assert.Equal(booked, first.Event);
-                },
-                second =>
-                {
-                    Assert.Equal(2, second.Version.Value);
-                    Assert.Equal(released, second.Event);
-                });
+            stream.Count.ShouldBe(2);
+            stream[0].Version.Value.ShouldBe(1);
+            stream[0].Event.ShouldBe(booked);
+            stream[1].Version.Value.ShouldBe(2);
+            stream[1].Event.ShouldBe(released);
         }
     }
 
@@ -62,7 +48,7 @@ public sealed class EfCoreEventStoreTests
 
         var stream = await store.ReadStreamAsync(StreamId.From(Guid.NewGuid()), CancellationToken.None);
 
-        Assert.Empty(stream);
+        stream.ShouldBeEmpty();
     }
 
     [Fact]
@@ -75,7 +61,7 @@ public sealed class EfCoreEventStoreTests
 
         await store.AppendAsync(streamId, StreamVersion.None, [], EventMetadata.None, CancellationToken.None);
 
-        Assert.Empty(await store.ReadStreamAsync(streamId, CancellationToken.None));
+        (await store.ReadStreamAsync(streamId, CancellationToken.None)).ShouldBeEmpty();
     }
 
     [Fact]
@@ -97,13 +83,13 @@ public sealed class EfCoreEventStoreTests
             var store = fixture.CreateEventStore(context, serializer);
 
             // The stream is now at version 1, but we still assert it is empty (None).
-            var conflict = await Assert.ThrowsAsync<EventStoreConcurrencyException>(() =>
+            var conflict = await Should.ThrowAsync<EventStoreConcurrencyException>(() =>
                 store.AppendAsync(
                     streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None));
 
-            Assert.Equal(streamId, conflict.StreamId);
-            Assert.Equal(StreamVersion.None, conflict.ExpectedVersion);
-            Assert.Equal(StreamVersion.From(1), conflict.ActualVersion);
+            conflict.StreamId.ShouldBe(streamId);
+            conflict.ExpectedVersion.ShouldBe(StreamVersion.None);
+            conflict.ActualVersion.ShouldBe(StreamVersion.From(1));
         }
     }
 
@@ -125,13 +111,13 @@ public sealed class EfCoreEventStoreTests
         // Sequential here: the second writer re-reads version 1, so the in-code version check
         // rejects it. The true concurrent race (both reading 0, the DB unique index rejecting the
         // loser via SQLSTATE 23505) is covered by the Postgres integration test (#67).
-        await Assert.ThrowsAsync<EventStoreConcurrencyException>(() =>
+        await Should.ThrowAsync<EventStoreConcurrencyException>(() =>
             secondStore.AppendAsync(
                 streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None));
 
         await using var verify = fixture.CreateContext();
         var verifyStore = fixture.CreateEventStore(verify, serializer);
-        Assert.Single(await verifyStore.ReadStreamAsync(streamId, CancellationToken.None));
+        (await verifyStore.ReadStreamAsync(streamId, CancellationToken.None)).ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -148,6 +134,6 @@ public sealed class EfCoreEventStoreTests
 
         var stream = await store.ReadStreamAsync(streamId, CancellationToken.None);
 
-        Assert.Equal(metadata, Assert.Single(stream).Metadata);
+        stream.ShouldHaveSingleItem().Metadata.ShouldBe(metadata);
     }
 }

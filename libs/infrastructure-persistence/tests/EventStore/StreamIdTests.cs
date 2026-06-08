@@ -1,3 +1,4 @@
+using Shouldly;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
@@ -9,13 +10,13 @@ public sealed class StreamIdTests
     {
         var id = Guid.NewGuid();
 
-        Assert.Equal(id, StreamId.From(id).Value);
+        StreamId.From(id).Value.ShouldBe(id);
     }
 
     [Fact]
     public void From_rejects_the_empty_guid()
     {
-        Assert.Throws<ArgumentException>(() => StreamId.From(Guid.Empty));
+        Should.Throw<ArgumentException>(() => StreamId.From(Guid.Empty));
     }
 
     [Fact]
@@ -23,6 +24,6 @@ public sealed class StreamIdTests
     {
         var id = Guid.NewGuid();
 
-        Assert.Equal(StreamId.From(id), StreamId.From(id));
+        StreamId.From(id).ShouldBe(StreamId.From(id));
     }
 }

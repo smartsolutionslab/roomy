@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -21,9 +22,7 @@ public sealed class InfrastructurePersistenceConventionTests
     [Fact]
     public void InfrastructurePersistence_is_discovered_by_the_convention_rule_set()
     {
-        Assert.Contains(
-            RoomyAssemblies.All,
-            assembly => assembly == ArchitectureConventions.InfrastructurePersistenceAssembly);
+        RoomyAssemblies.All.ShouldContain(ArchitectureConventions.InfrastructurePersistenceAssembly);
     }
 
     [Fact]
@@ -34,8 +33,7 @@ public sealed class InfrastructurePersistenceConventionTests
             .NotHaveDependencyOn("MediatR")
             .GetResult();
 
-        Assert.True(
-            result.IsSuccessful,
+        result.IsSuccessful.ShouldBeTrue(
             SharedKernelPurityTests.FailureMessage(
                 "infrastructure must not depend on MediatR (ADR-0005)",
                 result));
@@ -52,6 +50,6 @@ public sealed class InfrastructurePersistenceConventionTests
             .HaveDependencyOn("Microsoft.EntityFrameworkCore")
             .GetTypes();
 
-        Assert.NotEmpty(dependsOnEfCore);
+        dependsOnEfCore.ShouldNotBeEmpty();
     }
 }

@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -19,8 +20,7 @@ public sealed class SharedKernelPurityTests
             .NotHaveDependencyOnAny(ArchitectureConventions.ForbiddenFrameworkNamespaces)
             .GetResult();
 
-        Assert.True(
-            result.IsSuccessful,
+        result.IsSuccessful.ShouldBeTrue(
             FailureMessage(
                 "shared-kernel must not depend on MediatR, Wolverine, EF Core, ASP.NET Core, or YARP",
                 result));
@@ -34,8 +34,7 @@ public sealed class SharedKernelPurityTests
             .NotHaveDependencyOn("MediatR")
             .GetResult();
 
-        Assert.True(
-            result.IsSuccessful,
+        result.IsSuccessful.ShouldBeTrue(
             FailureMessage("MediatR is forbidden in the core (ADR-0005)", result));
     }
 

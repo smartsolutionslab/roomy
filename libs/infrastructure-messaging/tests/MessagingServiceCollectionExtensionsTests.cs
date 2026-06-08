@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging.Tests;
@@ -31,11 +32,11 @@ public sealed class MessagingServiceCollectionExtensionsTests
 
         builder.AddRoomyMessaging(RabbitOptions());
 
-        var registration = Assert.Single(
-            builder.Services,
-            descriptor => descriptor.ServiceType == typeof(IIntegrationEventPublisher));
-        Assert.Equal(typeof(WolverineIntegrationEventPublisher), registration.ImplementationType);
-        Assert.Equal(ServiceLifetime.Scoped, registration.Lifetime);
+        var registration = builder.Services
+            .Where(descriptor => descriptor.ServiceType == typeof(IIntegrationEventPublisher))
+            .ShouldHaveSingleItem();
+        registration.ImplementationType.ShouldBe(typeof(WolverineIntegrationEventPublisher));
+        registration.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 
     [Fact]
@@ -45,7 +46,7 @@ public sealed class MessagingServiceCollectionExtensionsTests
 
         var returned = builder.AddRoomyMessaging(RabbitOptions());
 
-        Assert.Same(builder, returned);
+        returned.ShouldBeSameAs(builder);
     }
 
     [Theory]
@@ -57,7 +58,7 @@ public sealed class MessagingServiceCollectionExtensionsTests
         var options = RabbitOptions();
         options.Transport = transport;
 
-        Assert.Throws<NotSupportedException>(() => builder.AddRoomyMessaging(options));
+        Should.Throw<NotSupportedException>(() => builder.AddRoomyMessaging(options));
     }
 
     [Fact]
@@ -67,7 +68,7 @@ public sealed class MessagingServiceCollectionExtensionsTests
         var options = RabbitOptions();
         options.ConnectionString = null;
 
-        Assert.ThrowsAny<ArgumentException>(() => builder.AddRoomyMessaging(options));
+        Should.Throw<ArgumentException>(() => builder.AddRoomyMessaging(options));
     }
 
     [Fact]
@@ -77,13 +78,13 @@ public sealed class MessagingServiceCollectionExtensionsTests
         var options = RabbitOptions();
         options.PostgresConnectionString = null;
 
-        Assert.ThrowsAny<ArgumentException>(() => builder.AddRoomyMessaging(options));
+        Should.Throw<ArgumentException>(() => builder.AddRoomyMessaging(options));
     }
 
     [Fact]
     public void AddRoomyMessaging_rejects_a_null_builder()
     {
-        Assert.Throws<ArgumentNullException>(
+        Should.Throw<ArgumentNullException>(
             () => MessagingServiceCollectionExtensions.AddRoomyMessaging(null!, RabbitOptions()));
     }
 
@@ -92,12 +93,12 @@ public sealed class MessagingServiceCollectionExtensionsTests
     {
         var builder = Host.CreateApplicationBuilder();
 
-        Assert.Throws<ArgumentNullException>(() => builder.AddRoomyMessaging(null!));
+        Should.Throw<ArgumentNullException>(() => builder.AddRoomyMessaging(null!));
     }
 
     [Fact]
     public void MessagingOptions_default_transport_is_rabbitmq()
     {
-        Assert.Equal(MessagingTransport.RabbitMq, new MessagingOptions().Transport);
+        new MessagingOptions().Transport.ShouldBe(MessagingTransport.RabbitMq);
     }
 }

@@ -1,4 +1,5 @@
 using NetArchTest.Rules;
+using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
@@ -14,7 +15,7 @@ public sealed class NoMediatRTests
     public void No_Roomy_assembly_depends_on_MediatR()
     {
         // Real assertion today (the shared-kernel is present); not vacuous.
-        Assert.NotEmpty(RoomyAssemblies.All);
+        RoomyAssemblies.All.ShouldNotBeEmpty();
 
         foreach (var assembly in RoomyAssemblies.All)
         {
@@ -23,8 +24,7 @@ public sealed class NoMediatRTests
                 .NotHaveDependencyOn("MediatR")
                 .GetResult();
 
-            Assert.True(
-                result.IsSuccessful,
+            result.IsSuccessful.ShouldBeTrue(
                 SharedKernelPurityTests.FailureMessage(
                     $"MediatR is forbidden (assembly {assembly.GetName().Name})",
                     result));
