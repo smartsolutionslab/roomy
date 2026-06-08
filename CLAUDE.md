@@ -72,7 +72,7 @@ agent failure modes, not to teach you the codebase.
 | Gateway / BFF | YARP |
 | APIs | REST/JSON documented with OpenAPI; typed Angular client generated from the spec; gRPC reserved for hot internal paths later (ADR-0018) |
 | Orchestration (local + composition) | .NET Aspire |
-| Frontend | Angular **21** (21.2.x) — single app + feature libs per context, standalone **signal-based** components, zoneless (ADR-0016) |
+| Frontend | Angular **22** (22.x) — single app + feature libs per context, standalone **signal-based** components, zoneless (ADR-0016); upgraded ahead of Nx support behind a declared peer override (ADR-0027) |
 | Localization | Transloco — DE + EN, runtime switching, no hardcoded strings (ADR-0024) |
 | Accessibility | WCAG 2.2 AA baseline; behaviours via Angular CDK (ADR-0024) |
 | Monorepo | Nx |
