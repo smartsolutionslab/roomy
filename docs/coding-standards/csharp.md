@@ -30,6 +30,8 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - Interfaces: `I` prefix. Type parameters: `T`, or descriptive `TKey` / `TResult`.
 - Async methods returning a `Task`/`ValueTask`: `Async` suffix.
 - Booleans read as predicates: `Is…`, `Has…`, `Can…`, `Should…`.
+- Identifiers use the `Identifier` suffix, never `Id`/`ID`: the type is `UserIdentifier`
+  (not `UserId`); an aggregate's own key property is `Identifier`.
 - No abbreviations, no Hungarian notation. Names reveal intent — this is the primary
   documentation mechanism and takes priority over comments.
 - No single-letter or shortcut names anywhere, **including lambda and LINQ parameters**:
@@ -52,13 +54,28 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 
 ## Domain modeling (DDD)
 
-- No primitive obsession: model concepts as types. `Email`, `CustomerId`, `DeskNumber`
+- No primitive obsession: model concepts as types. `Email`, `CustomerIdentifier`, `DeskNumber`
   are value objects, not `string`/`Guid`/`int`.
 - Value objects are immutable with value equality — `record` or `readonly record struct`
-  where appropriate — and validate in the factory/constructor with `Ensure`.
+  where appropriate — and implement the `IValueObject` marker (`shared-kernel`). Enums are
+  inherently value types and are exempt.
+- Value objects are created through a validating factory: **`From(raw)`** throws on invalid
+  input and **`TryFrom(raw)`** returns the value object or `null` (never throws); `From` is
+  simply `TryFrom(raw) ?? throw`. Value objects **composed** of several values use **`Of(…)`**
+  / **`TryOf(…)`** instead. (Behavioural value objects with their own domain factories — e.g.
+  `Role.Employee` — and enums take no parse factory.)
+- **Identifiers** are branded GUID value objects generated with `Guid.CreateVersion7()`
+  (time-ordered, index-friendly). They expose implicit conversions **to and from `Guid`** — the
+  inbound `Guid` going through the validating factory — so EF Core value converters stay trivial.
 - Entities and aggregates have identity-based equality, no public setters; state changes
-  go through intention-revealing methods that preserve invariants.
-- The aggregate is the consistency boundary; reference other aggregates by ID only.
+  go through intention-revealing methods that preserve invariants. Mark aggregate roots with
+  **`IAggregate`** and other entities with **`IEntity`** (`shared-kernel`; `IAggregate : IEntity`).
+- **Organize the domain by aggregate.** A folder — and matching namespace segment — per
+  aggregate holds the aggregate root, its value objects, **and its repository interface**
+  together (e.g. `…/Domain/Users/` → `User`, `UserIdentifier`, `Email`, `Role`, `IUserRepository`).
+  The repository contract is part of the aggregate's domain. Ports to external systems (an
+  identity provider, a mailer) are not repositories and live in `application`.
+- The aggregate is the consistency boundary; reference other aggregates by identifier only.
 - Encapsulate collections: expose `IReadOnlyList<T>`/`IReadOnlyCollection<T>`, mutate
   only through methods.
 - Raise domain events for in-context reactions; cross-context flows use integration
@@ -130,8 +147,9 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 ## Repositories & persistence
 
 - One repository per aggregate root, with collection-style semantics: `Add`, `Remove`,
-  and intent-named queries (`FindByEmail`). Persistence is an implementation detail
-  behind an `application` port.
+  and intent-named queries (`FindByEmail`). The repository **interface lives in `domain`,
+  next to its aggregate**; only the implementation is `infrastructure`. Inject it named as
+  the aggregate's plural — `users` — keeping the `IUserRepository` type name.
 - Never leak `IQueryable` out of `infrastructure`.
 
 ## Testing
