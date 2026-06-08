@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="SmartSolutionsLab.Roomy.Gateway.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
     <ProjectReference Include="../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
   </ItemGroup>
