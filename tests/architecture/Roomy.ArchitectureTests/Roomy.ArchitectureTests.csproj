@@ -16,6 +16,13 @@
     <ProjectReference Include="../../../libs/identity/domain/Roomy.Identity.Domain.csproj" />
     <ProjectReference Include="../../../libs/identity/application/Roomy.Identity.Application.csproj" />
     <ProjectReference Include="../../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+    <!--
+      Per-context published-language contracts (ADR-0031): referenced so the convention rules load and
+      inspect them, and so the cross-context isolation rule observes that consuming a producer's
+      contracts is allowed while referencing its internal types is not.
+    -->
+    <ProjectReference Include="../../../libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
+    <ProjectReference Include="../../../libs/organization/contracts/Roomy.Contracts.Organization.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="../../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
