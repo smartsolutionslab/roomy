@@ -61,4 +61,7 @@
   <Folder Name="/tests/identity-integration-apphost/">
     <Project Path="tests/identity-integration-apphost/Roomy.Identity.TestAppHost.csproj" />
   </Folder>
+  <Folder Name="/tests/identity-keycloak-apphost/">
+    <Project Path="tests/identity-keycloak-apphost/Roomy.Identity.KeycloakTestAppHost.csproj" />
+  </Folder>
 </Solution>
