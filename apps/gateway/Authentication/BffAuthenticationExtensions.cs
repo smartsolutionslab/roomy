@@ -40,6 +40,13 @@ public static class BffAuthenticationExtensions
             .AddCookie(CookieScheme, ConfigureCookie)
             .AddOpenIdConnect(OidcScheme, ConfigureOpenIdConnect);
 
+        // Apply the Keycloak client settings to the OIDC handler at configuration time. The
+        // handler validates its options (ClientId and Authority are required) the first time it
+        // is initialized for a request, so they must be set before validation runs — not lazily
+        // in a request event, which fires too late and makes every request fail validation.
+        services.AddOptions<OpenIdConnectOptions>(OidcScheme)
+            .Configure<IOptions<KeycloakOidcOptions>>(ApplyKeycloakOptions);
+
         services.AddAuthorization();
 
         return services;
@@ -83,23 +90,13 @@ public static class BffAuthenticationExtensions
         options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
 
         options.Events.OnTokenValidated = FlattenRealmRoles;
-
-        // Bind the per-environment Keycloak settings resolved from configuration/Aspire.
-        options.Events.OnRedirectToIdentityProvider = context =>
-        {
-            ApplyKeycloakOptions(context.HttpContext, options);
-            return Task.CompletedTask;
-        };
     }
 
-    private static void ApplyKeycloakOptions(HttpContext httpContext, OpenIdConnectOptions options)
+    private static void ApplyKeycloakOptions(
+        OpenIdConnectOptions options,
+        IOptions<KeycloakOidcOptions> keycloakOptions)
     {
-        var keycloak = httpContext.RequestServices
-            .GetRequiredService<IOptions<KeycloakOidcOptions>>()
-            .Value;
-
-        if (!string.IsNullOrEmpty(options.ClientId))
-            return;
+        var keycloak = keycloakOptions.Value;
 
         options.Authority = BuildAuthority(keycloak);
         options.ClientId = keycloak.ClientId;
