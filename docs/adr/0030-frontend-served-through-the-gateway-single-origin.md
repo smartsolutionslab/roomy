@@ -59,15 +59,16 @@ Mechanism notes:
 - One origin for the browser: BFF cookie, OIDC callback, and API calls all align (ADR-0013).
 - The SPA needs no API base URL, no CORS, and no token handling.
 - `dotnet run` on the app host brings up the SPA together with the gateway and backing services.
+- Hot-module-reload works through the single origin: the Vite HMR client targets the page origin
+  (the gateway) and YARP proxies the websocket upgrade — verified with a `101 Switching Protocols`
+  handshake through the gateway — so no direct dev-server connection is needed.
 
 **Negative / trade-offs**
 - The gateway is in the request path for static assets in dev. Acceptable; it mirrors prod.
-- Vite hot-module-reload over the proxy may need `server.hmr` tuning; tracked as a follow-up if
-  it proves flaky — a full page reload still works regardless.
 - Production SPA serving is not solved here; it is an explicit follow-up.
 
 **Follow-ups**
 - Production: serve the built SPA from the gateway (static files + SPA fallback), replacing the
-  dev-only proxy route.
+  dev-only proxy route — tracked in #90, with the deployment slice (ADR-0017).
 - Revisit `Aspire.Hosting.NodeJs` / Community Toolkit Node hosting once a 13.x-aligned release
   exists, if it simplifies the `AddExecutable` wiring.
