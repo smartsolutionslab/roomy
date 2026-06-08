@@ -21,10 +21,10 @@
     <!--
       The BFF security pattern (ADR-0013): the OpenID Connect handler runs the server-side
       auth-code flow against Keycloak; cookies hold the session. The handler ships as a
-      separate package (not in the Microsoft.AspNetCore.App shared framework); 10.0.0 tracks
+      separate package (not in the Microsoft.AspNetCore.App shared framework); 10.0.8 tracks
       the SDK (global.json 10.0.300).
     -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.8" />
 
     <!--
       YARP is the reverse proxy that makes the gateway the single public entry point
