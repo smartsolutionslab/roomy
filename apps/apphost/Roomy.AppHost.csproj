@@ -5,4 +5,16 @@
     <UserSecretsId>b3cfe2eb-679c-4f01-90db-c8e8fde502ce</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!--
+      Aspire integration packages provisioning the local infrastructure (issue #17).
+      Versions are pinned to the AppHost's Aspire version (13.3.5, see the SDK above) so the
+      resource graph stays consistent. The Keycloak integration only ships as a preview at
+      this Aspire version, hence the -preview suffix on that package alone.
+    -->
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.3.5" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.3.5" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.3.5-preview.1.26270.6" />
+  </ItemGroup>
+
 </Project>
