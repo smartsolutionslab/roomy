@@ -32,6 +32,7 @@ internal static class RoomyAssemblies
         Enqueue(ArchitectureConventions.SharedKernelAssembly);
         Enqueue(ArchitectureConventions.ApplicationContractsAssembly);
         Enqueue(ArchitectureConventions.InfrastructurePersistenceAssembly);
+        Enqueue(ArchitectureConventions.InfrastructureMessagingAssembly);
 
         while (queue.Count > 0)
         {
