@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
+using SmartSolutionsLab.Roomy.Identity.Api.Hosting;
 using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
@@ -74,6 +75,9 @@ builder.Services.AddSingleton(new DefaultAdminOptions
         ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
 });
 builder.Services.AddScoped<DefaultAdminSeeder>();
+
+// Apply migrations, then seed — registration order is start order, so the schema exists first.
+builder.Services.AddHostedService<IdentityDatabaseMigrator>();
 builder.Services.AddHostedService<DefaultAdminSeederHostedService>();
 
 var app = builder.Build();
