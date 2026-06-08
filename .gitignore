@@ -14,8 +14,12 @@ artifacts/
 TestResults/
 [Tt]est[Rr]esults/
 coverage/
+# Keep the reusable coverage-gate sources: `coverage/` above is meant for output dirs,
+# but it also matches the tests/coverage/ props directory, which is tracked.
+!tests/coverage/
 *.coverage
 *.coveragexml
+*.cobertura.xml
 project.lock.json
 
 # --- Node / Angular / Nx ---

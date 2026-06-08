@@ -38,8 +38,32 @@ jobs:
       - name: Build (warnings as errors)
         run: dotnet build Roomy.slnx --configuration Release --no-restore -warnaserror
 
-      - name: Test
-        run: dotnet test Roomy.slnx --configuration Release --no-build
+      # Runs every test project and, in the same pass, enforces the coverage gate.
+      # `--collect "XPlat Code Coverage"` with coverlet.runsettings collects and reports
+      # coverage per project (policy exclusions applied). The 85% line+branch FLOOR on
+      # domain + application (ADR-0022, docs/testing-strategy.md) is enforced inside the
+      # gated test projects themselves: each imports tests/coverage/CoverageGate.props,
+      # whose Coverlet MSBuild threshold fails `dotnet test` below the floor. Shared
+      # primitives, infrastructure and UI are reported here but not gated, per policy.
+      - name: Test (with coverage)
+        run: >
+          dotnet test Roomy.slnx --configuration Release --no-build
+          --collect "XPlat Code Coverage"
+          --settings coverlet.runsettings
+          --results-directory ${{ runner.temp }}/coverage
+
+      # Human-readable coverage summary in the job log + step summary. Reporting only —
+      # the merge-blocking floor is the step above.
+      - name: Coverage report
+        if: ${{ !cancelled() }}
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          reportgenerator \
+            "-reports:${{ runner.temp }}/coverage/**/coverage.cobertura.xml" \
+            "-targetdir:${{ runner.temp }}/coverage-report" \
+            "-reporttypes:TextSummary;MarkdownSummaryGithub"
+          cat "${{ runner.temp }}/coverage-report/Summary.txt"
+          cat "${{ runner.temp }}/coverage-report/SummaryGithub.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Verify formatting
         run: dotnet format Roomy.slnx --verify-no-changes

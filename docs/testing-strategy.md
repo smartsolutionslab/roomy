@@ -54,6 +54,20 @@ cheaply at the seams, so e2e is reserved for genuine end-to-end journeys.
   app host, and DTOs/records without behaviour.
 - Measured **per service** via `nx affected`. Tools: Coverlet (.NET), Vitest coverage (TS).
 
+### Enforcement (issue #14)
+
+- **.NET** — the floor is a build-failing Coverlet MSBuild threshold (`Threshold=85`,
+  `ThresholdType=line,branch`). A domain/application test project opts in by importing
+  `tests/coverage/CoverageGate.props` and setting `CoverageInclude` to its
+  assembly-under-test; from then on `dotnet test` fails below the floor. CI collects and
+  reports coverage for **all** test projects via `coverlet.runsettings` (same policy
+  exclusions); only the gated projects block the merge. Shared-kernel primitives,
+  infrastructure and UI test projects are reported but do **not** import the gate.
+- **TS/Vitest** — deferred until the first JS runtime logic and tests exist (frontend
+  app shell, feature libs). The only JS library today (`@roomy/util`) is type-only and
+  erased at runtime, so it has no executable lines to cover; a Vitest coverage gate
+  lands with the first testable TS, reusing the runner mandated by ADR-0019.
+
 ## Mutation testing (the real quality signal)
 
 - **Stryker.NET** (C#) and **StrykerJS** (TS) on **domain + application**.
