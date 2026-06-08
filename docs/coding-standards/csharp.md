@@ -103,7 +103,8 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   for the boundary checks we keep — one consistent guard vocabulary. Scattered `ThrowIf*`
   calls and internal `ArgumentNullException` guards on NRT-checked references are not our style.
 - Express "may be absent" with `T?`, not with `null` smuggled through a non-nullable
-  type. Never return `null` for a collection — return empty.
+  type. Never return `null` for a collection — return empty. (Exception: repository and
+  service contracts do **not** return `T?` — see *Repositories & persistence*.)
 - Invariant violations and programmer errors throw (via `Ensure`); infrastructure faults
   throw. **Expected business outcomes** (e.g. "desk already booked") return a
   `Result`/`Result<T>` from `SmartSolutionsLab.Roomy.SharedKernel.Results` — explicit, never an exception.
@@ -147,9 +148,15 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 ## Repositories & persistence
 
 - One repository per aggregate root, with collection-style semantics: `Add`, `Remove`,
-  and intent-named queries (`FindByEmail`). The repository **interface lives in `domain`,
+  and intent-named queries. The repository **interface lives in `domain`,
   next to its aggregate**; only the implementation is `infrastructure`. Inject it named as
   the aggregate's plural — `users` — keeping the `IUserRepository` type name.
+- **Avoid nullable return types on repositories and services.** A contract never returns
+  `T?` to mean "not found". Express a fetch that may miss as `Result<T>` (with
+  `Error.NotFound` when absent), and a pure presence check as `Task<bool>`
+  (`ExistsByEmailAsync`) — so the caller handles absence explicitly instead of threading a
+  null. A `Get…` that is expected to hit returns `Result<T>`; never a bare `T?`. The same
+  applies to application services and ports (they already return `Result`/`Result<T>`).
 - Never leak `IQueryable` out of `infrastructure`.
 
 ## Testing
