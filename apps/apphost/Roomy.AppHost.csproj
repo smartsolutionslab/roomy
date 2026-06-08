@@ -20,6 +20,8 @@
   <ItemGroup>
     <!-- The gateway/BFF host the app model orchestrates (#21); generates Projects.Roomy_Gateway. -->
     <ProjectReference Include="../gateway/Roomy.Gateway.csproj" />
+    <!-- The identity context service (001); generates Projects.Roomy_Identity_Api. -->
+    <ProjectReference Include="../identity-api/Roomy.Identity.Api.csproj" />
   </ItemGroup>
 
 </Project>

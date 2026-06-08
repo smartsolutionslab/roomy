@@ -30,6 +30,10 @@ var postgres = builder.AddPostgres("postgres", userName: postgresUser, password:
     .WithContainerName("roomy-postgres")
     .WithLifetime(ContainerLifetime.Persistent);
 
+// The identity context's own database on the shared server (database-per-service, ADR-0014). Each
+// future context adds its own database the same way.
+var identityDatabase = postgres.AddDatabase("identity");
+
 // --- RabbitMQ (ADR-0015) -----------------------------------------------------------
 // The default message broker for cross-service integration events. Aspire runs it
 // locally regardless of the deployed transport. The management UI eases local
@@ -70,6 +74,24 @@ builder.AddExecutable(
         "nx", "serve", "web", "--port", "4200", "--host", "127.0.0.1")
     .WithHttpEndpoint(port: 4200, targetPort: 4200, isProxied: false);
 
+// --- Identity API (001) ------------------------------------------------------------
+// The identity context service: it owns its database, provisions Keycloak users, and exposes the
+// account/role surface the BFF composes (ADR-0013/0014). It validates the BFF-forwarded token against
+// Keycloak and publishes integration events over RabbitMQ. The DefaultAdmin is seeded at startup from
+// these dev credentials, so the system is administrable from first run (FR-004); the admin REST calls
+// reuse the Keycloak admin parameters. Dev-only credentials — overridden per environment.
+var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api")
+    .WithReference(identityDatabase).WaitFor(identityDatabase)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
+    .WithReference(keycloak).WaitFor(keycloak)
+    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
+    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
+    .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
+    .WithEnvironment("DefaultAdmin__Email", "admin@roomy.local")
+    .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
+    .WithEnvironment("DefaultAdmin__InitialPassword", "DevAdmin.23456");
+
 // --- YARP gateway / BFF (ADR-0013, ADR-0018) ---------------------------------------
 // The single public entry point. It is the confidential OIDC client (BFF security
 // pattern): it holds the session server-side, hands the browser only a cookie, and
@@ -81,12 +103,12 @@ var gateway = builder.AddProject<Projects.Roomy_Gateway>("gateway")
     .WaitFor(keycloak)
     .WithEnvironment("Authentication__Keycloak__Authority", keycloak.GetEndpoint("http"))
     .WithEnvironment("Authentication__Keycloak__ClientSecret", "dev-only-bff-secret-change-me")
+    .WithReference(identityApi)
+    .WaitFor(identityApi)
     .WithExternalHttpEndpoints();
 
-// Reference the resources so the app model and analyzers treat them as used until the
-// context services that consume them are introduced (#18-#23).
-_ = postgres;
-_ = rabbitmq;
+// The gateway is the app's external entry point and is not referenced by another resource; the
+// discard keeps it from tripping the unused-variable analyzer.
 _ = gateway;
 
 builder.Build().Run();
