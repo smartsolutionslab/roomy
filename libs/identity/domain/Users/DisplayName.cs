@@ -10,9 +10,9 @@ public sealed record DisplayName : IValueObject
     private DisplayName(string value) => Value = value;
 
     public static DisplayName From(string value) =>
-        TryFrom(value) ?? throw new ArgumentException("DisplayName must not be blank.", nameof(value));
+        TryParse(value) ?? throw new ArgumentException("DisplayName must not be blank.", nameof(value));
 
-    public static DisplayName? TryFrom(string value)
+    public static DisplayName? TryParse(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
         return new DisplayName(value.Trim());

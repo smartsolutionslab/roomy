@@ -3,7 +3,7 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
 // The identity of a User account: a branded, time-ordered GUIDv7 so it can never be confused with
-// another identifier (no primitive obsession). Minted with New() on registration, or From()/TryFrom()
+// another identifier (no primitive obsession). Minted with New() on registration, or From()/TryParse()
 // when rehydrating. The implicit Guid conversions keep the EF Core value converter trivial.
 public readonly record struct UserIdentifier : IValueObject
 {
@@ -12,9 +12,9 @@ public readonly record struct UserIdentifier : IValueObject
     public static UserIdentifier New() => new() { Value = Guid.CreateVersion7() };
 
     public static UserIdentifier From(Guid value) =>
-        TryFrom(value) ?? throw new ArgumentException("UserIdentifier must not be empty.", nameof(value));
+        TryParse(value) ?? throw new ArgumentException("UserIdentifier must not be empty.", nameof(value));
 
-    public static UserIdentifier? TryFrom(Guid value)
+    public static UserIdentifier? TryParse(Guid value)
     {
         if (value == Guid.Empty) return null;
         return new() { Value = value };

@@ -30,17 +30,17 @@ public sealed class EmailTests
     }
 
     [Fact]
-    public void TryFrom_returns_the_normalized_email_for_a_valid_address()
+    public void TryParse_returns_the_normalized_email_for_a_valid_address()
     {
-        Email.TryFrom("  Ada@Example.com ").ShouldBe(Email.From("ada@example.com"));
+        Email.TryParse("  Ada@Example.com ").ShouldBe(Email.From("ada@example.com"));
     }
 
     [Theory]
     [InlineData("not-an-email")]
     [InlineData("")]
-    public void TryFrom_returns_null_for_invalid_input(string candidate)
+    public void TryParse_returns_null_for_invalid_input(string candidate)
     {
-        Email.TryFrom(candidate).ShouldBeNull();
+        Email.TryParse(candidate).ShouldBeNull();
     }
 
     [Fact]
