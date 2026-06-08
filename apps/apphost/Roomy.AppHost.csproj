@@ -17,4 +17,9 @@
     <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.3.5-preview.1.26270.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The gateway/BFF host the app model orchestrates (#21); generates Projects.Roomy_Gateway. -->
+    <ProjectReference Include="../gateway/Roomy.Gateway.csproj" />
+  </ItemGroup>
+
 </Project>
