@@ -1,0 +1,40 @@
+:root {
+  --roomy-color-background: #f7f8fa;
+  --roomy-color-surface: #ffffff;
+  --roomy-color-text: #1a1c21;
+  --roomy-color-text-muted: #525866;
+  --roomy-color-border: #d4d7dd;
+  --roomy-color-accent: #1d4ed8;
+  --roomy-color-on-accent: #ffffff;
+
+  --roomy-space-xs: 0.25rem;
+  --roomy-space-sm: 0.5rem;
+  --roomy-space-md: 1rem;
+  --roomy-space-lg: 2rem;
+
+  --roomy-radius-sm: 0.25rem;
+
+  --roomy-font-family: system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --roomy-font-size-base: 1rem;
+  --roomy-font-size-lg: 1.25rem;
+
+  --roomy-focus-outline: 2px solid var(--roomy-color-accent);
+  --roomy-focus-outline-offset: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--roomy-color-background);
+  color: var(--roomy-color-text);
+  font-family: var(--roomy-font-family);
+  font-size: var(--roomy-font-size-base);
+  line-height: 1.5;
+}
