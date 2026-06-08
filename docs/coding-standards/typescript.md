@@ -97,9 +97,16 @@ catch.
   state (that is what `computed` is for). No manual `markForCheck`.
 - **Inputs/outputs:** signal-based `input()`, `output()`, `model()`. No `@Input()` /
   `@Output()` decorators in new code.
-- **DI:** `inject()` over constructor parameters.
+- **Host bindings:** declare host bindings and listeners in the `host` metadata object of
+  the `@Component` / `@Directive`; no `@HostBinding` / `@HostListener` decorators.
+- **DI:** `inject()` over constructor parameters; singleton services use
+  `providedIn: 'root'`.
 - **Templates:** built-in control flow `@if` / `@for` / `@switch`; every `@for` uses
   `track`; no logic in templates; prefer signals/async pipe over manual subscription.
+  Bind with native `[class.x]` / `[style.x]`, never `ngClass` / `ngStyle`. Prefer inline
+  templates for small components; an external template/style is referenced by a path
+  relative to the component `.ts` file.
+- **Forms:** Reactive forms over template-driven.
 - **RxJS:** only where streams are genuinely warranted; bridge with `toSignal` /
   `toObservable`; use `takeUntilDestroyed`; never nest `subscribe`; no manual
   `subscribe` in a component when a signal or the async pipe will do.
@@ -112,6 +119,7 @@ catch.
 - **Styling:** vanilla CSS as long as it suffices — design tokens as CSS custom
   properties, native nesting, component-scoped, no global leakage. Adopt SCSS/SASS or
   Tailwind only when a concrete need arises (ADR-0019).
+- **Images:** `NgOptimizedImage` for static images (it does not apply to inline base64).
 - **Components:** built on Angular CDK primitives for behaviour/accessibility, styled
   with own CSS; no styled component library adopted wholesale (ADR-0021).
 - **Localization:** all user-facing text via Transloco (DE + EN), no hardcoded strings,
