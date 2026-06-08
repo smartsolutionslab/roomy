@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SmartSolutionsLab.Roomy.Infrastructure.Messaging.Tests</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Infrastructure.Messaging.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../src/Roomy.Infrastructure.Messaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Wolverine's in-memory test harness (WolverineFx + Wolverine.Tracking) exercises the port -> bus
+      mapping and routing conventions without a live broker, which the Docker-less CI cannot provide.
+      A real RabbitMQ + Postgres outbox round-trip is deferred to a Testcontainers test (#68).
+    -->
+    <!--
+      The in-memory harness starts a real Wolverine runtime, which compiles handler code at runtime
+      and therefore needs the Roslyn-backed runtime compiler. WolverineFx no longer ships it in the
+      core (GH-2876); it auto-registers when referenced. Test-only — production hosts pre-generate
+      code via the Wolverine codegen command instead.
+    -->
+    <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.5.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

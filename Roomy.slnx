@@ -7,6 +7,12 @@
   <Folder Name="/libs/application-contracts/">
     <Project Path="libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
   </Folder>
+  <Folder Name="/libs/infrastructure-messaging/src/">
+    <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
+  </Folder>
+  <Folder Name="/libs/infrastructure-messaging/tests/">
+    <Project Path="libs/infrastructure-messaging/tests/Roomy.Infrastructure.Messaging.Tests.csproj" />
+  </Folder>
   <Folder Name="/libs/infrastructure-persistence/src/">
     <Project Path="libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
   </Folder>

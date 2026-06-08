@@ -1,5 +1,6 @@
 using System.Reflection;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
+using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
@@ -64,4 +65,14 @@ internal static class ArchitectureConventions
     /// segments) do not apply to it, while the repo-wide no-MediatR rule still does.
     /// </summary>
     internal static Assembly InfrastructurePersistenceAssembly => typeof(IEventStore).Assembly;
+
+    /// <summary>
+    /// A live anchor type inside the messaging infrastructure assembly. Referencing it by type forces
+    /// that assembly to load so the no-MediatR rule genuinely inspects it (#20, ADR-0005). This is
+    /// infrastructure: it legitimately depends on Wolverine (the deferred messaging adapter), so the
+    /// "no framework in the core" rules — which target only the <c>.Domain</c>/<c>.Application</c>
+    /// segments — do not apply to it, while the repo-wide no-MediatR rule still does.
+    /// </summary>
+    internal static Assembly InfrastructureMessagingAssembly =>
+        typeof(WolverineIntegrationEventPublisher).Assembly;
 }

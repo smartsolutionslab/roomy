@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Infrastructure.Messaging</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Infrastructure.Messaging</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
+    <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Wolverine is the messaging adapter (ADR-0005): it implements the owned IIntegrationEventPublisher
+      port and provides the durable transactional outbox/inbox over EF Core + PostgreSQL, with RabbitMQ
+      as the default transport (ADR-0015). 6.5.1 is the latest GA 6.x line and the only one verified to
+      restore and build on net10.0 (the EF/Postgres durability packages are part of the same release).
+    -->
+    <PackageReference Include="WolverineFx" Version="6.5.1" />
+    <PackageReference Include="WolverineFx.RabbitMQ" Version="6.5.1" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="6.5.1" />
+    <PackageReference Include="WolverineFx.Postgresql" Version="6.5.1" />
+  </ItemGroup>
+
+</Project>

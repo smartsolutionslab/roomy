@@ -17,6 +17,14 @@ rule and the related invariants on the .NET side — the counterpart to the Nx
   framework rules are scoped to the `.Domain`/`.Application` namespace segments only, which this
   assembly's `.Infrastructure.Persistence` namespace does not match. See
   `InfrastructurePersistenceConventionTests`.
+- `infrastructure-messaging` (the Wolverine + RabbitMQ integration-event adapter, #20/ADR-0005/0015)
+  is likewise **infrastructure**: the no-MediatR rule applies, and it legitimately depends on
+  **Wolverine** — the deferred messaging adapter the core never references. The "no framework in
+  the core" rules do not apply to its `.Infrastructure.Messaging` namespace. Crucially, those same
+  rules keep `domain`/`application` Wolverine-free: `application-contracts` (which owns the
+  `IIntegrationEventPublisher` port) is checked non-vacuously against the framework list — which
+  includes `Wolverine` — by `ApplicationContractsPurityTests`. See
+  `InfrastructureMessagingConventionTests`.
 - No Roomy assembly anywhere references MediatR ("no MediatR", ADR-0005).
 
 **Forward-looking** (convention-based, by namespace — active as soon as a matching assembly
