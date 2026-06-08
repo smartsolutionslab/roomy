@@ -17,6 +17,9 @@ concurrency:
 
 permissions:
   contents: read
+  # nrwl/nx-set-shas reads the Actions API on push to main to find the last successful run
+  # (the affected base); without actions:read it gets 403 and the Nx job fails on every push.
+  actions: read
 
 jobs:
   # .NET gate suite: restore, build with warnings-as-errors, test, and verify
