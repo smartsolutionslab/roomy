@@ -1,0 +1,35 @@
+name: Task / chore
+description: Tooling, setup, infrastructure, CI, or other non-feature work.
+title: "<short summary>"
+labels: ["chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For setup, tooling, CI, infra, or maintenance work. Adjust the labels to fit
+        (e.g. `ci`, `backend`, `frontend`, `infra`, `docs`). See `docs/project-setup-issues.md`
+        for the shape of the setup backlog.
+  - type: textarea
+    id: what
+    attributes:
+      label: What needs doing
+      description: The change and why it is needed.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Done criteria
+      description: How we know it is complete and verifiable.
+      placeholder: |
+        - ...
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Dependencies, related issues/ADRs, or constraints.
+    validations:
+      required: false

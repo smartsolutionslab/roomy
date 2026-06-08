@@ -1,0 +1,54 @@
+name: User story
+description: A product feature framed from a user's perspective, with testable acceptance criteria.
+title: "<CODE-N>: <short title>"
+labels: ["user-story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One story per branch and PR, built spec-first and test-first (see `CLAUDE.md`).
+        Mirror the existing story issues (IA-/OR-/AT-/OC-) and link the owning spec.
+  - type: textarea
+    id: story
+    attributes:
+      label: Story
+      description: The user-facing intent.
+      placeholder: "As an administrator I want to ... so that ..."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: Testable, EARS-style criteria. Each becomes a failing test before any implementation.
+      placeholder: |
+        - Correct credentials grant access.
+        - Incorrect credentials are rejected without revealing whether the account exists.
+    validations:
+      required: true
+  - type: dropdown
+    id: context
+    attributes:
+      label: Bounded context
+      description: The owning context. Cross-context flow is by ID + integration events only.
+      options:
+        - identity
+        - organization
+        - attendance
+    validations:
+      required: true
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      description: Path to the owning Spec Kit spec.
+      placeholder: "specs/001-identity-access/spec.md"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Seeds, edge cases, source references, or anything else reviewers should know.
+    validations:
+      required: false

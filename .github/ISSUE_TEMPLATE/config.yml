@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read CLAUDE.md first
+    url: https://github.com/smartsolutionslab/roomy/blob/main/CLAUDE.md
+    about: The operating contract, golden rules, and work loop — read before filing work.
+  - name: Contribution workflow
+    url: https://github.com/smartsolutionslab/roomy/blob/main/CONTRIBUTING.md
+    about: Branching, Conventional Commits, rebase-and-merge, and PR expectations.
