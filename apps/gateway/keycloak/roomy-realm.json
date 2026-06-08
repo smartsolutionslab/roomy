@@ -1,0 +1,56 @@
+{
+  "realm": "roomy",
+  "enabled": true,
+  "displayName": "Roomy",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "passwordPolicy": "length(8)",
+  "roles": {
+    "realm": [
+      {
+        "name": "employee",
+        "description": "Base role granted to every Roomy user (ADR-0013)."
+      },
+      {
+        "name": "administrator",
+        "description": "Elevated role for administrative actions (ADR-0013)."
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "roomy-bff",
+      "name": "Roomy YARP gateway (BFF)",
+      "description": "Confidential OIDC client for the BFF security pattern (ADR-0013).",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "secret": "dev-only-bff-secret-change-me",
+      "redirectUris": [
+        "https://localhost:7443/signin-oidc",
+        "http://localhost:5443/signin-oidc"
+      ],
+      "postLogoutRedirectUris": [
+        "https://localhost:7443/signout-callback-oidc",
+        "http://localhost:5443/signout-callback-oidc"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "roles",
+        "email"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SmartSolutionsLab.Roomy.Gateway.Tests</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Gateway.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      These are pure unit tests over the gateway's token-free projection helpers (realm-role
+      flattening, the SPA CurrentUser mapping). They run without a live identity provider. The
+      genuine end-to-end OIDC login flow needs a real Keycloak, which the Docker-less CI cannot
+      provide; that round-trip is deferred to a Testcontainers/Aspire test (follow-up to #21).
+    -->
+    <ProjectReference Include="../Roomy.Gateway.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
