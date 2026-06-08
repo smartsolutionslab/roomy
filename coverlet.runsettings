@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Coverage collection settings for the XPlat Code Coverage data collector
+  (coverlet.collector), used by the "dotnet test" XPlat Code Coverage collector.
+
+  This drives REPORTING across every .NET test project. It applies the same policy
+  exclusions as the gate (tests/coverage/CoverageGate.props) so the reported numbers
+  reflect production code that is meaningful to cover, per docs/testing-strategy.md:
+  the OpenAPI-generated client, EF migrations, the Aspire app host and composition root,
+  and behaviourless DTOs are not counted.
+
+  The merge-gating floor (85% line+branch on domain plus application) is enforced
+  separately by CoverageGate.props inside the gated test projects, not here. This file
+  only shapes what is collected and reported.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <Exclude>[*]*.Migrations.*,[Roomy.AppHost]*,[*]*Dto,[*]*Request,[*]*Response</Exclude>
+          <ExcludeByFile>**/Migrations/*.cs,**/obj/**/*.cs</ExcludeByFile>
+          <SkipAutoProps>true</SkipAutoProps>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

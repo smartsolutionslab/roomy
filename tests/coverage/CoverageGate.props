@@ -1,0 +1,74 @@
+<Project>
+
+  <!--
+    Reusable code-coverage floor for test projects that cover domain or application code.
+
+    Importing this file turns `dotnet test` / `dotnet build` into a coverage gate: the
+    build FAILS when line OR branch coverage of the project-under-test drops below the
+    floor. This is the mechanism behind the merge gate mandated by ADR-0022 and
+    docs/testing-strategy.md ("Coverage policy").
+
+    POLICY (docs/testing-strategy.md → "Coverage policy"):
+      - Floor of ~85-90% line AND branch, gated on **domain + application only**.
+      - Coverage is a diagnostic, not a target: the floor is expected to be exceeded
+        naturally by TDD, never padded toward. The real quality signal is the mutation
+        score (Stryker, nightly, issue #24).
+      - Infrastructure and UI coverage is reported, NOT gated.
+      - Excluded from measurement: the OpenAPI-generated client, EF migrations, the
+        composition root / Aspire app host, and behaviourless DTOs/records.
+
+    HOW TO USE: a test project that exercises a context's `domain` or `application`
+    library imports this file and points it at the assembly under test, e.g.
+
+      <Import Project="$(MSBuildThisFileDirectory)../../tests/coverage/CoverageGate.props" />
+      <PropertyGroup>
+        <CoverageInclude>[SmartSolutionsLab.Roomy.Attendance.Domain]*</CoverageInclude>
+      </PropertyGroup>
+
+    Shared-kernel primitives, infrastructure and UI test projects do NOT import this
+    file: their coverage is collected and reported (via coverlet.collector +
+    coverlet.runsettings) but not gated, per the policy above.
+
+    The threshold values are intentionally set in MSBuild rather than on the CLI:
+    `ThresholdType=line,branch` contains a comma that the dotnet/MSBuild argument parser
+    mis-splits, so a props-file home keeps the gate robust across shells and CI.
+  -->
+
+  <PropertyGroup>
+    <!-- Run Coverlet as part of `dotnet test` and fail below the floor. -->
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+
+    <!-- The floor: 85% line AND branch, evaluated over the included assemblies. -->
+    <Threshold>85</Threshold>
+    <ThresholdType>line,branch</ThresholdType>
+    <ThresholdStat>total</ThresholdStat>
+
+    <!--
+      Measure only the production assembly the importing test project targets. Each
+      gated test project sets CoverageInclude to its assembly-under-test (Coverlet
+      include filter, e.g. [SmartSolutionsLab.Roomy.Attendance.Domain]*). Without it the
+      gate would also count the test assembly and any transitive primitives, diluting
+      the signal.
+    -->
+    <Include Condition="'$(CoverageInclude)' != ''">$(CoverageInclude)</Include>
+
+    <!--
+      Policy exclusions (docs/testing-strategy.md): generated code, EF migrations, the
+      Aspire app host / composition root, and behaviourless DTOs are not measured.
+      Compiler- and tooling-generated members are excluded by attribute; migrations and
+      app-host code by namespace/file convention.
+    -->
+    <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+    <Exclude>[*]*.Migrations.*,[Roomy.AppHost]*,[*]*Dto,[*]*Request,[*]*Response</Exclude>
+    <ExcludeByFile>**/Migrations/*.cs,**/obj/**/*.cs</ExcludeByFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
