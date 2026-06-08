@@ -62,9 +62,9 @@ description: "Task list for Identity & Access (001)"
 
 **Independent Test**: With an empty DB, start the service; log in via the BFF with configured DefaultAdmin credentials → `GET /account/me` returns `role: administrator`; wrong password and unknown email both return the same generic failure.
 
-- [ ] T013 [P] [US1] Integration test in `tests/identity/Features/DefaultAdminSeedingTests.cs` — seeding is idempotent and creates the Keycloak admin user + account record. (RED)
+- [x] T013 [P] [US1] Integration test in `tests/identity-integration/DefaultAdminSeederTests.cs` — RED-verified, against real Postgres: seeding provisions the Administrator role, activates the account, and persists it; a second run is idempotent (the provider is called once, one record exists). The real Keycloak provisioning path is already covered by `KeycloakIdentityProviderTests` (T011), so a recording stub stands in for the provider here to keep the focus on the seeder's orchestration.
 - [ ] T014 [P] [US1] Integration test in `tests/identity/Features/AccountMeTests.cs` — authenticated admin → `GET /account/me` = `administrator`; invalid credentials → single generic failure (FR-008). (RED)
-- [ ] T015 [US1] Implement the DefaultAdmin seeding hosted service in `apps/identity-api/Seeding/DefaultAdminSeeder.cs` — read email + initial password from configuration, provision via `IIdentityProviderPort`, persist the `User`.
+- [x] T015 [US1] DefaultAdmin seeding in `apps/identity-api/Seeding/` — `DefaultAdminSeeder` (provision via `IIdentityProviderPort` with the Administrator role → `User.Register` + `Activate` → persist; idempotent via `ExistsByEmailAsync`), `DefaultAdminOptions` (bound from the `DefaultAdmin` config section), and a `DefaultAdminSeederHostedService` that runs it once at startup in a scope and fails startup loudly on error (FR-004). Registered in `Program.cs`. T013 green.
 - [ ] T016 [US1] Implement `GET /account/me` in `apps/identity-api/Endpoints/AccountEndpoints.cs` returning the account/role projection.
 - [ ] T017 [US1] Configure the Keycloak realm (roles `employee`/`administrator`, unique-email, password min-length 8) and the YARP BFF OIDC login route (gateway client) — realm import under `apps/identity-api/keycloak/` and gateway config.
 
