@@ -1,5 +1,6 @@
 using System.Reflection;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
+using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
@@ -54,4 +55,13 @@ internal static class ArchitectureConventions
     /// rather than relying on it happening to be loaded.
     /// </summary>
     internal static Assembly ApplicationContractsAssembly => typeof(IIntegrationEventPublisher).Assembly;
+
+    /// <summary>
+    /// A live anchor type inside the shared persistence infrastructure assembly. Referencing it by
+    /// type forces that assembly to load so the no-MediatR rule genuinely inspects it (#19,
+    /// ADR-0012). This is infrastructure: it legitimately depends on EF Core / Npgsql, so the
+    /// "no framework in the core" rules (which target only the <c>.Domain</c>/<c>.Application</c>
+    /// segments) do not apply to it, while the repo-wide no-MediatR rule still does.
+    /// </summary>
+    internal static Assembly InfrastructurePersistenceAssembly => typeof(IEventStore).Assembly;
 }

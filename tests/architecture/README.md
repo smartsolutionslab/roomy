@@ -10,6 +10,13 @@ rule and the related invariants on the .NET side — the counterpart to the Nx
 
 - `shared-kernel` is a pure primitives library — it must not depend on MediatR, Wolverine,
   EF Core, ASP.NET Core, or YARP.
+- `application-contracts` is likewise framework-free (the owned dispatch/messaging seam).
+- `infrastructure-persistence` (the EF Core baseline + hand-rolled event store, #19/ADR-0012)
+  is **infrastructure**: the repo-wide no-MediatR rule applies to it, but the "no framework in
+  the core" rules deliberately do **not** — it legitimately depends on EF Core / Npgsql. The
+  framework rules are scoped to the `.Domain`/`.Application` namespace segments only, which this
+  assembly's `.Infrastructure.Persistence` namespace does not match. See
+  `InfrastructurePersistenceConventionTests`.
 - No Roomy assembly anywhere references MediatR ("no MediatR", ADR-0005).
 
 **Forward-looking** (convention-based, by namespace — active as soon as a matching assembly
