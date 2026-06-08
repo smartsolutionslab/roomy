@@ -32,12 +32,9 @@ public sealed class EventStoreConcurrencyException : Exception
     {
     }
 
-    /// <summary>The stream the conflicting append targeted.</summary>
     public StreamId StreamId { get; }
 
-    /// <summary>The version the writer asserted.</summary>
     public StreamVersion ExpectedVersion { get; }
 
-    /// <summary>The version the stream was actually at.</summary>
     public StreamVersion ActualVersion { get; }
 }
