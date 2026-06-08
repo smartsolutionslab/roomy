@@ -26,6 +26,13 @@
   <Folder Name="/libs/identity/infrastructure/">
     <Project Path="libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/libs/identity/contracts/">
+    <Project Path="libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
+  </Folder>
+  <Folder Name="/libs/organization/" />
+  <Folder Name="/libs/organization/contracts/">
+    <Project Path="libs/organization/contracts/Roomy.Contracts.Organization.csproj" />
+  </Folder>
   <Folder Name="/libs/infrastructure-messaging/src/">
     <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </Folder>

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Contracts.Organization</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Contracts.Organization</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
