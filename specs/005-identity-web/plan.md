@@ -32,7 +32,7 @@ behaviours (ADR-0021/0024). Tests: `@testing-library/angular` + `@testing-librar
 
 **Target Platform**: browser SPA served through the gateway (single origin, ADR-0030).
 
-**Project Type**: frontend feature within `apps/web` (built inline — see D-FE1).
+**Project Type**: Angular feature library `@roomy/identity-feature`, lazy-loaded by `apps/web` (ADR-0035 — see D-FE1).
 
 **Constraints**: no tokens in the SPA (ADR-0013); no hardcoded strings (ADR-0024); WCAG 2.2 AA
 (ADR-0024); zoneless + OnPush + signals (ADR-0016).
@@ -45,7 +45,7 @@ behaviours (ADR-0021/0024). Tests: `@testing-library/angular` + `@testing-librar
 | II. Clean Architecture & DDD | ✅ (frontend) | UI mirrors the identity context; view models (`Account`, `AdminUser`) are typed, not loose primitives. |
 | III. Context Isolation | ✅ | The SPA talks only to the gateway; no cross-context coupling. Identity screens live under a single `context:identity`-aligned area. |
 | IV. No Framework in the Core | n/a | Frontend feature. |
-| V. Decisions Recorded | ✅ | No **new** ADR: ADR-0013 (BFF), ADR-0016/0027 (Angular), ADR-0024 (i18n/a11y), ADR-0030 (single origin) cover this. The inline-vs-lib choice (D-FE1) is recorded here and flagged for review. |
+| V. Decisions Recorded | ✅ | **ADR-0035** records the frontend feature-library structure + tags (written before the lib code, golden rule 4). ADR-0013 (BFF), ADR-0016/0027 (Angular), ADR-0024 (i18n/a11y), ADR-0030 (single origin) cover the rest. |
 | VI. Green Before Done | ✅ | `pnpm nx affected -t lint test build`. |
 | VII. Small, Single-Purpose Changes | ✅ | One feature, one branch; the gateway route addition is a single, clearly-scoped commit. |
 
@@ -53,19 +53,22 @@ behaviours (ADR-0021/0024). Tests: `@testing-library/angular` + `@testing-librar
 
 ## Key decisions
 
-### D-FE1 — Build inline under `apps/web/src/app`, defer the Nx feature lib
+### D-FE1 — Build in an Nx feature library `@roomy/identity-feature` (ADR-0035)
 
-**Decision.** Implement the identity screens as standalone components under
-`apps/web/src/app/account/` and `apps/web/src/app/admin/`, with a small `identity/` data-access area
-(typed gateway clients + view models), mirroring the existing inline `session/`, `shell/`, `home/`
-structure. Do **not** create an Nx `@roomy/identity-feature-*` lib in this slice.
+**Decision.** Implement the identity screens in a per-context Angular feature library
+`libs/identity/feature` (`@roomy/identity-feature`, tags `type:feature`/`context:identity`), not
+inline under `apps/web`. The library holds the account page, admin screens, route guards, the
+exported routes, and (for now) the typed gateway clients + view models; the app lazy-loads the
+library's routes. This realizes ADR-0016's "feature libs per context".
 
-**Why.** The web app has no feature-lib infrastructure today (everything is inline), and ADR-0016's
-per-context frontend libs imply a structural decision the tag taxonomy doesn't yet resolve for
-frontend (the `type:*` axis is domain/application/infrastructure/app/util — no "feature" value).
-Establishing that structure + tag semantics is a cross-cutting change that warrants its own ADR
-(golden rule 4). Keeping this slice inline makes it small and reviewable; the lib extraction is a
-clean, separately-ADR'd follow-up. **Flagged for reviewer agreement.**
+**Why.** Per the reviewer's direction, the frontend uses proper Nx libraries from this slice on.
+Establishing that needed a cross-cutting structural decision — frontend library *types*
+(`feature`/`ui`/`data-access`) and how the single SPA crosses contexts — recorded in **ADR-0035**
+(written before this code, golden rule 4): the `type:*` axis gains the frontend types, and the one
+Angular app is tagged `context:web` so it may compose any context's feature libs while
+`identity-feature` itself stays isolated to `context:identity`. Libraries are tested with
+`vitest-analog` + `@testing-library/angular` (the app's `@angular/build:unit-test` is
+application-only); the test code is identical to the app's.
 
 ### D-FE2 — Account data from `/account/me`, session gate from `/bff/user`
 
@@ -85,22 +88,26 @@ Because the session loads asynchronously at startup, the guards await the first 
 ## Project Structure (this feature)
 
 ```text
+libs/identity/feature/                     # @roomy/identity-feature (type:feature, context:identity)
+└─ src/lib/
+   ├─ data-access/
+   │  ├─ account.ts          # typed view models (Account, AdminUser, AccountRole)
+   │  ├─ account-client.ts   # GET /account/me  (relative URL, token-free)
+   │  └─ admin-users-client.ts # GET /admin/users, POST :grant-administrator
+   ├─ account/
+   │  ├─ account-page.ts/.html/.css + account-page.spec.ts   # FR-001
+   ├─ admin/
+   │  ├─ admin-users-page.ts/.html/.css + admin-users-page.spec.ts  # FR-004/005
+   │  └─ not-authorized.ts/.html           # FR-003/006 fallback
+   ├─ auth/
+   │  ├─ auth.guard.ts + auth.guard.spec.ts        # FR-002
+   │  └─ admin.guard.ts + admin.guard.spec.ts      # FR-003
+   └─ identity.routes.ts     # exported routes, lazy-loaded by the app
+   src/index.ts              # public API: identityRoutes
+
 apps/web/src/app/
-├─ identity/
-│  ├─ account.ts            # typed view models (Account, AdminUser, AccountRole)
-│  ├─ account-client.ts     # GET /account/me  (relative URL, token-free)
-│  └─ admin-users-client.ts # GET /admin/users, POST :grant-administrator
-├─ account/
-│  ├─ account-page.ts/.html/.css        # FR-001
-│  └─ account-page.spec.ts
-├─ admin/
-│  ├─ admin-users-page.ts/.html/.css    # FR-004/005
-│  ├─ admin-users-page.spec.ts
-│  └─ not-authorized.ts/.html           # FR-003/006 fallback
-├─ auth/
-│  ├─ auth.guard.ts + auth.guard.spec.ts        # FR-002
-│  └─ admin.guard.ts + admin.guard.spec.ts      # FR-003
-└─ session/session.service.ts            # extend with readiness for guards (D-FE3)
+├─ app.routes.ts             # lazy-load @roomy/identity-feature routes
+└─ session/session.service.ts # extend with readiness for guards (D-FE3)
 
 apps/web/public/i18n/{en,de}.json        # add `account.*` and `admin.*` namespaces (FR-006)
 apps/gateway/appsettings.json            # add the `/admin/{**}` YARP route (backend enablement)
