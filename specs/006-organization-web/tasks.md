@@ -29,14 +29,14 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 
 ## Phase 1: Backend enablement — organization OpenAPI emit (ADR-0036)
 
-- [ ] T001 Stand up the OpenAPI spec emit on `organization-api`, mirroring identity: add
+- [x] T001 Stand up the OpenAPI spec emit on `organization-api`, mirroring identity: add
   `Microsoft.AspNetCore.OpenApi` + `Microsoft.Extensions.ApiDescription.Server` package refs and the
   `OpenApiDocumentsDirectory` / `OpenApiGenerateDocumentsOnBuild=false` props to
   `apps/organization-api/Roomy.Organization.Api.csproj`; add `AddOpenApi()` + `MapOpenApi()` and the
   `OpenApi:EmitDocument` skip-guards (skip messaging + company seeder during emit) to `Program.cs`;
   commit the emitted `apps/organization-api/Roomy.Organization.Api.json`. Verify: a clean build with
   `-p:OpenApiGenerateDocumentsOnBuild=true` re-emits an identical spec.
-- [ ] T002 Add the CI drift gates to `.github/workflows/ci.yml`: a "Verify the OpenAPI spec is
+- [x] T002 Add the CI drift gates to `.github/workflows/ci.yml`: a "Verify the OpenAPI spec is
   current" step for `organization-api` (build with emit, `git diff --exit-code` the `.json`) and the
   organization client to the "Verify the generated API client is current" step
   (`nx run organization-data-access:generate-client` + diff `generated`).
@@ -45,14 +45,14 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 
 ## Phase 2: Data-access lib — `@roomy/organization-data-access`
 
-- [ ] T003 Generate the lib `libs/organization/data-access` (`type:data-access`,
+- [x] T003 Generate the lib `libs/organization/data-access` (`type:data-access`,
   `context:organization`) with `--unitTestRunner=vitest-analog`; add `ng-openapi-gen.json` (input
   `apps/organization-api/Roomy.Organization.Api.json`, output `src/lib/generated`) and the
   `generate-client` target (mirror identity's `project.json`); run it and commit `generated/`.
-- [ ] T004 [US1] `office.ts` — `Office`/`Room` view models, `OfficeId`/`RoomId` branded ids, and
+- [x] T004 [US1] `office.ts` — `Office`/`Room` view models, `OfficeId`/`RoomId` branded ids, and
   `toOffice` mapping the generated DTO at the boundary (ADR-0020). Spec: `office.spec.ts` maps a DTO
   to the branded model (capacity derived from rooms is read straight from the response).
-- [ ] T005 [US1] `offices-gateway.ts` — `OfficesGateway` facade over the generated client:
+- [x] T005 [US1] `offices-gateway.ts` — `OfficesGateway` facade over the generated client:
   `listOffices`, `createOffice`, `renameOffice`, `relocateOffice`, `addRoom`, `renameRoom`, each a
   relative-URL call mapped to the branded model. Spec `offices-gateway.spec.ts`: each method calls
   the expected generated fn / URL and maps the response (HttpTestingController).
@@ -61,7 +61,7 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 
 ## Phase 3: Shared route guards (ADR-0038)
 
-- [ ] T006 Generate `libs/shared/feature` (`@roomy/shared-feature`, `type:feature`,
+- [x] T006 Generate `libs/shared/feature` (`@roomy/shared-feature`, `type:feature`,
   `context:shared`, `vitest-analog`). **Move** `auth.guard.ts(+spec)`, `admin.guard.ts(+spec)`, and
   `not-authorized.ts/.html/.css(+spec)` from `identity-feature` into it and re-export from
   `src/index.ts`. Rewire `identity.routes.ts` + the `/not-authorized` route + any imports in
@@ -76,11 +76,11 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 capacity, rooms); an employee is sent to not-authorized and the Offices nav entry is absent; an empty
 list shows the empty state; an unauthenticated visitor is redirected to `/bff/login`.
 
-- [ ] T007 [US1] `offices-page.spec.ts` (RED) — renders offices from a stubbed `OfficesGateway`
+- [x] T007 [US1] `offices-page.spec.ts` (RED) — renders offices from a stubbed `OfficesGateway`
   (name, location, capacity, rooms with name+capacity); empty list → empty-state message; loading +
   error states. `organization.routes.ts` guarded by `authGuard` + `adminGuard` (from
   `@roomy/shared-feature`). `@testing-library/angular`.
-- [ ] T008 [US1] `offices-page.ts/.html/.css` (standalone, OnPush, signal-based;
+- [x] T008 [US1] `offices-page.ts/.html/.css` (standalone, OnPush, signal-based;
   `TranslocoDirective`), the `/offices` route, `organization.*` i18n keys in `en.json` + `de.json`,
   lazy-load `organizationRoutes` in `apps/web/src/app/app.routes.ts`, and the **Offices** admin nav
   entry in the shell shown only to administrators. T007 green.
@@ -92,11 +92,11 @@ list shows the empty state; an unauthenticated visitor is redirected to `/bff/lo
 **Independent Test**: an admin submits a name + location → the office appears; a duplicate name shows
 a field-level "name already taken" message and adds nothing.
 
-- [ ] T009 [US2] Extend `offices-page.spec.ts` (RED) — submitting the create-office form calls
+- [x] T009 [US2] Extend `offices-page.spec.ts` (RED) — submitting the create-office form calls
   `OfficesGateway.createOffice` and prepends the returned office (201); a `409` shows a localized
   field-level conflict message and leaves the list unchanged; a `5xx` shows a non-blocking error; the
   form has accessible labels and an announced result.
-- [ ] T010 [US2] Wire the create-office form in `offices-page.ts` (+ `aria-live` result region,
+- [x] T010 [US2] Wire the create-office form in `offices-page.ts` (+ `aria-live` result region,
   field-level conflict, FR-007) and the i18n keys. T009 green.
 
 ---
