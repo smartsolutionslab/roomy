@@ -1,0 +1,61 @@
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
+
+namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
+
+// Spins up a single real PostgreSQL via Aspire — only the database resource, none of the rest of the
+// app graph — and creates the organization schema from the EF model once for the test class. Lets the
+// persistence tests exercise the real provider (value converters, the owned Room collection, unique
+// indexes) against the same Postgres the app host provisions. Requires Docker.
+public sealed class PostgresDatabaseFixture : IAsyncLifetime
+{
+    private const string ServerResourceName = "postgres";
+    private const string DatabaseResourceName = "organization";
+
+    private DistributedApplication? application;
+    private string connectionString = string.Empty;
+
+    public async ValueTask InitializeAsync()
+    {
+        var builder = await DistributedApplicationTestingBuilder
+            .CreateAsync<Projects.Roomy_Organization_TestAppHost>();
+
+        application = await builder.BuildAsync();
+        await application.StartAsync();
+
+        // The container is provisioned asynchronously; connect only once it accepts connections,
+        // otherwise the first query races the server's startup and fails transiently.
+        using var readiness = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+        var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
+        await notifications.WaitForResourceHealthyAsync(ServerResourceName, readiness.Token);
+
+        connectionString = await application.GetConnectionStringAsync(DatabaseResourceName, readiness.Token)
+            ?? throw new InvalidOperationException("The Postgres resource produced no connection string.");
+
+        // The InitialCreate migration lands with the host slice (T012); until then the schema is built
+        // from the EF model, so these tests exercise the real provider now.
+        await using var context = CreateContext();
+        await context.Database.EnsureCreatedAsync(readiness.Token);
+    }
+
+    public OrganizationDbContext CreateContext()
+    {
+        var options = new DbContextOptionsBuilder<OrganizationDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+
+        return new OrganizationDbContext(options);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (application is not null)
+        {
+            await application.DisposeAsync();
+        }
+    }
+}
