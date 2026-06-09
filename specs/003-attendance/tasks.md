@@ -77,9 +77,9 @@ description: "Task list for Attendance Planning (003)"
 
 > **Depends on PR #113** (organization Office/Room domain). Merge it and rebase before T016.
 
-- [ ] T016 [US2] Add `OfficeOpened(OfficeId, CompanyId, Name, Location, OccurredAt)` and `RoomAdded(RoomId, OfficeId, CompanyId, Name, Capacity, OccurredAt)` to `libs/organization/contracts/` (namespace `SmartSolutionsLab.Roomy.Contracts.Organization`, IDs/primitives only, ADR-0031), and **publish** them from organization's create-office / add-room handlers over the Wolverine outbox. Test: creating an office/room enqueues the event.
-- [ ] T017 [US2] RED tests in `tests/attendance/Infrastructure/` — `RoomAddedConsumer`/`OfficeOpenedConsumer` upsert the `Rooms` read model (wire event → internal command at the edge); `RoomDirectory.FindAsync` maps a row to `RoomCapacityView` and returns `unknown_room` (`NotFound`) for an unknown room.
-- [ ] T018 [US2] Implement the `Rooms` read model (EF config + migration) + `RoomDirectory` + the two consumers in `libs/attendance/infrastructure/`. T017 green. **Integration test** (real Postgres + published event): the consumer materializes capacity that the reserve flow then enforces (scenario 3 e2e).
+- [x] T016 [US2] Add `OfficeOpened(OfficeId, CompanyId, Name, Location, OccurredAt)` and `RoomAdded(RoomId, OfficeId, CompanyId, Name, Capacity, OccurredAt)` to `libs/organization/contracts/` (namespace `SmartSolutionsLab.Roomy.Contracts.Organization`, IDs/primitives only, ADR-0031), and **publish** them from organization's create-office / add-room handlers over the Wolverine outbox. Test: creating an office/room enqueues the event.
+- [x] T017 [US2] RED tests in `tests/attendance/Infrastructure/` — `RoomAddedConsumer`/`OfficeOpenedConsumer` upsert the `Rooms` read model (wire event → internal command at the edge); `RoomDirectory.FindAsync` maps a row to `RoomCapacityView` and returns `unknown_room` (`NotFound`) for an unknown room.
+- [x] T018 [US2] Implement the `Rooms` read model (EF config + migration) + `RoomDirectory` + the two consumers in `libs/attendance/infrastructure/`. T017 green. **Integration test** (real Postgres + published event): the consumer materializes capacity that the reserve flow then enforces (scenario 3 e2e).
 
 **Checkpoint**: real capacity feed live; US1's room-full rule holds against organization data end-to-end.
 
