@@ -30,6 +30,7 @@ public class IdentifierAndValueObjectTests
         ((Guid)OfficeIdentifier.From(value)).ShouldBe(value);
         ((Guid)RoomIdentifier.From(value)).ShouldBe(value);
         ((Guid)ReservationIdentifier.From(value)).ShouldBe(value);
+        ((Guid)UserIdentifier.From(value)).ShouldBe(value);
     }
 
     [Fact]
@@ -40,6 +41,7 @@ public class IdentifierAndValueObjectTests
         Should.Throw<ArgumentException>(() => OfficeIdentifier.From(Guid.Empty));
         Should.Throw<ArgumentException>(() => RoomIdentifier.From(Guid.Empty));
         Should.Throw<ArgumentException>(() => ReservationIdentifier.From(Guid.Empty));
+        Should.Throw<ArgumentException>(() => UserIdentifier.From(Guid.Empty));
     }
 
     [Fact]
