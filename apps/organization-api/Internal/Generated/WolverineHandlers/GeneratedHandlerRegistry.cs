@@ -11,7 +11,7 @@ namespace Internal.Generated.WolverineHandlers
 
         public override System.Type[] HandlerTypes()
         {
-            return System.Array.Empty<System.Type>();
+            return new System.Type[] { typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserProvisioningFailedConsumer), typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserRegisteredConsumer) };
         }
 
 

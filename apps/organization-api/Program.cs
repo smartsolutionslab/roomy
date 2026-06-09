@@ -66,10 +66,12 @@ if (emittingOpenApiDocument)
     JasperFxEnvironment.AutoStartHost = true;
 }
 
-// Wolverine's durable transactional outbox over the organization database, RabbitMQ transport
-// (ADR-0005/0015). Publish-only: this context emits OfficeOpened/RoomAdded (drained from domain events
-// at commit, ADR-0037) but consumes nothing, so no handler assemblies are scanned. The outbox shares the
-// organization database so a published event commits atomically with the office/room write (ADR-0012).
+// Wolverine's durable transactional outbox + inbox over the organization database, RabbitMQ transport
+// (ADR-0005/0015). It publishes OfficeOpened/RoomAdded/EmployeeHired (drained from domain events at
+// commit, ADR-0037) and — since 008 — also consumes identity's provisioning acks
+// (UserRegistered/UserProvisioningFailed), so the infrastructure assembly is scanned for those consumers.
+// The outbox/inbox share the organization database so a published event or a consumed ack commits
+// atomically with the employee write (ADR-0012/0025).
 if (!emittingOpenApiDocument)
 {
     builder.AddRoomyMessaging(
@@ -80,7 +82,8 @@ if (!emittingOpenApiDocument)
             ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
                 ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
         },
-        applicationAssembly: typeof(OrganizationApiHost).Assembly);
+        applicationAssembly: typeof(OrganizationApiHost).Assembly,
+        typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserRegisteredConsumer).Assembly);
 
     // Organization publishes from a state-based unit of work, so it opts into the transactional outbox
     // (ADR-0037). Consume-only hosts (identity, attendance) do not, keeping their handler graph clean.
@@ -107,6 +110,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapOfficeEndpoints();
+app.MapEmployeeEndpoints();
 
 // Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
 // route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.

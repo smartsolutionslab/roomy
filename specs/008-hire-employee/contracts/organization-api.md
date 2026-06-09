@@ -18,7 +18,8 @@ consistency — the response does **not** mean the login exists yet).
 - **202 Accepted:** `{ employeeId, userId, state: "Provisioning" }` — the employee is recorded and
   provisioning has started. **202**, not 201, signals the resource is not yet fully usable (the login is
   provisioned asynchronously).
-- **422 `invalid_hire`:** a missing/invalid field (bad email, empty name, unknown role, empty password).
+- **400 Bad Request:** a missing/invalid field (bad email, empty name, unknown role, empty password) —
+  matching the organization context's existing validation convention (the office endpoints return 400).
 - **403:** the caller is not an administrator.
 - **401:** no authenticated BFF session.
 
@@ -28,8 +29,9 @@ consistency — the response does **not** mean the login exists yet).
 
 ## Error body
 
-All non-2xx carry `{ code, message }` mapped from `Result`/`Error` (`ErrorType` → status: Validation→422,
-Forbidden→403). No domain detail leaks beyond `code` + a human `message`.
+Validation failures return **400** with a human-readable message (the organization context's convention,
+mirroring the office endpoints); authorization failures are **403**/**401** from the policy. No domain
+detail leaks beyond a human message.
 
 ## Gateway route
 

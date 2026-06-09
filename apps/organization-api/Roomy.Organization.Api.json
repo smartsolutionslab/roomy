@@ -399,6 +399,46 @@
           }
         }
       }
+    },
+    "/employees": {
+      "post": {
+        "tags": [
+          "EmployeeEndpoints"
+        ],
+        "operationId": "HireEmployee",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HireEmployeeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiredEmployeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -434,6 +474,50 @@
             "type": "string"
           },
           "location": {
+            "type": "string"
+          }
+        }
+      },
+      "HiredEmployeeResponse": {
+        "required": [
+          "employeeId",
+          "userId",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "HireEmployeeRequest": {
+        "required": [
+          "displayName",
+          "email",
+          "role",
+          "initialPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "initialPassword": {
             "type": "string"
           }
         }
@@ -575,6 +659,9 @@
   "tags": [
     {
       "name": "OfficeEndpoints"
+    },
+    {
+      "name": "EmployeeEndpoints"
     }
   ]
 }
