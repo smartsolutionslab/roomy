@@ -43,10 +43,11 @@ backend host endpoint and the catalogue read model (RED→GREEN).
   GET /reservations/mine) and `Endpoints/OccupancyEndpoints.cs` (GET /occupancy), covering their
   documented status codes (201/204/200/400/403/404/409/422). Commit the emitted
   `apps/attendance-api/Roomy.Attendance.Api.json`.
-- [ ] T003 Add the CI drift gates to `.github/workflows/ci.yml`: a "Verify the OpenAPI spec is
-  current" step for `attendance-api` (build with emit, `git diff --exit-code` the `.json`) and the
-  attendance client to the "Verify the generated API client is current" step
-  (`nx run attendance-data-access:generate-client` + diff `generated`).
+- [x] T003 Add the OpenAPI spec drift gate to `.github/workflows/ci.yml`: extend "Verify the OpenAPI
+  spec is current" for `attendance-api` (build with emit, `git diff --exit-code` the `.json`), with the
+  dummy `ConnectionStrings__attendance` + `Attendance__CompanyId` emit env. (The generated-client gate
+  line `nx run attendance-data-access:generate-client` is added in **T008**, once the lib exists, to
+  keep CI coherent per commit.)
 
 ---
 

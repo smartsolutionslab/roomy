@@ -80,10 +80,14 @@ jobs:
           git diff --exit-code -- apps/identity-api/Roomy.Identity.Api.json
           dotnet build apps/organization-api/Roomy.Organization.Api.csproj --configuration Release --no-restore -p:OpenApiGenerateDocumentsOnBuild=true
           git diff --exit-code -- apps/organization-api/Roomy.Organization.Api.json
+          dotnet build apps/attendance-api/Roomy.Attendance.Api.csproj --configuration Release --no-restore -p:OpenApiGenerateDocumentsOnBuild=true
+          git diff --exit-code -- apps/attendance-api/Roomy.Attendance.Api.json
         env:
           OpenApi__EmitDocument: "true"
           ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
           ConnectionStrings__organization: "Host=localhost;Database=organization;Username=ci;Password=ci"
+          ConnectionStrings__attendance: "Host=localhost;Database=attendance;Username=ci;Password=ci"
+          Attendance__CompanyId: "00000000-0000-0000-0000-000000000001"
           ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
           Keycloak__BaseAddress: "http://localhost:8080"
           Keycloak__AdminUsername: "ci"
