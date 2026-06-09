@@ -22,6 +22,7 @@
     -->
     <ProjectReference Include="../../../libs/organization/domain/Roomy.Organization.Domain.csproj" />
     <ProjectReference Include="../../../libs/organization/application/Roomy.Organization.Application.csproj" />
+    <ProjectReference Include="../../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
     <!--
       Per-context published-language contracts (ADR-0031): referenced so the convention rules load and
       inspect them, and so the cross-context isolation rule observes that consuming a producer's

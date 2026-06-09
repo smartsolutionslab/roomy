@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Organization.Infrastructure</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Organization.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../application/Roomy.Organization.Application.csproj" />
+    <ProjectReference Include="../domain/Roomy.Organization.Domain.csproj" />
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <!-- The shared EF Core baseline: RoomyDbContext, snake_case naming, Npgsql registration (ADR-0012). -->
+    <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core 10 (GA), matching the persistence baseline. The Npgsql provider arrives transitively. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8" />
+  </ItemGroup>
+
+</Project>
