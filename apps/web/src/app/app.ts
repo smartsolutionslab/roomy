@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { SessionService } from '@roomy/shared-data-access';
 
-import { SessionService } from './session/session.service';
 import { LanguageSwitcher } from './shell/language-switcher';
 
 @Component({
