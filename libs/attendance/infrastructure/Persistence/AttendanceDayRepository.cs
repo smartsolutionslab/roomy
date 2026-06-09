@@ -1,15 +1,21 @@
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 
 // The event-sourced repository for AttendanceDay (ADR-0036) over the hand-rolled event store
-// (ADR-0012). Load replays the stream onto a fresh aggregate for the company-day; Save appends the
-// uncommitted events at the aggregate's expected version. The store's optimistic-concurrency exception
-// is mapped to Error.Conflict so it never escapes the infrastructure (research R2), letting the
-// application reload and re-decide.
-public sealed class AttendanceDayRepository(IEventStore eventStore) : IAttendanceDayRepository
+// (ADR-0012). Load replays the stream onto a fresh aggregate for the company-day; Save stages the
+// occupancy projection (ADR-0038) and appends the uncommitted events at the aggregate's expected
+// version, so the read-model rows and the events commit in one transaction (FR-010). The store's
+// optimistic-concurrency exception is mapped to Error.Conflict so it never escapes the infrastructure
+// (research R2); the change tracker is reset first so a losing attempt's staged rows do not leak into
+// the application's bounded retry.
+public sealed class AttendanceDayRepository(
+    IEventStore eventStore,
+    IReservationProjection projection,
+    AttendanceDbContext context) : IAttendanceDayRepository
 {
     public async Task<AttendanceDay> LoadAsync(
         CompanyIdentifier company,
@@ -35,6 +41,11 @@ public sealed class AttendanceDayRepository(IEventStore eventStore) : IAttendanc
         var streamId = AttendanceDayStreamId.For(attendanceDay.Company, attendanceDay.Date);
         var expectedVersion = StreamVersion.From(attendanceDay.Version);
 
+        // Stage the occupancy read-model rows on the shared context, then append the events: the append's
+        // SaveChanges commits both in one transaction (ADR-0038), so a view reflects the booking the
+        // moment it commits (FR-010).
+        await projection.ApplyAsync(attendanceDay.UncommittedEvents, cancellationToken).ConfigureAwait(false);
+
         try
         {
             await eventStore.AppendAsync(
@@ -46,6 +57,9 @@ public sealed class AttendanceDayRepository(IEventStore eventStore) : IAttendanc
         }
         catch (EventStoreConcurrencyException)
         {
+            // Discard this attempt's staged events and read-model rows so the application's bounded retry
+            // re-projects against freshly reloaded state (research R4) — the scoped context is reused.
+            context.ChangeTracker.Clear();
             return Error.Conflict(
                 "concurrency_conflict",
                 "The attendance day was modified concurrently.");

@@ -4,6 +4,7 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
@@ -31,6 +32,9 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IEventStore, EfCoreEventStore>();
 
+        // The occupancy projection is staged inline with the event append (ADR-0038), so it shares the
+        // scoped AttendanceDbContext with the event store and commits in the same transaction.
+        services.AddScoped<IReservationProjection, ReservationProjection>();
         services.AddScoped<IAttendanceDayRepository, AttendanceDayRepository>();
 
         return services;

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
@@ -43,9 +44,15 @@ public sealed class PostgresEventStoreFixture : IAsyncLifetime
         await context.Database.EnsureCreatedAsync(readiness.Token);
     }
 
-    // A fresh repository over its own DbContext + event store, as the app resolves it per request. Each
-    // call gets an independent context so a test can model two concurrent writers on one database.
-    public AttendanceDayRepository CreateRepository() => new(CreateEventStore(CreateDbContext()));
+    // A fresh repository over its own DbContext + event store + occupancy projection, as the app resolves
+    // it per request. The projection and event store share the one context so the read-model rows and the
+    // events commit in a single transaction (ADR-0038). Each call gets an independent context so a test
+    // can model two concurrent writers on one database.
+    public AttendanceDayRepository CreateRepository()
+    {
+        var context = CreateDbContext();
+        return new(CreateEventStore(context), new ReservationProjection(context), context);
+    }
 
     public AttendanceDbContext CreateDbContext()
     {
