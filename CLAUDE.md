@@ -70,7 +70,7 @@ agent failure modes, not to teach you the codebase.
 | Backend | .NET 10 / C#, Clean Architecture + DDD |
 | Messaging | Wolverine — async integration events + transactional outbox/inbox behind owned abstractions (ADR-0005). Transport-agnostic: **RabbitMQ** default, Azure Service Bus / AWS SQS+SNS selectable by config (ADR-0015). Required from the first cross-service flow (ADR-0014) |
 | Gateway / BFF | YARP |
-| APIs | REST/JSON documented with OpenAPI; typed Angular client generated from the spec; gRPC reserved for hot internal paths later (ADR-0018) |
+| APIs | REST/JSON documented with OpenAPI; typed Angular client generated from the spec — build-time spec emit + `ng-openapi-gen`, drift-gated in CI (ADR-0036); gRPC reserved for hot internal paths later (ADR-0018) |
 | Orchestration (local + composition) | .NET Aspire |
 | Frontend | Angular **22** (22.x) — single app + feature libs per context, standalone **signal-based** components, zoneless (ADR-0016); upgraded ahead of Nx support behind a declared peer override (ADR-0027) |
 | Localization | Transloco — DE + EN, runtime switching, no hardcoded strings (ADR-0024) |
