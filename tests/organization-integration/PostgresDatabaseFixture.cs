@@ -19,6 +19,8 @@ public sealed class PostgresDatabaseFixture : IAsyncLifetime
     private DistributedApplication? application;
     private string connectionString = string.Empty;
 
+    public string ConnectionString => connectionString;
+
     public async ValueTask InitializeAsync()
     {
         var builder = await DistributedApplicationTestingBuilder
@@ -36,10 +38,10 @@ public sealed class PostgresDatabaseFixture : IAsyncLifetime
         connectionString = await application.GetConnectionStringAsync(DatabaseResourceName, readiness.Token)
             ?? throw new InvalidOperationException("The Postgres resource produced no connection string.");
 
-        // The InitialCreate migration lands with the host slice (T012); until then the schema is built
-        // from the EF model, so these tests exercise the real provider now.
+        // Build the schema by applying the EF migrations, not EnsureCreated, so these tests also
+        // validate that the InitialCreate migration produces the mapped schema (mirrors identity).
         await using var context = CreateContext();
-        await context.Database.EnsureCreatedAsync(readiness.Token);
+        await context.Database.MigrateAsync(readiness.Token);
     }
 
     public OrganizationDbContext CreateContext()

@@ -1,0 +1,71 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Organization.Api.Authentication;
+using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
+using SmartSolutionsLab.Roomy.Organization.Api.Seeding;
+using SmartSolutionsLab.Roomy.Organization.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
+
+// The organization context owns its database (ADR-0014); Aspire injects the connection string by name.
+var connectionString = builder.Configuration.GetConnectionString("organization")
+    ?? throw new InvalidOperationException("Missing connection string 'organization'.");
+
+builder.Services.AddOrganizationPersistence(connectionString);
+
+// The API is internal — reached only through the BFF, which forwards the Keycloak access token
+// (ADR-0013). Validate it as a JWT bearer against the realm; the audience is not validated (the gateway
+// gates access), but the issuer/realm must match. Realm roles are flattened to role claims so the
+// administrator-only routes can authorize on RequireRole.
+var keycloak = builder.Configuration.GetSection("Keycloak");
+var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
+    ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
+var keycloakRealm = keycloak["Realm"] ?? "roomy";
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                KeycloakRealmRoles.AddRoleClaims(context.Principal);
+                return Task.CompletedTask;
+            },
+        };
+    });
+builder.Services.AddAuthorization();
+
+builder.Services.AddOrganizationUseCases();
+
+// Seed the single company at startup so offices have a company to belong to (research.md D2). The
+// seeder is idempotent, so it is safe on every restart. The schema is applied out-of-process by the
+// db-migrator before this host starts (Aspire WaitForCompletion, ADR-0033).
+var company = builder.Configuration.GetSection(CompanyOptions.SectionName);
+builder.Services.AddSingleton(new CompanyOptions
+{
+    Name = company["Name"]
+        ?? throw new InvalidOperationException("Missing configuration 'Company:Name'."),
+});
+builder.Services.AddScoped<CompanySeeder>();
+builder.Services.AddHostedService<CompanySeederHostedService>();
+
+var app = builder.Build();
+
+app.MapDefaultEndpoints();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapOfficeEndpoints();
+
+app.Run();

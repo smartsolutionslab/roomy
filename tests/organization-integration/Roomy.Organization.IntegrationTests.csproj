@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+    <!-- The host under test — booted in-process for the office endpoint tests. -->
+    <ProjectReference Include="../../apps/organization-api/Roomy.Organization.Api.csproj" />
     <!-- The minimal Aspire app host the testing builder boots as the entry point: Postgres + the
          organization database, so the EF mapping is verified against the real provider. -->
     <ProjectReference Include="../organization-integration-apphost/Roomy.Organization.TestAppHost.csproj" />
@@ -19,6 +21,8 @@
          against the actual provider. Needs Docker — available on the CI ubuntu-latest runner. -->
     <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+    <!-- WebApplicationFactory, to boot the organization host in-process for the office endpoint tests. -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
