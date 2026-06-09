@@ -30,6 +30,14 @@
     -->
     <ProjectReference Include="../../../libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
     <ProjectReference Include="../../../libs/organization/contracts/Roomy.Contracts.Organization.csproj" />
+    <!--
+      The attendance context layers (#13, CLAUDE.md): referenced so the convention-based rules
+      genuinely load and inspect them rather than passing vacuously. Empty today; the layer and
+      no-MediatR rules activate as the event-sourced aggregate, handlers, and adapters are added.
+    -->
+    <ProjectReference Include="../../../libs/attendance/domain/Roomy.Attendance.Domain.csproj" />
+    <ProjectReference Include="../../../libs/attendance/application/Roomy.Attendance.Application.csproj" />
+    <ProjectReference Include="../../../libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="../../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />

@@ -48,6 +48,16 @@
   <Folder Name="/libs/organization/infrastructure/">
     <Project Path="libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/libs/attendance/" />
+  <Folder Name="/libs/attendance/domain/">
+    <Project Path="libs/attendance/domain/Roomy.Attendance.Domain.csproj" />
+  </Folder>
+  <Folder Name="/libs/attendance/application/">
+    <Project Path="libs/attendance/application/Roomy.Attendance.Application.csproj" />
+  </Folder>
+  <Folder Name="/libs/attendance/infrastructure/">
+    <Project Path="libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/libs/infrastructure-messaging/src/">
     <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </Folder>
