@@ -121,8 +121,8 @@ description: "Task list for Attendance Planning (003)"
 
 **Independent test:** `GET /reservations?date=…` returns the day's rows (or empty) by replaying the `AttendanceDay` stream (research R6).
 
-- [ ] T027 [US5] RED API test — `GET /reservations?date=` returns the day's reservations for any authenticated user; empty array for a day with none.
-- [ ] T028 [US5] Implement `ViewDayReservations` query + handler (replay via the repository) + the `GET /reservations` endpoint. T027 green.
+- [x] T027 [US5] RED API test — `GET /reservations?date=` returns the day's reservations for any authenticated user; empty array for a day with none.
+- [x] T028 [US5] Implement `ViewDayReservations` query + handler (replay via the repository) + the `GET /reservations` endpoint. T027 green.
 
 **Checkpoint**: all user stories independently functional.
 

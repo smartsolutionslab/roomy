@@ -216,6 +216,35 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
     }
 
+    [Fact]
+    public async Task Viewing_a_day_returns_its_reservations()
+    {
+        // Scenario 11 (view) — any authenticated user sees the day's reservations, replayed from the stream.
+        roomDirectory.Capacity = 8;
+        var date = monday.AddDays(11);
+        await CreateReservationAsync(Guid.NewGuid(), date);
+        await CreateReservationAsync(Guid.NewGuid(), date);
+
+        var response = await ClientForSubject(Guid.NewGuid())
+            .GetAsync(ViewUrl(date), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var reservations = await response.Content.ReadFromJsonAsync<ReservationDto[]>(TestContext.Current.CancellationToken);
+        reservations!.Length.ShouldBe(2);
+        reservations.All(reservation => reservation.Date == date).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Viewing_an_empty_day_returns_an_empty_array()
+    {
+        var response = await ClientForSubject(Guid.NewGuid())
+            .GetAsync(ViewUrl(monday.AddDays(12)), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var reservations = await response.Content.ReadFromJsonAsync<ReservationDto[]>(TestContext.Current.CancellationToken);
+        reservations!.ShouldBeEmpty();
+    }
+
     public void Dispose() => app.Dispose();
 
     private async Task<Guid> CreateReservationAsync(Guid subject, DateOnly date)
@@ -229,6 +258,9 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
 
     private static string CancelUrl(Guid reservationId, DateOnly date) =>
         $"/reservations/{reservationId}?date={date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}";
+
+    private static string ViewUrl(DateOnly date) =>
+        $"/reservations?date={date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}";
 
     private HttpClient ClientForSubject(Guid subject)
     {
