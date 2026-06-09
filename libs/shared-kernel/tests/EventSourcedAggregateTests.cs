@@ -3,7 +3,7 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests;
 
-// The event-sourced write-model base (ADR-0036): state is the fold over a stream. A tiny Counter
+// The event-sourced write-model base (ADR-0039): state is the fold over a stream. A tiny Counter
 // aggregate exercises the contract — replay, raise (apply + collect), version tracking — without
 // pulling in any context or the event store.
 public class EventSourcedAggregateTests

@@ -46,7 +46,7 @@ record how it is wired and the consistency it gives.
   all four query shapes; do not build a message-driven projection bus for an in-process, same-database
   read side.
 - **Correctness under the optimistic-retry loop:** reserve/cancel run a bounded `load → decide →
-  save` retry on one scoped `DbContext` (ADR-0036); a projection that stages rows on that context
+  save` retry on one scoped `DbContext` (ADR-0039); a projection that stages rows on that context
   must not let a failed attempt's rows leak into a later successful save.
 
 ## Considered options
@@ -99,7 +99,7 @@ We choose **Option B**. Concretely:
   today/tomorrow names). These are consumer-side changes within attendance; organization's published
   language (ADR-0031) is unchanged.
 - **The today/tomorrow name policy is an application rule.** The occupancy query handler derives
-  "today" from the injected `TimeProvider` (Europe/Berlin, as reserve/cancel do, ADR-0036) and
+  "today" from the injected `TimeProvider` (Europe/Berlin, as reserve/cancel do, ADR-0039) and
   includes names only for today and the next day; all other days return counts only.
 
 ## Consequences

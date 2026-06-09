@@ -5,7 +5,7 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 
-// The event-sourced repository for AttendanceDay (ADR-0036) over the hand-rolled event store
+// The event-sourced repository for AttendanceDay (ADR-0039) over the hand-rolled event store
 // (ADR-0012). Load replays the stream onto a fresh aggregate for the company-day; Save stages the
 // occupancy projection (ADR-0038) and appends the uncommitted events at the aggregate's expected
 // version, so the read-model rows and the events commit in one transaction (FR-010). The store's

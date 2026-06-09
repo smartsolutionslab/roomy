@@ -6,7 +6,7 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 
 // Reserves a place (FR-001..007). It reads the room's capacity, then runs the aggregate's decision
-// inside a bounded optimistic-retry loop (research R2 / ADR-0036): load → decide → save. A domain
+// inside a bounded optimistic-retry loop (research R2 / ADR-0039): load → decide → save. A domain
 // rejection (room full, duplicate day, not bookable) returns immediately; only a save-time concurrency
 // conflict retries — reloading so the loser of the last-place race (scenario 12) re-decides against
 // fresh state. "Today" is the Europe/Berlin calendar day and OccurredAt the instant, both from the

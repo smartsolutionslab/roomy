@@ -59,7 +59,7 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 
 ---
 
-## Phase 3: Shared route guards (ADR-0038)
+## Phase 3: Shared route guards (ADR-0040)
 
 - [x] T006 Generate `libs/shared/feature` (`@roomy/shared-feature`, `type:feature`,
   `context:shared`, `vitest-analog`). **Move** `auth.guard.ts(+spec)`, `admin.guard.ts(+spec)`, and
@@ -151,7 +151,7 @@ updates it; a duplicate room name shows a field-level conflict.
 
 - Tests fail before implementation (verify RED).
 - No new gateway route (the `/offices/{**}` YARP route already exists).
-- ADR-0038 (shared guards) is the only new ADR; ADR-0036 (codegen) is applied, not re-decided.
+- ADR-0040 (shared guards) is the only new ADR; ADR-0036 (codegen) is applied, not re-decided.
 - Token-free throughout (ADR-0013); same-origin relative URLs (ADR-0030); generated, drift-gated
   client (ADR-0036).
 
@@ -165,5 +165,5 @@ office's derived capacity); a `409` keeps the editor open with a field-level con
 be fixed (the rename-conflict test cancels, then asserts the office is unchanged), a `404` closes the
 editor, shows a "no longer exists" notice and reloads the list, and other failures show a
 non-blocking error. The success `aria-live` region announces every mutation. The route guards come
-from `@roomy/shared-feature` (ADR-0038); no `organization → identity` import. DE/EN key parity is
+from `@roomy/shared-feature` (ADR-0040); no `organization → identity` import. DE/EN key parity is
 verified (73/73). The web app builds under strict template checking.

@@ -1,6 +1,6 @@
 namespace SmartSolutionsLab.Roomy.SharedKernel;
 
-// Base for an event-sourced aggregate root (ADR-0036). Unlike the state-based Aggregate (ADR-0032),
+// Base for an event-sourced aggregate root (ADR-0039). Unlike the state-based Aggregate (ADR-0032),
 // whose state lives in mapped fields and whose IDomainEvents are an optional side-record, here state
 // IS the left-fold over the aggregate's event stream (ADR-0012): every change happens in Apply, and
 // nowhere else. Raise applies an event and collects it for the repository to append; LoadFromHistory

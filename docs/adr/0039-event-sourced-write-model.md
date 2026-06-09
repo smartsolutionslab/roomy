@@ -1,4 +1,4 @@
-# 0036. Event-sourced write model: aggregate base, repository, and optimistic-retry
+# 0039. Event-sourced write model: aggregate base, repository, and optimistic-retry
 
 - **Status:** Proposed
 - **Date:** 2026-06-09
