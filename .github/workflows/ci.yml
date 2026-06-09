@@ -137,6 +137,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Regenerate the typed client from the committed OpenAPI spec and fail if it differs from what
+      # is committed (ADR-0036). Pure Node — no app, database or .NET needed — so a spec change that
+      # was not followed by re-running generate-client cannot drift the client the frontend consumes.
+      - name: Verify the generated API client is current
+        run: |
+          pnpm nx run identity-data-access:generate-client
+          git diff --exit-code -- libs/identity/data-access/src/lib/generated
+
       - name: Derive affected SHAs
         uses: nrwl/nx-set-shas@v5
 
