@@ -1,3 +1,4 @@
+using JasperFx;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,9 @@ using SmartSolutionsLab.Roomy.Attendance.Api;
 using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
+using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +23,24 @@ var attendanceConnectionString = builder.Configuration.GetConnectionString("atte
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 builder.Services.AddAttendanceUseCases();
 
-// Until organization's capacity feed lands (US2), no room is known to attendance, so a reservation is
-// rejected as unknown_room. US2 replaces this with the Rooms read-model adapter.
-builder.Services.AddScoped<IRoomDirectory, UnprovisionedRoomDirectory>();
+// Capacity comes from the local Rooms read model, fed by organization's RoomAdded (ADR-0014/0037).
+builder.Services.AddScoped<IRoomDirectory, RoomDirectory>();
+
+// Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
+// (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
+// assembly) into the Rooms read model; the inbox shares the attendance database so the projection and
+// the dedup commit together. No outbound integration events this slice (occupancy folds the stream
+// locally, 004).
+builder.AddRoomyMessaging(
+    new MessagingOptions
+    {
+        Transport = MessagingTransport.RabbitMq,
+        PostgresConnectionString = attendanceConnectionString,
+        ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
+            ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+    },
+    applicationAssembly: typeof(AttendanceApiHost).Assembly,
+    typeof(RoomAddedConsumer).Assembly);
 
 // Single-tenant v1 (ADR-0011): the company that owns every AttendanceDay (ADR-0026) is configured.
 var attendance = builder.Configuration.GetSection(AttendanceApiOptions.SectionName);
@@ -58,4 +77,6 @@ app.UseAuthorization();
 
 app.MapReservationEndpoints();
 
-app.Run();
+// RunJasperFxCommands so the Wolverine code-generation commands are available (ADR-0034): the host runs
+// from committed, pre-generated code (TypeLoadMode.Static). With no arguments it just runs the host.
+return await app.RunJasperFxCommands(args);

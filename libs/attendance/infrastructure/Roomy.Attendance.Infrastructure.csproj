@@ -11,6 +11,9 @@
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
     <!-- The hand-rolled event store + EF Core baseline: EventStoreDbContext, IEventStore, EventTypeRegistry (ADR-0012). -->
     <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- Organization's published language, consumed at the messaging edge: RoomAdded feeds the Rooms
+         read model (ADR-0031, 003 US2). Consumers reference the producer's contracts only. -->
+    <ProjectReference Include="../../organization/contracts/Roomy.Contracts.Organization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

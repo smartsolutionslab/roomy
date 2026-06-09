@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Api;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
@@ -33,14 +34,18 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         app = new WebApplicationFactory<AttendanceApiHost>().WithWebHostBuilder(webHost =>
         {
             webHost.UseSetting("ConnectionStrings:attendance", fixture.ConnectionString);
+            webHost.UseSetting("ConnectionStrings:rabbitmq", "amqp://guest:guest@localhost:5672");
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Attendance:CompanyId", companyId.ToString());
 
             webHost.ConfigureTestServices(services =>
             {
-                // Replace the BFF/Keycloak token validation with the test scheme, the live clock with a
-                // fixed one, and the unprovisioned room directory with a controllable stub.
+                // Keep the HTTP test free of external infra: drop the Wolverine runtime (it would connect
+                // to RabbitMQ on start), and replace the BFF/Keycloak token validation with the test
+                // scheme, the live clock with a fixed one, and the room directory with a controllable stub.
+                services.RemoveAll<IHostedService>();
+
                 services.AddAuthentication(TestAuthHandler.SchemeName)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
 

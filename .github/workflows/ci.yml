@@ -52,15 +52,19 @@ jobs:
           git diff --exit-code -- apps/identity-api/Internal/Generated
           dotnet run --project apps/organization-api --configuration Release --no-build -- codegen write
           git diff --exit-code -- apps/organization-api/Internal/Generated
+          dotnet run --project apps/attendance-api --configuration Release --no-build -- codegen write
+          git diff --exit-code -- apps/attendance-api/Internal/Generated
         env:
           ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
           ConnectionStrings__organization: "Host=localhost;Database=organization;Username=ci;Password=ci"
+          ConnectionStrings__attendance: "Host=localhost;Database=attendance;Username=ci;Password=ci"
           ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
           Keycloak__BaseAddress: "http://localhost:8080"
           Keycloak__AdminUsername: "ci"
           Keycloak__AdminPassword: "ci"
           Keycloak__Realm: "roomy"
           Company__Name: "Roomy"
+          Attendance__CompanyId: "0199a0b0-0000-7000-8000-000000000001"
           DefaultAdmin__Email: "ci@roomy.local"
           DefaultAdmin__DisplayName: "CI"
           DefaultAdmin__InitialPassword: "ci-password-123"
