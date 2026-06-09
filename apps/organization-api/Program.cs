@@ -1,4 +1,5 @@
 using JasperFx;
+using JasperFx.CommandLine;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -50,35 +51,53 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddOrganizationUseCases();
 
+// Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
+builder.Services.AddOpenApi();
+
+// Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
+// HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher
+// disposing it first; it is scoped to the emit so normal startup is unaffected. The document is built
+// from endpoint metadata alone, so during an emit the messaging runtime and the company seeder — the
+// two startups that open a broker/database connection — are skipped, letting the spec emit with no
+// Postgres or RabbitMQ.
+var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+if (emittingOpenApiDocument)
+{
+    JasperFxEnvironment.AutoStartHost = true;
+}
+
 // Wolverine's durable transactional outbox over the organization database, RabbitMQ transport
 // (ADR-0005/0015). Publish-only: this context emits OfficeOpened/RoomAdded (drained from domain events
 // at commit, ADR-0037) but consumes nothing, so no handler assemblies are scanned. The outbox shares the
 // organization database so a published event commits atomically with the office/room write (ADR-0012).
-builder.AddRoomyMessaging(
-    new MessagingOptions
-    {
-        Transport = MessagingTransport.RabbitMq,
-        PostgresConnectionString = connectionString,
-        ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-            ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
-    },
-    applicationAssembly: typeof(OrganizationApiHost).Assembly);
-
-// Organization publishes from a state-based unit of work, so it opts into the transactional outbox
-// (ADR-0037). Consume-only hosts (identity, attendance) do not, keeping their handler graph unperturbed.
-builder.Services.AddIntegrationEventOutbox();
-
-// Seed the single company at startup so offices have a company to belong to (research.md D2). The
-// seeder is idempotent, so it is safe on every restart. The schema is applied out-of-process by the
-// db-migrator before this host starts (Aspire WaitForCompletion, ADR-0033).
-var company = builder.Configuration.GetSection(CompanyOptions.SectionName);
-builder.Services.AddSingleton(new CompanyOptions
+if (!emittingOpenApiDocument)
 {
-    Name = company["Name"]
-        ?? throw new InvalidOperationException("Missing configuration 'Company:Name'."),
-});
-builder.Services.AddScoped<CompanySeeder>();
-builder.Services.AddHostedService<CompanySeederHostedService>();
+    builder.AddRoomyMessaging(
+        new MessagingOptions
+        {
+            Transport = MessagingTransport.RabbitMq,
+            PostgresConnectionString = connectionString,
+            ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
+                ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+        },
+        applicationAssembly: typeof(OrganizationApiHost).Assembly);
+
+    // Organization publishes from a state-based unit of work, so it opts into the transactional outbox
+    // (ADR-0037). Consume-only hosts (identity, attendance) do not, keeping their handler graph clean.
+    builder.Services.AddIntegrationEventOutbox();
+
+    // Seed the single company at startup so offices have a company to belong to (research.md D2). The
+    // seeder is idempotent, so it is safe on every restart. The schema is applied out-of-process by the
+    // db-migrator before this host starts (Aspire WaitForCompletion, ADR-0033).
+    var company = builder.Configuration.GetSection(CompanyOptions.SectionName);
+    builder.Services.AddSingleton(new CompanyOptions
+    {
+        Name = company["Name"]
+            ?? throw new InvalidOperationException("Missing configuration 'Company:Name'."),
+    });
+    builder.Services.AddScoped<CompanySeeder>();
+    builder.Services.AddHostedService<CompanySeederHostedService>();
+}
 
 var app = builder.Build();
 
@@ -88,6 +107,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapOfficeEndpoints();
+
+// Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
+// route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.
+app.MapOpenApi();
 
 // RunJasperFxCommands so the Wolverine code-generation commands are available (ADR-0034): the host
 // runs from committed, pre-generated code (TypeLoadMode.Static). With no arguments it just runs the host.
