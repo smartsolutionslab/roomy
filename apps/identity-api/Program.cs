@@ -14,12 +14,6 @@ using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
-// The host dispatches startup through JasperFx (RunJasperFxCommands, ADR-0034). AutoStartHost lets
-// HostFactoryResolver-based tooling — EF design-time and the OpenAPI `getdocument` emit (ADR-0036) —
-// obtain the built service provider instead of the command dispatcher disposing it first. With no
-// command (how Aspire launches the service) the host still just runs.
-JasperFxEnvironment.AutoStartHost = true;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
@@ -79,11 +73,17 @@ builder.Services.AddOpenApi();
 // EmployeeHired consumer resolves RegisterUser through these.
 builder.Services.AddIdentityUseCases();
 
-// Emitting the OpenAPI spec (ADR-0036) boots the host through `getdocument` with AutoStartHost, which
-// starts hosted services. The document is built from endpoint metadata alone, so during an emit the
+// Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
+// HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher
+// disposing it first; it is scoped to the emit so the Wolverine `codegen write` step and normal
+// startup are unaffected. The document is built from endpoint metadata alone, so during an emit the
 // messaging runtime and the DefaultAdmin seeder — the two startups that open a broker/database
 // connection — are skipped, letting the spec emit with no Postgres or RabbitMQ.
 var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+if (emittingOpenApiDocument)
+{
+    JasperFxEnvironment.AutoStartHost = true;
+}
 
 // Wolverine's durable transactional outbox/inbox over the identity database, with RabbitMQ as the
 // default transport (ADR-0005/0012/0015). The outbox shares the database with the User write so a
