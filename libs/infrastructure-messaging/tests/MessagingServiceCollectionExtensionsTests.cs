@@ -1,7 +1,10 @@
+using JasperFx.CodeGeneration;
+using JasperFx.CodeGeneration.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
+using Wolverine;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging.Tests;
 
@@ -100,5 +103,21 @@ public sealed class MessagingServiceCollectionExtensionsTests
     public void MessagingOptions_default_transport_is_rabbitmq()
     {
         new MessagingOptions().Transport.ShouldBe(MessagingTransport.RabbitMq);
+    }
+
+    [Fact]
+    public async Task AddRoomyMessaging_uses_static_code_generation_so_hosts_need_no_runtime_compiler()
+    {
+        // WolverineFx 6.5 dropped the Roslyn runtime compiler from core (GH-2876); a host in the
+        // default Dynamic mode crashes at startup. Static mode loads pre-generated code instead, with
+        // service location allowed for opaque factories (typed HttpClients) — see ADR-0034.
+        var builder = Host.CreateApplicationBuilder();
+
+        builder.AddRoomyMessaging(RabbitOptions());
+
+        await using var provider = builder.Services.BuildServiceProvider();
+        var wolverine = provider.GetRequiredService<WolverineOptions>();
+        wolverine.CodeGeneration.TypeLoadMode.ShouldBe(TypeLoadMode.Static);
+        wolverine.ServiceLocationPolicy.ShouldBe(ServiceLocationPolicy.AllowedButWarn);
     }
 }

@@ -316,3 +316,8 @@ dotnet_naming_rule.local_functions_are_pascal_case.severity = warning
 # `dotnet format` leave them as EF emits them (block-scoped namespaces, #nullable disable, etc.).
 [**/Migrations/*.cs]
 generated_code = true
+
+# Wolverine static-codegen output (`dotnet run -- codegen write`, ADR-0034) is tool-emitted and
+# committed so the host loads it instead of compiling at runtime. Treat it as generated code.
+[**/Internal/Generated/**.cs]
+generated_code = true
