@@ -15,14 +15,48 @@ public static class OfficeEndpoints
 
     public static IEndpointRouteBuilder MapOfficeEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/offices", CreateOfficeAsync).RequireAdministrator();
-        endpoints.MapGet("/offices", ListOfficesAsync).RequireAuthorization();
-        endpoints.MapGet("/offices/{officeId:guid}", GetOfficeAsync).RequireAuthorization();
-        endpoints.MapPatch("/offices/{officeId:guid}/name", RenameOfficeAsync).RequireAdministrator();
-        endpoints.MapPatch("/offices/{officeId:guid}/location", ChangeLocationAsync).RequireAdministrator();
-        endpoints.MapPost("/offices/{officeId:guid}/rooms", AddRoomAsync).RequireAdministrator();
+        endpoints.MapPost("/offices", CreateOfficeAsync)
+            .RequireAdministrator()
+            .WithName("CreateOffice")
+            .Produces<OfficeResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status409Conflict);
+        endpoints.MapGet("/offices", ListOfficesAsync)
+            .RequireAuthorization()
+            .WithName("ListOffices")
+            .Produces<IEnumerable<OfficeResponse>>();
+        endpoints.MapGet("/offices/{officeId:guid}", GetOfficeAsync)
+            .RequireAuthorization()
+            .WithName("GetOffice")
+            .Produces<OfficeResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
+        endpoints.MapPatch("/offices/{officeId:guid}/name", RenameOfficeAsync)
+            .RequireAdministrator()
+            .WithName("RenameOffice")
+            .Produces<OfficeResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
+        endpoints.MapPatch("/offices/{officeId:guid}/location", ChangeLocationAsync)
+            .RequireAdministrator()
+            .WithName("ChangeOfficeLocation")
+            .Produces<OfficeResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound);
+        endpoints.MapPost("/offices/{officeId:guid}/rooms", AddRoomAsync)
+            .RequireAdministrator()
+            .WithName("AddRoom")
+            .Produces<RoomResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
         endpoints.MapPatch("/offices/{officeId:guid}/rooms/{roomId:guid}/name", RenameRoomAsync)
-            .RequireAdministrator();
+            .RequireAdministrator()
+            .WithName("RenameRoom")
+            .Produces<OfficeResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
         return endpoints;
     }
