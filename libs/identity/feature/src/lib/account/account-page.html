@@ -1,0 +1,22 @@
+<ng-container *transloco="let translate">
+  <section class="account">
+    <h1 class="account__title">{{ translate('account.title') }}</h1>
+
+    @if (failed()) {
+    <p class="account__error" role="alert">{{ translate('account.error') }}</p>
+    } @else if (account(); as currentAccount) {
+    <dl class="account__details">
+      <dt>{{ translate('account.nameLabel') }}</dt>
+      <dd class="account__name">{{ currentAccount.displayName }}</dd>
+
+      <dt>{{ translate('account.emailLabel') }}</dt>
+      <dd class="account__email">{{ currentAccount.email }}</dd>
+
+      <dt>{{ translate('account.roleLabel') }}</dt>
+      <dd class="account__role">{{ translate('account.role.' + currentAccount.role) }}</dd>
+    </dl>
+    } @else {
+    <p class="account__loading">{{ translate('account.loading') }}</p>
+    }
+  </section>
+</ng-container>

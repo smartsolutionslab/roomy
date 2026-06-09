@@ -13,5 +13,17 @@
   "home": {
     "title": "Willkommen bei Roomy",
     "intro": "Koordinieren Sie die Büroanwesenheit über Ihre Teams und Räume hinweg."
+  },
+  "account": {
+    "title": "Mein Konto",
+    "nameLabel": "Name",
+    "emailLabel": "E-Mail",
+    "roleLabel": "Rolle",
+    "loading": "Konto wird geladen…",
+    "error": "Konto konnte nicht geladen werden.",
+    "role": {
+      "employee": "Mitarbeiter",
+      "administrator": "Administrator"
+    }
   }
 }

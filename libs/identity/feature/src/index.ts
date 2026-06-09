@@ -1,1 +1,1 @@
-export * from './lib/identity-feature/identity-feature';
+export { identityRoutes } from './lib/identity.routes';
