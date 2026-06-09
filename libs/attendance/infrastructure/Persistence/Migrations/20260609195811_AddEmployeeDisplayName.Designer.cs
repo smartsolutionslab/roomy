@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    partial class AttendanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609195811_AddEmployeeDisplayName")]
+    partial class AddEmployeeDisplayName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
