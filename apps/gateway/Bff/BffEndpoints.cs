@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -40,7 +38,7 @@ public static class BffEndpoints
         var properties = new AuthenticationProperties { RedirectUri = SafeReturnUrl(returnUrl) };
         return Results.SignOut(
             properties,
-            [CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme]);
+            [BffAuthenticationExtensions.CookieScheme, BffAuthenticationExtensions.OidcScheme]);
     }
 
     private static IResult WhoAmI(HttpContext httpContext)
