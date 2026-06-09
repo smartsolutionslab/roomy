@@ -91,10 +91,10 @@ description: "Task list for Occupancy Views (004)"
 
 **Independent test:** `ViewMyReservations` over a seeded read model returns past+future rows with names; `GET /reservations/mine` returns the caller's list; the SPA page lists them with cancel only on future rows.
 
-- [ ] T022 [P] [US9] RED application tests in `tests/attendance/Application/ViewMyReservationsTests.cs` — an employee with past **and** future rows ⇒ all returned, each with `OfficeId/OfficeName/RoomId/RoomName/Date`; another employee's rows excluded; empty list when none.
-- [ ] T023 [US9] Implement `ViewMyReservations` query + `MyReservationView` DTO + `IMyReservationsReadModel` port (`libs/attendance/application/UseCases/` + `Ports/`) and the `MyReservationsReadModel` adapter over `Reservations` joined to `Offices`/`Rooms` (`libs/attendance/infrastructure/ReadModels/`); register in DI. T022 green.
-- [ ] T024 [US9] RED API/contract tests for `GET /reservations/mine` — returns the caller's reservations (actor resolved from token `sub` via `Employees`); `unknown_employee` ⇒ 404; past rows included as history. Per `contracts/attendance-api.md`.
-- [ ] T025 [US9] Add `GET /reservations/mine` to `apps/attendance-api/Endpoints/ReservationEndpoints.cs` (resolve actor like reserve/cancel), map `Result`→HTTP; re-emit the spec (drift gate green). T024 green.
+- [x] T022 [P] [US9] RED application tests in `tests/attendance/Application/ViewMyReservationsTests.cs` — an employee with past **and** future rows ⇒ all returned, each with `OfficeId/OfficeName/RoomId/RoomName/Date`; another employee's rows excluded; empty list when none.
+- [x] T023 [US9] Implement `ViewMyReservations` query + `MyReservationView` DTO + `IMyReservationsReadModel` port (`libs/attendance/application/UseCases/` + `Ports/`) and the `MyReservationsReadModel` adapter over `Reservations` joined to `Offices`/`Rooms` (`libs/attendance/infrastructure/ReadModels/`); register in DI. T022 green.
+- [x] T024 [US9] RED API/contract tests for `GET /reservations/mine` — returns the caller's reservations (actor resolved from token `sub` via `Employees`); `unknown_employee` ⇒ 404; past rows included as history. Per `contracts/attendance-api.md`.
+- [x] T025 [US9] Add `GET /reservations/mine` to `apps/attendance-api/Endpoints/ReservationEndpoints.cs` (resolve actor like reserve/cancel), map `Result`→HTTP; re-emit the spec (drift gate green). T024 green.
 - [ ] T026 [US9] RED + impl the `my-reservations` page — `data-access` store over the generated client; `feature` routed page in `libs/attendance/feature/` listing past+future with office/room/day, **cancel only on future** rows wired to the existing `DELETE /reservations/{id}?date=` (past ⇒ disabled; server returns `past_immutable`); Transloco DE+EN, CDK a11y; route in `apps/web`. Component test covers the past-vs-future cancel rule.
 
 **Checkpoint**: US6 + US9 both work independently — occupancy lists and a personal reservations overview.
