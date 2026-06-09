@@ -69,6 +69,43 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
     }
 
     [Fact]
+    public async Task Assigns_the_administrator_role_to_a_provisioned_employee()
+    {
+        var provider = fixture.CreateProvider();
+        var provisioned = await provider.ProvisionUserAsync(
+            UniqueEmail(), DisplayName.From("Ada Lovelace"), ValidPassword, Role.Employee,
+            TestContext.Current.CancellationToken);
+        provisioned.IsSuccess.ShouldBeTrue();
+
+        var result = await provider.AssignAdministratorRoleAsync(
+            provisioned.Value, TestContext.Current.CancellationToken);
+
+        result.IsSuccess.ShouldBeTrue();
+        var roles = await fixture.GetRealmRoleNamesAsync(
+            provisioned.Value, TestContext.Current.CancellationToken);
+        roles.ShouldContain("administrator");
+        roles.ShouldContain("employee");
+    }
+
+    [Fact]
+    public async Task Assigning_the_administrator_role_is_idempotent()
+    {
+        var provider = fixture.CreateProvider();
+        var provisioned = await provider.ProvisionUserAsync(
+            UniqueEmail(), DisplayName.From("Grace Hopper"), ValidPassword,
+            Role.Employee.GrantAdministrator(), TestContext.Current.CancellationToken);
+        provisioned.IsSuccess.ShouldBeTrue();
+
+        var result = await provider.AssignAdministratorRoleAsync(
+            provisioned.Value, TestContext.Current.CancellationToken);
+
+        result.IsSuccess.ShouldBeTrue();
+        var roles = await fixture.GetRealmRoleNamesAsync(
+            provisioned.Value, TestContext.Current.CancellationToken);
+        roles.Count(role => role == "administrator").ShouldBe(1);
+    }
+
+    [Fact]
     public async Task Rejects_a_password_below_the_minimum_length()
     {
         var provider = fixture.CreateProvider();
