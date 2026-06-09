@@ -83,7 +83,11 @@ trip and to keep the gate cheap.
 `/bff/login?returnUrl=<attempted path>`. `adminGuard`: requires `roles` to include `administrator`,
 otherwise route to a not-authorized view (and the admin nav entry is hidden when not an admin).
 Because the session loads asynchronously at startup, the guards await the first session resolution
-(the `SessionService` is extended with a `whenLoaded()`/readiness signal) before deciding.
+(`SessionService.ensureLoaded()`) before deciding. Since a guard lives in the `identity-feature`
+lib and a lib cannot import the app (boundary), `SessionService`/`CurrentUser` were moved out of
+`apps/web` into a shared **data-access** lib `@roomy/shared-data-access` (`type:data-access`,
+`context:shared`), which the shell and every context feature lib reuse (revises the original
+"extend the app's SessionService" intent).
 
 ## Project Structure (this feature)
 
@@ -105,9 +109,11 @@ libs/identity/feature/                     # @roomy/identity-feature (type:featu
    └─ identity.routes.ts     # exported routes, lazy-loaded by the app
    src/index.ts              # public API: identityRoutes
 
+libs/shared/data-access/                   # @roomy/shared-data-access (type:data-access, context:shared)
+└─ src/lib/session/session.service.ts      # SessionService.ensureLoaded() + CurrentUser (moved from app)
+
 apps/web/src/app/
-├─ app.routes.ts             # lazy-load @roomy/identity-feature routes
-└─ session/session.service.ts # extend with readiness for guards (D-FE3)
+└─ app.routes.ts             # lazy-load @roomy/identity-feature routes
 
 apps/web/public/i18n/{en,de}.json        # add `account.*` and `admin.*` namespaces (FR-006)
 apps/gateway/appsettings.json            # add the `/admin/{**}` YARP route (backend enablement)
