@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../libs/organization/domain/Roomy.Organization.Domain.csproj" />
+    <ProjectReference Include="../../libs/organization/application/Roomy.Organization.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

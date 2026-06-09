@@ -21,6 +21,7 @@
       application/infrastructure layers join here as they land — CLAUDE.md, tests/architecture/README).
     -->
     <ProjectReference Include="../../../libs/organization/domain/Roomy.Organization.Domain.csproj" />
+    <ProjectReference Include="../../../libs/organization/application/Roomy.Organization.Application.csproj" />
     <!--
       Per-context published-language contracts (ADR-0031): referenced so the convention rules load and
       inspect them, and so the cross-context isolation rule observes that consuming a producer's
