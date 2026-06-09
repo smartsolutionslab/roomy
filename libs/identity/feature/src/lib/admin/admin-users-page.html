@@ -2,7 +2,11 @@
   <section class="admin-users">
     <h1 class="admin-users__title">{{ translate('admin.users.title') }}</h1>
 
-    @if (grantFailed()) {
+    @if (grantSucceeded(); as grantedName) {
+    <p class="admin-users__status" role="status" aria-live="polite">
+      {{ translate('admin.users.grantSuccess', { name: grantedName }) }}
+    </p>
+    } @if (grantFailed()) {
     <p class="admin-users__error" role="alert" aria-live="assertive">
       {{ translate('admin.users.grantError') }}
     </p>
@@ -29,11 +33,18 @@
           <td>{{ translate('account.role.' + account.role) }}</td>
           <td>{{ translate('admin.users.status.' + account.status) }}</td>
           <td>
-            @if (account.role === 'employee') {
-            <button type="button" (click)="grantAdministrator(account)">
+            @if (account.role === 'employee') { @if (confirmingUserId() === account.userId) {
+            <button type="button" (click)="confirmGrant(account)">
+              {{ translate('admin.users.confirm') }}
+            </button>
+            <button type="button" (click)="cancelGrant()">
+              {{ translate('admin.users.cancel') }}
+            </button>
+            } @else {
+            <button type="button" (click)="requestGrant(account)">
               {{ translate('admin.users.grant') }}
             </button>
-            }
+            } }
           </td>
         </tr>
         }
