@@ -25,6 +25,8 @@ import {
   viewMyReservations,
   viewOccupancy,
 } from './generated';
+import { toOccupancyDays } from './occupancy';
+import type { OccupancyDay } from './occupancy';
 
 // Reads and mutates attendance through the gateway (`/rooms`, `/reservations**`, `/occupancy`) using the
 // generated client (ADR-0036), mapping the trusted DTOs to branded view models at this boundary
@@ -49,6 +51,22 @@ export class AttendanceGateway {
     return viewOccupancy(this.http, this.config.rootUrl, { officeId: office, from: day, to: day }).pipe(
       map((response) => toRoomAvailability(response.body)),
     );
+  }
+
+  // Occupancy for an office or room over a date range (GET /occupancy), as full day figures — the office
+  // rollup, per-room occupied/capacity, and (today/tomorrow only) occupants (008 OC-1/2/4/6). Exactly one
+  // of officeId/roomId is set; the caller keeps the range within the backend's 31-day bound.
+  occupancy(
+    scope: { officeId?: OfficeId; roomId?: RoomId },
+    from: string,
+    to: string,
+  ): Observable<OccupancyDay[]> {
+    return viewOccupancy(this.http, this.config.rootUrl, {
+      officeId: scope.officeId,
+      roomId: scope.roomId,
+      from,
+      to,
+    }).pipe(map((response) => toOccupancyDays(response.body)));
   }
 
   // Reserve a place (POST /reservations). Resolves to the new reservation id; rejections (room_full,

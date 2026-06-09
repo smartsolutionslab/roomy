@@ -28,14 +28,14 @@ description: "Task list for Occupancy Web — occupancy views & calendar (008)"
 
 ## Phase 1: Data-access — occupancy read on `@roomy/attendance-data-access`
 
-- [ ] T001 [P] [US1] `occupancy-range.ts` — Europe/Berlin range maths: `rangeFor('day'|'week'|'month',
+- [x] T001 [P] [US1] `occupancy-range.ts` — Europe/Berlin range maths: `rangeFor('day'|'week'|'month',
   anchor) -> { from, to }` (each ≤ 31 days, FR-006) and `monthGrid(anchor) -> weeks[][]` (calendar
   cells, leading/trailing days to fill weeks). Spec `occupancy-range.spec.ts`: week = Mon–Sun span,
   month = 1st–last, grid aligns weekdays.
-- [ ] T002 [P] [US1] `occupancy.ts` — `OccupancyDay`/`OccupancyRoom`/`Occupant` view models +
+- [x] T002 [P] [US1] `occupancy.ts` — `OccupancyDay`/`OccupancyRoom`/`Occupant` view models +
   `toOccupancyDays(OccupancyDayResponse[])` mapping (coerce `number | string`; `occupants` undefined when
   the response withholds it — never inferred, FR-003). Spec `occupancy.spec.ts`.
-- [ ] T003 [US1] Extend `AttendanceGateway` with `occupancy(scope: { officeId?: OfficeId; roomId?: RoomId },
+- [x] T003 [US1] Extend `AttendanceGateway` with `occupancy(scope: { officeId?: OfficeId; roomId?: RoomId },
   from: string, to: string): Observable<OccupancyDay[]>` over the generated `viewOccupancy`; export the
   new view models + range helpers from `src/index.ts`. Spec extension: office scope and room scope call
   `/occupancy` with the right params and map the response (HttpTestingController).
