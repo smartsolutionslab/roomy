@@ -13,5 +13,17 @@
   "home": {
     "title": "Welcome to Roomy",
     "intro": "Coordinate office attendance across your teams and spaces."
+  },
+  "account": {
+    "title": "My account",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "roleLabel": "Role",
+    "loading": "Loading your account…",
+    "error": "We could not load your account.",
+    "role": {
+      "employee": "Employee",
+      "administrator": "Administrator"
+    }
   }
 }

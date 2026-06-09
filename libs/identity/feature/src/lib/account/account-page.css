@@ -1,0 +1,20 @@
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-md, 1rem);
+}
+
+.account__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--roomy-space-xs, 0.25rem) var(--roomy-space-md, 1rem);
+  margin: 0;
+}
+
+.account__details dt {
+  font-weight: 600;
+}
+
+.account__details dd {
+  margin: 0;
+}
