@@ -4,6 +4,13 @@
   gap: var(--roomy-space-md, 1rem);
 }
 
+/* WCAG 2.2 AA — a visible focus indicator on every interactive control (FR-010). */
+.offices button:focus-visible,
+.offices input:focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: var(--roomy-focus-outline-offset);
+}
+
 .offices__list {
   list-style: none;
   margin: 0;

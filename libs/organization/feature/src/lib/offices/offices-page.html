@@ -21,10 +21,14 @@
     </form>
 
     <p class="offices__result" role="status" aria-live="polite">
-      @if (createdName(); as name) {
-      {{ translate('organization.create.created', { name }) }}
+      @if (result(); as message) {
+      {{ translate(message.key, message.params) }}
       }
     </p>
+
+    @if (editNotFound()) {
+    <p class="offices__error" role="alert">{{ translate('organization.edit.notFound') }}</p>
+    }
 
     @if (loadFailed()) {
     <p class="offices__error" role="alert">{{ translate('organization.offices.loadError') }}</p>
@@ -34,13 +38,56 @@
     <ul class="offices__list">
       @for (office of items; track office.id) {
       <li class="offices__item">
+        @if (isActive('rename-office', office.id)) {
+        <form class="offices__edit" [formGroup]="textForm" (ngSubmit)="saveOfficeName(office.id)">
+          <label class="offices__field">
+            <span>{{ translate('organization.edit.nameLabel') }}</span>
+            <input type="text" formControlName="value" />
+          </label>
+          @if (editConflict()) {
+          <p class="offices__error" role="alert">
+            {{ translate('organization.edit.nameConflict') }}
+          </p>
+          } @if (editFailed()) {
+          <p class="offices__error" role="alert">{{ translate('organization.edit.error') }}</p>
+          }
+          <button type="submit">{{ translate('organization.edit.save') }}</button>
+          <button type="button" (click)="cancelEdit()">
+            {{ translate('organization.edit.cancel') }}
+          </button>
+        </form>
+        } @else {
         <h2 class="offices__name">{{ office.name }}</h2>
+        <button type="button" (click)="openRenameOffice(office)">
+          {{ translate('organization.edit.rename') }}
+        </button>
+        }
+
+        @if (isActive('relocate-office', office.id)) {
+        <form class="offices__edit" [formGroup]="textForm" (ngSubmit)="saveOfficeLocation(office.id)">
+          <label class="offices__field">
+            <span>{{ translate('organization.edit.locationLabel') }}</span>
+            <input type="text" formControlName="value" />
+          </label>
+          @if (editFailed()) {
+          <p class="offices__error" role="alert">{{ translate('organization.edit.error') }}</p>
+          }
+          <button type="submit">{{ translate('organization.edit.save') }}</button>
+          <button type="button" (click)="cancelEdit()">
+            {{ translate('organization.edit.cancel') }}
+          </button>
+        </form>
+        } @else {
         <dl class="offices__meta">
           <dt>{{ translate('organization.offices.locationLabel') }}</dt>
           <dd>{{ office.location }}</dd>
           <dt>{{ translate('organization.offices.capacityLabel') }}</dt>
           <dd>{{ office.capacity }}</dd>
         </dl>
+        <button type="button" (click)="openRelocateOffice(office)">
+          {{ translate('organization.edit.relocate') }}
+        </button>
+        }
 
         <h3 class="offices__rooms-heading">{{ translate('organization.offices.roomsHeading') }}</h3>
         @if (office.rooms.length === 0) {
@@ -49,11 +96,72 @@
         <ul class="offices__rooms">
           @for (room of office.rooms; track room.id) {
           <li class="offices__room">
+            @if (isRenamingRoom(office.id, room.id)) {
+            <form class="offices__edit" [formGroup]="textForm" (ngSubmit)="saveRoomName(office.id, room.id)">
+              <label class="offices__field">
+                <span>{{ translate('organization.rooms.renameLabel') }}</span>
+                <input type="text" formControlName="value" />
+              </label>
+              @if (editConflict()) {
+              <p class="offices__error" role="alert">
+                {{ translate('organization.rooms.nameConflict') }}
+              </p>
+              } @if (editFailed()) {
+              <p class="offices__error" role="alert">{{ translate('organization.edit.error') }}</p>
+              }
+              <button type="submit">{{ translate('organization.edit.save') }}</button>
+              <button type="button" (click)="cancelEdit()">
+                {{ translate('organization.edit.cancel') }}
+              </button>
+            </form>
+            } @else {
             <span class="offices__room-name">{{ room.name }}</span>
             <span class="offices__room-capacity">{{ room.capacity }}</span>
+            <button
+              type="button"
+              [attr.aria-label]="translate('organization.rooms.renameRoom', { name: room.name })"
+              (click)="openRenameRoom(office, room)"
+            >
+              {{ translate('organization.edit.rename') }}
+            </button>
+            }
           </li>
           }
         </ul>
+        }
+
+        @if (isActive('add-room', office.id)) {
+        <form class="offices__add-room" [formGroup]="roomForm" (ngSubmit)="addRoom(office.id)">
+          <label class="offices__field">
+            <span>{{ translate('organization.rooms.nameLabel') }}</span>
+            <input type="text" formControlName="name" />
+          </label>
+          <label class="offices__field">
+            <span>{{ translate('organization.rooms.capacityLabel') }}</span>
+            <input type="number" formControlName="capacity" min="1" />
+          </label>
+          @if (roomAttempted() && roomForm.controls.name.invalid) {
+          <p class="offices__error" role="alert">
+            {{ translate('organization.rooms.nameRequired') }}
+          </p>
+          } @if (roomAttempted() && roomForm.controls.capacity.invalid) {
+          <p class="offices__error" role="alert">{{ translate('organization.rooms.capacityMin') }}</p>
+          } @if (editConflict()) {
+          <p class="offices__error" role="alert">
+            {{ translate('organization.rooms.nameConflict') }}
+          </p>
+          } @if (editFailed()) {
+          <p class="offices__error" role="alert">{{ translate('organization.rooms.error') }}</p>
+          }
+          <button type="submit">{{ translate('organization.rooms.submit') }}</button>
+          <button type="button" (click)="cancelEdit()">
+            {{ translate('organization.edit.cancel') }}
+          </button>
+        </form>
+        } @else {
+        <button type="button" (click)="openAddRoom(office)">
+          {{ translate('organization.rooms.add') }}
+        </button>
         }
       </li>
       }

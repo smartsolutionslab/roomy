@@ -69,6 +69,32 @@
       "nameConflict": "Ein Büro mit diesem Namen existiert bereits.",
       "error": "Das Büro konnte nicht erstellt werden. Bitte erneut versuchen.",
       "created": "Büro {{name}} erstellt."
+    },
+    "edit": {
+      "rename": "Umbenennen",
+      "relocate": "Standort ändern",
+      "nameLabel": "Neuer Name",
+      "locationLabel": "Neuer Standort",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "nameConflict": "Ein Büro mit diesem Namen existiert bereits.",
+      "notFound": "Dieses Büro existiert nicht mehr.",
+      "error": "Die Änderung konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "updated": "Büro {{name}} aktualisiert."
+    },
+    "rooms": {
+      "add": "Raum hinzufügen",
+      "submit": "Hinzufügen",
+      "nameLabel": "Raumname",
+      "capacityLabel": "Kapazität (Plätze)",
+      "renameLabel": "Neuer Raumname",
+      "renameRoom": "Raum {{name}} umbenennen",
+      "nameRequired": "Ein Raumname ist erforderlich.",
+      "capacityMin": "Die Kapazität muss mindestens 1 betragen.",
+      "nameConflict": "Ein Raum mit diesem Namen existiert in diesem Büro bereits.",
+      "error": "Der Raum konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "added": "Raum {{name}} hinzugefügt.",
+      "renamed": "Raum {{name}} umbenannt."
     }
   },
   "shared": {
