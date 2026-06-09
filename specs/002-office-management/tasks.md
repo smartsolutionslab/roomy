@@ -98,7 +98,7 @@ description: "Task list for Office & Room Management (002)"
 
 ## Phase 8: End-to-end wiring & polish
 
-- [ ] T023 Wire `organization-api` into the Aspire app host (`apps/apphost/AppHost.cs`) — add the `organization` database, the `db-migrator` reference to it, the `organization-api` project gated `WaitForCompletion(db-migrator)` + Keycloak reference/config, and a gateway YARP route `/offices/{**}` → the `organization` cluster (default policy + token forwarding). Extend the app-host model test (`tests/apphost/`) to assert the wiring. Live browser/e2e is deferred (mirrors identity's deferral).
+- [x] T023 Wire `organization-api` into the Aspire app host (`apps/apphost/AppHost.cs`) — add the `organization` database, the `db-migrator` reference to it, the `organization-api` project gated `WaitForCompletion(db-migrator)` + Keycloak reference/config, and a gateway YARP route `/offices/{**}` → the `organization` cluster (default policy + token forwarding). Extend the app-host model test (`tests/apphost/`) to assert the wiring. Live browser/e2e is deferred (mirrors identity's deferral).
 - [ ] T024 [P] Produce the OpenAPI document for the organization surface (the typed Angular client + an admin UI are a later frontend slice).
 
 ---
