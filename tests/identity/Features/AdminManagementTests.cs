@@ -114,6 +114,9 @@ public sealed class AdminManagementTests
         public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
             Task.FromResult(false);
 
+        public Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyList<User>>(users.Values.ToList());
+
         public Task AddAsync(User user, CancellationToken cancellationToken)
         {
             users[user.Identifier] = user;
