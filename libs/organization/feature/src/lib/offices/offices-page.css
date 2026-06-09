@@ -1,0 +1,50 @@
+.offices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-md, 1rem);
+}
+
+.offices__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-md, 1rem);
+}
+
+.offices__item {
+  border: 1px solid var(--roomy-color-border, #d0d0d0);
+  border-radius: var(--roomy-radius, 0.25rem);
+  padding: var(--roomy-space-sm, 0.5rem) var(--roomy-space-md, 1rem);
+}
+
+.offices__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--roomy-space-xs, 0.25rem) var(--roomy-space-sm, 0.5rem);
+  margin: 0 0 var(--roomy-space-sm, 0.5rem);
+}
+
+.offices__meta dt {
+  font-weight: 600;
+}
+
+.offices__meta dd {
+  margin: 0;
+}
+
+.offices__rooms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs, 0.25rem);
+}
+
+.offices__room {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--roomy-space-sm, 0.5rem);
+}

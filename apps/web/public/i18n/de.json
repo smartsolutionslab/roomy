@@ -9,7 +9,8 @@
     "signIn": "Anmelden",
     "signOut": "Abmelden",
     "signedInAs": "Angemeldet als {{name}}",
-    "adminLink": "Verwaltung"
+    "adminLink": "Verwaltung",
+    "officesLink": "Büros"
   },
   "home": {
     "title": "Willkommen bei Roomy",
@@ -47,6 +48,18 @@
         "provisioning": "Wird bereitgestellt",
         "active": "Aktiv"
       }
+    }
+  },
+  "organization": {
+    "offices": {
+      "title": "Büros",
+      "loading": "Büros werden geladen…",
+      "empty": "Noch keine Büros.",
+      "loadError": "Die Büros konnten nicht geladen werden.",
+      "locationLabel": "Standort",
+      "capacityLabel": "Kapazität",
+      "roomsHeading": "Räume",
+      "noRooms": "Noch keine Räume."
     }
   },
   "shared": {

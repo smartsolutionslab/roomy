@@ -1,0 +1,41 @@
+<ng-container *transloco="let translate">
+  <section class="offices">
+    <h1 class="offices__title">{{ translate('organization.offices.title') }}</h1>
+
+    @if (loadFailed()) {
+    <p class="offices__error" role="alert">{{ translate('organization.offices.loadError') }}</p>
+    } @else if (offices(); as items) { @if (items.length === 0) {
+    <p class="offices__empty">{{ translate('organization.offices.empty') }}</p>
+    } @else {
+    <ul class="offices__list">
+      @for (office of items; track office.id) {
+      <li class="offices__item">
+        <h2 class="offices__name">{{ office.name }}</h2>
+        <dl class="offices__meta">
+          <dt>{{ translate('organization.offices.locationLabel') }}</dt>
+          <dd>{{ office.location }}</dd>
+          <dt>{{ translate('organization.offices.capacityLabel') }}</dt>
+          <dd>{{ office.capacity }}</dd>
+        </dl>
+
+        <h3 class="offices__rooms-heading">{{ translate('organization.offices.roomsHeading') }}</h3>
+        @if (office.rooms.length === 0) {
+        <p class="offices__no-rooms">{{ translate('organization.offices.noRooms') }}</p>
+        } @else {
+        <ul class="offices__rooms">
+          @for (room of office.rooms; track room.id) {
+          <li class="offices__room">
+            <span class="offices__room-name">{{ room.name }}</span>
+            <span class="offices__room-capacity">{{ room.capacity }}</span>
+          </li>
+          }
+        </ul>
+        }
+      </li>
+      }
+    </ul>
+    } } @else {
+    <p class="offices__loading">{{ translate('organization.offices.loading') }}</p>
+    }
+  </section>
+</ng-container>

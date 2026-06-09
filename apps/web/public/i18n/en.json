@@ -9,7 +9,8 @@
     "signIn": "Sign in",
     "signOut": "Sign out",
     "signedInAs": "Signed in as {{name}}",
-    "adminLink": "Administration"
+    "adminLink": "Administration",
+    "officesLink": "Offices"
   },
   "home": {
     "title": "Welcome to Roomy",
@@ -47,6 +48,18 @@
         "provisioning": "Provisioning",
         "active": "Active"
       }
+    }
+  },
+  "organization": {
+    "offices": {
+      "title": "Offices",
+      "loading": "Loading offices…",
+      "empty": "No offices yet.",
+      "loadError": "We could not load the offices.",
+      "locationLabel": "Location",
+      "capacityLabel": "Capacity",
+      "roomsHeading": "Rooms",
+      "noRooms": "No rooms yet."
     }
   },
   "shared": {
