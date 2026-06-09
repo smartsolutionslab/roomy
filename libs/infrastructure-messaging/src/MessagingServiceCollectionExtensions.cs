@@ -97,9 +97,23 @@ public static class MessagingServiceCollectionExtensions
         });
 
         builder.Services.AddScoped<IIntegrationEventPublisher, WolverineIntegrationEventPublisher>();
-        builder.Services.AddScoped<IIntegrationEventOutbox, WolverineIntegrationEventOutbox>();
 
         return builder;
+    }
+
+    /// <summary>
+    /// Registers the transactional <see cref="IIntegrationEventOutbox"/> (ADR-0037) for a context that
+    /// publishes integration events from a state-based unit of work. Opt-in: only publishers add it, so a
+    /// consume-only host (which never resolves it) keeps an unperturbed Wolverine handler graph. Call
+    /// after <see cref="AddRoomyMessaging"/>.
+    /// </summary>
+    public static IServiceCollection AddIntegrationEventOutbox(this IServiceCollection services)
+    {
+        Ensure.That((IServiceCollection?)services).IsNotNull();
+
+        services.AddScoped<IIntegrationEventOutbox, WolverineIntegrationEventOutbox>();
+
+        return services;
     }
 
     /// <summary>

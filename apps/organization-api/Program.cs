@@ -64,6 +64,10 @@ builder.AddRoomyMessaging(
     },
     applicationAssembly: typeof(OrganizationApiHost).Assembly);
 
+// Organization publishes from a state-based unit of work, so it opts into the transactional outbox
+// (ADR-0037). Consume-only hosts (identity, attendance) do not, keeping their handler graph unperturbed.
+builder.Services.AddIntegrationEventOutbox();
+
 // Seed the single company at startup so offices have a company to belong to (research.md D2). The
 // seeder is idempotent, so it is safe on every restart. The schema is applied out-of-process by the
 // db-migrator before this host starts (Aspire WaitForCompletion, ADR-0033).
