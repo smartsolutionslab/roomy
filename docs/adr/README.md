@@ -58,3 +58,5 @@ ADRs are written **before** the implementing code, not after.
 | [0031](0031-integration-event-contract-strategy.md) | Integration-event contract strategy: per-context published language | Proposed |
 | [0032](0032-domain-events-on-aggregates.md) | Domain events raised by aggregates, collected and dispatch-deferred | Proposed |
 | [0036](0036-openapi-client-codegen.md) | OpenAPI client codegen: build-time spec emit, ng-openapi-gen, drift-gated in CI | Proposed |
+| [0037](0037-integration-events-via-domain-event-outbox-drain.md) | Integration events published by draining domain events into the outbox at commit | Proposed |
+| [0038](0038-occupancy-read-side-inline-projection.md) | Occupancy read side: inline synchronous projection into materialized read models | Proposed |
