@@ -20,7 +20,32 @@ public static class ReservationEndpoints
     {
         endpoints.MapPost("/reservations", ReserveAsync).RequireAuthorization();
         endpoints.MapDelete("/reservations/{reservationId:guid}", CancelAsync).RequireAuthorization();
+        endpoints.MapGet("/reservations", ViewAsync).RequireAuthorization();
         return endpoints;
+    }
+
+    // GET /reservations?date=YYYY-MM-DD — view the company-day's reservations (FR-012, scenario 11).
+    // Any authenticated employee may view; the result is replayed from the AttendanceDay stream.
+    private static async Task<IResult> ViewAsync(
+        DateOnly date,
+        AttendanceApiOptions options,
+        IQueryHandler<ViewDayReservations, IReadOnlyList<ReservationView>> view,
+        CancellationToken cancellationToken)
+    {
+        var query = new ViewDayReservations(
+            CompanyIdentifier.From(options.CompanyId),
+            BookingDate.From(date));
+
+        var result = await view.HandleAsync(query, cancellationToken);
+
+        return result.Match(
+            reservations => Results.Ok(reservations.Select(reservation => new ReservationResponse(
+                reservation.Reservation.Value,
+                reservation.Office.Value,
+                reservation.Room.Value,
+                reservation.Date.Value,
+                reservation.Employee.Value))),
+            error => error.ToHttpResult());
     }
 
     // POST /reservations — reserve a place in a room for a day (FR-001/011). The acting employee is
