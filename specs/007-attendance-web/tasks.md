@@ -73,18 +73,18 @@ backend host endpoint and the catalogue read model (RED→GREEN).
 
 ## Phase 3: Data-access lib — `@roomy/attendance-data-access`
 
-- [ ] T008 Generate the lib `libs/attendance/data-access` (`type:data-access`, `context:attendance`)
+- [x] T008 Generate the lib `libs/attendance/data-access` (`type:data-access`, `context:attendance`)
   with `--unitTestRunner=vitest-analog`; add `ng-openapi-gen.json` (input
   `apps/attendance-api/Roomy.Attendance.Api.json`, output `src/lib/generated`) and the
   `generate-client` target (mirror organization's `project.json`); run it and commit `generated/`.
-- [ ] T009 [P] [US1] `bookable-day.ts` — Europe/Berlin working-day + today..today+14 window helper:
+- [x] T009 [P] [US1] `bookable-day.ts` — Europe/Berlin working-day + today..today+14 window helper:
   `isBookable(date, today)`, `bookableDaysFrom(today)`. Spec `bookable-day.spec.ts`: rejects past,
   weekend, and >14-day-ahead; accepts in-window weekdays incl. today (scenario 5).
-- [ ] T010 [P] [US1/US2] `booking.ts` — `BookableOffice`/`BookableRoom`/`MyReservation` view models,
+- [x] T010 [P] [US1/US2] `booking.ts` — `BookableOffice`/`BookableRoom`/`MyReservation` view models,
   `OfficeId`/`RoomId`/`ReservationId` branded ids, and mappings from the generated DTOs (group the
   flat `/rooms` list into offices; mark `MyReservation` upcoming vs past against today). Spec
   `booking.spec.ts`.
-- [ ] T011 [US1..US3] `attendance-gateway.ts` — `AttendanceGateway` facade over the generated client:
+- [x] T011 [US1..US3] `attendance-gateway.ts` — `AttendanceGateway` facade over the generated client:
   `listBookableOffices`, `occupancyForOffice(officeId, day)`, `reserve({officeId, roomId, date})`,
   `myReservations`, `cancel(reservationId, date)`. Spec `attendance-gateway.spec.ts`: each method
   calls the expected generated fn/URL and maps the response/error code (HttpTestingController).

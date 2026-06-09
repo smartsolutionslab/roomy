@@ -20,7 +20,9 @@
       "@roomy/shared-data-access": ["./libs/shared/data-access/src/index.ts"],
       "@roomy/organization-data-access": ["./libs/organization/data-access/src/index.ts"],
       "@roomy/shared-feature": ["./libs/shared/feature/src/index.ts"],
-      "@roomy/organization-feature": ["./libs/organization/feature/src/index.ts"]
+      "@roomy/organization-feature": ["./libs/organization/feature/src/index.ts"],
+      "@roomy/attendance-data-access": ["./libs/attendance/data-access/src/index.ts"],
+      "@roomy/attendance-feature": ["./libs/attendance/feature/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
