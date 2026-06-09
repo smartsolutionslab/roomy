@@ -127,10 +127,12 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
 // The attendance context service: it owns its event-sourced database and exposes the reservation
 // surface the BFF composes (ADR-0012/0014). It validates the BFF-forwarded token against Keycloak
 // (issuer/realm only) and starts after the migrator has applied the schema (WaitForCompletion,
-// ADR-0033). The single-tenant company (ADR-0011) is a dev value here; it aligns with organization's
-// seeded company when the capacity feed lands (US2). No RabbitMQ yet — US1 has no integration flows.
+// ADR-0033). The single-tenant company (ADR-0011) is a dev value here; it must match organization's
+// seeded company so the RoomAdded capacity feed lands on the right rooms (US2). It consumes
+// organization's RoomAdded over RabbitMQ into its Rooms read model (ADR-0037).
 var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
     .WithReference(attendanceDatabase).WaitForCompletion(dbMigrator)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")

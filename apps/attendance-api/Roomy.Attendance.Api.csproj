@@ -14,6 +14,9 @@
     -->
     <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
     <ProjectReference Include="../../libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
+    <!-- The Wolverine messaging backbone (ADR-0005): the durable inbox that consumes organization's
+         RoomAdded into the Rooms read model (003 US2). -->
+    <ProjectReference Include="../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
