@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.DbMigrator;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
@@ -24,6 +26,11 @@ var organizationConnectionString = builder.Configuration.GetConnectionString("or
     ?? throw new InvalidOperationException("Missing connection string 'organization'.");
 builder.Services.AddOrganizationPersistence(organizationConnectionString);
 builder.Services.AddMigrationTarget<OrganizationDbContext>();
+
+var attendanceConnectionString = builder.Configuration.GetConnectionString("attendance")
+    ?? throw new InvalidOperationException("Missing connection string 'attendance'.");
+builder.Services.AddAttendancePersistence(attendanceConnectionString);
+builder.Services.AddMigrationTarget<AttendanceDbContext>();
 
 builder.Services.AddSingleton<DatabaseMigrator>();
 

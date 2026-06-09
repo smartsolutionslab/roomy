@@ -37,6 +37,9 @@ var identityDatabase = postgres.AddDatabase("identity");
 // The organization context's own database on the shared server (database-per-service, ADR-0014).
 var organizationDatabase = postgres.AddDatabase("organization");
 
+// The attendance context's own database (event-sourced, ADR-0012/0014).
+var attendanceDatabase = postgres.AddDatabase("attendance");
+
 // --- RabbitMQ (ADR-0015) -----------------------------------------------------------
 // The default message broker for cross-service integration events. Aspire runs it
 // locally regardless of the deployed transport. The management UI eases local
@@ -83,7 +86,8 @@ builder.AddExecutable(
 // reads it. Each new context adds its own database reference here.
 var dbMigrator = builder.AddProject<Projects.Roomy_DbMigrator>("db-migrator")
     .WithReference(identityDatabase).WaitFor(identityDatabase)
-    .WithReference(organizationDatabase).WaitFor(organizationDatabase);
+    .WithReference(organizationDatabase).WaitFor(organizationDatabase)
+    .WithReference(attendanceDatabase).WaitFor(attendanceDatabase);
 
 // --- Identity API (001) ------------------------------------------------------------
 // The identity context service: it owns its database, provisions Keycloak users, and exposes the
@@ -117,6 +121,19 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Company__Name", "Roomy");
 
+// --- Attendance API (003, Core) ----------------------------------------------------
+// The attendance context service: it owns its event-sourced database and exposes the reservation
+// surface the BFF composes (ADR-0012/0014). It validates the BFF-forwarded token against Keycloak
+// (issuer/realm only) and starts after the migrator has applied the schema (WaitForCompletion,
+// ADR-0033). The single-tenant company (ADR-0011) is a dev value here; it aligns with organization's
+// seeded company when the capacity feed lands (US2). No RabbitMQ yet — US1 has no integration flows.
+var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
+    .WithReference(attendanceDatabase).WaitForCompletion(dbMigrator)
+    .WithReference(keycloak).WaitFor(keycloak)
+    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
+    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithEnvironment("Attendance__CompanyId", "0199a0b0-0000-7000-8000-000000000001");
+
 // --- YARP gateway / BFF (ADR-0013, ADR-0018) ---------------------------------------
 // The single public entry point. It is the confidential OIDC client (BFF security
 // pattern): it holds the session server-side, hands the browser only a cookie, and
@@ -132,6 +149,8 @@ var gateway = builder.AddProject<Projects.Roomy_Gateway>("gateway")
     .WaitFor(identityApi)
     .WithReference(organizationApi)
     .WaitFor(organizationApi)
+    .WithReference(attendanceApi)
+    .WaitFor(attendanceApi)
     .WithExternalHttpEndpoints();
 
 // The gateway is the app's external entry point and is not referenced by another resource; the

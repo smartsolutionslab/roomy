@@ -24,6 +24,8 @@
     <ProjectReference Include="../identity-api/Roomy.Identity.Api.csproj" />
     <!-- The organization context service (002); generates Projects.Roomy_Organization_Api. -->
     <ProjectReference Include="../organization-api/Roomy.Organization.Api.csproj" />
+    <!-- The attendance context service (003, Core); generates Projects.Roomy_Attendance_Api. -->
+    <ProjectReference Include="../attendance-api/Roomy.Attendance.Api.csproj" />
     <!-- The shared schema-rollout runner (ADR-0033); generates Projects.Roomy_DbMigrator. -->
     <ProjectReference Include="../db-migrator/Roomy.DbMigrator.csproj" />
   </ItemGroup>
