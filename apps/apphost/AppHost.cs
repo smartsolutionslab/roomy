@@ -34,6 +34,9 @@ var postgres = builder.AddPostgres("postgres", userName: postgresUser, password:
 // future context adds its own database the same way.
 var identityDatabase = postgres.AddDatabase("identity");
 
+// The organization context's own database on the shared server (database-per-service, ADR-0014).
+var organizationDatabase = postgres.AddDatabase("organization");
+
 // --- RabbitMQ (ADR-0015) -----------------------------------------------------------
 // The default message broker for cross-service integration events. Aspire runs it
 // locally regardless of the deployed transport. The management UI eases local
@@ -79,7 +82,8 @@ builder.AddExecutable(
 // APIs gate on its completion instead of self-migrating, so the schema is in place before any service
 // reads it. Each new context adds its own database reference here.
 var dbMigrator = builder.AddProject<Projects.Roomy_DbMigrator>("db-migrator")
-    .WithReference(identityDatabase).WaitFor(identityDatabase);
+    .WithReference(identityDatabase).WaitFor(identityDatabase)
+    .WithReference(organizationDatabase).WaitFor(organizationDatabase);
 
 // --- Identity API (001) ------------------------------------------------------------
 // The identity context service: it owns its database, provisions Keycloak users, and exposes the
@@ -100,6 +104,19 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
     .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
     .WithEnvironment("DefaultAdmin__InitialPassword", "DevAdmin.23456");
 
+// --- Organization API (002) --------------------------------------------------------
+// The organization context service: it owns its database and exposes the office/room admin surface
+// (ADR-0014). It validates the BFF-forwarded token against Keycloak to authorize (no admin
+// provisioning — it only reads roles). It starts after the migrator has applied the schema
+// (WaitForCompletion, ADR-0033); the single company is then seeded at startup so offices have a company
+// to belong to (research.md D2). No RabbitMQ — this slice publishes and consumes nothing.
+var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organization-api")
+    .WithReference(organizationDatabase).WaitForCompletion(dbMigrator)
+    .WithReference(keycloak).WaitFor(keycloak)
+    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
+    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithEnvironment("Company__Name", "Roomy");
+
 // --- YARP gateway / BFF (ADR-0013, ADR-0018) ---------------------------------------
 // The single public entry point. It is the confidential OIDC client (BFF security
 // pattern): it holds the session server-side, hands the browser only a cookie, and
@@ -113,6 +130,8 @@ var gateway = builder.AddProject<Projects.Roomy_Gateway>("gateway")
     .WithEnvironment("Authentication__Keycloak__ClientSecret", "dev-only-bff-secret-change-me")
     .WithReference(identityApi)
     .WaitFor(identityApi)
+    .WithReference(organizationApi)
+    .WaitFor(organizationApi)
     .WithExternalHttpEndpoints();
 
 // The gateway is the app's external entry point and is not referenced by another resource; the

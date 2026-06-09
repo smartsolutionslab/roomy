@@ -43,4 +43,22 @@ public sealed class AppHostCompositionTests
         identityApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
             wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
     }
+
+    [Fact]
+    public async Task Composes_the_organization_service_with_its_database_gated_on_the_migration_runner()
+    {
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
+            TestContext.Current.CancellationToken);
+        await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
+
+        var model = application.Services.GetRequiredService<DistributedApplicationModel>();
+        var resourceNames = model.Resources.Select(resource => resource.Name).ToList();
+
+        resourceNames.ShouldContain("organization-api");
+        resourceNames.ShouldContain("organization");
+
+        var organizationApi = model.Resources.Single(resource => resource.Name == "organization-api");
+        organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
+            wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
+    }
 }

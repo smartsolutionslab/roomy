@@ -13,6 +13,7 @@
     -->
     <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
     <ProjectReference Include="../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
