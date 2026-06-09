@@ -34,6 +34,11 @@ public sealed class DefaultAdminSeederTests(PostgresDatabaseFixture fixture)
             LastRole = role;
             return Task.FromResult(Result.Success(KeycloakSubjectIdentifier.From(Guid.NewGuid())));
         }
+
+        public Task<Result> AssignAdministratorRoleAsync(
+            KeycloakSubjectIdentifier subject,
+            CancellationToken cancellationToken) =>
+            throw new NotSupportedException("Seeding does not elevate an existing account.");
     }
 
     [Fact]
