@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
@@ -54,6 +55,36 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
             .FindByUserAsync(UserIdentifier.From(userId), TestContext.Current.CancellationToken);
 
         resolved.Value.Value.ShouldBe(employeeId);
+    }
+
+    [Fact]
+    public async Task An_employee_hired_event_persists_the_display_name()
+    {
+        var employeeId = Guid.CreateVersion7();
+        await ConsumeAsync(Hired(employeeId, Guid.CreateVersion7()));
+
+        await using var query = fixture.CreateDbContext();
+        var stored = await query.Employees
+            .SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
+
+        stored.DisplayName.ShouldBe("Ada Lovelace");
+    }
+
+    [Fact]
+    public async Task A_repeated_employee_hired_refreshes_a_changed_display_name()
+    {
+        var employeeId = Guid.CreateVersion7();
+        var userId = Guid.CreateVersion7();
+        await ConsumeAsync(new EmployeeHired(
+            employeeId, userId, "ada@example.com", "Ada Lovelace", HiredRole.Employee, "pw", occurredAt));
+        await ConsumeAsync(new EmployeeHired(
+            employeeId, userId, "ada@example.com", "Ada, Countess of Lovelace", HiredRole.Employee, "pw", occurredAt));
+
+        await using var query = fixture.CreateDbContext();
+        var stored = await query.Employees
+            .SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
+
+        stored.DisplayName.ShouldBe("Ada, Countess of Lovelace");
     }
 
     private static EmployeeHired Hired(Guid employeeId, Guid userId) =>
