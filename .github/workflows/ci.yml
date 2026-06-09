@@ -155,6 +155,8 @@ jobs:
         run: |
           pnpm nx run identity-data-access:generate-client
           git diff --exit-code -- libs/identity/data-access/src/lib/generated
+          pnpm nx run organization-data-access:generate-client
+          git diff --exit-code -- libs/organization/data-access/src/lib/generated
 
       - name: Derive affected SHAs
         uses: nrwl/nx-set-shas@v5
