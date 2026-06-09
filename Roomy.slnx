@@ -87,6 +87,9 @@
   <Folder Name="/tests/architecture/">
     <Project Path="tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj" />
   </Folder>
+  <Folder Name="/tests/attendance/">
+    <Project Path="tests/attendance/Roomy.Attendance.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/identity/">
     <Project Path="tests/identity/Roomy.Identity.Tests.csproj" />
   </Folder>
