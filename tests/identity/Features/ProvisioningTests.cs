@@ -106,6 +106,9 @@ public sealed class ProvisioningTests
         public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
             Task.FromResult(false);
 
+        public Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyList<User>>(Added);
+
         public Task<Result<User>> GetByIdentifierAsync(
             UserIdentifier identifier,
             CancellationToken cancellationToken) =>

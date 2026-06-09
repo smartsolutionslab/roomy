@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Identity.Api.Authentication;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Api.Hosting;
 using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
@@ -49,6 +50,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.ValidateAudience = false;
+
+        // Keycloak nests realm roles under realm_access.roles; flatten them to role claims so the
+        // administrator-only routes can authorize on RequireRole (ADR-0013).
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                KeycloakRealmRoles.AddRoleClaims(context.Principal);
+                return Task.CompletedTask;
+            },
+        };
     });
 builder.Services.AddAuthorization();
 
@@ -96,5 +108,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapAccountEndpoints();
+app.MapAdminUserEndpoints();
 
 app.Run();

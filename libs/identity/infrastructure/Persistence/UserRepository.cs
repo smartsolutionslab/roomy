@@ -42,6 +42,9 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
         context.Users.AnyAsync(user => user.Email == email, cancellationToken);
 
+    public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken) =>
+        await context.Users.AsNoTracking().ToListAsync(cancellationToken);
+
     public async Task AddAsync(User user, CancellationToken cancellationToken) =>
         await context.Users.AddAsync(user, cancellationToken);
 }

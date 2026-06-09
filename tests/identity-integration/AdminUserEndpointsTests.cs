@@ -1,0 +1,191 @@
+using System.Net;
+using System.Net.Http.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Shouldly;
+using SmartSolutionsLab.Roomy.Identity.Api;
+using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
+using SmartSolutionsLab.Roomy.Identity.Application;
+using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.SharedKernel.Results;
+
+namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
+
+// Boots the identity host in-process against real Postgres to verify the admin account surface
+// (identity-api.md): listing and reading accounts and the grant-administrator elevation, all
+// administrator-only (FR-007). The external infra is removed (no Wolverine, no seeder), the BFF token
+// is the test auth scheme, and the Keycloak provider is a recording stub — the real Keycloak round-trip
+// is the deferred e2e.
+public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
+{
+    private readonly PostgresDatabaseFixture fixture;
+    private readonly RecordingIdentityProvider identityProvider = new();
+    private readonly WebApplicationFactory<IdentityApiHost> app;
+
+    public AdminUserEndpointsTests(PostgresDatabaseFixture fixture)
+    {
+        this.fixture = fixture;
+        app = new WebApplicationFactory<IdentityApiHost>().WithWebHostBuilder(webHost =>
+        {
+            webHost.UseSetting("ConnectionStrings:identity", fixture.ConnectionString);
+            webHost.UseSetting("ConnectionStrings:rabbitmq", "amqp://guest:guest@localhost:5672");
+            webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
+            webHost.UseSetting("Keycloak:AdminUsername", "admin");
+            webHost.UseSetting("Keycloak:AdminPassword", "admin");
+            webHost.UseSetting("DefaultAdmin:Email", "default-admin@roomy.test");
+            webHost.UseSetting("DefaultAdmin:DisplayName", "Default Admin");
+            webHost.UseSetting("DefaultAdmin:InitialPassword", "default-admin-password");
+
+            webHost.ConfigureTestServices(services =>
+            {
+                services.RemoveAll<IHostedService>();
+                services.RemoveAll<IIdentityProviderPort>();
+                services.AddSingleton<IIdentityProviderPort>(identityProvider);
+                services.AddAuthentication(TestAuthHandler.SchemeName)
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+            });
+        });
+    }
+
+    private async Task<User> SeedUserAsync(Role role)
+    {
+        var user = User.Register(
+            Email.From($"admin-ep-{Guid.NewGuid():N}@example.com"), DisplayName.From("Test User"), role);
+        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+
+        await using var context = fixture.CreateContext();
+        context.Users.Add(user);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        return user;
+    }
+
+    private HttpClient AdministratorClient()
+    {
+        var client = app.CreateClient();
+        client.DefaultRequestHeaders.Add(TestAuthHandler.SubjectHeader, Guid.NewGuid().ToString());
+        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "administrator");
+        return client;
+    }
+
+    private HttpClient EmployeeClient()
+    {
+        var client = app.CreateClient();
+        client.DefaultRequestHeaders.Add(TestAuthHandler.SubjectHeader, Guid.NewGuid().ToString());
+        return client;
+    }
+
+    [Fact]
+    public async Task Lists_seeded_accounts_with_their_status_for_an_administrator()
+    {
+        var employee = await SeedUserAsync(Role.Employee);
+
+        var response = await AdministratorClient()
+            .GetAsync("/admin/users", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var users = await response.Content
+            .ReadFromJsonAsync<AdminUserResponse[]>(TestContext.Current.CancellationToken);
+        var listed = users.ShouldNotBeNull().Single(user => user.UserId == employee.Identifier.Value);
+        listed.Role.ShouldBe("employee");
+        listed.Status.ShouldBe("active");
+    }
+
+    [Fact]
+    public async Task Returns_a_single_account_for_an_administrator()
+    {
+        var employee = await SeedUserAsync(Role.Employee);
+
+        var response = await AdministratorClient()
+            .GetAsync($"/admin/users/{employee.Identifier.Value}", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var user = await response.Content
+            .ReadFromJsonAsync<AdminUserResponse>(TestContext.Current.CancellationToken);
+        user.ShouldNotBeNull();
+        user.Email.ShouldBe(employee.Email.Value);
+        user.Role.ShouldBe("employee");
+    }
+
+    [Fact]
+    public async Task Returns_404_for_an_unknown_account()
+    {
+        var response = await AdministratorClient()
+            .GetAsync($"/admin/users/{Guid.NewGuid()}", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Grants_administrator_to_an_employee()
+    {
+        var employee = await SeedUserAsync(Role.Employee);
+
+        var grant = await AdministratorClient().PostAsync(
+            $"/admin/users/{employee.Identifier.Value}:grant-administrator",
+            content: null,
+            TestContext.Current.CancellationToken);
+
+        grant.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        identityProvider.AssignedSubjects.ShouldContain(employee.KeycloakSubjectIdentifier!.Value);
+
+        await using var context = fixture.CreateContext();
+        var reloaded = await context.Users.SingleAsync(
+            user => user.Identifier == employee.Identifier, TestContext.Current.CancellationToken);
+        reloaded.IsAdministrator.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Forbids_an_employee_from_listing_accounts()
+    {
+        var response = await EmployeeClient()
+            .GetAsync("/admin/users", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Forbids_an_employee_from_granting_administrator()
+    {
+        var employee = await SeedUserAsync(Role.Employee);
+
+        var response = await EmployeeClient().PostAsync(
+            $"/admin/users/{employee.Identifier.Value}:grant-administrator",
+            content: null,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Requires_a_session_to_list_accounts()
+    {
+        var response = await app.CreateClient()
+            .GetAsync("/admin/users", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    public void Dispose() => app.Dispose();
+
+    private sealed class RecordingIdentityProvider : IIdentityProviderPort
+    {
+        public List<KeycloakSubjectIdentifier> AssignedSubjects { get; } = [];
+
+        public Task<Result<KeycloakSubjectIdentifier>> ProvisionUserAsync(
+            Email email, DisplayName displayName, string initialPassword, Role role,
+            CancellationToken cancellationToken) =>
+            throw new NotSupportedException("The admin surface does not provision accounts.");
+
+        public Task<Result> AssignAdministratorRoleAsync(
+            KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
+        {
+            AssignedSubjects.Add(subject);
+            return Task.FromResult(Result.Success());
+        }
+    }
+}
