@@ -61,6 +61,27 @@ jobs:
           DefaultAdmin__DisplayName: "CI"
           DefaultAdmin__InitialPassword: "ci-password-123"
 
+      # The typed Angular client is generated from a committed OpenAPI spec (ADR-0036). Re-emit the
+      # spec and fail if it differs from what is committed, so an endpoint or DTO change that was not
+      # followed by re-emitting cannot drift the client contract. Emitting boots the host through
+      # `getdocument`, but OpenApi:EmitDocument skips the messaging runtime and the seeder, so it opens
+      # no broker or database connection — dummy config is enough, exactly as for the Wolverine step.
+      - name: Verify the OpenAPI spec is current
+        run: |
+          dotnet build apps/identity-api/Roomy.Identity.Api.csproj --configuration Release --no-restore -p:OpenApiGenerateDocumentsOnBuild=true
+          git diff --exit-code -- apps/identity-api/Roomy.Identity.Api.json
+        env:
+          OpenApi__EmitDocument: "true"
+          ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
+          ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
+          Keycloak__BaseAddress: "http://localhost:8080"
+          Keycloak__AdminUsername: "ci"
+          Keycloak__AdminPassword: "ci"
+          Keycloak__Realm: "roomy"
+          DefaultAdmin__Email: "ci@roomy.local"
+          DefaultAdmin__DisplayName: "CI"
+          DefaultAdmin__InitialPassword: "ci-password-123"
+
       # Runs every test project and, in the same pass, enforces the coverage gate.
       # `--collect "XPlat Code Coverage"` with coverlet.runsettings collects and reports
       # coverage per project (policy exclusions applied). The 85% line+branch FLOOR on
