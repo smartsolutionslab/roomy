@@ -12,7 +12,9 @@
     "adminLink": "Verwaltung",
     "officesLink": "Büros",
     "reserveLink": "Platz reservieren",
-    "myReservationsLink": "Meine Reservierungen"
+    "myReservationsLink": "Meine Reservierungen",
+    "occupancyLink": "Belegung",
+    "calendarLink": "Kalender"
   },
   "home": {
     "title": "Willkommen bei Roomy",
@@ -140,6 +142,33 @@
         "pastImmutable": "Vergangene Reservierungen können nicht geändert werden.",
         "generic": "Die Reservierung konnte nicht storniert werden. Bitte erneut versuchen."
       }
+    },
+    "occupancy": {
+      "title": "Belegung",
+      "officeLabel": "Büro",
+      "officePlaceholder": "Büro auswählen",
+      "roomLabel": "Raum",
+      "allRooms": "Alle Räume",
+      "rangeLabel": "Zeitraum",
+      "presetDay": "Tag",
+      "presetWeek": "Woche",
+      "presetMonth": "Monat",
+      "dateLabel": "Datum",
+      "loading": "Wird geladen…",
+      "loadError": "Die Belegung konnte nicht geladen werden.",
+      "empty": "Es sind noch keine Büros oder Räume vorhanden.",
+      "unknownScope": "Dieses Büro oder dieser Raum ist nicht mehr verfügbar.",
+      "officeOccupied": "Büro: {{occupied}} von {{capacity}} belegt",
+      "roomOccupied": "{{occupied}} von {{capacity}} belegt",
+      "full": "Belegt",
+      "bookedHeading": "Gebucht"
+    },
+    "calendar": {
+      "title": "Belegungskalender",
+      "previousMonth": "Voriger Monat",
+      "nextMonth": "Nächster Monat",
+      "mine": "Sie haben eine Reservierung",
+      "occupied": "{{occupied}}/{{capacity}}"
     }
   },
   "shared": {

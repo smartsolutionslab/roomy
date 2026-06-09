@@ -12,7 +12,9 @@
     "adminLink": "Administration",
     "officesLink": "Offices",
     "reserveLink": "Reserve a place",
-    "myReservationsLink": "My reservations"
+    "myReservationsLink": "My reservations",
+    "occupancyLink": "Occupancy",
+    "calendarLink": "Calendar"
   },
   "home": {
     "title": "Welcome to Roomy",
@@ -140,6 +142,33 @@
         "pastImmutable": "Past reservations cannot be changed.",
         "generic": "We could not cancel the reservation. Please try again."
       }
+    },
+    "occupancy": {
+      "title": "Occupancy",
+      "officeLabel": "Office",
+      "officePlaceholder": "Select an office",
+      "roomLabel": "Room",
+      "allRooms": "All rooms",
+      "rangeLabel": "Range",
+      "presetDay": "Day",
+      "presetWeek": "Week",
+      "presetMonth": "Month",
+      "dateLabel": "Date",
+      "loading": "Loading…",
+      "loadError": "We could not load the occupancy.",
+      "empty": "No offices or rooms are available yet.",
+      "unknownScope": "That office or room is no longer available.",
+      "officeOccupied": "Office: {{occupied}} of {{capacity}} occupied",
+      "roomOccupied": "{{occupied}} of {{capacity}} occupied",
+      "full": "Full",
+      "bookedHeading": "Booked"
+    },
+    "calendar": {
+      "title": "Occupancy calendar",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "mine": "You have a reservation",
+      "occupied": "{{occupied}}/{{capacity}}"
     }
   },
   "shared": {

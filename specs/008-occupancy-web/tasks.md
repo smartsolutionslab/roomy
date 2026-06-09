@@ -60,34 +60,34 @@ description: "Task list for Occupancy Web — occupancy views & calendar (008)"
 
 ## Phase 3: Occupancy calendar — `occupancy-calendar` (US2, FR-004)
 
-- [ ] T007 [US2] RED: `occupancy/occupancy-calendar.spec.ts` — a month grid (from `monthGrid`) where each
+- [x] T007 [US2] RED: `occupancy/occupancy-calendar.spec.ts` — a month grid (from `monthGrid`) where each
   in-month day shows its occupancy figure (from one `occupancy(scope, monthStart, monthEnd)` call) and the
   viewer's booked days (from `myReservations`) are highlighted with a non-colour cue (scenario 5); month
   navigation re-queries.
-- [ ] T008 [US2] GREEN: `occupancy/occupancy-calendar.ts/.html/.css` — the month grid, occupancy per cell,
+- [x] T008 [US2] GREEN: `occupancy/occupancy-calendar.ts/.html/.css` — the month grid, occupancy per cell,
   own-bookings highlight + visually-hidden label, previous/next month. Reuses the scope picker.
 
 ---
 
 ## Phase 4: Wiring, localization, accessibility (US3, FR-007..FR-009)
 
-- [ ] T009 [US3] Add `occupancy` + `calendar` routes (guarded by `authGuard`) to
+- [x] T009 [US3] Add `occupancy` + `calendar` routes (guarded by `authGuard`) to
   `libs/attendance/feature/src/lib/attendance.routes.ts` (mounted under `/attendance` already). Guard
   spec is covered by `007`; add a route smoke test if useful.
-- [ ] T010 [US3] Add the `Occupancy` nav entry to `apps/web/src/app/app.html` for any signed-in user
+- [x] T010 [US3] Add the `Occupancy` nav entry to `apps/web/src/app/app.html` for any signed-in user
   (beside Reserve / My reservations).
-- [ ] T011 [US3] `occupancy.*` i18n namespace in `apps/web/public/i18n/{en,de}.json` (labels, headings,
+- [x] T011 [US3] `occupancy.*` i18n namespace in `apps/web/public/i18n/{en,de}.json` (labels, headings,
   day/month names, preset names, "occupied/capacity" surrounding text, error/empty messages); assert
   DE/EN key parity (scenario 10, FR-008). Mirror the keys in the feature's test transloco helper.
-- [ ] T012 [US3] WCAG 2.2 AA pass (FR-009): keyboard operability across the picker, list, and calendar;
+- [x] T012 [US3] WCAG 2.2 AA pass (FR-009): keyboard operability across the picker, list, and calendar;
   the calendar grid reads correctly to assistive tech; the own-bookings highlight has a non-colour cue;
   visible focus. Extend specs as needed.
 
 ---
 
 ## Verify (Definition of Done)
-- [ ] `pnpm nx run-many -t test lint -p attendance-data-access attendance-feature web` green.
-- [ ] `pnpm nx build web` green.
-- [ ] OpenAPI spec + generated-client drift gates green (no change expected — `/occupancy` already in the spec).
-- [ ] EN/DE i18n key parity holds.
-- [ ] Reconcile this `tasks.md` to reality on merge (heed the tasks.md-lag convention).
+- [x] `pnpm nx run-many -t test lint -p attendance-data-access attendance-feature web` green.
+- [x] `pnpm nx build web` green.
+- [x] OpenAPI spec + generated-client drift gates green (no change expected — `/occupancy` already in the spec).
+- [x] EN/DE i18n key parity holds.
+- [x] Reconcile this `tasks.md` to reality on merge (heed the tasks.md-lag convention).
