@@ -10,7 +10,12 @@ public static class AccountEndpoints
 {
     public static IEndpointRouteBuilder MapAccountEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/account/me", GetCurrentAccountAsync).RequireAuthorization();
+        endpoints.MapGet("/account/me", GetCurrentAccountAsync)
+            .RequireAuthorization()
+            .WithName("GetCurrentAccount")
+            .Produces<AccountResponse>()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound);
         return endpoints;
     }
 
