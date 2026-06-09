@@ -8,6 +8,8 @@ export { Api } from './api';
 
 export type { AddRoomRequest } from './models/add-room-request';
 export type { CreateOfficeRequest } from './models/create-office-request';
+export type { HiredEmployeeResponse } from './models/hired-employee-response';
+export type { HireEmployeeRequest } from './models/hire-employee-request';
 export type { OfficeResponse } from './models/office-response';
 export type { ProblemDetails } from './models/problem-details';
 export type { RelocateOfficeRequest } from './models/relocate-office-request';
@@ -29,3 +31,5 @@ export type { AddRoom$Params as AddRoom$Params } from './fn/office-endpoints/add
 export { addRoom as addRoom } from './fn/office-endpoints/add-room';
 export type { RenameRoom$Params as RenameRoom$Params } from './fn/office-endpoints/rename-room';
 export { renameRoom as renameRoom } from './fn/office-endpoints/rename-room';
+export type { HireEmployee$Params as HireEmployee$Params } from './fn/employee-endpoints/hire-employee';
+export { hireEmployee as hireEmployee } from './fn/employee-endpoints/hire-employee';

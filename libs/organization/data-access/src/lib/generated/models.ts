@@ -3,6 +3,8 @@
 
 export type { AddRoomRequest } from './models/add-room-request';
 export type { CreateOfficeRequest } from './models/create-office-request';
+export type { HiredEmployeeResponse } from './models/hired-employee-response';
+export type { HireEmployeeRequest } from './models/hire-employee-request';
 export type { OfficeResponse } from './models/office-response';
 export type { ProblemDetails } from './models/problem-details';
 export type { RelocateOfficeRequest } from './models/relocate-office-request';

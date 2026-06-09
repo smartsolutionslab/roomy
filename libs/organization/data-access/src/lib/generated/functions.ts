@@ -15,3 +15,5 @@ export type { AddRoom$Params as AddRoom$Params } from './fn/office-endpoints/add
 export { addRoom as addRoom } from './fn/office-endpoints/add-room';
 export type { RenameRoom$Params as RenameRoom$Params } from './fn/office-endpoints/rename-room';
 export { renameRoom as renameRoom } from './fn/office-endpoints/rename-room';
+export type { HireEmployee$Params as HireEmployee$Params } from './fn/employee-endpoints/hire-employee';
+export { hireEmployee as hireEmployee } from './fn/employee-endpoints/hire-employee';
