@@ -3,33 +3,73 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Shouldly;
+using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
+using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
+using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
 // Boots the organization host in-process against the real test Postgres, with the BFF token replaced by
 // the test auth scheme, to verify the office endpoints and their authorization (organization-api.md).
-// The company seeder runs at startup, so CreateOffice has a company to create offices under.
+// The Wolverine runtime is dropped (it would connect to RabbitMQ on start, ADR-0037), so the company the
+// seeder would create is seeded here instead, giving CreateOffice a company to create offices under.
 public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly WebApplicationFactory<OrganizationApiHost> app;
 
     public OfficeEndpointsTests(PostgresDatabaseFixture fixture)
     {
+        SeedCompany(fixture);
+
         app = new WebApplicationFactory<OrganizationApiHost>().WithWebHostBuilder(webHost =>
         {
             webHost.UseSetting("ConnectionStrings:organization", fixture.ConnectionString);
+            webHost.UseSetting("ConnectionStrings:rabbitmq", "amqp://guest:guest@localhost:5672");
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Company:Name", "Roomy Test Company");
 
             webHost.ConfigureTestServices(services =>
+            {
+                // Keep the HTTP test free of external infra: drop the Wolverine runtime (and the company
+                // seeder, replaced by SeedCompany above), replace the Wolverine outbox with one that just
+                // saves (the drain is covered by OrganizationUnitOfWorkTests), and use the test auth scheme.
+                services.RemoveAll<IHostedService>();
+                services.RemoveAll<IIntegrationEventOutbox>();
+                services.AddScoped<IIntegrationEventOutbox, SavingOnlyOutbox>();
                 services.AddAuthentication(TestAuthHandler.SchemeName)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { }));
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+            });
         });
+    }
+
+    private static void SeedCompany(PostgresDatabaseFixture fixture)
+    {
+        using var context = fixture.CreateContext();
+        if (context.Set<Company>().Any())
+        {
+            return;
+        }
+
+        context.Add(Company.Create(CompanyName.From("Roomy Test Company")));
+        context.SaveChanges();
+    }
+
+    // Saves the work but skips the Wolverine relay (removed with the runtime above); these tests assert
+    // the HTTP/office behaviour, while OrganizationUnitOfWorkTests covers the domain-event drain.
+    private sealed class SavingOnlyOutbox : IIntegrationEventOutbox
+    {
+        public Task SaveAndPublishAsync(
+            DbContext context,
+            IReadOnlyCollection<IIntegrationEvent> integrationEvents,
+            CancellationToken cancellationToken) => context.SaveChangesAsync(cancellationToken);
     }
 
     private HttpClient ClientWithRoles(params string[] roles)
