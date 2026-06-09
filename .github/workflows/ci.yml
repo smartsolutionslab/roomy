@@ -50,13 +50,17 @@ jobs:
         run: |
           dotnet run --project apps/identity-api --configuration Release --no-build -- codegen write
           git diff --exit-code -- apps/identity-api/Internal/Generated
+          dotnet run --project apps/organization-api --configuration Release --no-build -- codegen write
+          git diff --exit-code -- apps/organization-api/Internal/Generated
         env:
           ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
+          ConnectionStrings__organization: "Host=localhost;Database=organization;Username=ci;Password=ci"
           ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
           Keycloak__BaseAddress: "http://localhost:8080"
           Keycloak__AdminUsername: "ci"
           Keycloak__AdminPassword: "ci"
           Keycloak__Realm: "roomy"
+          Company__Name: "Roomy"
           DefaultAdmin__Email: "ci@roomy.local"
           DefaultAdmin__DisplayName: "CI"
           DefaultAdmin__InitialPassword: "ci-password-123"

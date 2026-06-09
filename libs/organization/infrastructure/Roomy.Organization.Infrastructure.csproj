@@ -11,6 +11,11 @@
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
     <!-- The shared EF Core baseline: RoomyDbContext, snake_case naming, Npgsql registration (ADR-0012). -->
     <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- The transactional outbox seam (ADR-0037) + the owned IIntegrationEvent marker; the unit of work
+         drains domain events to the outbox here. This context's published language is mapped at this edge. -->
+    <ProjectReference Include="../../infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
+    <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
+    <ProjectReference Include="../contracts/Roomy.Contracts.Organization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

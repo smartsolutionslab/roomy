@@ -1,8 +1,11 @@
+using JasperFx;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Authentication;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Organization.Api.Seeding;
@@ -47,6 +50,20 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddOrganizationUseCases();
 
+// Wolverine's durable transactional outbox over the organization database, RabbitMQ transport
+// (ADR-0005/0015). Publish-only: this context emits OfficeOpened/RoomAdded (drained from domain events
+// at commit, ADR-0037) but consumes nothing, so no handler assemblies are scanned. The outbox shares the
+// organization database so a published event commits atomically with the office/room write (ADR-0012).
+builder.AddRoomyMessaging(
+    new MessagingOptions
+    {
+        Transport = MessagingTransport.RabbitMq,
+        PostgresConnectionString = connectionString,
+        ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
+            ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+    },
+    applicationAssembly: typeof(OrganizationApiHost).Assembly);
+
 // Seed the single company at startup so offices have a company to belong to (research.md D2). The
 // seeder is idempotent, so it is safe on every restart. The schema is applied out-of-process by the
 // db-migrator before this host starts (Aspire WaitForCompletion, ADR-0033).
@@ -68,4 +85,6 @@ app.UseAuthorization();
 
 app.MapOfficeEndpoints();
 
-app.Run();
+// RunJasperFxCommands so the Wolverine code-generation commands are available (ADR-0034): the host
+// runs from committed, pre-generated code (TypeLoadMode.Static). With no arguments it just runs the host.
+return await app.RunJasperFxCommands(args);

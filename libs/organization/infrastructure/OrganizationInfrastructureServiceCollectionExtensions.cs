@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 using SmartSolutionsLab.Roomy.Organization.Application;
@@ -25,6 +26,9 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
         services.AddScoped<IOfficeRepository, OfficeRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IUnitOfWork, OrganizationUnitOfWork>();
+
+        // The unit of work stamps OccurredAt on the integration events it drains to the outbox (ADR-0037).
+        services.TryAddSingleton(TimeProvider.System);
 
         return services;
     }

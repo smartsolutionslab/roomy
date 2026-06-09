@@ -13,6 +13,9 @@
     -->
     <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
     <ProjectReference Include="../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+    <!-- The Wolverine messaging backbone (ADR-0005): the transactional outbox that relays the office/room
+         integration events over RabbitMQ (publish-only — this context consumes nothing). -->
+    <ProjectReference Include="../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
