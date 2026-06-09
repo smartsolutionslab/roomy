@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { identityRoutes } from '@roomy/identity-feature';
+import { organizationRoutes } from '@roomy/organization-feature';
 import { notAuthorizedRoute } from '@roomy/shared-feature';
 
 export const appRoutes: Route[] = [
@@ -10,4 +11,5 @@ export const appRoutes: Route[] = [
   },
   notAuthorizedRoute,
   ...identityRoutes,
+  ...organizationRoutes,
 ];
