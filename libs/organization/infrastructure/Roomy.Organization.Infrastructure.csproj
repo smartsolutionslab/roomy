@@ -16,6 +16,9 @@
     <ProjectReference Include="../../infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
     <ProjectReference Include="../contracts/Roomy.Contracts.Organization.csproj" />
+    <!-- Identity's published language, consumed at this edge (ADR-0031): the provisioning-saga acks
+         UserRegistered / UserProvisioningFailed are mapped to internal commands here (008). -->
+    <ProjectReference Include="../../identity/contracts/Roomy.Contracts.Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>
