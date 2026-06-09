@@ -16,6 +16,15 @@ const english = {
       roomsHeading: 'Rooms',
       noRooms: 'No rooms yet.',
     },
+    create: {
+      heading: 'Add an office',
+      nameLabel: 'Name',
+      locationLabel: 'Location',
+      submit: 'Create office',
+      nameConflict: 'An office with that name already exists.',
+      error: 'We could not create the office. Please try again.',
+      created: 'Office {{name}} created.',
+    },
   },
 };
 
@@ -30,6 +39,15 @@ const german = {
       capacityLabel: 'Kapazität',
       roomsHeading: 'Räume',
       noRooms: 'Noch keine Räume.',
+    },
+    create: {
+      heading: 'Büro hinzufügen',
+      nameLabel: 'Name',
+      locationLabel: 'Standort',
+      submit: 'Büro erstellen',
+      nameConflict: 'Ein Büro mit diesem Namen existiert bereits.',
+      error: 'Das Büro konnte nicht erstellt werden. Bitte erneut versuchen.',
+      created: 'Büro {{name}} erstellt.',
     },
   },
 };

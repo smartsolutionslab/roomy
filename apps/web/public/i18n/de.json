@@ -60,6 +60,15 @@
       "capacityLabel": "Kapazität",
       "roomsHeading": "Räume",
       "noRooms": "Noch keine Räume."
+    },
+    "create": {
+      "heading": "Büro hinzufügen",
+      "nameLabel": "Name",
+      "locationLabel": "Standort",
+      "submit": "Büro erstellen",
+      "nameConflict": "Ein Büro mit diesem Namen existiert bereits.",
+      "error": "Das Büro konnte nicht erstellt werden. Bitte erneut versuchen.",
+      "created": "Büro {{name}} erstellt."
     }
   },
   "shared": {
