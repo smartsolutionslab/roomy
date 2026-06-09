@@ -3,12 +3,12 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
+import { CurrentUser } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import axe from 'axe-core';
 
 import { App } from './app';
 import { importTestTransloco } from './i18n/transloco-testing';
-import { CurrentUser } from './session/current-user';
 
 async function renderShell(session: CurrentUser | null = null) {
   const view = await render(App, {
