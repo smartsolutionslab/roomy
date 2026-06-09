@@ -1,0 +1,85 @@
+<ng-container *transloco="let translate">
+  <section class="reserve">
+    <h1 class="reserve__title">{{ translate('attendance.reserve.title') }}</h1>
+
+    <p class="reserve__result" role="status" aria-live="polite">
+      @if (result(); as message) {
+      {{ translate(message.key, message.params) }}
+      }
+    </p>
+
+    @if (errorKey(); as key) {
+    <p class="reserve__error" role="alert">{{ translate(key) }}</p>
+    }
+
+    @if (loadFailed()) {
+    <p class="reserve__error" role="alert">{{ translate('attendance.reserve.loadError') }}</p>
+    } @else if (offices(); as items) { @if (items.length === 0) {
+    <p class="reserve__empty">{{ translate('attendance.reserve.empty') }}</p>
+    } @else {
+    <label class="reserve__field">
+      <span>{{ translate('attendance.reserve.officeLabel') }}</span>
+      <select #officeSelect (change)="chooseOffice(officeSelect.value)">
+        <option value="">{{ translate('attendance.reserve.officePlaceholder') }}</option>
+        @for (office of items; track office.id) {
+        <option [value]="office.id">{{ office.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="reserve__field">
+      <span>{{ translate('attendance.reserve.dayLabel') }}</span>
+      <select #daySelect (change)="chooseDay(daySelect.value)">
+        <option value="">{{ translate('attendance.reserve.dayPlaceholder') }}</option>
+        @for (day of bookableDays(); track day) {
+        <option [value]="day">{{ day }}</option>
+        }
+      </select>
+    </label>
+
+    @if (selectedOffice(); as office) {
+    <h2 class="reserve__rooms-heading">{{ translate('attendance.reserve.roomsHeading') }}</h2>
+    <ul class="reserve__rooms">
+      @for (room of office.rooms; track room.id) {
+      <li class="reserve__room">
+        <button
+          type="button"
+          class="reserve__room-button"
+          [disabled]="isFull(room)"
+          [attr.aria-pressed]="selectedRoomId() === room.id"
+          (click)="chooseRoom(room)"
+        >
+          <span class="reserve__room-name">{{ room.name }}</span>
+          @if (availabilityFor(room)) { @if (isFull(room)) {
+          <span class="reserve__room-full">{{ translate('attendance.reserve.full') }}</span>
+          } @else {
+          <span class="reserve__room-places">{{
+            translate('attendance.reserve.placesLeft', {
+              remaining: remaining(room),
+              capacity: room.capacity
+            })
+          }}</span>
+          } } @else {
+          <span class="reserve__room-capacity">{{
+            translate('attendance.reserve.capacityLabel', { capacity: room.capacity })
+          }}</span>
+          }
+        </button>
+      </li>
+      }
+    </ul>
+
+    <button
+      type="button"
+      class="reserve__confirm"
+      [disabled]="!canReserve()"
+      (click)="reserve()"
+    >
+      {{ translate('attendance.reserve.confirm') }}
+    </button>
+    } }
+    } @else {
+    <p class="reserve__loading">{{ translate('attendance.reserve.loading') }}</p>
+    }
+  </section>
+</ng-container>

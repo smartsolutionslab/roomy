@@ -1,0 +1,43 @@
+.reserve {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 40rem;
+}
+
+.reserve__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reserve__rooms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reserve__room-button {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  text-align: start;
+}
+
+.reserve__room-button[aria-pressed='true'] {
+  outline: 2px solid currentcolor;
+}
+
+.reserve__room-button:focus-visible,
+.reserve__confirm:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+.reserve__error {
+  color: #b00020;
+}
