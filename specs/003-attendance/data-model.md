@@ -139,6 +139,7 @@ Actor→employee resolution for authorization (research R3).
 | `past_immutable` | Validation | 422 | FR-009 (cancel edge) |
 | `reservation_not_found` | NotFound | 404 | cancel a non-existent reservation |
 | `not_owner` | Forbidden | 403 | FR-012 (scenario 11) |
+| `not_authorized` | Forbidden | 403 | FR-011 (non-admin reserving on behalf of another) |
 | `unknown_room` / `unknown_employee` | NotFound | 404 | read-model miss |
 | `concurrency_retry_exhausted` | Conflict | 409 | FR-007 (scenario 12 fallback) |
 

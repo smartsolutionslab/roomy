@@ -18,6 +18,7 @@ internal sealed class TestAuthHandler(
 {
     public const string SchemeName = "Test";
     public const string SubjectHeader = "X-Test-Subject";
+    public const string RolesHeader = "X-Test-Roles";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -27,6 +28,12 @@ internal sealed class TestAuthHandler(
         }
 
         var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, subject.ToString()) };
+        if (Request.Headers.TryGetValue(RolesHeader, out var roles) && !string.IsNullOrEmpty(roles))
+        {
+            var separators = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+            claims.AddRange(roles.ToString().Split(',', separators).Select(role => new Claim(ClaimTypes.Role, role)));
+        }
+
         var identity = new ClaimsIdentity(claims, SchemeName);
         var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName);
         return Task.FromResult(AuthenticateResult.Success(ticket));

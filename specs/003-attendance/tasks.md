@@ -106,10 +106,10 @@ description: "Task list for Attendance Planning (003)"
 
 **Independent test:** with a resolved actor, `onBehalfOf` is admin-only on reserve (403 for a non-admin targeting another); cancel is owner-or-admin (403 `not_owner` otherwise).
 
-- [ ] T023 [US4] RED tests — `EmployeeHiredConsumer` upserts the `Employees` read model (`EmployeeId`↔`UserId`); `IEmployeeDirectory.FindByUserAsync(sub)` returns the `EmployeeId` (`unknown_employee` `NotFound` on miss).
-- [ ] T024 [US4] Implement the `Employees` read model (EF config + migration) + `EmployeeDirectory` + `EmployeeHiredConsumer` in `libs/attendance/infrastructure/`. T023 green. (Consumes the **existing** `EmployeeHired` — no organization change needed.)
-- [ ] T025 [US4] RED tests — the actor is resolved from the token `sub` via `IEmployeeDirectory`; admin status from the JWT `administrator` realm role (as `identity-api` flattens it). Reserve: non-admin with `onBehalfOf` ≠ self → 403 (FR-011); admin on-behalf → 201 (scenario 10). Cancel: non-owner non-admin → 403 `not_owner` (scenario 11); admin → 204.
-- [ ] T026 [US4] Wire actor resolution + admin flag into `ReservePlaceHandler`/`CancelReservationHandler` and the endpoints (the API passes the resolved `EmployeeIdentifier` + `actorIsAdmin`). T025 green. API tests cover 10–11.
+- [x] T023 [US4] RED tests — `EmployeeHiredConsumer` upserts the `Employees` read model (`EmployeeId`↔`UserId`); `IEmployeeDirectory.FindByUserAsync(sub)` returns the `EmployeeId` (`unknown_employee` `NotFound` on miss).
+- [x] T024 [US4] Implement the `Employees` read model (EF config + migration) + `EmployeeDirectory` + `EmployeeHiredConsumer` in `libs/attendance/infrastructure/`. T023 green. (Consumes the **existing** `EmployeeHired` — no organization change needed.)
+- [x] T025 [US4] RED tests — the actor is resolved from the token `sub` via `IEmployeeDirectory`; admin status from the JWT `administrator` realm role (as `identity-api` flattens it). Reserve: non-admin with `onBehalfOf` ≠ self → 403 (FR-011); admin on-behalf → 201 (scenario 10). Cancel: non-owner non-admin → 403 `not_owner` (scenario 11); admin → 204.
+- [x] T026 [US4] Wire actor resolution + admin flag into `ReservePlaceHandler`/`CancelReservationHandler` and the endpoints (the API passes the resolved `EmployeeIdentifier` + `actorIsAdmin`). T025 green. API tests cover 10–11.
 
 **Checkpoint**: admins act on behalf of anyone; employees are confined to their own reservations.
 
