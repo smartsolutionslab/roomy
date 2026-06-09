@@ -1,0 +1,82 @@
+<ng-container *transloco="let translate">
+  <section class="calendar">
+    <h1 class="calendar__title">{{ translate('attendance.calendar.title') }}</h1>
+
+    @if (loadFailed()) {
+    <p class="calendar__error" role="alert">{{ translate('attendance.occupancy.loadError') }}</p>
+    } @else if (offices(); as items) { @if (items.length === 0) {
+    <p class="calendar__empty">{{ translate('attendance.occupancy.empty') }}</p>
+    } @else {
+    <label class="calendar__field">
+      <span>{{ translate('attendance.occupancy.officeLabel') }}</span>
+      <select #officeSelect (change)="chooseOffice(officeSelect.value)">
+        <option value="">{{ translate('attendance.occupancy.officePlaceholder') }}</option>
+        @for (office of items; track office.id) {
+        <option [value]="office.id">{{ office.name }}</option>
+        }
+      </select>
+    </label>
+
+    @if (selectedOffice(); as office) {
+    <label class="calendar__field">
+      <span>{{ translate('attendance.occupancy.roomLabel') }}</span>
+      <select #roomSelect (change)="chooseRoom(roomSelect.value)">
+        <option value="">{{ translate('attendance.occupancy.allRooms') }}</option>
+        @for (room of office.rooms; track room.id) {
+        <option [value]="room.id">{{ room.name }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="calendar__nav">
+      <button type="button" (click)="previousMonth()" [attr.aria-label]="translate('attendance.calendar.previousMonth')">
+        ‹
+      </button>
+      <h2 class="calendar__month">{{ monthLabel() }}</h2>
+      <button type="button" (click)="nextMonth()" [attr.aria-label]="translate('attendance.calendar.nextMonth')">
+        ›
+      </button>
+    </div>
+
+    <table class="calendar__grid">
+      <thead>
+        <tr>
+          @for (weekday of weekdayLabels(); track weekday) {
+          <th scope="col">{{ weekday }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (week of weeks(); track week[0]) {
+        <tr>
+          @for (date of week; track date) {
+          <td
+            class="calendar__cell"
+            [class.calendar__cell--outside]="!isSameMonth(date)"
+            [class.calendar__cell--mine]="isMine(date)"
+          >
+            @if (isSameMonth(date)) {
+            <span class="calendar__daynum">{{ date.slice(8) }}</span>
+            @if (figureFor(date); as day) {
+            <span class="calendar__figure">{{
+              translate('attendance.calendar.occupied', {
+                occupied: day.office.occupied,
+                capacity: day.office.capacity
+              })
+            }}</span>
+            } @if (isMine(date)) {
+            <span class="calendar__mine" aria-hidden="true">★</span>
+            <span class="calendar__sr">{{ translate('attendance.calendar.mine') }}</span>
+            } }
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+    }
+    } } @else {
+    <p class="calendar__loading">{{ translate('attendance.occupancy.loading') }}</p>
+    }
+  </section>
+</ng-container>
