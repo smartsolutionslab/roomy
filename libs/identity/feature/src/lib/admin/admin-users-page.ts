@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { AdminUser, AdminUsersGateway } from '@roomy/identity-data-access';
 import { catchError, of } from 'rxjs';
-
-import { AdminUser } from '../data-access/admin-user';
-import { AdminUsersClient } from '../data-access/admin-users-client';
 
 @Component({
   selector: 'roomy-admin-users-page',
@@ -14,7 +12,7 @@ import { AdminUsersClient } from '../data-access/admin-users-client';
   styleUrl: './admin-users-page.css',
 })
 export class AdminUsersPage {
-  private readonly adminUsersClient = inject(AdminUsersClient);
+  private readonly adminUsersGateway = inject(AdminUsersGateway);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly users = signal<AdminUser[] | null>(null);
@@ -22,7 +20,7 @@ export class AdminUsersPage {
   protected readonly grantFailed = signal(false);
 
   constructor() {
-    this.adminUsersClient
+    this.adminUsersGateway
       .getAll()
       .pipe(
         takeUntilDestroyed(),
@@ -36,7 +34,7 @@ export class AdminUsersPage {
 
   protected grantAdministrator(account: AdminUser): void {
     this.grantFailed.set(false);
-    this.adminUsersClient
+    this.adminUsersGateway
       .grantAdministrator(account.userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

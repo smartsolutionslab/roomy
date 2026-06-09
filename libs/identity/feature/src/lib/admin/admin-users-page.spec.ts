@@ -1,16 +1,15 @@
 import { provideZonelessChangeDetection } from '@angular/core';
+import { AdminUser, AdminUsersGateway, UserId, userId } from '@roomy/identity-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of, throwError } from 'rxjs';
 
 import { importIdentityTestTransloco } from '../../testing/transloco';
-import { AdminUser } from '../data-access/admin-user';
-import { AdminUsersClient } from '../data-access/admin-users-client';
 
 import { AdminUsersPage } from './admin-users-page';
 
 const employee: AdminUser = {
-  userId: 'a3f1c2d4-0000-7000-8000-000000000002',
+  userId: userId('a3f1c2d4-0000-7000-8000-000000000002'),
   email: 'grace@roomy.test',
   displayName: 'Grace Hopper',
   role: 'employee',
@@ -19,14 +18,14 @@ const employee: AdminUser = {
 
 function renderPage(
   accounts: AdminUser[],
-  grant: (userId: string) => Observable<void> = () => of(undefined),
+  grant: (user: UserId) => Observable<void> = () => of(undefined),
 ) {
   return render(AdminUsersPage, {
     imports: [importIdentityTestTransloco()],
     providers: [
       provideZonelessChangeDetection(),
       {
-        provide: AdminUsersClient,
+        provide: AdminUsersGateway,
         useValue: { getAll: () => of(accounts), grantAdministrator: grant },
       },
     ],

@@ -1,10 +1,9 @@
 import { provideZonelessChangeDetection } from '@angular/core';
+import { Account, AccountGateway, userId } from '@roomy/identity-data-access';
 import { render, screen } from '@testing-library/angular';
 import { Observable, of, throwError } from 'rxjs';
 
 import { importIdentityTestTransloco } from '../../testing/transloco';
-import { Account } from '../data-access/account';
-import { AccountClient } from '../data-access/account-client';
 
 import { AccountPage } from './account-page';
 
@@ -13,14 +12,14 @@ function renderAccountPage(currentAccount: Observable<Account>) {
     imports: [importIdentityTestTransloco()],
     providers: [
       provideZonelessChangeDetection(),
-      { provide: AccountClient, useValue: { getCurrentAccount: () => currentAccount } },
+      { provide: AccountGateway, useValue: { getCurrentAccount: () => currentAccount } },
     ],
   });
 }
 
 describe('AccountPage', () => {
   const account: Account = {
-    userId: 'a3f1c2d4-0000-7000-8000-000000000001',
+    userId: userId('a3f1c2d4-0000-7000-8000-000000000001'),
     email: 'ada@roomy.test',
     displayName: 'Ada Lovelace',
     role: 'administrator',
