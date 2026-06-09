@@ -33,6 +33,7 @@ export default [
       '**/.nx',
       '**/bin',
       '**/obj',
+      '**/vitest.config.*.timestamp*',
     ],
   },
   // TypeScript correctness ruleset (issue #10). typescript-eslint recommended
@@ -115,7 +116,8 @@ export default [
                 'type:util',
               ],
             },
-            // apps/hosts are the composition root: they may wire any layer.
+            // apps/hosts are the composition root: they may wire any layer,
+            // backend or frontend (the SPA composes feature/ui/data-access libs).
             {
               sourceTag: 'type:app',
               onlyDependOnLibsWithTags: [
@@ -123,8 +125,32 @@ export default [
                 'type:infrastructure',
                 'type:application',
                 'type:domain',
+                'type:feature',
+                'type:ui',
+                'type:data-access',
                 'type:util',
               ],
+            },
+            // --- Frontend layer rule (Angular feature libraries, ADR-0035) ---
+            // feature (smart, routed UI) → ui, data-access, and util.
+            {
+              sourceTag: 'type:feature',
+              onlyDependOnLibsWithTags: [
+                'type:feature',
+                'type:ui',
+                'type:data-access',
+                'type:util',
+              ],
+            },
+            // ui (presentational) → ui and util only.
+            {
+              sourceTag: 'type:ui',
+              onlyDependOnLibsWithTags: ['type:ui', 'type:util'],
+            },
+            // data-access (gateway clients + state) → data-access and util.
+            {
+              sourceTag: 'type:data-access',
+              onlyDependOnLibsWithTags: ['type:data-access', 'type:util'],
             },
             // util is a leaf: shared primitives depend on nothing but util.
             {
@@ -152,6 +178,20 @@ export default [
             {
               sourceTag: 'context:shared',
               onlyDependOnLibsWithTags: ['context:shared'],
+            },
+            // The single SPA is the frontend composition root: unlike the
+            // per-context backend hosts, ADR-0016/0030 mandate ONE Angular app
+            // across all contexts, so it may compose any context's frontend
+            // libs (ADR-0035). This is the only project tagged context:web.
+            {
+              sourceTag: 'context:web',
+              onlyDependOnLibsWithTags: [
+                'context:web',
+                'context:identity',
+                'context:organization',
+                'context:attendance',
+                'context:shared',
+              ],
             },
           ],
         },

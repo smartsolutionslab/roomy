@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "roomy",
   "sourceRoot": "apps/web/src",
-  "tags": ["type:app", "context:shared"],
+  "tags": ["type:app", "context:web"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",

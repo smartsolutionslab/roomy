@@ -15,6 +15,8 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "~2.1.2",
+    "@analogjs/vitest-angular": "~2.1.2",
     "@angular-devkit/core": "~22.0.0",
     "@angular-devkit/schematics": "~22.0.0",
     "@angular/build": "~22.0.0",
@@ -27,7 +29,10 @@
     "@nx/eslint": "22.7.5",
     "@nx/eslint-plugin": "22.7.5",
     "@nx/js": "22.7.5",
+    "@nx/vite": "22.7.5",
+    "@nx/vitest": "22.7.5",
     "@nx/web": "22.7.5",
+    "@oxc-project/runtime": "^0.115.0",
     "@schematics/angular": "~22.0.0",
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.5",
@@ -35,7 +40,10 @@
     "@testing-library/angular": "^19.4.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/node": "20.19.9",
     "@typescript-eslint/utils": "^8.40.0",
+    "@vitest/coverage-v8": "~4.1.0",
+    "@vitest/ui": "~4.1.0",
     "angular-eslint": "^22.0.0",
     "axe-core": "^4.12.0",
     "eslint": "^9.39.4",
@@ -49,6 +57,7 @@
     "tslib": "^2.3.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.1",
+    "vite": "^8.0.0",
     "vitest": "^4.0.8"
   },
   "pnpm": {
