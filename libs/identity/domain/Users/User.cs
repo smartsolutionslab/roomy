@@ -7,7 +7,7 @@ namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;
 // (FR-001/FR-002). A User is registered as Provisioning and becomes Active only once the Keycloak
 // user exists and its role is assigned. Credentials are not modelled here — they live in Keycloak
 // (research R1/R2).
-public sealed class User : IAggregate
+public sealed class User : Aggregate
 {
     private User(UserIdentifier identifier, Email email, DisplayName displayName, Role role)
     {
@@ -21,7 +21,7 @@ public sealed class User : IAggregate
     public UserIdentifier Identifier { get; }
     public Email Email { get; }
     public DisplayName DisplayName { get; }
-    public Role Role { get; }
+    public Role Role { get; private set; }
     public KeycloakSubjectIdentifier? KeycloakSubjectIdentifier { get; private set; }
     public UserStatus Status { get; private set; }
 
@@ -57,5 +57,15 @@ public sealed class User : IAggregate
 
         KeycloakSubjectIdentifier = keycloakSubjectIdentifier;
         Status = UserStatus.Active;
+    }
+
+    // Elevates the account to Administrator and records the change (US4 / IA-4). Idempotent: an account
+    // that is already an administrator is unchanged and raises nothing, so a repeated grant is a no-op.
+    public void GrantAdministrator(DateTimeOffset occurredAt)
+    {
+        if (Role.IsAdministrator) return;
+
+        Role = Role.GrantAdministrator();
+        RaiseDomainEvent(new AdministratorGranted(Identifier, occurredAt));
     }
 }
