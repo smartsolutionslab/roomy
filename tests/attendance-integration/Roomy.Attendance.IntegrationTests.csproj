@@ -13,6 +13,8 @@
     <ProjectReference Include="../../libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
     <!-- The minimal Aspire app host the testing builder boots as an entry point: Postgres only. -->
     <ProjectReference Include="../attendance-integration-apphost/Roomy.Attendance.TestAppHost.csproj" />
+    <!-- The host under test — its POST /reservations contract is exercised in-process. -->
+    <ProjectReference Include="../../apps/attendance-api/Roomy.Attendance.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +26,8 @@
     -->
     <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+    <!-- WebApplicationFactory, to boot the attendance host in-process for the POST /reservations test. -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

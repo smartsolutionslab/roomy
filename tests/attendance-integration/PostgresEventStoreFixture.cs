@@ -22,6 +22,8 @@ public sealed class PostgresEventStoreFixture : IAsyncLifetime
     private DistributedApplication? application;
     private string connectionString = string.Empty;
 
+    public string ConnectionString => connectionString;
+
     public async ValueTask InitializeAsync()
     {
         var builder = await DistributedApplicationTestingBuilder

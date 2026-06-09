@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Attendance.Api</RootNamespace>
+    <AssemblyName>Roomy.Attendance.Api</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The attendance context host (ADR-0014): the composition root. It wires the event-sourced
+      persistence (ADR-0012) behind the shared service defaults and exposes the reservation surface.
+      No messaging yet — US1 has no consumers or publishers; the capacity/employee feeds arrive in
+      US2/US4.
+    -->
+    <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Validates the BFF-forwarded Keycloak access token as a JWT bearer (ADR-0013). -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core design-time tooling: used only by `dotnet ef` against the design-time factory. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
