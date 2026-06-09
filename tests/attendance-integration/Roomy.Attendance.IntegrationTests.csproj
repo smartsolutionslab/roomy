@@ -11,6 +11,19 @@
     <ProjectReference Include="../../libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
     <!-- The shared event store: JsonEventSerializer + the registry the attendance events round-trip through. -->
     <ProjectReference Include="../../libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- The minimal Aspire app host the testing builder boots as an entry point: Postgres only. -->
+    <ProjectReference Include="../attendance-integration-apphost/Roomy.Attendance.TestAppHost.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Stands up a real PostgreSQL through the same Aspire resource model the app host uses, so the
+      event-store append/read and the (stream_id, version) optimistic-concurrency constraint are
+      verified against the actual provider rather than a SQLite stand-in. Needs Docker — available on
+      the CI ubuntu-latest runner.
+    -->
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
