@@ -34,6 +34,8 @@ export default [
       '**/bin',
       '**/obj',
       '**/vitest.config.*.timestamp*',
+      // Generated OpenAPI clients (ADR-0036) are build artefacts; never lint them.
+      '**/data-access/src/lib/generated',
     ],
   },
   // TypeScript correctness ruleset (issue #10). typescript-eslint recommended

@@ -52,6 +52,7 @@
     "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
     "jsdom": "^27.1.0",
+    "ng-openapi-gen": "1.0.5",
     "nx": "^22.7.5",
     "prettier": "^3.8.3",
     "tslib": "^2.3.0",

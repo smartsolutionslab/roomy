@@ -28,6 +28,7 @@ apps/apphost/
 # Committed for the CI drift gate, they must match the generator's output exactly, so Prettier must
 # not reformat them. Each context's generated-client directory is added as it is created.
 apps/identity-api/Roomy.Identity.Api.json
+**/data-access/src/lib/generated
 
 # Spec Kit tooling and spec content
 .specify/
