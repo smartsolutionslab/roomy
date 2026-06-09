@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.DbMigrator</RootNamespace>
+    <AssemblyName>Roomy.DbMigrator</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The shared schema-rollout runner (ADR-0033). A run-once composition root: it references each
+      context's infrastructure to create its database and apply its EF migrations, then exits. The
+      context APIs gate on its completion (Aspire WaitForCompletion) and no longer self-migrate.
+    -->
+    <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
