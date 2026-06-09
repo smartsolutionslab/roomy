@@ -1,0 +1,62 @@
+using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
+using SmartSolutionsLab.Roomy.SharedKernel;
+using SmartSolutionsLab.Roomy.SharedKernel.Results;
+
+namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
+
+// An office of the seeded company: a name, a location and the rooms it contains. The aggregate root
+// is the consistency boundary for its rooms — it owns room creation/renaming, enforces room-name
+// uniqueness within itself, and derives its capacity as the sum of its rooms (FR-008).
+public sealed class Office : Aggregate
+{
+    private readonly List<Room> rooms = [];
+
+    private Office(
+        OfficeIdentifier identifier,
+        CompanyIdentifier companyIdentifier,
+        OfficeName name,
+        Location location)
+    {
+        Identifier = identifier;
+        CompanyIdentifier = companyIdentifier;
+        Name = name;
+        Location = location;
+    }
+
+    public OfficeIdentifier Identifier { get; }
+    public CompanyIdentifier CompanyIdentifier { get; }
+    public OfficeName Name { get; private set; }
+    public Location Location { get; private set; }
+    public IReadOnlyList<Room> Rooms => rooms;
+    public int Capacity => rooms.Sum(room => room.Capacity.Value);
+
+    public static Office Create(CompanyIdentifier companyIdentifier, OfficeName name, Location location) =>
+        new(OfficeIdentifier.New(), companyIdentifier, name, location);
+
+    public void Rename(OfficeName name) => Name = name;
+
+    public void RelocateTo(Location location) => Location = location;
+
+    public Result<Room> AddRoom(RoomName name, Capacity capacity)
+    {
+        if (rooms.Any(room => room.Name == name))
+            return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
+
+        var room = Room.Create(name, capacity);
+        rooms.Add(room);
+        return room;
+    }
+
+    public Result RenameRoom(RoomIdentifier roomIdentifier, RoomName name)
+    {
+        var room = rooms.SingleOrDefault(candidate => candidate.Identifier == roomIdentifier);
+        if (room is null)
+            return Error.NotFound("office.room_not_found", $"No room with identifier '{roomIdentifier}' exists in this office.");
+
+        if (rooms.Any(candidate => candidate.Identifier != roomIdentifier && candidate.Name == name))
+            return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
+
+        room.Rename(name);
+        return Result.Success();
+    }
+}
