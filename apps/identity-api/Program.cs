@@ -1,8 +1,10 @@
+using JasperFx;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Authentication;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
@@ -79,6 +81,7 @@ builder.AddRoomyMessaging(
         ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
             ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
     },
+    applicationAssembly: typeof(IdentityApiHost).Assembly,
     typeof(EmployeeHiredConsumer).Assembly);
 
 // Seed the DefaultAdmin at startup so the system is administrable from first run (FR-004, research
@@ -109,4 +112,8 @@ app.UseAuthorization();
 app.MapAccountEndpoints();
 app.MapAdminUserEndpoints();
 
-app.Run();
+// RunJasperFxCommands instead of Run so the Wolverine code-generation commands are available
+// (ADR-0034): `dotnet run -- codegen write` regenerates the committed handler code. With no arguments
+// (how Aspire launches the service) it just runs the host. WebApplicationFactory-based tests set
+// JasperFxEnvironment.AutoStartHost so this dispatcher still starts the host they intercept.
+return await app.RunJasperFxCommands(args);
