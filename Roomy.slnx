@@ -3,6 +3,9 @@
   <Folder Name="/apps/apphost/">
     <Project Path="apps/apphost/Roomy.AppHost.csproj" />
   </Folder>
+  <Folder Name="/apps/db-migrator/">
+    <Project Path="apps/db-migrator/Roomy.DbMigrator.csproj" />
+  </Folder>
   <Folder Name="/apps/gateway/">
     <Project Path="apps/gateway/Roomy.Gateway.csproj" />
   </Folder>
