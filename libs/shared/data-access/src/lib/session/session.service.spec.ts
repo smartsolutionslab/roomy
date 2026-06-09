@@ -36,9 +36,7 @@ describe('SessionService', () => {
 
   it('treats a 401 as signed out but still marks the session loaded', () => {
     session.load();
-    httpController
-      .expectOne('/bff/user')
-      .flush(null, { status: 401, statusText: 'Unauthorized' });
+    httpController.expectOne('/bff/user').flush(null, { status: 401, statusText: 'Unauthorized' });
 
     expect(session.currentUser()).toBeNull();
     expect(session.loaded()).toBe(true);

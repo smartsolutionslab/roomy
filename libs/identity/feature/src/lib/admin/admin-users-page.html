@@ -1,0 +1,46 @@
+<ng-container *transloco="let translate">
+  <section class="admin-users">
+    <h1 class="admin-users__title">{{ translate('admin.users.title') }}</h1>
+
+    @if (grantFailed()) {
+    <p class="admin-users__error" role="alert" aria-live="assertive">
+      {{ translate('admin.users.grantError') }}
+    </p>
+    } @if (loadFailed()) {
+    <p class="admin-users__error" role="alert">{{ translate('admin.users.loadError') }}</p>
+    } @else if (users(); as accounts) { @if (accounts.length === 0) {
+    <p class="admin-users__empty">{{ translate('admin.users.empty') }}</p>
+    } @else {
+    <table class="admin-users__table">
+      <thead>
+        <tr>
+          <th scope="col">{{ translate('admin.users.nameHeader') }}</th>
+          <th scope="col">{{ translate('admin.users.emailHeader') }}</th>
+          <th scope="col">{{ translate('admin.users.roleHeader') }}</th>
+          <th scope="col">{{ translate('admin.users.statusHeader') }}</th>
+          <th scope="col">{{ translate('admin.users.actionsHeader') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (account of accounts; track account.userId) {
+        <tr>
+          <td>{{ account.displayName }}</td>
+          <td>{{ account.email }}</td>
+          <td>{{ translate('account.role.' + account.role) }}</td>
+          <td>{{ translate('admin.users.status.' + account.status) }}</td>
+          <td>
+            @if (account.role === 'employee') {
+            <button type="button" (click)="grantAdministrator(account)">
+              {{ translate('admin.users.grant') }}
+            </button>
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    } } @else {
+    <p class="admin-users__loading">{{ translate('admin.users.loading') }}</p>
+    }
+  </section>
+</ng-container>

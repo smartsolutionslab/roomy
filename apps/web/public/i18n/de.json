@@ -8,7 +8,8 @@
     "languageGerman": "Deutsch",
     "signIn": "Anmelden",
     "signOut": "Abmelden",
-    "signedInAs": "Angemeldet als {{name}}"
+    "signedInAs": "Angemeldet als {{name}}",
+    "adminLink": "Verwaltung"
   },
   "home": {
     "title": "Willkommen bei Roomy",
@@ -24,6 +25,29 @@
     "role": {
       "employee": "Mitarbeiter",
       "administrator": "Administrator"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "Konten",
+      "loading": "Konten werden geladen…",
+      "empty": "Noch keine Konten.",
+      "loadError": "Die Konten konnten nicht geladen werden.",
+      "grantError": "Administratorrechte konnten nicht vergeben werden. Bitte erneut versuchen.",
+      "grant": "Administrator vergeben",
+      "nameHeader": "Name",
+      "emailHeader": "E-Mail",
+      "roleHeader": "Rolle",
+      "statusHeader": "Status",
+      "actionsHeader": "Aktionen",
+      "status": {
+        "provisioning": "Wird bereitgestellt",
+        "active": "Aktiv"
+      }
+    },
+    "notAuthorized": {
+      "title": "Nicht berechtigt",
+      "message": "Sie haben keine Berechtigung, diese Seite anzuzeigen."
     }
   }
 }

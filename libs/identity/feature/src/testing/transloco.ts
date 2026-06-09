@@ -17,6 +17,29 @@ const english = {
       administrator: 'Administrator',
     },
   },
+  admin: {
+    users: {
+      title: 'Accounts',
+      loading: 'Loading accounts…',
+      empty: 'No accounts yet.',
+      loadError: 'We could not load the accounts.',
+      grantError: 'We could not grant administrator. Please try again.',
+      grant: 'Grant administrator',
+      nameHeader: 'Name',
+      emailHeader: 'Email',
+      roleHeader: 'Role',
+      statusHeader: 'Status',
+      actionsHeader: 'Actions',
+      status: {
+        provisioning: 'Provisioning',
+        active: 'Active',
+      },
+    },
+    notAuthorized: {
+      title: 'Not authorized',
+      message: 'You do not have permission to view this page.',
+    },
+  },
 };
 
 const german = {
@@ -30,6 +53,29 @@ const german = {
     role: {
       employee: 'Mitarbeiter',
       administrator: 'Administrator',
+    },
+  },
+  admin: {
+    users: {
+      title: 'Konten',
+      loading: 'Konten werden geladen…',
+      empty: 'Noch keine Konten.',
+      loadError: 'Die Konten konnten nicht geladen werden.',
+      grantError: 'Administratorrechte konnten nicht vergeben werden. Bitte erneut versuchen.',
+      grant: 'Administrator vergeben',
+      nameHeader: 'Name',
+      emailHeader: 'E-Mail',
+      roleHeader: 'Rolle',
+      statusHeader: 'Status',
+      actionsHeader: 'Aktionen',
+      status: {
+        provisioning: 'Wird bereitgestellt',
+        active: 'Aktiv',
+      },
+    },
+    notAuthorized: {
+      title: 'Nicht berechtigt',
+      message: 'Sie haben keine Berechtigung, diese Seite anzuzeigen.',
     },
   },
 };

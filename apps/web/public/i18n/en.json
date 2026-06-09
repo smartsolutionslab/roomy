@@ -8,7 +8,8 @@
     "languageGerman": "German",
     "signIn": "Sign in",
     "signOut": "Sign out",
-    "signedInAs": "Signed in as {{name}}"
+    "signedInAs": "Signed in as {{name}}",
+    "adminLink": "Administration"
   },
   "home": {
     "title": "Welcome to Roomy",
@@ -24,6 +25,29 @@
     "role": {
       "employee": "Employee",
       "administrator": "Administrator"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "Accounts",
+      "loading": "Loading accounts…",
+      "empty": "No accounts yet.",
+      "loadError": "We could not load the accounts.",
+      "grantError": "We could not grant administrator. Please try again.",
+      "grant": "Grant administrator",
+      "nameHeader": "Name",
+      "emailHeader": "Email",
+      "roleHeader": "Role",
+      "statusHeader": "Status",
+      "actionsHeader": "Actions",
+      "status": {
+        "provisioning": "Provisioning",
+        "active": "Active"
+      }
+    },
+    "notAuthorized": {
+      "title": "Not authorized",
+      "message": "You do not have permission to view this page."
     }
   }
 }

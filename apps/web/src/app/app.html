@@ -9,6 +9,9 @@
     <div class="app__session">
       @if (currentUser(); as user) {
       <span class="app__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
+      @if (user.roles.includes('administrator')) {
+      <a class="app__admin-link" routerLink="/admin/users">{{ translate('shell.adminLink') }}</a>
+      }
       <form class="app__signout" method="post" action="/bff/logout">
         <button type="submit">{{ translate('shell.signOut') }}</button>
       </form>
