@@ -1,0 +1,5 @@
+.not-authorized {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-sm, 0.5rem);
+}

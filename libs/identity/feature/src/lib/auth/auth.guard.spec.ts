@@ -23,8 +23,8 @@ function configure(session: SessionStub) {
 
 function runGuard(url: string): Promise<boolean> {
   const state = { url } as RouterStateSnapshot;
-  return TestBed.runInInjectionContext(
-    () => authGuard({} as ActivatedRouteSnapshot, state),
+  return TestBed.runInInjectionContext(() =>
+    authGuard({} as ActivatedRouteSnapshot, state),
   ) as Promise<boolean>;
 }
 

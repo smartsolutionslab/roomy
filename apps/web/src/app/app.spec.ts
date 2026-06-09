@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { CurrentUser } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
@@ -13,7 +14,12 @@ import { importTestTransloco } from './i18n/transloco-testing';
 async function renderShell(session: CurrentUser | null = null) {
   const view = await render(App, {
     imports: [importTestTransloco()],
-    providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+    providers: [
+      provideZonelessChangeDetection(),
+      provideRouter([]),
+      provideHttpClient(),
+      provideHttpClientTesting(),
+    ],
   });
 
   // The shell asks the BFF who is signed in on init (ADR-0030); answer that one request.
@@ -59,6 +65,18 @@ describe('App shell', () => {
 
     expect(screen.getByText('Signed in as Ada Lovelace')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Sign out' })).toBeTruthy();
+  });
+
+  it('offers an administration link to administrators', async () => {
+    await renderShell({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
+
+    expect(screen.getByRole('link', { name: 'Administration' })).toBeTruthy();
+  });
+
+  it('does not offer the administration link to a non-administrator', async () => {
+    await renderShell({ name: 'Grace Hopper', roles: ['employee'] });
+
+    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
   });
 
   it('has no detectable accessibility violations', async () => {
