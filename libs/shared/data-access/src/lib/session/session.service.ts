@@ -13,17 +13,28 @@ export class SessionService {
   private readonly httpClient = inject(HttpClient);
   private readonly currentUserState = signal<CurrentUser | null>(null);
   private readonly loadedState = signal(false);
+  private loadOnce?: Promise<void>;
 
   readonly currentUser = this.currentUserState.asReadonly();
   readonly loaded = this.loadedState.asReadonly();
 
   load(): void {
-    this.httpClient
-      .get<CurrentUser>('/bff/user')
-      .pipe(catchError(() => of(null)))
-      .subscribe((user) => {
-        this.currentUserState.set(user);
-        this.loadedState.set(true);
-      });
+    void this.ensureLoaded();
+  }
+
+  // Resolves once the first `/bff/user` response settles (success or 401), so route guards can
+  // wait for a decided session before allowing or redirecting. Memoized: concurrent callers and
+  // the startup `load()` share the one request.
+  ensureLoaded(): Promise<void> {
+    return (this.loadOnce ??= new Promise<void>((resolve) => {
+      this.httpClient
+        .get<CurrentUser>('/bff/user')
+        .pipe(catchError(() => of(null)))
+        .subscribe((user) => {
+          this.currentUserState.set(user);
+          this.loadedState.set(true);
+          resolve();
+        });
+    }));
   }
 }
