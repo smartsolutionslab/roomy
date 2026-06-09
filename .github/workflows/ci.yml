@@ -41,6 +41,26 @@ jobs:
       - name: Build (warnings as errors)
         run: dotnet build Roomy.slnx --configuration Release --no-restore -warnaserror
 
+      # Wolverine runs from pre-generated code instead of compiling at runtime (ADR-0034, GH-2876).
+      # Regenerate the handler code and fail if it differs from what is committed, so a handler or
+      # Wolverine-config change without re-running `codegen write` cannot reach production (where there
+      # is no runtime compiler). `codegen write` builds the host's Wolverine model offline — it opens no
+      # broker or database connection — so dummy config is enough to satisfy the host's startup guards.
+      - name: Verify Wolverine codegen is current
+        run: |
+          dotnet run --project apps/identity-api --configuration Release --no-build -- codegen write
+          git diff --exit-code -- apps/identity-api/Internal/Generated
+        env:
+          ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
+          ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
+          Keycloak__BaseAddress: "http://localhost:8080"
+          Keycloak__AdminUsername: "ci"
+          Keycloak__AdminPassword: "ci"
+          Keycloak__Realm: "roomy"
+          DefaultAdmin__Email: "ci@roomy.local"
+          DefaultAdmin__DisplayName: "CI"
+          DefaultAdmin__InitialPassword: "ci-password-123"
+
       # Runs every test project and, in the same pass, enforces the coverage gate.
       # `--collect "XPlat Code Coverage"` with coverlet.runsettings collects and reports
       # coverage per project (policy exclusions applied). The 85% line+branch FLOOR on
