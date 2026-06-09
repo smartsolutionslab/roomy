@@ -53,19 +53,19 @@ backend host endpoint and the catalogue read model (RED→GREEN).
 
 ## Phase 2: Bookable catalogue — `GET /rooms` (D-AW2)
 
-- [ ] T004 [US1] RED: `IBookableRoomsReadModel` port +
+- [x] T004 [US1] RED: `IBookableRoomsReadModel` port +
   `libs/attendance/application/UseCases/ViewBookableRooms.cs` (query) + `BookableRoomView.cs`
   (officeId, officeName, roomId, roomName, capacity) + `ViewBookableRoomsHandler` returning the
   company's bookable rooms. Handler unit test (Shouldly) over a faked read model: groups/returns
   rooms with their office names; empty when none.
-- [ ] T005 [US1] GREEN: `libs/attendance/infrastructure/ReadModels/Rooms/BookableRoomsReadModel.cs`
+- [x] T005 [US1] GREEN: `libs/attendance/infrastructure/ReadModels/Rooms/BookableRoomsReadModel.cs`
   adapter joining the `Offices` + `Rooms` read models (no cross-service join, ADR-0014); register it
   in the infrastructure DI. Integration/read-model test that it returns offices with their rooms.
-- [ ] T006 [US1] `Endpoints/RoomCatalogueEndpoints.cs` — `GET /rooms` mapping the query to
+- [x] T006 [US1] `Endpoints/RoomCatalogueEndpoints.cs` — `GET /rooms` mapping the query to
   `[{ officeId, officeName, roomId, roomName, capacity }]`, `RequireAuthorization()`, with
   `.WithName/.Produces`; wire `MapRoomCatalogueEndpoints` in `Program.cs`. Host test: an authenticated
   GET returns the catalogue; `401` without a session. Re-emit the OpenAPI spec (T002 gate).
-- [ ] T007 [US1] Add the `attendance-rooms` route to `apps/gateway/appsettings.json`
+- [x] T007 [US1] Add the `attendance-rooms` route to `apps/gateway/appsettings.json`
   (`/rooms/{**catch-all}` → `attendance` cluster, `AuthorizationPolicy: default`), mirroring
   `attendance-reservations`.
 

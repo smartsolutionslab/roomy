@@ -41,6 +41,10 @@ builder.Services.AddScoped<IOccupancyReadModel, OccupancyReadModel>();
 // "My reservations" reads the caller's rows from the local Reservations read model (004 US9).
 builder.Services.AddScoped<IMyReservationsReadModel, MyReservationsReadModel>();
 
+// The reserve picker's bookable catalogue reads the local Offices/Rooms read models (007 US1) — no
+// cross-service join.
+builder.Services.AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>();
+
 // Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
 builder.Services.AddOpenApi();
 
@@ -120,6 +124,7 @@ app.UseAuthorization();
 
 app.MapReservationEndpoints();
 app.MapOccupancyEndpoints();
+app.MapRoomCatalogueEndpoints();
 
 // Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
 // route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.
