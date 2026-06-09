@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Organization.Domain</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Organization.Domain</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>
