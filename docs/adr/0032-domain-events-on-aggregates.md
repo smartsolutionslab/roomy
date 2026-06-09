@@ -64,10 +64,12 @@ We chose **Option A**. The shared-kernel gains:
   `IAggregate` stays the marker the architecture tests key on (`Aggregate : IAggregate`).
 
 Events are **recorded, not dispatched**. An aggregate raises an event into its collection;
-nothing drains it in the MVP. The unit of work clears the collection on commit so a saved
-aggregate does not carry stale events. When a real consumer appears, the dispatch seam is a
-single addition at the infrastructure edge (a `SaveChanges` interceptor that drains
-`DomainEvents` into in-process handlers or the outbox) — the aggregate API does not change.
+nothing drains it in the MVP, and the per-request `DbContext` scope means a saved aggregate
+is discarded with its events rather than outliving them. When a real consumer appears, the
+dispatch seam is a single addition at the infrastructure edge — a `SaveChanges` interceptor
+that drains `DomainEvents` into in-process handlers (or the outbox) and clears them as part
+of the commit — and the aggregate API does not change. Until then the unit of work is a
+plain `SaveChangesAsync`; `ClearDomainEvents()` exists for that future drain and for tests.
 
 `OccurredAt` is passed into the raising method by the caller, never read from an ambient
 clock, keeping the domain deterministic and testable (mirrors how the application stamps
@@ -92,6 +94,6 @@ integration events with the injected `TimeProvider`).
 
 **Follow-ups**
 - `User` derives from `Aggregate` and raises `AdministratorGranted` on elevation (US4).
-- The unit-of-work commit path clears `DomainEvents` after a successful save.
-- When the first domain-event consumer lands, add the `SaveChanges`-interceptor drain and
-  record it as a follow-up ADR; until then, dispatch stays deliberately unbuilt.
+- When the first domain-event consumer lands, add the `SaveChanges`-interceptor drain that
+  dispatches and clears `DomainEvents` on commit, and record it as a follow-up ADR; until
+  then, dispatch stays deliberately unbuilt and the unit of work only saves.
