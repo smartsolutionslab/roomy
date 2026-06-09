@@ -31,14 +31,14 @@ backend host endpoint and the catalogue read model (RED→GREEN).
 
 ## Phase 1: Backend enablement — attendance OpenAPI emit (ADR codegen, #0036)
 
-- [ ] T001 Stand up the OpenAPI spec emit on `attendance-api`, mirroring identity/organization: add
+- [x] T001 Stand up the OpenAPI spec emit on `attendance-api`, mirroring identity/organization: add
   `Microsoft.AspNetCore.OpenApi` + `Microsoft.Extensions.ApiDescription.Server` package refs and the
   `OpenApiDocumentsDirectory` / `OpenApiGenerateDocumentsOnBuild=false` props to
   `apps/attendance-api/Roomy.Attendance.Api.csproj`; add `AddOpenApi()` + `MapOpenApi()` and the
   `OpenApi:EmitDocument` skip-guards (skip messaging/inbox + any seeder during emit) to `Program.cs`.
   Verify: a clean build with `-p:OpenApiGenerateDocumentsOnBuild=true` boots through `getdocument`
   with no broker/DB.
-- [ ] T002 Annotate the existing endpoints for the typed client: add `.WithName/.Produces/
+- [x] T002 Annotate the existing endpoints for the typed client: add `.WithName/.Produces/
   .ProducesProblem` to `Endpoints/ReservationEndpoints.cs` (POST/DELETE/GET /reservations,
   GET /reservations/mine) and `Endpoints/OccupancyEndpoints.cs` (GET /occupancy), covering their
   documented status codes (201/204/200/400/403/404/409/422). Commit the emitted

@@ -19,7 +19,12 @@ public static class OccupancyEndpoints
 
     public static IEndpointRouteBuilder MapOccupancyEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/occupancy", ViewAsync).RequireAuthorization();
+        endpoints.MapGet("/occupancy", ViewAsync)
+            .RequireAuthorization()
+            .WithName("ViewOccupancy")
+            .Produces<IEnumerable<OccupancyDayResponse>>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
         return endpoints;
     }
 
