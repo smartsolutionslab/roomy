@@ -1,4 +1,5 @@
 using JasperFx;
+using JasperFx.CommandLine;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -40,21 +41,38 @@ builder.Services.AddScoped<IOccupancyReadModel, OccupancyReadModel>();
 // "My reservations" reads the caller's rows from the local Reservations read model (004 US9).
 builder.Services.AddScoped<IMyReservationsReadModel, MyReservationsReadModel>();
 
+// Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
+builder.Services.AddOpenApi();
+
+// Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
+// HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher
+// disposing it first; it is scoped to the emit so normal startup is unaffected. The document is built
+// from endpoint metadata alone, so during an emit the messaging runtime — the only startup that opens a
+// broker/database connection — is skipped, letting the spec emit with no Postgres or RabbitMQ.
+var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+if (emittingOpenApiDocument)
+{
+    JasperFxEnvironment.AutoStartHost = true;
+}
+
 // Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
 // (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
 // assembly) into the Rooms read model; the inbox shares the attendance database so the projection and
 // the dedup commit together. No outbound integration events this slice (occupancy folds the stream
 // locally, 004).
-builder.AddRoomyMessaging(
-    new MessagingOptions
-    {
-        Transport = MessagingTransport.RabbitMq,
-        PostgresConnectionString = attendanceConnectionString,
-        ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-            ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
-    },
-    applicationAssembly: typeof(AttendanceApiHost).Assembly,
-    typeof(RoomAddedConsumer).Assembly);
+if (!emittingOpenApiDocument)
+{
+    builder.AddRoomyMessaging(
+        new MessagingOptions
+        {
+            Transport = MessagingTransport.RabbitMq,
+            PostgresConnectionString = attendanceConnectionString,
+            ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
+                ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+        },
+        applicationAssembly: typeof(AttendanceApiHost).Assembly,
+        typeof(RoomAddedConsumer).Assembly);
+}
 
 // Single-tenant v1 (ADR-0011): the company that owns every AttendanceDay (ADR-0026) is configured.
 var attendance = builder.Configuration.GetSection(AttendanceApiOptions.SectionName);
@@ -102,6 +120,10 @@ app.UseAuthorization();
 
 app.MapReservationEndpoints();
 app.MapOccupancyEndpoints();
+
+// Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
+// route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.
+app.MapOpenApi();
 
 // RunJasperFxCommands so the Wolverine code-generation commands are available (ADR-0034): the host runs
 // from committed, pre-generated code (TypeLoadMode.Static). With no arguments it just runs the host.

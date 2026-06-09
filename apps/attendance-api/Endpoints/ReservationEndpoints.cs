@@ -18,10 +18,29 @@ public static class ReservationEndpoints
 
     public static IEndpointRouteBuilder MapReservationEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/reservations", ReserveAsync).RequireAuthorization();
-        endpoints.MapDelete("/reservations/{reservationId:guid}", CancelAsync).RequireAuthorization();
-        endpoints.MapGet("/reservations", ViewAsync).RequireAuthorization();
-        endpoints.MapGet("/reservations/mine", ViewMineAsync).RequireAuthorization();
+        endpoints.MapPost("/reservations", ReserveAsync)
+            .RequireAuthorization()
+            .WithName("Reserve")
+            .Produces<ReservationResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+        endpoints.MapDelete("/reservations/{reservationId:guid}", CancelAsync)
+            .RequireAuthorization()
+            .WithName("CancelReservation")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+        endpoints.MapGet("/reservations", ViewAsync)
+            .RequireAuthorization()
+            .WithName("ViewDayReservations")
+            .Produces<IEnumerable<ReservationResponse>>();
+        endpoints.MapGet("/reservations/mine", ViewMineAsync)
+            .RequireAuthorization()
+            .WithName("ViewMyReservations")
+            .Produces<IEnumerable<MyReservationResponse>>();
         return endpoints;
     }
 
