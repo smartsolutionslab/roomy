@@ -27,4 +27,20 @@ public sealed class AppHostCompositionTests
         resourceNames.ShouldContain("postgres");
         resourceNames.ShouldContain("rabbitmq");
     }
+
+    [Fact]
+    public async Task Runs_the_migration_runner_to_completion_before_the_identity_service_starts()
+    {
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
+            TestContext.Current.CancellationToken);
+        await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
+
+        var model = application.Services.GetRequiredService<DistributedApplicationModel>();
+
+        model.Resources.Select(resource => resource.Name).ShouldContain("db-migrator");
+
+        var identityApi = model.Resources.Single(resource => resource.Name == "identity-api");
+        identityApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
+            wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
+    }
 }
