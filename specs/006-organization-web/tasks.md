@@ -106,10 +106,10 @@ a field-level "name already taken" message and adds nothing.
 **Independent Test**: an admin changes an office's name or location → the office reflects it; a
 duplicate name is rejected with a field-level conflict.
 
-- [ ] T011 [US3] Extend `offices-page.spec.ts` (RED) — editing an office's name
+- [x] T011 [US3] Extend `offices-page.spec.ts` (RED) — editing an office's name
   (`PATCH …/name`) and location (`PATCH …/location`) calls the gateway and updates the row from the
   returned office; `409` on rename → field-level conflict; `404` → "no longer exists" + refresh.
-- [ ] T012 [US3] Wire the inline edit-office affordance in `offices-page.ts` and the i18n keys.
+- [x] T012 [US3] Wire the inline edit-office affordance in `offices-page.ts` and the i18n keys.
   T011 green.
 
 ---
@@ -120,19 +120,19 @@ duplicate name is rejected with a field-level conflict.
 office capacity grows; capacity `< 1` or a blank name is rejected client-side; renaming a room
 updates it; a duplicate room name shows a field-level conflict.
 
-- [ ] T013 [US4] Extend `offices-page.spec.ts` (RED) — adding a room calls
+- [x] T013 [US4] Extend `offices-page.spec.ts` (RED) — adding a room calls
   `OfficesGateway.addRoom` and appends the room + bumps the office's derived capacity (201); capacity
   `< 1` or blank name → form invalid, **no request sent**, localized validation message (FR-006);
   `409` → field-level conflict. Renaming a room calls `renameRoom` and updates it from the returned
   office; `409` → field-level conflict.
-- [ ] T014 [US4] Wire the add-room + rename-room affordances in `offices-page.ts` (client-side
+- [x] T014 [US4] Wire the add-room + rename-room affordances in `offices-page.ts` (client-side
   capacity/name validation, `aria-live` result, field-level conflict) and the i18n keys. T013 green.
 
 ---
 
 ## Phase 8: Polish
 
-- [ ] T015 [P] Accessibility pass (WCAG 2.2 AA): keyboard operability, focus visibility, roles/names,
+- [x] T015 [P] Accessibility pass (WCAG 2.2 AA): keyboard operability, focus visibility, roles/names,
   labelled form controls, announced mutation results, `lang` correctness across both languages;
   verify with the testing-library role queries already in the specs. Confirm `de.json` parity with
   `en.json` for the `organization.*` namespace (no missing keys).
@@ -154,3 +154,16 @@ updates it; a duplicate room name shows a field-level conflict.
 - ADR-0038 (shared guards) is the only new ADR; ADR-0036 (codegen) is applied, not re-decided.
 - Token-free throughout (ADR-0013); same-origin relative URLs (ADR-0030); generated, drift-gated
   client (ADR-0036).
+
+## Status reconciliation
+
+All tasks (T001–T015) are complete. The offices page (`libs/organization/feature/`) uses a single
+**active-editor** model — one inline editor (rename office / change location / add room / rename
+room) open at a time — which keeps the form state correct across multiple offices. Mutations refresh
+the affected office from the mutation response (add-room appends the returned room and recomputes the
+office's derived capacity); a `409` keeps the editor open with a field-level conflict so the name can
+be fixed (the rename-conflict test cancels, then asserts the office is unchanged), a `404` closes the
+editor, shows a "no longer exists" notice and reloads the list, and other failures show a
+non-blocking error. The success `aria-live` region announces every mutation. The route guards come
+from `@roomy/shared-feature` (ADR-0038); no `organization → identity` import. DE/EN key parity is
+verified (73/73). The web app builds under strict template checking.
