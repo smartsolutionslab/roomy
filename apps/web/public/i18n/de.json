@@ -10,7 +10,9 @@
     "signOut": "Abmelden",
     "signedInAs": "Angemeldet als {{name}}",
     "adminLink": "Verwaltung",
-    "officesLink": "Büros"
+    "officesLink": "Büros",
+    "reserveLink": "Platz reservieren",
+    "myReservationsLink": "Meine Reservierungen"
   },
   "home": {
     "title": "Willkommen bei Roomy",
@@ -95,6 +97,49 @@
       "error": "Der Raum konnte nicht gespeichert werden. Bitte erneut versuchen.",
       "added": "Raum {{name}} hinzugefügt.",
       "renamed": "Raum {{name}} umbenannt."
+    }
+  },
+  "attendance": {
+    "reserve": {
+      "title": "Platz reservieren",
+      "loading": "Wird geladen…",
+      "loadError": "Die Büros konnten nicht geladen werden.",
+      "empty": "Es sind noch keine Büros oder Räume buchbar.",
+      "officeLabel": "Büro",
+      "officePlaceholder": "Büro auswählen",
+      "dayLabel": "Tag",
+      "dayPlaceholder": "Tag auswählen",
+      "roomsHeading": "Räume",
+      "capacityLabel": "{{capacity}} Plätze",
+      "placesLeft": "{{remaining}} von {{capacity}} Plätzen frei",
+      "full": "Belegt",
+      "confirm": "Reservieren",
+      "reserved": "{{room}} für {{date}} reserviert.",
+      "errors": {
+        "roomFull": "Dieser Raum ist am gewählten Tag belegt.",
+        "alreadyReserved": "Sie haben an diesem Tag bereits eine Reservierung.",
+        "notBookable": "Nur Werktage innerhalb der nächsten zwei Wochen sind buchbar.",
+        "unknownRoom": "Dieser Raum ist nicht mehr verfügbar.",
+        "retry": "Jemand hat gerade den letzten Platz belegt. Bitte erneut versuchen.",
+        "generic": "Der Platz konnte nicht reserviert werden. Bitte erneut versuchen."
+      }
+    },
+    "mine": {
+      "title": "Meine Reservierungen",
+      "loading": "Wird geladen…",
+      "loadError": "Ihre Reservierungen konnten nicht geladen werden.",
+      "empty": "Sie haben noch keine Reservierungen.",
+      "reserveLink": "Platz reservieren",
+      "upcomingHeading": "Bevorstehend",
+      "pastHeading": "Vergangen",
+      "cancel": "Stornieren",
+      "cancelReservation": "Reservierung für {{room}} am {{date}} stornieren",
+      "change": "Ändern",
+      "cancelled": "Reservierung storniert.",
+      "errors": {
+        "pastImmutable": "Vergangene Reservierungen können nicht geändert werden.",
+        "generic": "Die Reservierung konnte nicht storniert werden. Bitte erneut versuchen."
+      }
     }
   },
   "shared": {

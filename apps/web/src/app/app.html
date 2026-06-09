@@ -9,6 +9,8 @@
     <div class="app__session">
       @if (currentUser(); as user) {
       <span class="app__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
+      <a class="app__nav-link" routerLink="/attendance/reserve">{{ translate('shell.reserveLink') }}</a>
+      <a class="app__nav-link" routerLink="/attendance/mine">{{ translate('shell.myReservationsLink') }}</a>
       @if (user.roles.includes('administrator')) {
       <a class="app__admin-link" routerLink="/offices">{{ translate('shell.officesLink') }}</a>
       <a class="app__admin-link" routerLink="/admin/users">{{ translate('shell.adminLink') }}</a>
