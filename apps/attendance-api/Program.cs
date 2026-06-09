@@ -10,6 +10,7 @@ using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
@@ -31,6 +32,10 @@ builder.Services.AddScoped<IRoomDirectory, RoomDirectory>();
 // The acting user resolves to their EmployeeId via the local Employees read model, fed by EmployeeHired
 // (003 US4). Used by the endpoints to authorize reserve/cancel.
 builder.Services.AddScoped<IEmployeeDirectory, EmployeeDirectory>();
+
+// Occupancy reads the local Reservations/Rooms/Offices/Employees read models for the view (004 US6,
+// ADR-0038) — no cross-service join.
+builder.Services.AddScoped<IOccupancyReadModel, OccupancyReadModel>();
 
 // Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
 // (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
@@ -93,6 +98,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapReservationEndpoints();
+app.MapOccupancyEndpoints();
 
 // RunJasperFxCommands so the Wolverine code-generation commands are available (ADR-0034): the host runs
 // from committed, pre-generated code (TypeLoadMode.Static). With no arguments it just runs the host.

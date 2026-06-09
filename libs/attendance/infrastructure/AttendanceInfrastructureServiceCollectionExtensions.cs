@@ -49,6 +49,7 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
         services.AddScoped<ICommandHandler<ReservePlace, ReservationIdentifier>, ReservePlaceHandler>();
         services.AddScoped<ICommandHandler<CancelReservation>, CancelReservationHandler>();
         services.AddScoped<IQueryHandler<ViewDayReservations, IReadOnlyList<ReservationView>>, ViewDayReservationsHandler>();
+        services.AddScoped<IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>>, ViewOccupancyHandler>();
 
         return services;
     }
