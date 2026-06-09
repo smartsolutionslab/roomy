@@ -74,14 +74,22 @@ builder.AddExecutable(
         "nx", "serve", "web", "--port", "4200", "--host", "127.0.0.1")
     .WithHttpEndpoint(port: 4200, targetPort: 4200, isProxied: false);
 
+// --- Database migration runner (ADR-0033) ------------------------------------------
+// Creates each context's database and applies its EF migrations in one pass, then exits. The context
+// APIs gate on its completion instead of self-migrating, so the schema is in place before any service
+// reads it. Each new context adds its own database reference here.
+var dbMigrator = builder.AddProject<Projects.Roomy_DbMigrator>("db-migrator")
+    .WithReference(identityDatabase).WaitFor(identityDatabase);
+
 // --- Identity API (001) ------------------------------------------------------------
 // The identity context service: it owns its database, provisions Keycloak users, and exposes the
 // account/role surface the BFF composes (ADR-0013/0014). It validates the BFF-forwarded token against
-// Keycloak and publishes integration events over RabbitMQ. The DefaultAdmin is seeded at startup from
-// these dev credentials, so the system is administrable from first run (FR-004); the admin REST calls
-// reuse the Keycloak admin parameters. Dev-only credentials — overridden per environment.
+// Keycloak and publishes integration events over RabbitMQ. It starts only after the migrator has applied
+// the schema (WaitForCompletion, ADR-0033); the DefaultAdmin is then seeded at startup from these dev
+// credentials, so the system is administrable from first run (FR-004); the admin REST calls reuse the
+// Keycloak admin parameters. Dev-only credentials — overridden per environment.
 var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api")
-    .WithReference(identityDatabase).WaitFor(identityDatabase)
+    .WithReference(identityDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
