@@ -44,15 +44,15 @@ description: "Task list for Occupancy Web — occupancy views & calendar (008)"
 
 ## Phase 2: Occupancy list — `occupancy-page` (US1)
 
-- [ ] T004 [US1] RED: `occupancy/occupancy-page.spec.ts` — pick an office (rollup + per-room figures,
+- [x] T004 [US1] RED: `occupancy/occupancy-page.spec.ts` — pick an office (rollup + per-room figures,
   scenarios 1–2); switch to a room scope (scenario 7); day/week/month presets each render every day's
   occupied/capacity (scenario 3); today shows occupant names, a future day shows counts only (scenario
   4); a past range renders read-only with no action controls (scenario 6); empty catalogue + request
   error states.
-- [ ] T005 [US1] GREEN: `occupancy/occupancy-page.ts/.html/.css` — scope picker from `listBookableOffices`,
+- [x] T005 [US1] GREEN: `occupancy/occupancy-page.ts/.html/.css` — scope picker from `listBookableOffices`,
   day/week/month preset selector, `occupancy(scope, from, to)` fetch, per-room + office-rollup figures,
   today/tomorrow names rendered only when present. `today` an input defaulting to `todayInBerlin()`.
-- [ ] T006 [US1] Error/empty handling: `404 unknown_office|unknown_room` → localized "no longer
+- [x] T006 [US1] Error/empty handling: `404 unknown_office|unknown_room` → localized "no longer
   available" + refresh the catalogue; network/5xx → non-blocking error; empty catalogue → empty-state.
   Extend the spec.
 
