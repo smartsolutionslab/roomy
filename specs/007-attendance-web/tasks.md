@@ -93,14 +93,14 @@ backend host endpoint and the catalogue read model (RED→GREEN).
 
 ## Phase 4: Reserve flow — `reserve-page` (US1, FR-001..FR-004)
 
-- [ ] T012 [US1] RED: `reserve-page.spec.ts` — office step lists offices from the catalogue
+- [x] T012 [US1] RED: `reserve-page.spec.ts` — office step lists offices from the catalogue
   (empty-state when none, scenario edge); room step lists the office's rooms with remaining places for
   the chosen day from occupancy and disables a full room (scenario 3); day step offers only bookable
   days (scenario 5); confirm calls `reserve` and announces success (scenario 1, 2).
-- [ ] T013 [US1] GREEN: `reserve/reserve-page.ts/.html/.css` — the office→room→day→confirm flow,
+- [x] T013 [US1] GREEN: `reserve/reserve-page.ts/.html/.css` — the office→room→day→confirm flow,
   signal-based + OnPush, reactive forms, `aria-live` success; remaining places via
   `occupancyForOffice`.
-- [ ] T014 [US1] Error surfacing (FR-004): map `room_full`, `already_reserved_today`, `not_bookable`,
+- [x] T014 [US1] Error surfacing (FR-004): map `room_full`, `already_reserved_today`, `not_bookable`,
   `unknown_room` (refresh catalogue), `concurrency_retry_exhausted` (retryable) to localized,
   non-blocking messages; no reservation on rejection (scenarios 3, 4, 5, 10 + edge cases). Extend
   `reserve-page.spec.ts`.
@@ -109,29 +109,29 @@ backend host endpoint and the catalogue read model (RED→GREEN).
 
 ## Phase 5: My reservations — `my-reservations-page` (US2, US3, US4)
 
-- [ ] T015 [US2] RED+GREEN: `my-reservations/my-reservations-page.ts/.html/.css` +
+- [x] T015 [US2] RED+GREEN: `my-reservations/my-reservations-page.ts/.html/.css` +
   `my-reservations-page.spec.ts` — list mine from `myReservations`, ordered by day, upcoming vs past
   distinguished; empty-state with a link to reserve (scenario 6, edge).
-- [ ] T016 [US3] Cancel an upcoming reservation: a cancel action only on upcoming rows; on success
+- [x] T016 [US3] Cancel an upcoming reservation: a cancel action only on upcoming rows; on success
   remove it and announce (scenario 7). No cancel offered for past rows; a `past_immutable` rejection
   surfaces a localized message (scenario 8). Extend the spec.
-- [ ] T017 [US4] "Change" affordance on an upcoming row → cancels then routes into `reserve-page`
+- [x] T017 [US4] "Change" affordance on an upcoming row → cancels then routes into `reserve-page`
   (no combined edit step, scenario 9). Spec asserts the navigation + that no single-step edit exists.
 
 ---
 
 ## Phase 6: Wiring, localization, accessibility (US5, FR-009..FR-011)
 
-- [ ] T018 [US5] `attendance.routes.ts` (guarded by `authGuard` from `@roomy/shared-feature`, NOT
+- [x] T018 [US5] `attendance.routes.ts` (guarded by `authGuard` from `@roomy/shared-feature`, NOT
   `adminGuard`) + `src/index.ts` exporting `attendanceRoutes`; lazy-load in
   `apps/web/src/app/app.routes.ts`. Guard spec: unauthenticated → `/bff/login?returnUrl` (scenario 11);
   any signed-in employee is admitted (scenario 12).
-- [ ] T019 [US5] Add the nav entry (Attendance / My reservations) in the web shell, shown to any
+- [x] T019 [US5] Add the nav entry (Attendance / My reservations) in the web shell, shown to any
   signed-in user (not admin-gated); spec the shell shows it for a non-admin session.
-- [ ] T020 [US5] `attendance.*` i18n namespace in `apps/web/public/i18n/{en,de}.json` (labels,
+- [x] T020 [US5] `attendance.*` i18n namespace in `apps/web/public/i18n/{en,de}.json` (labels,
   headings, actions, day names, validation + error messages); assert DE/EN key parity (scenario 13,
   FR-010).
-- [ ] T021 [US5] WCAG 2.2 AA pass (FR-011): keyboard operability across the reserve flow and the
+- [x] T021 [US5] WCAG 2.2 AA pass (FR-011): keyboard operability across the reserve flow and the
   my-reservations list, roles/names, visible focus, labelled controls, announced reserve/cancel
   results. Extend specs as needed.
 
@@ -139,9 +139,9 @@ backend host endpoint and the catalogue read model (RED→GREEN).
 
 ## Verify (Definition of Done)
 
-- [ ] `pnpm nx run-many -t test lint -p attendance-data-access attendance-feature web` green.
-- [ ] `pnpm nx build web` green.
-- [ ] `dotnet build -warnaserror` + `dotnet test` (host endpoint + catalogue read model) +
+- [x] `pnpm nx run-many -t test lint -p attendance-data-access attendance-feature web` green.
+- [x] `pnpm nx build web` green.
+- [x] `dotnet build -warnaserror` + `dotnet test` (host endpoint + catalogue read model) +
   `dotnet format --verify-no-changes` green.
-- [ ] OpenAPI spec + generated client drift gates green (no diff).
-- [ ] Reconcile this `tasks.md` to reality on merge (heed the tasks.md-lag convention).
+- [x] OpenAPI spec + generated client drift gates green (no diff).
+- [x] Reconcile this `tasks.md` to reality on merge (heed the tasks.md-lag convention).
