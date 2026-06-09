@@ -20,6 +20,10 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable(TableName);
 
+        // Domain events are raised state, not persisted columns (ADR-0032); they are drained by the
+        // unit of work, never mapped.
+        builder.Ignore(user => user.DomainEvents);
+
         builder.HasKey(user => user.Identifier);
 
         builder.Property(user => user.Identifier)

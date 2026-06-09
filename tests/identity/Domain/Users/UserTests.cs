@@ -79,4 +79,65 @@ public sealed class UserTests
         Should.Throw<InvalidOperationException>(
             () => user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid())));
     }
+
+    [Fact]
+    public void GrantAdministrator_elevates_an_employee_and_keeps_the_employee_role()
+    {
+        var user = RegisterEmployee();
+
+        user.GrantAdministrator(GrantedAt);
+
+        user.IsAdministrator.ShouldBeTrue();
+        user.IsEmployee.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void GrantAdministrator_raises_an_administrator_granted_event()
+    {
+        var user = RegisterEmployee();
+
+        user.GrantAdministrator(GrantedAt);
+
+        var raised = user.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<AdministratorGranted>();
+        raised.UserId.ShouldBe(user.Identifier);
+        raised.OccurredAt.ShouldBe(GrantedAt);
+    }
+
+    [Fact]
+    public void GrantAdministrator_is_idempotent_and_raises_no_further_event()
+    {
+        var user = RegisterEmployee();
+
+        user.GrantAdministrator(GrantedAt);
+        user.GrantAdministrator(GrantedAt.AddMinutes(1));
+
+        user.IsAdministrator.ShouldBeTrue();
+        user.DomainEvents.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public void GrantAdministrator_raises_nothing_for_an_account_already_an_administrator()
+    {
+        var user = User.Register(
+            Email.From("grace@example.com"),
+            DisplayName.From("Grace Hopper"),
+            Role.Employee.GrantAdministrator());
+
+        user.GrantAdministrator(GrantedAt);
+
+        user.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void ClearDomainEvents_empties_the_recorded_events()
+    {
+        var user = RegisterEmployee();
+        user.GrantAdministrator(GrantedAt);
+
+        user.ClearDomainEvents();
+
+        user.DomainEvents.ShouldBeEmpty();
+    }
+
+    private static readonly DateTimeOffset GrantedAt = new(2026, 6, 9, 12, 0, 0, TimeSpan.Zero);
 }
