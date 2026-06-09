@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Authentication;
@@ -122,7 +123,57 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task Cancelling_an_own_reservation_returns_204()
+    {
+        roomDirectory.Capacity = 8;
+        var date = monday.AddDays(3);
+        var owner = Guid.NewGuid();
+        var reservationId = await CreateReservationAsync(owner, date);
+
+        var response = await ClientForSubject(owner).DeleteAsync(CancelUrl(reservationId, date), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task Cancelling_another_employees_reservation_returns_403()
+    {
+        roomDirectory.Capacity = 8;
+        var date = monday.AddDays(4);
+        var reservationId = await CreateReservationAsync(Guid.NewGuid(), date);
+
+        var response = await ClientForSubject(Guid.NewGuid()).DeleteAsync(CancelUrl(reservationId, date), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        var error = await response.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
+        error!.Code.ShouldBe("not_owner");
+    }
+
+    [Fact]
+    public async Task Cancelling_an_unknown_reservation_returns_404()
+    {
+        var response = await ClientForSubject(Guid.NewGuid())
+            .DeleteAsync(CancelUrl(Guid.NewGuid(), monday.AddDays(7)), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        var error = await response.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
+        error!.Code.ShouldBe("reservation_not_found");
+    }
+
     public void Dispose() => app.Dispose();
+
+    private async Task<Guid> CreateReservationAsync(Guid subject, DateOnly date)
+    {
+        var response = await ClientForSubject(subject)
+            .PostAsJsonAsync("/reservations", Booking(date), TestContext.Current.CancellationToken);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var created = await response.Content.ReadFromJsonAsync<ReservationDto>(TestContext.Current.CancellationToken);
+        return created!.ReservationId;
+    }
+
+    private static string CancelUrl(Guid reservationId, DateOnly date) =>
+        $"/reservations/{reservationId}?date={date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}";
 
     private HttpClient ClientForSubject(Guid subject)
     {
