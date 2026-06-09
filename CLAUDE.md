@@ -175,17 +175,22 @@ lint failures (ADR-0002/0003). The .NET side mirrors this with architecture test
 
 | Tag axis | Values |
 |---|---|
-| `type:*` | `domain` · `application` · `infrastructure` · `app` · `util` |
-| `context:*` | `identity` · `organization` · `attendance` · `shared` |
+| `type:*` | backend: `domain` · `application` · `infrastructure` · `app` · `util`; frontend (ADR-0035): `feature` · `ui` · `data-access` |
+| `context:*` | `identity` · `organization` · `attendance` · `shared` · `web` (the single SPA, ADR-0035) |
 
 `depConstraints` (encoded in `eslint.config.mjs`):
 
-- **Layer (dependency rule):** `domain` → `domain`, `util`; `application` → `application`,
+- **Backend layer (dependency rule):** `domain` → `domain`, `util`; `application` → `application`,
   `domain`, `util`; `infrastructure` → `infrastructure`, `application`, `domain`, `util`;
   `app` (composition root) → any layer; `util` → `util` only.
+- **Frontend layer (Angular libs, ADR-0035):** `feature` → `feature`, `ui`, `data-access`, `util`;
+  `ui` → `ui`, `util`; `data-access` → `data-access`, `util`. The `app` composition root may also
+  depend on `feature`/`ui`/`data-access`.
 - **Context isolation:** each `context:*` may depend only on its own context and
   `context:shared`; `context:shared` depends only on `context:shared`. Cross-context flow
-  is by ID + integration events, never by importing another context's libs.
+  is by ID + integration events, never by importing another context's libs. **Exception:** the
+  single Angular SPA is tagged `context:web` and may compose any context's frontend libs — it is
+  the one frontend composition root (ADR-0016/0030/0035); backend contexts stay isolated per host.
 
 > ESLint here is scoped to the boundary rule only; the full lint/format ruleset is #10.
 
@@ -272,8 +277,10 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   on · warnings-as-errors · async all the way with `CancellationToken` · constructor
   injection only.
 - **Angular:** standalone + signal-based + zoneless · `OnPush` · `inject()` · signal
-  `input()`/`output()` · no `NgModule` · feature libs (`@roomy/<context>-<type>`) mirror
-  the backend contexts.
+  `input()`/`output()` · no `NgModule` · per-context feature libs at `libs/<context>/<type>`
+  (`@roomy/<context>-<type>`, types `feature`/`ui`/`data-access`) mirror the backend contexts
+  (ADR-0035). Libs are tested with `vitest-analog` + `@testing-library/angular`; the app uses
+  `@angular/build:unit-test` — same test code, different runner.
 
 ---
 
