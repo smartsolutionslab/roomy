@@ -245,6 +245,38 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         reservations!.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task Viewing_my_reservations_lists_my_own_bookings()
+    {
+        // FR-004 (scenario 6): the caller sees their own reservations. The reserve flow projects into the
+        // Reservations read model (ADR-0038), so a freshly booked place appears in "my reservations".
+        roomDirectory.Capacity = 8;
+        var subject = Guid.NewGuid();
+        await CreateReservationAsync(subject, monday.AddDays(7));
+        await CreateReservationAsync(subject, monday.AddDays(8));
+
+        var response = await ClientForSubject(subject).GetAsync("/reservations/mine", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var mine = await response.Content.ReadFromJsonAsync<MyReservationDto[]>(TestContext.Current.CancellationToken);
+        mine!.Length.ShouldBe(2);
+        mine.All(reservation => reservation.Date == monday.AddDays(7) || reservation.Date == monday.AddDays(8)).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Viewing_my_reservations_excludes_other_employees_bookings()
+    {
+        roomDirectory.Capacity = 8;
+        await CreateReservationAsync(Guid.NewGuid(), monday.AddDays(2));
+        var subject = Guid.NewGuid();
+
+        var response = await ClientForSubject(subject).GetAsync("/reservations/mine", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var mine = await response.Content.ReadFromJsonAsync<MyReservationDto[]>(TestContext.Current.CancellationToken);
+        mine!.ShouldBeEmpty();
+    }
+
     public void Dispose() => app.Dispose();
 
     private async Task<Guid> CreateReservationAsync(Guid subject, DateOnly date)
@@ -292,6 +324,8 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     private sealed record ReserveBody(Guid OfficeId, Guid RoomId, DateOnly Date, Guid? OnBehalfOf = null);
 
     private sealed record ReservationDto(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
+
+    private sealed record MyReservationDto(Guid ReservationId, Guid OfficeId, string OfficeName, Guid RoomId, string RoomName, DateOnly Date);
 
     private sealed record ErrorDto(string Code, string Message);
 
