@@ -16,6 +16,14 @@ const employee: AdminUser = {
   status: 'active',
 };
 
+const administrator: AdminUser = {
+  userId: userId('a3f1c2d4-0000-7000-8000-000000000003'),
+  email: 'ada@roomy.test',
+  displayName: 'Ada Lovelace',
+  role: 'administrator',
+  status: 'active',
+};
+
 function renderPage(
   accounts: AdminUser[],
   grant: (user: UserId) => Observable<void> = () => of(undefined),
@@ -48,24 +56,62 @@ describe('AdminUsersPage', () => {
     expect(await screen.findByText('No accounts yet.')).toBeTruthy();
   });
 
-  it('grants administrator and reflects the new role in the row', async () => {
-    await renderPage([employee]);
+  it('asks for confirmation before granting administrator', async () => {
+    const grant = vi.fn(() => of<void>(undefined));
+    await renderPage([employee], grant);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Grant administrator' }));
 
+    expect(await screen.findByRole('button', { name: 'Confirm' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Grant administrator' })).toBeNull();
+    expect(grant).not.toHaveBeenCalled();
+  });
+
+  it('restores the grant action and makes no request when the confirmation is cancelled', async () => {
+    const grant = vi.fn(() => of<void>(undefined));
+    await renderPage([employee], grant);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Grant administrator' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+
+    expect(await screen.findByRole('button', { name: 'Grant administrator' })).toBeTruthy();
+    expect(grant).not.toHaveBeenCalled();
+  });
+
+  it('grants administrator on confirmation and announces the new role in the row', async () => {
+    const grant = vi.fn(() => of<void>(undefined));
+    await renderPage([employee], grant);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Grant administrator' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirm' }));
+
     expect(await screen.findByText('Administrator')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Grant administrator' })).toBeNull();
+    expect(grant).toHaveBeenCalledTimes(1);
+
+    const announcement = await screen.findByRole('status');
+    expect(announcement.textContent).toContain('Grace Hopper');
   });
 
   it('keeps the row unchanged and announces an error when granting fails', async () => {
     await renderPage([employee], () => throwError(() => new Error('gateway error')));
 
     await userEvent.click(await screen.findByRole('button', { name: 'Grant administrator' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirm' }));
 
     expect(
       await screen.findByText('We could not grant administrator. Please try again.'),
     ).toBeTruthy();
     expect(screen.getByText('Employee')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Grant administrator' })).toBeTruthy();
+  });
+
+  it('offers no grant action for an account that is already an administrator', async () => {
+    await renderPage([administrator]);
+
+    expect(await screen.findByText('Ada Lovelace')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Grant administrator' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Confirm' })).toBeNull();
   });
 });

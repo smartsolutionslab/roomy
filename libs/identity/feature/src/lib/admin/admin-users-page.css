@@ -15,3 +15,12 @@
   padding: var(--roomy-space-xs, 0.25rem) var(--roomy-space-sm, 0.5rem);
   border-bottom: 1px solid var(--roomy-color-border, #d0d0d0);
 }
+
+.admin-users__table td button {
+  margin-right: var(--roomy-space-xs, 0.25rem);
+}
+
+.admin-users__table td button:focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: var(--roomy-focus-outline-offset);
+}
