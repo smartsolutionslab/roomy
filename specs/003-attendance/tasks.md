@@ -91,10 +91,10 @@ description: "Task list for Attendance Planning (003)"
 
 **Independent test:** `AttendanceDay.Cancel` frees a place so a previously full room is re-bookable (9); cancelling a past-day reservation is rejected (FR-009).
 
-- [ ] T019 [US3] RED domain tests — `Cancel` raises `ReservationCancelled` for a today/future reservation; the freed place makes a full room re-bookable (8–9); a past-day cancel is `past_immutable` (FR-009 edge).
-- [ ] T020 [US3] Add `Cancel(reservation, actor, actorIsAdmin, today)` + `Apply(ReservationCancelled)` to `AttendanceDay`. T019 green. (Owner/admin gate is wired in US4; here Cancel takes the flags.)
-- [ ] T021 [US3] RED application tests for `CancelReservationHandler` — loads, cancels, saves; a freed place is immediately re-bookable (re-run Reserve succeeds). Define `CancelReservation` command.
-- [ ] T022 [US3] Implement `CancelReservationHandler` + `DELETE /reservations/{reservationId}` endpoint. T021 green. API/contract tests: 204 / 422 `past_immutable` / 404.
+- [x] T019 [US3] RED domain tests — `Cancel` raises `ReservationCancelled` for a today/future reservation; the freed place makes a full room re-bookable (8–9); a past-day cancel is `past_immutable` (FR-009 edge).
+- [x] T020 [US3] Add `Cancel(reservation, actor, actorIsAdmin, today)` + `Apply(ReservationCancelled)` to `AttendanceDay`. T019 green. (Owner/admin gate is wired in US4; here Cancel takes the flags.)
+- [x] T021 [US3] RED application tests for `CancelReservationHandler` — loads, cancels, saves; a freed place is immediately re-bookable (re-run Reserve succeeds). Define `CancelReservation` command.
+- [x] T022 [US3] Implement `CancelReservationHandler` + `DELETE /reservations/{reservationId}?date=` endpoint (date carried because the stream is keyed by company-day). T021 green. API/contract tests: 204 / 403 `not_owner` / 404.
 
 **Checkpoint**: cancel works; freed places re-bookable (scenario 9).
 

@@ -26,13 +26,18 @@ Reserve a place in a room for a day (FR-001, scenarios 1–2, 10).
 - **404 `unknown_room`:** the room is not (yet) known to attendance.
 - **403:** non-admin acting on another employee.
 
-## `DELETE /reservations/{reservationId}`
+## `DELETE /reservations/{reservationId}?date={yyyy-MM-dd}`
 Cancel a reservation, freeing the place (FR-008, scenarios 8–9).
 
+- **`date` (required):** the reservation's day, in the Europe/Berlin calendar. The event-sourced
+  store is keyed by company-day (the `AttendanceDay` stream id derives from `CompanyId + Date`,
+  ADR-0026), so the reservation id alone cannot address the stream; the client always has the date
+  (the list/view shows it). A single-tenant decision — revisit if a reservation→day index is later
+  warranted (e.g. occupancy `004`).
 - **Auth:** the **owner** or an **administrator** (FR-012, scenario 11).
 - **204:** cancelled; the place is freed (raises `ReservationCancelled`).
 - **403 `not_owner`:** an employee cancelling another's reservation.
-- **404:** unknown reservation.
+- **404 `reservation_not_found`:** no such reservation for that company-day.
 - **422 `past_immutable`:** the reservation's day is in the past (FR-009).
 
 ## `GET /reservations?date={yyyy-MM-dd}`

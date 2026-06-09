@@ -14,6 +14,7 @@ public static class ReservationEndpoints
     public static IEndpointRouteBuilder MapReservationEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/reservations", ReserveAsync).RequireAuthorization();
+        endpoints.MapDelete("/reservations/{reservationId:guid}", CancelAsync).RequireAuthorization();
         return endpoints;
     }
 
@@ -49,6 +50,38 @@ public static class ReservationEndpoints
                 $"/reservations/{reservationId.Value}",
                 new ReservationResponse(reservationId.Value, request.OfficeId, request.RoomId, request.Date, subject)),
             error => error.ToHttpResult());
+    }
+
+    // DELETE /reservations/{reservationId}?date=YYYY-MM-DD — cancel a reservation, freeing the place
+    // (FR-008). The date locates the company-day stream (the id alone cannot). 204 on success; the
+    // Result maps to 404 / 422 / 403 per the contract.
+    private static async Task<IResult> CancelAsync(
+        Guid reservationId,
+        DateOnly date,
+        ClaimsPrincipal principal,
+        AttendanceApiOptions options,
+        ICommandHandler<CancelReservation> cancel,
+        CancellationToken cancellationToken)
+    {
+        var subjectClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? principal.FindFirstValue("sub");
+        if (subjectClaim is null || !Guid.TryParse(subjectClaim, out var subject))
+        {
+            return Results.Unauthorized();
+        }
+
+        // US1/US3: the authenticated subject stands in as the acting employee and is never an admin.
+        // US4 resolves the UserId -> EmployeeId mapping and the administrator role from the token.
+        var command = new CancelReservation(
+            CompanyIdentifier.From(options.CompanyId),
+            ReservationIdentifier.From(reservationId),
+            BookingDate.From(date),
+            EmployeeIdentifier.From(subject),
+            ActorIsAdmin: false);
+
+        var result = await cancel.HandleAsync(command, cancellationToken);
+
+        return result.Match(Results.NoContent, error => error.ToHttpResult());
     }
 }
 

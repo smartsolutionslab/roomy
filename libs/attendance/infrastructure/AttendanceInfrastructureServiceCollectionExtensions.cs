@@ -43,6 +43,7 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ICommandHandler<ReservePlace, ReservationIdentifier>, ReservePlaceHandler>();
+        services.AddScoped<ICommandHandler<CancelReservation>, CancelReservationHandler>();
 
         return services;
     }
