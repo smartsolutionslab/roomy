@@ -66,6 +66,32 @@
       "nameConflict": "An office with that name already exists.",
       "error": "We could not create the office. Please try again.",
       "created": "Office {{name}} created."
+    },
+    "edit": {
+      "rename": "Rename",
+      "relocate": "Change location",
+      "nameLabel": "New name",
+      "locationLabel": "New location",
+      "save": "Save",
+      "cancel": "Cancel",
+      "nameConflict": "An office with that name already exists.",
+      "notFound": "That office no longer exists.",
+      "error": "We could not save the change. Please try again.",
+      "updated": "Office {{name}} updated."
+    },
+    "rooms": {
+      "add": "Add room",
+      "submit": "Add",
+      "nameLabel": "Room name",
+      "capacityLabel": "Capacity (places)",
+      "renameLabel": "New room name",
+      "renameRoom": "Rename room {{name}}",
+      "nameRequired": "A room name is required.",
+      "capacityMin": "Capacity must be at least 1.",
+      "nameConflict": "A room with that name already exists in this office.",
+      "error": "We could not save the room. Please try again.",
+      "added": "Room {{name}} added.",
+      "renamed": "Room {{name}} renamed."
     }
   },
   "shared": {
