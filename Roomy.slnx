@@ -42,6 +42,9 @@
   <Folder Name="/libs/organization/application/">
     <Project Path="libs/organization/application/Roomy.Organization.Application.csproj" />
   </Folder>
+  <Folder Name="/libs/organization/infrastructure/">
+    <Project Path="libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/libs/infrastructure-messaging/src/">
     <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </Folder>
@@ -76,6 +79,9 @@
   </Folder>
   <Folder Name="/tests/organization/">
     <Project Path="tests/organization/Roomy.Organization.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/organization-integration/">
+    <Project Path="tests/organization-integration/Roomy.Organization.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/tests/identity-integration/">
     <Project Path="tests/identity-integration/Roomy.Identity.IntegrationTests.csproj" />
