@@ -15,6 +15,9 @@
   <Folder Name="/apps/identity-api/">
     <Project Path="apps/identity-api/Roomy.Identity.Api.csproj" />
   </Folder>
+  <Folder Name="/apps/organization-api/">
+    <Project Path="apps/organization-api/Roomy.Organization.Api.csproj" />
+  </Folder>
   <Folder Name="/libs/" />
   <Folder Name="/libs/application-contracts/">
     <Project Path="libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
