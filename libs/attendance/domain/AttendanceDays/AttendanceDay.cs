@@ -70,15 +70,57 @@ public sealed class AttendanceDay : EventSourcedAggregate
         return reservationId;
     }
 
+    public Result Cancel(
+        ReservationIdentifier reservation,
+        EmployeeIdentifier actor,
+        bool actorIsAdmin,
+        BookingDate today,
+        DateTimeOffset occurredAt)
+    {
+        var existing = reservations.Find(held => held.Id == reservation);
+        if (existing is null)
+        {
+            return Error.NotFound("reservation_not_found", "No such reservation for this day.");
+        }
+
+        if (Date.Value < today.Value)
+        {
+            return Error.Validation("past_immutable", "A reservation in the past cannot be cancelled.");
+        }
+
+        if (!actorIsAdmin && existing.Employee != actor)
+        {
+            return Error.Forbidden(
+                "not_owner",
+                "Only the reservation's owner or an administrator may cancel it.");
+        }
+
+        Raise(new ReservationCancelled(
+            existing.Id.Value,
+            Company.Value,
+            Date.Value,
+            existing.Employee.Value,
+            existing.Room.Value,
+            occurredAt));
+
+        return Result.Success();
+    }
+
     protected override void Apply(object @event)
     {
-        if (@event is ReservationPlaced placed)
+        switch (@event)
         {
-            reservations.Add(new Reservation(
-                ReservationIdentifier.From(placed.ReservationId),
-                EmployeeIdentifier.From(placed.EmployeeId),
-                OfficeIdentifier.From(placed.OfficeId),
-                RoomIdentifier.From(placed.RoomId)));
+            case ReservationPlaced placed:
+                reservations.Add(new Reservation(
+                    ReservationIdentifier.From(placed.ReservationId),
+                    EmployeeIdentifier.From(placed.EmployeeId),
+                    OfficeIdentifier.From(placed.OfficeId),
+                    RoomIdentifier.From(placed.RoomId)));
+                break;
+
+            case ReservationCancelled cancelled:
+                reservations.RemoveAll(held => held.Id == ReservationIdentifier.From(cancelled.ReservationId));
+                break;
         }
     }
 }
