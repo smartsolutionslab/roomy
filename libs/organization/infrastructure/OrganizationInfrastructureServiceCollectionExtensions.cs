@@ -32,6 +32,10 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
     public static IServiceCollection AddOrganizationUseCases(this IServiceCollection services)
     {
         services.AddScoped<ICommandHandler<CreateOffice, OfficeIdentifier>, CreateOfficeHandler>();
+        services.AddScoped<ICommandHandler<AddRoomToOffice, RoomIdentifier>, AddRoomToOfficeHandler>();
+        services.AddScoped<ICommandHandler<RenameOffice>, RenameOfficeHandler>();
+        services.AddScoped<ICommandHandler<ChangeOfficeLocation>, ChangeOfficeLocationHandler>();
+        services.AddScoped<ICommandHandler<RenameRoom>, RenameRoomHandler>();
 
         return services;
     }

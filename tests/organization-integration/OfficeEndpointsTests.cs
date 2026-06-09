@@ -121,5 +121,157 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         all.ShouldContain(entry => entry.Id == office.Id);
     }
 
+    private async Task<OfficeResponse> CreateOfficeAsync(HttpClient client, string name)
+    {
+        var response = await client
+            .PostAsJsonAsync("/offices", OfficeNamed(name), TestContext.Current.CancellationToken);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var office = await response.Content
+            .ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        office.ShouldNotBeNull();
+        return office;
+    }
+
+    [Fact]
+    public async Task An_administrator_adds_a_room_and_the_office_capacity_reflects_it()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"WithRooms-{Guid.NewGuid():N}");
+
+        var response = await administrator.PostAsJsonAsync(
+            $"/offices/{office.Id}/rooms",
+            new AddRoomRequest("Aurora", 8),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var room = await response.Content.ReadFromJsonAsync<RoomResponse>(TestContext.Current.CancellationToken);
+        room.ShouldNotBeNull();
+        room.Capacity.ShouldBe(8);
+
+        var reloaded = await administrator
+            .GetFromJsonAsync<OfficeResponse>($"/offices/{office.Id}", TestContext.Current.CancellationToken);
+        reloaded.ShouldNotBeNull();
+        reloaded.Capacity.ShouldBe(8);
+        reloaded.Rooms.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task A_room_capacity_below_one_is_rejected()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"BadCapacity-{Guid.NewGuid():N}");
+
+        var response = await administrator.PostAsJsonAsync(
+            $"/offices/{office.Id}/rooms",
+            new AddRoomRequest("Aurora", 0),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task A_duplicate_room_name_is_rejected()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"DupRoom-{Guid.NewGuid():N}");
+        await administrator.PostAsJsonAsync(
+            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 8), TestContext.Current.CancellationToken);
+
+        var response = await administrator.PostAsJsonAsync(
+            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 4), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task An_employee_cannot_add_a_room()
+    {
+        var office = await CreateOfficeAsync(ClientWithRoles("administrator"), $"RoomAuthz-{Guid.NewGuid():N}");
+
+        var response = await ClientWithRoles("employee").PostAsJsonAsync(
+            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 8), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task An_administrator_renames_an_office()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"Rename-{Guid.NewGuid():N}");
+        var newName = $"Renamed-{Guid.NewGuid():N}";
+
+        var response = await administrator.PatchAsJsonAsync(
+            $"/offices/{office.Id}/name", new RenameOfficeRequest(newName), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updated = await response.Content.ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        updated.ShouldNotBeNull();
+        updated.Name.ShouldBe(newName);
+    }
+
+    [Fact]
+    public async Task Renaming_an_office_to_an_existing_name_is_rejected()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var taken = await CreateOfficeAsync(administrator, $"Taken-{Guid.NewGuid():N}");
+        var other = await CreateOfficeAsync(administrator, $"Other-{Guid.NewGuid():N}");
+
+        var response = await administrator.PatchAsJsonAsync(
+            $"/offices/{other.Id}/name", new RenameOfficeRequest(taken.Name), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task An_administrator_changes_an_office_location()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"Relocate-{Guid.NewGuid():N}");
+
+        var response = await administrator.PatchAsJsonAsync(
+            $"/offices/{office.Id}/location", new RelocateOfficeRequest("Munich"), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updated = await response.Content.ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        updated.ShouldNotBeNull();
+        updated.Location.ShouldBe("Munich");
+    }
+
+    [Fact]
+    public async Task An_administrator_renames_a_room()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"RenameRoom-{Guid.NewGuid():N}");
+        var added = await administrator.PostAsJsonAsync(
+            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 8), TestContext.Current.CancellationToken);
+        var room = await added.Content.ReadFromJsonAsync<RoomResponse>(TestContext.Current.CancellationToken);
+        room.ShouldNotBeNull();
+
+        var response = await administrator.PatchAsJsonAsync(
+            $"/offices/{office.Id}/rooms/{room.Id}/name",
+            new RenameRoomRequest("Polaris"),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updated = await response.Content.ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        updated.ShouldNotBeNull();
+        updated.Rooms.ShouldContain(entry => entry.Name == "Polaris");
+    }
+
+    [Fact]
+    public async Task Renaming_an_unknown_room_is_not_found()
+    {
+        var administrator = ClientWithRoles("administrator");
+        var office = await CreateOfficeAsync(administrator, $"NoRoom-{Guid.NewGuid():N}");
+
+        var response = await administrator.PatchAsJsonAsync(
+            $"/offices/{office.Id}/rooms/{Guid.NewGuid()}/name",
+            new RenameRoomRequest("Polaris"),
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
     public void Dispose() => app.Dispose();
 }
