@@ -21,6 +21,7 @@ public static class ReservationEndpoints
         endpoints.MapPost("/reservations", ReserveAsync).RequireAuthorization();
         endpoints.MapDelete("/reservations/{reservationId:guid}", CancelAsync).RequireAuthorization();
         endpoints.MapGet("/reservations", ViewAsync).RequireAuthorization();
+        endpoints.MapGet("/reservations/mine", ViewMineAsync).RequireAuthorization();
         return endpoints;
     }
 
@@ -45,6 +46,39 @@ public static class ReservationEndpoints
                 reservation.Room.Value,
                 reservation.Date.Value,
                 reservation.Employee.Value))),
+            error => error.ToHttpResult());
+    }
+
+    // GET /reservations/mine — the caller's own reservations, past and future (FR-004, scenario 6). The
+    // acting employee is resolved from the token; past reservations are returned as history and the client
+    // offers cancellation only for future ones (the rule lives in the cancel endpoint).
+    private static async Task<IResult> ViewMineAsync(
+        ClaimsPrincipal principal,
+        IEmployeeDirectory employees,
+        IQueryHandler<ViewMyReservations, IReadOnlyList<MyReservationView>> view,
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetSubject(principal, out var subject))
+        {
+            return Results.Unauthorized();
+        }
+
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
+        if (actor.IsFailure)
+        {
+            return actor.Error.ToHttpResult();
+        }
+
+        var result = await view.HandleAsync(new ViewMyReservations(actor.Value), cancellationToken);
+
+        return result.Match(
+            reservations => Results.Ok(reservations.Select(reservation => new MyReservationResponse(
+                reservation.Reservation.Value,
+                reservation.Office.Value,
+                reservation.OfficeName,
+                reservation.Room.Value,
+                reservation.RoomName,
+                reservation.Date.Value))),
             error => error.ToHttpResult());
     }
 
@@ -142,3 +176,11 @@ public static class ReservationEndpoints
 internal sealed record ReserveRequest(Guid OfficeId, Guid RoomId, DateOnly Date, Guid? OnBehalfOf = null);
 
 internal sealed record ReservationResponse(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
+
+internal sealed record MyReservationResponse(
+    Guid ReservationId,
+    Guid OfficeId,
+    string OfficeName,
+    Guid RoomId,
+    string RoomName,
+    DateOnly Date);

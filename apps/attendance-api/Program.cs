@@ -37,6 +37,9 @@ builder.Services.AddScoped<IEmployeeDirectory, EmployeeDirectory>();
 // ADR-0038) — no cross-service join.
 builder.Services.AddScoped<IOccupancyReadModel, OccupancyReadModel>();
 
+// "My reservations" reads the caller's rows from the local Reservations read model (004 US9).
+builder.Services.AddScoped<IMyReservationsReadModel, MyReservationsReadModel>();
+
 // Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
 // (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
 // assembly) into the Rooms read model; the inbox shares the attendance database so the projection and
