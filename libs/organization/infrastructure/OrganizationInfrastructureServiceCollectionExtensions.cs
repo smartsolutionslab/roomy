@@ -5,6 +5,7 @@ using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 using SmartSolutionsLab.Roomy.Organization.Application;
 using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
+using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
@@ -25,6 +26,7 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
         services.AddRoomyDbContext<OrganizationDbContext>(connectionString);
         services.AddScoped<IOfficeRepository, OfficeRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUnitOfWork, OrganizationUnitOfWork>();
 
         // The unit of work stamps OccurredAt on the integration events it drains to the outbox (ADR-0037).
