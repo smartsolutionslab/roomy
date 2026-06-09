@@ -54,6 +54,11 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
 
                 services.RemoveAll<IRoomDirectory>();
                 services.AddSingleton<IRoomDirectory>(roomDirectory);
+
+                // Resolve every subject to an employee with the same id, so the acting user owns what it
+                // reserves; the admin-on-behalf cases target a different employee id explicitly.
+                services.RemoveAll<IEmployeeDirectory>();
+                services.AddSingleton<IEmployeeDirectory>(new IdentityEmployeeDirectory());
             });
         });
     }
@@ -166,6 +171,51 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         error!.Code.ShouldBe("reservation_not_found");
     }
 
+    [Fact]
+    public async Task Reserving_on_behalf_of_another_employee_as_a_non_admin_is_forbidden()
+    {
+        // FR-011 (scenario 10) — onBehalfOf is administrator-only.
+        roomDirectory.Capacity = 8;
+        var body = new ReserveBody(Guid.NewGuid(), Guid.NewGuid(), monday.AddDays(8), OnBehalfOf: Guid.NewGuid());
+
+        var response = await ClientForSubject(Guid.NewGuid())
+            .PostAsJsonAsync("/reservations", body, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        var error = await response.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
+        error!.Code.ShouldBe("not_authorized");
+    }
+
+    [Fact]
+    public async Task An_administrator_reserves_on_behalf_of_another_employee()
+    {
+        // Scenario 10 — an administrator acts on behalf of an employee; the reservation is the target's.
+        roomDirectory.Capacity = 8;
+        var target = Guid.NewGuid();
+        var body = new ReserveBody(Guid.NewGuid(), Guid.NewGuid(), monday.AddDays(9), OnBehalfOf: target);
+
+        var response = await AdminClientForSubject(Guid.NewGuid())
+            .PostAsJsonAsync("/reservations", body, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var created = await response.Content.ReadFromJsonAsync<ReservationDto>(TestContext.Current.CancellationToken);
+        created!.EmployeeId.ShouldBe(target);
+    }
+
+    [Fact]
+    public async Task An_administrator_cancels_another_employees_reservation()
+    {
+        // Scenario 10/11 — an administrator may cancel anyone's reservation.
+        roomDirectory.Capacity = 8;
+        var date = monday.AddDays(10);
+        var reservationId = await CreateReservationAsync(Guid.NewGuid(), date);
+
+        var response = await AdminClientForSubject(Guid.NewGuid())
+            .DeleteAsync(CancelUrl(reservationId, date), TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+    }
+
     public void Dispose() => app.Dispose();
 
     private async Task<Guid> CreateReservationAsync(Guid subject, DateOnly date)
@@ -187,6 +237,13 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         return client;
     }
 
+    private HttpClient AdminClientForSubject(Guid subject)
+    {
+        var client = ClientForSubject(subject);
+        client.DefaultRequestHeaders.Add(TestAuthHandler.RolesHeader, "administrator");
+        return client;
+    }
+
     private static ReserveBody Booking(DateOnly date) => new(Guid.NewGuid(), Guid.NewGuid(), date);
 
     private static DateOnly FirstMondayOnOrAfter(DateOnly start)
@@ -200,7 +257,7 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         return date;
     }
 
-    private sealed record ReserveBody(Guid OfficeId, Guid RoomId, DateOnly Date);
+    private sealed record ReserveBody(Guid OfficeId, Guid RoomId, DateOnly Date, Guid? OnBehalfOf = null);
 
     private sealed record ReservationDto(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
 
@@ -209,6 +266,12 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
     {
         public override DateTimeOffset GetUtcNow() => now;
+    }
+
+    private sealed class IdentityEmployeeDirectory : IEmployeeDirectory
+    {
+        public Task<Result<EmployeeIdentifier>> FindByUserAsync(UserIdentifier user, CancellationToken cancellationToken) =>
+            Task.FromResult(Result.Success(EmployeeIdentifier.From(user.Value)));
     }
 
     private sealed class StubRoomDirectory : IRoomDirectory

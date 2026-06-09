@@ -5,10 +5,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Attendance.Api;
+using SmartSolutionsLab.Roomy.Attendance.Api.Authentication;
 using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
@@ -25,6 +27,10 @@ builder.Services.AddAttendanceUseCases();
 
 // Capacity comes from the local Rooms read model, fed by organization's RoomAdded (ADR-0014/0037).
 builder.Services.AddScoped<IRoomDirectory, RoomDirectory>();
+
+// The acting user resolves to their EmployeeId via the local Employees read model, fed by EmployeeHired
+// (003 US4). Used by the endpoints to authorize reserve/cancel.
+builder.Services.AddScoped<IEmployeeDirectory, EmployeeDirectory>();
 
 // Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
 // (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
@@ -65,6 +71,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.ValidateAudience = false;
+
+        // Keycloak nests realm roles under realm_access.roles; flatten them to role claims so the
+        // reserve/cancel endpoints can authorize the administrator on-behalf path (FR-011, ADR-0013).
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                KeycloakRealmRoles.AddRoleClaims(context.Principal);
+                return Task.CompletedTask;
+            },
+        };
     });
 builder.Services.AddAuthorization();
 
