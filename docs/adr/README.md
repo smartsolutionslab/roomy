@@ -56,3 +56,4 @@ ADRs are written **before** the implementing code, not after.
 | [0025](0025-user-employee-provisioning-saga.md) | User/Employee provisioning across Identity and Organization | Proposed |
 | [0026](0026-attendanceday-aggregate-granularity.md) | AttendanceDay aggregate granularity (CompanyId + Date) | Proposed |
 | [0031](0031-integration-event-contract-strategy.md) | Integration-event contract strategy: per-context published language | Proposed |
+| [0032](0032-domain-events-on-aggregates.md) | Domain events raised by aggregates, collected and dispatch-deferred | Proposed |
