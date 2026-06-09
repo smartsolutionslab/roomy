@@ -18,3 +18,7 @@ export {
   isWorkingDay,
   todayInBerlin,
 } from './lib/bookable-day';
+export type { Occupant, OccupancyDay, OccupancyOffice, OccupancyRoom } from './lib/occupancy';
+export { toOccupancyDays } from './lib/occupancy';
+export type { DateRange, RangePreset } from './lib/occupancy-range';
+export { addMonths, isSameMonth, monthGrid, rangeFor } from './lib/occupancy-range';
