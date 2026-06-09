@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Organization.Application</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Organization.Application</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../domain/Roomy.Organization.Domain.csproj" />
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <!-- Owned dispatch ports (ICommand/ICommandHandler), no MediatR (ADR-0005). -->
+    <ProjectReference Include="../../application-contracts/src/Roomy.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

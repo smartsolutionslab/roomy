@@ -39,6 +39,9 @@
   <Folder Name="/libs/organization/domain/">
     <Project Path="libs/organization/domain/Roomy.Organization.Domain.csproj" />
   </Folder>
+  <Folder Name="/libs/organization/application/">
+    <Project Path="libs/organization/application/Roomy.Organization.Application.csproj" />
+  </Folder>
   <Folder Name="/libs/infrastructure-messaging/src/">
     <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </Folder>
