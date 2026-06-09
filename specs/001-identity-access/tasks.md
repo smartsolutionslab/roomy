@@ -120,8 +120,8 @@ description: "Task list for Identity & Access (001)"
 
 **Independent Test**: A provisioned employee logs in via the BFF → `GET /account/me` = `employee`; calling `/admin/users` → `403`.
 
-- [ ] T027 [P] [US5] Integration test in `tests/identity/Features/EmployeeLoginTests.cs` — employee login → `role: employee`; `/admin/*` → `403`. (RED)
-- [ ] T028 [US5] Ensure the `employee` role claim maps through Keycloak → token → BFF authorization; add any missing role-claim mapping in the gateway/realm config. (Login infra reused from US1.)
+- [x] T027 [US5] Story-level acceptance test in `tests/identity-integration/EmployeeLoginTests.cs` (not the `tests/identity/Features/` path this task guessed before the layering settled — login is an HTTP/host concern with no use case to unit-test). It boots the host in-process against real Postgres and, with one provisioned-employee identity whose forwarded token carries the `employee` realm role, asserts both halves of the US5 independent test together: `GET /account/me` → `role: employee` **and** `GET /admin/users` → `403` (FR-007). Unlike the prior stories, this is **green on arrival** — the constituent behaviours already landed in US1 (`AccountMeTests`) and US4 (`AdminUserEndpointsTests` + `KeycloakRealmRoles`), so there was no missing implementation to drive a RED→GREEN cycle; this pins them together as the employee-login regression guard. The live Keycloak + BFF login round-trip stays the deferred Playwright e2e (plan.md).
+- [x] T028 [US5] **Nothing missing** — the `employee` role claim already maps Keycloak → token → BFF authorization end-to-end: the realm defines the `employee` role (`apps/gateway/keycloak/roomy-realm.json`) and the `roomy-bff` client carries the `roles` default client scope, so Keycloak emits realm roles under `realm_access.roles`; the host flattens those to `ClaimTypes.Role` (`KeycloakRealmRoles`, landed with US4/T026 and unit-verified for the `employee` role in `KeycloakRealmRolesTests`). No gateway/realm change was required; T027 exercises the resulting authorization end-to-end.
 
 **Checkpoint**: Both roles can log in with correct capabilities.
 
