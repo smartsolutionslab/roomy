@@ -30,8 +30,12 @@ public sealed class Office : Aggregate
     public IReadOnlyList<Room> Rooms => rooms;
     public int Capacity => rooms.Sum(room => room.Capacity.Value);
 
-    public static Office Create(CompanyIdentifier companyIdentifier, OfficeName name, Location location) =>
-        new(OfficeIdentifier.New(), companyIdentifier, name, location);
+    public static Office Create(CompanyIdentifier companyIdentifier, OfficeName name, Location location)
+    {
+        var office = new Office(OfficeIdentifier.New(), companyIdentifier, name, location);
+        office.RaiseDomainEvent(new OfficeOpened(office.Identifier, companyIdentifier, name, location));
+        return office;
+    }
 
     public void Rename(OfficeName name) => Name = name;
 
@@ -44,6 +48,7 @@ public sealed class Office : Aggregate
 
         var room = Room.Create(name, capacity);
         rooms.Add(room);
+        RaiseDomainEvent(new RoomAdded(room.Identifier, Identifier, CompanyIdentifier, name, capacity));
         return room;
     }
 
