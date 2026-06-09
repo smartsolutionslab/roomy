@@ -58,7 +58,7 @@ added).
 
 **Decision:** On a save-time concurrency conflict the repository **resets the `AttendanceDbContext`
 change tracker** before returning `Error.Conflict`, so a failed attempt's staged events and read-model
-rows are discarded and the bounded retry (ReservePlace/CancelReservation, ADR-0036) re-projects against
+rows are discarded and the bounded retry (ReservePlace/CancelReservation, ADR-0039) re-projects against
 freshly reloaded state. The projection is applied immediately before the event append within
 `SaveAsync`, so the append's `SaveChanges` commits both.
 
@@ -107,7 +107,7 @@ master data, not attendance facts, and would duplicate/serve-stale a changing va
 ## R7 — Today/tomorrow name policy and the calendar highlight
 
 **Decision:** The **application** `ViewOccupancy` handler derives "today" from the injected
-`TimeProvider` (Europe/Berlin, as reserve/cancel do, ADR-0036) and includes employee names only for
+`TimeProvider` (Europe/Berlin, as reserve/cancel do, ADR-0039) and includes employee names only for
 today and the next calendar day; every other day returns counts only (FR-007 data minimisation). The
 calendar (US7/FR-003) renders over the same `/occupancy` figures, with the viewer's own days flagged by
 intersecting with `/reservations/mine` — no separate endpoint.

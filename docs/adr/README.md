@@ -60,3 +60,5 @@ ADRs are written **before** the implementing code, not after.
 | [0036](0036-openapi-client-codegen.md) | OpenAPI client codegen: build-time spec emit, ng-openapi-gen, drift-gated in CI | Proposed |
 | [0037](0037-integration-events-via-domain-event-outbox-drain.md) | Integration events published by draining domain events into the outbox at commit | Proposed |
 | [0038](0038-occupancy-read-side-inline-projection.md) | Occupancy read side: inline synchronous projection into materialized read models | Proposed |
+| [0039](0039-event-sourced-write-model.md) | Event-sourced write model: aggregate base, repository, and optimistic-retry | Proposed |
+| [0040](0040-shared-frontend-route-guards.md) | Shared frontend route guards and not-authorized view | Accepted |

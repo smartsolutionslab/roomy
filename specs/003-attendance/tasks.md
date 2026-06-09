@@ -31,7 +31,7 @@ description: "Task list for Attendance Planning (003)"
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 **Author ADR-0036** in `docs/adr/0036-event-sourced-write-model.md` — the event-sourced write model: the `EventSourcedAggregate` base (replay/`Apply`/`Raise`/`Version`), the event-sourced repository pattern over `IEventStore`, and the **bounded optimistic-retry** policy for the last-place race (FR-007/scenario 12; ADR-0026 follow-up). **Architectural prerequisite — MUST land before any write-model code** (golden rule 4). Link from ADR-0012/0026.
+- [ ] T001 **Author ADR-0039** in `docs/adr/0039-event-sourced-write-model.md` — the event-sourced write model: the `EventSourcedAggregate` base (replay/`Apply`/`Raise`/`Version`), the event-sourced repository pattern over `IEventStore`, and the **bounded optimistic-retry** policy for the last-place race (FR-007/scenario 12; ADR-0026 follow-up). **Architectural prerequisite — MUST land before any write-model code** (golden rule 4). Link from ADR-0012/0026.
 - [ ] T002 Create the attendance context structure — `libs/attendance/{domain,application,infrastructure}`, host `apps/attendance-api`, test project `tests/attendance` — added to `Roomy.slnx`; per-project root namespaces `SmartSolutionsLab.Roomy.Attendance.*`; inherits `Directory.Build.props` (net10.0, nullable on, warnings-as-errors). **Add the three attendance `domain`/`application`/`infrastructure` projects as `ProjectReference`s to `tests/architecture/Roomy.ArchitectureTests`** (CLAUDE.md — otherwise the rules pass vacuously).
 - [ ] T003 [P] Tag the new projects `context:attendance` + their `type:*` layer; confirm the .NET architecture suite now loads/inspects the `Roomy.Attendance.*` assemblies (the boundary enforcement for backend; Nx/eslint boundaries cover frontend only).
 
@@ -45,7 +45,7 @@ description: "Task list for Attendance Planning (003)"
 - [ ] T005 [P] RED unit tests in `tests/attendance/Domain/ValueObjects/` (Shouldly) — `CompanyIdentifier`, `EmployeeIdentifier`, `OfficeIdentifier`, `RoomIdentifier`, `ReservationIdentifier` (GUIDv7 branded, non-empty, implicit `Guid`), `BookingDate`, `RoomCapacity` (≥ 1), `RoomReference`, and the `BookingWindow.IsBookable(candidate, today)` truth table (Mon–Fri ∧ `today ≤ candidate ≤ today+14`).
 - [ ] T006 [P] Implement those value objects + `BookingWindow` in `libs/attendance/domain/AttendanceDays/` (invariants via `Ensure.That(...)`). T005 green.
 - [ ] T007 [P] RED unit tests in `tests/shared-kernel/` for the `EventSourcedAggregate` base — `LoadFromHistory` replays events through `Apply` and advances `Version`; `Raise` applies **and** collects into `UncommittedEvents`; a fresh instance is at `StreamVersion.None`.
-- [ ] T008 Implement `EventSourcedAggregate` in `libs/shared-kernel/src/EventSourcedAggregate.cs` (carries `IAggregate`; framework-free, ADR-0036). T007 green.
+- [ ] T008 Implement `EventSourcedAggregate` in `libs/shared-kernel/src/EventSourcedAggregate.cs` (carries `IAggregate`; framework-free, ADR-0039). T007 green.
 - [ ] T009 RED→green: the two stream events `ReservationPlaced`/`ReservationCancelled` in `libs/attendance/domain/AttendanceDays/`, and `AttendanceEventTypeRegistry` in `libs/attendance/infrastructure/Persistence/` registering them as `attendance.reservation-placed.v1` / `attendance.reservation-cancelled.v1`. Test: round-trips each event through the serializer by stable name (serialize → deserialize equals original).
 - [ ] T010 `AttendanceDbContext : EventStoreDbContext` + the deterministic `AttendanceDayStreamId` (name-based `Guid` from `CompanyId`+`Date`, research R5) + the events-table **migration**, in `libs/attendance/infrastructure/Persistence/`. **Integration test** (real Postgres via a sibling Aspire test app host, per [[aspire-postgres-integration-tests]]): `IEventStore` append→read round-trips a stream and a conflicting `expectedVersion` surfaces `EventStoreConcurrencyException`.
 
@@ -139,7 +139,7 @@ description: "Task list for Attendance Planning (003)"
 ## Dependencies & Execution Order
 
 ### Phase dependencies
-- **Setup (P1)** → **Foundational (P2)** → user stories. T001 (ADR-0036) blocks the write-model code (T008+).
+- **Setup (P1)** → **Foundational (P2)** → user stories. T001 (ADR-0039) blocks the write-model code (T008+).
 - **US1 (P1)**: after Foundational. **No organization dependency** — testable with a stubbed `IRoomDirectory`.
 - **US2 (P2)**: after Foundational **and PR #113**. Independent of US1's aggregate code; implements the `IRoomDirectory` port US1 defines (T013).
 - **US3 (P2)**: after US1 (reuses the aggregate + repository).
@@ -154,7 +154,7 @@ description: "Task list for Attendance Planning (003)"
 ## Implementation Strategy
 
 ### MVP first (US1 only)
-1. Setup (incl. **ADR-0036**) → 2. Foundational → 3. US1 → **STOP & VALIDATE**: reservations + all invariants green against a stubbed room directory (scenarios 1–7, 12).
+1. Setup (incl. **ADR-0039**) → 2. Foundational → 3. US1 → **STOP & VALIDATE**: reservations + all invariants green against a stubbed room directory (scenarios 1–7, 12).
 
 ### Incremental delivery
 US1 (MVP) → US2 (real capacity, after #113) → US3 (cancel) → US4 (authorization) → US5 (view) → Polish. Each story is independently testable at its checkpoint.

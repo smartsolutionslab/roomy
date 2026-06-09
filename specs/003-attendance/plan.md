@@ -47,11 +47,11 @@ no tokens in the SPA (BFF, ADR-0013); Europe/Berlin calendar; warnings-as-errors
 | II. Clean Architecture & DDD | ✅ | `domain`(no deps)→`application`→`infrastructure`→`apps`; behaviour in the `AttendanceDay` aggregate; value objects over primitives; aggregate = consistency boundary (ADR-0026). New context projects added to `Roomy.ArchitectureTests` so the rules aren't vacuous. |
 | III. Context Isolation — IDs & Events | ✅ | Capacity/employee learned via `OfficeOpened`/`RoomAdded`/`EmployeeHired`; wire event → internal command at the edge; attendance owns its DB; consumes only `libs/organization/contracts`. |
 | IV. No Framework in Core | ✅ | Domain/application use owned `ICommandHandler`/`Result`/`Ensure`/`TimeProvider`-at-edge only; event store & Wolverine wired at the composition root. |
-| V. Decisions Recorded (ADR-before-code) | ⚠️→✅ | **ADR-0036 (event-sourced write model: aggregate base + repository + optimistic-retry)** MUST be authored before the write-model code — it is task #1. Reuses ADR-0012/0026 otherwise. |
+| V. Decisions Recorded (ADR-before-code) | ⚠️→✅ | **ADR-0039 (event-sourced write model: aggregate base + repository + optimistic-retry)** MUST be authored before the write-model code — it is task #1. Reuses ADR-0012/0026 otherwise. |
 | VI. Green Before Done — No Suppressions | ✅ | Full gate suite in quickstart §DoD; no analyzer/test suppression. |
 | VII. Small, Single-Purpose Changes | ✅ | One story on `feat/003-attendance`; atomic Conventional Commits; per-task or per-logical-group. |
 
-**Gate result:** PASS, conditional on ADR-0036 landing before the write-model implementation
+**Gate result:** PASS, conditional on ADR-0039 landing before the write-model implementation
 (tracked as the first task). No unjustified complexity — see no Complexity Tracking entries.
 
 ## Project Structure
@@ -73,7 +73,7 @@ specs/003-attendance/
 ```text
 libs/
   shared-kernel/src/
-    EventSourcedAggregate.cs            # NEW (ADR-0036) — replay/Apply/Raise/Version base
+    EventSourcedAggregate.cs            # NEW (ADR-0039) — replay/Apply/Raise/Version base
   attendance/
     domain/                             # Roomy.Attendance.Domain  (type:domain, context:attendance)
       AttendanceDays/

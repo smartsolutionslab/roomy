@@ -1,4 +1,4 @@
-# 0038. Shared frontend route guards and not-authorized view
+# 0040. Shared frontend route guards and not-authorized view
 
 - **Status:** Accepted
 - **Date:** 2026-06-09

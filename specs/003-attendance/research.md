@@ -12,7 +12,7 @@ plus the **cross-context capacity feed** from organization. Those are the substa
 
 ---
 
-## R1 — Event-sourced aggregate base (NEW shared-kernel primitive → ADR-0036)
+## R1 — Event-sourced aggregate base (NEW shared-kernel primitive → ADR-0039)
 
 **Decision.** Add an `EventSourcedAggregate` base to `shared-kernel` alongside the existing
 state-based `Aggregate`. It rebuilds from a stream, tracks the loaded version, and collects
@@ -36,8 +36,8 @@ model identity/organization use. Event sourcing inverts that: state **is** the f
 event log. Bolting replay onto `Aggregate` would conflate two persistence models on one type.
 
 **Architectural → ADR.** This is a cross-cutting primitive other event-sourced contexts will
-reuse, so it is recorded as **ADR-0036 (Event-sourced write model)** *before* the code
-(golden rule 4). ADR-0036 also covers R2 and R3 below (one decision: the write model).
+reuse, so it is recorded as **ADR-0039 (Event-sourced write model)** *before* the code
+(golden rule 4). ADR-0039 also covers R2 and R3 below (one decision: the write model).
 
 **Alternatives considered.**
 - *Keep it local to the attendance domain.* Rejected: occupancy and any future event-sourced
@@ -47,7 +47,7 @@ reuse, so it is recorded as **ADR-0036 (Event-sourced write model)** *before* th
 
 ---
 
-## R2 — Event-sourced repository + optimistic-retry for the last-place race (ADR-0036)
+## R2 — Event-sourced repository + optimistic-retry for the last-place race (ADR-0039)
 
 **Decision.** The domain defines the port `IAttendanceDayRepository`
 (`LoadAsync(companyId, date)` → `Result<AttendanceDay>`; `SaveAsync(attendanceDay)`); the

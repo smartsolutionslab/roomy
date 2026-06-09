@@ -63,6 +63,6 @@ POST /reservations { officeId, roomId, date: <last Saturday> }       -> 422 not_
 - Every acceptance scenario (1–13) + edge cases has a test written **before** its code, now green.
 - `pnpm nx affected -t lint test build`, `dotnet build -warnaserror`, `dotnet test`,
   `dotnet format --verify-no-changes` all green.
-- ADR-0036 (event-sourced write model) authored **before** the write-model code.
+- ADR-0039 (event-sourced write model) authored **before** the write-model code.
 - New context projects registered in `Roomy.ArchitectureTests`; CLAUDE.md context table +
   SPECKIT pointer updated.
