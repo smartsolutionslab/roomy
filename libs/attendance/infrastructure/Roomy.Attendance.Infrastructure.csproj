@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Attendance.Infrastructure</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Attendance.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../application/Roomy.Attendance.Application.csproj" />
+    <ProjectReference Include="../domain/Roomy.Attendance.Domain.csproj" />
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <!-- The hand-rolled event store + EF Core baseline: EventStoreDbContext, IEventStore, EventTypeRegistry (ADR-0012). -->
+    <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core 10 (GA), matching the persistence baseline. The Npgsql provider arrives transitively. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8" />
+  </ItemGroup>
+
+</Project>
