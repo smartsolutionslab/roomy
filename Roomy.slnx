@@ -90,6 +90,9 @@
   <Folder Name="/tests/attendance/">
     <Project Path="tests/attendance/Roomy.Attendance.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/attendance-integration/">
+    <Project Path="tests/attendance-integration/Roomy.Attendance.IntegrationTests.csproj" />
+  </Folder>
   <Folder Name="/tests/identity/">
     <Project Path="tests/identity/Roomy.Identity.Tests.csproj" />
   </Folder>
