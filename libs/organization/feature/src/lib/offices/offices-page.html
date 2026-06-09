@@ -2,6 +2,30 @@
   <section class="offices">
     <h1 class="offices__title">{{ translate('organization.offices.title') }}</h1>
 
+    <form class="offices__create" [formGroup]="createForm" (ngSubmit)="createOffice()">
+      <h2>{{ translate('organization.create.heading') }}</h2>
+      <label class="offices__field">
+        <span>{{ translate('organization.create.nameLabel') }}</span>
+        <input type="text" formControlName="name" />
+      </label>
+      <label class="offices__field">
+        <span>{{ translate('organization.create.locationLabel') }}</span>
+        <input type="text" formControlName="location" />
+      </label>
+      @if (createConflict()) {
+      <p class="offices__error" role="alert">{{ translate('organization.create.nameConflict') }}</p>
+      } @if (createFailed()) {
+      <p class="offices__error" role="alert">{{ translate('organization.create.error') }}</p>
+      }
+      <button type="submit">{{ translate('organization.create.submit') }}</button>
+    </form>
+
+    <p class="offices__result" role="status" aria-live="polite">
+      @if (createdName(); as name) {
+      {{ translate('organization.create.created', { name }) }}
+      }
+    </p>
+
     @if (loadFailed()) {
     <p class="offices__error" role="alert">{{ translate('organization.offices.loadError') }}</p>
     } @else if (offices(); as items) { @if (items.length === 0) {
