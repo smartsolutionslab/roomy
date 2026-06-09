@@ -97,6 +97,7 @@ public static class MessagingServiceCollectionExtensions
         });
 
         builder.Services.AddScoped<IIntegrationEventPublisher, WolverineIntegrationEventPublisher>();
+        builder.Services.AddScoped<IIntegrationEventOutbox, WolverineIntegrationEventOutbox>();
 
         return builder;
     }
