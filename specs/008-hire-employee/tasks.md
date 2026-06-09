@@ -31,7 +31,7 @@ description: "Task list for Hire Employee (008)"
 
 ## Phase 1: Setup
 
-- [ ] T001 Add a `ProjectReference` from `libs/organization/infrastructure` to `libs/identity/contracts` so the new consumers can map identity's `UserRegistered`/`UserProvisioningFailed` (`context:shared`, ADR-0031); confirm the Nx tags still pass the boundary lint and that `Roomy.ArchitectureTests` already references the three organization projects (added in 002 — otherwise the rules are vacuous).
+- [x] T001 Add a `ProjectReference` from `libs/organization/infrastructure` to `libs/identity/contracts` so the new consumers can map identity's `UserRegistered`/`UserProvisioningFailed` (`context:shared`, ADR-0031); confirm the Nx tags still pass the boundary lint and that `Roomy.ArchitectureTests` already references the three organization projects (added in 002 — otherwise the rules are vacuous).
 
 ---
 
@@ -39,12 +39,12 @@ description: "Task list for Hire Employee (008)"
 
 **⚠️ CRITICAL**: No user-story work can begin until this phase is complete. This builds the `Employee` aggregate (the consistency boundary for the whole provisioning lifecycle) and its persistence — shared by all three stories.
 
-- [ ] T002 [P] RED domain unit tests in `tests/organization/Domain/Employees/` (Shouldly) for the value objects — `EmployeeIdentifier`/`UserIdentifier` (GUIDv7 branded, non-empty, implicit `Guid`), `WorkEmail` (rejects malformed, normalizes), `EmployeeName` (rejects empty), `EmployeeRole` (Employee/Administrator ↔ `HiredRole`), `ProvisioningState`, `ProvisioningFailureReason`.
-- [ ] T003 [P] Implement those value objects + the `EmployeeHired` **domain event** (carries the VOs + the transient initial password) + `IEmployeeRepository` in `libs/organization/domain/Employees/` (invariants via `Ensure.That(...)`). T002 green.
-- [ ] T004 RED domain tests in `tests/organization/Domain/Employees/EmployeeTests.cs` — `Hire(...)` ⇒ employee in `Provisioning`, raises one `EmployeeHired` domain event with the role/email/name/password; `CompleteProvisioning()` ⇒ `Active` (second call a no-op; rejected on a `Failed` employee); `FailProvisioning(reason)` ⇒ `Failed` with the reason (idempotent; rejected on an `Active` employee). State machine + terminal guards (data-model.md, FR-007).
-- [ ] T005 Implement the `Employee` aggregate (`: Aggregate`, `RaiseDomainEvent`) in `libs/organization/domain/Employees/Employee.cs` — mirrors `Office`. T004 green.
-- [ ] T006 Add `EmployeeConfiguration` + `EmployeeRepository` (mirrors `Office`; fetch-that-may-miss returns `Result<Employee>`), the `Employees` `DbSet` in `OrganizationDbContext`, and the **migration** for the `employees` table (no password column). **Integration test** (real Postgres via the sibling test host, [[aspire-postgres-integration-tests]]): an employee round-trips, including its `ProvisioningState`/`FailureReason`.
-- [ ] T007 [P] Confirm the architecture suite stays green — `Employee` lives in `Roomy.Organization.Domain`; the foreign identity contracts are referenced only at the infrastructure edge, never in `application` (`tests/architecture`).
+- [x] T002 [P] RED domain unit tests in `tests/organization/Domain/Employees/` (Shouldly) for the value objects — `EmployeeIdentifier`/`UserIdentifier` (GUIDv7 branded, non-empty, implicit `Guid`), `WorkEmail` (rejects malformed, normalizes), `EmployeeName` (rejects empty), `EmployeeRole` (Employee/Administrator ↔ `HiredRole`), `ProvisioningState`, `ProvisioningFailureReason`.
+- [x] T003 [P] Implement those value objects + the `EmployeeHired` **domain event** (carries the VOs + the transient initial password) + `IEmployeeRepository` in `libs/organization/domain/Employees/` (invariants via `Ensure.That(...)`). T002 green.
+- [x] T004 RED domain tests in `tests/organization/Domain/Employees/EmployeeTests.cs` — `Hire(...)` ⇒ employee in `Provisioning`, raises one `EmployeeHired` domain event with the role/email/name/password; `CompleteProvisioning()` ⇒ `Active` (second call a no-op; rejected on a `Failed` employee); `FailProvisioning(reason)` ⇒ `Failed` with the reason (idempotent; rejected on an `Active` employee). State machine + terminal guards (data-model.md, FR-007).
+- [x] T005 Implement the `Employee` aggregate (`: Aggregate`, `RaiseDomainEvent`) in `libs/organization/domain/Employees/Employee.cs` — mirrors `Office`. T004 green.
+- [x] T006 Add `EmployeeConfiguration` + `EmployeeRepository` (mirrors `Office`; fetch-that-may-miss returns `Result<Employee>`), the `Employees` `DbSet` in `OrganizationDbContext`, and the **migration** for the `employees` table (no password column). **Integration test** (real Postgres via the sibling test host, [[aspire-postgres-integration-tests]]): an employee round-trips, including its `ProvisioningState`/`FailureReason`.
+- [x] T007 [P] Confirm the architecture suite stays green — `Employee` lives in `Roomy.Organization.Domain`; the foreign identity contracts are referenced only at the infrastructure edge, never in `application` (`tests/architecture`).
 
 **Checkpoint**: the `Employee` aggregate and its persistence exist; the saga wiring can begin.
 
