@@ -38,10 +38,6 @@ const english = {
         active: 'Active',
       },
     },
-    notAuthorized: {
-      title: 'Not authorized',
-      message: 'You do not have permission to view this page.',
-    },
   },
 };
 
@@ -78,10 +74,6 @@ const german = {
         provisioning: 'Wird bereitgestellt',
         active: 'Aktiv',
       },
-    },
-    notAuthorized: {
-      title: 'Nicht berechtigt',
-      message: 'Sie haben keine Berechtigung, diese Seite anzuzeigen.',
     },
   },
 };

@@ -47,7 +47,9 @@
         "provisioning": "Provisioning",
         "active": "Active"
       }
-    },
+    }
+  },
+  "shared": {
     "notAuthorized": {
       "title": "Not authorized",
       "message": "You do not have permission to view this page."

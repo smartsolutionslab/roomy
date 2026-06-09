@@ -47,7 +47,9 @@
         "provisioning": "Wird bereitgestellt",
         "active": "Aktiv"
       }
-    },
+    }
+  },
+  "shared": {
     "notAuthorized": {
       "title": "Nicht berechtigt",
       "message": "Sie haben keine Berechtigung, diese Seite anzuzeigen."

@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
-
-import { adminGuard } from './auth/admin.guard';
-import { authGuard } from './auth/auth.guard';
+import { adminGuard, authGuard } from '@roomy/shared-feature';
 
 export const identityRoutes: Routes = [
   {
@@ -13,10 +11,5 @@ export const identityRoutes: Routes = [
     path: 'admin/users',
     canActivate: [authGuard, adminGuard],
     loadComponent: () => import('./admin/admin-users-page').then((module) => module.AdminUsersPage),
-  },
-  {
-    path: 'not-authorized',
-    canActivate: [authGuard],
-    loadComponent: () => import('./admin/not-authorized').then((module) => module.NotAuthorized),
   },
 ];

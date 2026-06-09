@@ -1,14 +1,14 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
 
-import { importIdentityTestTransloco } from '../../testing/transloco';
+import { importSharedTestTransloco } from '../../testing/transloco';
 
 import { NotAuthorized } from './not-authorized';
 
 describe('NotAuthorized', () => {
   it('explains that the page is not permitted', async () => {
     await render(NotAuthorized, {
-      imports: [importIdentityTestTransloco()],
+      imports: [importSharedTestTransloco()],
       providers: [provideZonelessChangeDetection()],
     });
 
