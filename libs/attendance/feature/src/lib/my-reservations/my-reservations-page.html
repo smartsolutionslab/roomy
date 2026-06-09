@@ -1,0 +1,68 @@
+<ng-container *transloco="let translate">
+  <section class="mine">
+    <h1 class="mine__title">{{ translate('attendance.mine.title') }}</h1>
+
+    <p class="mine__result" role="status" aria-live="polite">
+      @if (result(); as message) {
+      {{ translate(message.key, message.params) }}
+      }
+    </p>
+
+    @if (errorKey(); as key) {
+    <p class="mine__error" role="alert">{{ translate(key) }}</p>
+    }
+
+    @if (loadFailed()) {
+    <p class="mine__error" role="alert">{{ translate('attendance.mine.loadError') }}</p>
+    } @else if (reservations(); as items) { @if (items.length === 0) {
+    <p class="mine__empty">{{ translate('attendance.mine.empty') }}</p>
+    <button type="button" class="mine__reserve-link" (click)="goToReserve()">
+      {{ translate('attendance.mine.reserveLink') }}
+    </button>
+    } @else {
+    <section class="mine__group">
+      <h2>{{ translate('attendance.mine.upcomingHeading') }}</h2>
+      <ul class="mine__list">
+        @for (reservation of upcoming(); track reservation.id) {
+        <li class="mine__item">
+          <span class="mine__office">{{ reservation.officeName }}</span>
+          <span class="mine__room">{{ reservation.roomName }}</span>
+          <span class="mine__date">{{ reservation.date }}</span>
+          <button
+            type="button"
+            [attr.aria-label]="
+              translate('attendance.mine.cancelReservation', {
+                room: reservation.roomName,
+                date: reservation.date
+              })
+            "
+            (click)="cancel(reservation)"
+          >
+            {{ translate('attendance.mine.cancel') }}
+          </button>
+          <button type="button" (click)="change(reservation)">
+            {{ translate('attendance.mine.change') }}
+          </button>
+        </li>
+        }
+      </ul>
+    </section>
+
+    @if (past().length > 0) {
+    <section class="mine__group">
+      <h2>{{ translate('attendance.mine.pastHeading') }}</h2>
+      <ul class="mine__list">
+        @for (reservation of past(); track reservation.id) {
+        <li class="mine__item mine__item--past">
+          <span class="mine__office">{{ reservation.officeName }}</span>
+          <span class="mine__room">{{ reservation.roomName }}</span>
+          <span class="mine__date">{{ reservation.date }}</span>
+        </li>
+        }
+      </ul>
+    </section>
+    } } } @else {
+    <p class="mine__loading">{{ translate('attendance.mine.loading') }}</p>
+    }
+  </section>
+</ng-container>
