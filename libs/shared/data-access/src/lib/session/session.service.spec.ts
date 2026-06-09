@@ -43,4 +43,23 @@ describe('SessionService', () => {
     expect(session.currentUser()).toBeNull();
     expect(session.loaded()).toBe(true);
   });
+
+  it('resolves ensureLoaded once the session has settled', async () => {
+    const settled = session.ensureLoaded();
+    httpController.expectOne('/bff/user').flush({ name: 'Ada', roles: [] });
+
+    await settled;
+
+    expect(session.loaded()).toBe(true);
+  });
+
+  it('loads the session once for concurrent callers', async () => {
+    const first = session.ensureLoaded();
+    const second = session.ensureLoaded();
+
+    httpController.expectOne('/bff/user').flush({ name: 'Ada', roles: [] });
+    await Promise.all([first, second]);
+
+    expect(session.loaded()).toBe(true);
+  });
 });
