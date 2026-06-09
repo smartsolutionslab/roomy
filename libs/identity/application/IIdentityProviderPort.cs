@@ -19,4 +19,11 @@ public interface IIdentityProviderPort
         string initialPassword,
         Role role,
         CancellationToken cancellationToken);
+
+    // Assigns the administrator realm role to an already-provisioned subject (US4 / IA-4). Keycloak is
+    // the token authority, so an elevation must propagate here for the role to appear on the user's
+    // token. Idempotent — re-assigning an existing role mapping is a no-op at Keycloak.
+    Task<Result> AssignAdministratorRoleAsync(
+        KeycloakSubjectIdentifier subject,
+        CancellationToken cancellationToken);
 }

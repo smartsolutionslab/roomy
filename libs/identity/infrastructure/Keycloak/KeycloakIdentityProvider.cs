@@ -47,6 +47,28 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
         return subject;
     }
 
+    public async Task<Result> AssignAdministratorRoleAsync(
+        KeycloakSubjectIdentifier subject,
+        CancellationToken cancellationToken)
+    {
+        var token = await AcquireAdminTokenAsync(cancellationToken);
+
+        var representation = await FetchRealmRoleAsync(token, "administrator", cancellationToken);
+        if (representation.IsFailure)
+        {
+            return representation.Error;
+        }
+
+        using var request = AdminRequest(
+            HttpMethod.Post,
+            $"admin/realms/{options.Realm}/users/{subject.Value}/role-mappings/realm",
+            token,
+            new JsonArray(representation.Value));
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        return response.IsSuccessStatusCode ? Result.Success() : ProviderError(response);
+    }
+
     private async Task<string> AcquireAdminTokenAsync(CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(

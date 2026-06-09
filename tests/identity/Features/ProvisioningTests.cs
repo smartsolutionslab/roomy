@@ -130,6 +130,11 @@ public sealed class ProvisioningTests
             Role role,
             CancellationToken cancellationToken) =>
             Task.FromResult(outcome);
+
+        public Task<Result> AssignAdministratorRoleAsync(
+            KeycloakSubjectIdentifier subject,
+            CancellationToken cancellationToken) =>
+            throw new NotSupportedException("Provisioning does not elevate an existing account.");
     }
 
     private sealed class RecordingPublisher : IIntegrationEventPublisher

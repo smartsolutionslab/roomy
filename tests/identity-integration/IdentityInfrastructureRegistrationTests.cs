@@ -30,6 +30,7 @@ public sealed class IdentityInfrastructureRegistrationTests
         using var scope = provider.CreateScope();
 
         scope.ServiceProvider.GetRequiredService<IUserRepository>().ShouldBeOfType<UserRepository>();
+        scope.ServiceProvider.GetRequiredService<IUnitOfWork>().ShouldBeOfType<IdentityUnitOfWork>();
         scope.ServiceProvider.GetRequiredService<IIdentityProviderPort>()
             .ShouldBeOfType<KeycloakIdentityProvider>();
     }
@@ -44,6 +45,19 @@ public sealed class IdentityInfrastructureRegistrationTests
         var registration = services
             .Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<RegisterUser>));
         registration.ImplementationType.ShouldBe(typeof(RegisterUserHandler));
+        registration.Lifetime.ShouldBe(ServiceLifetime.Scoped);
+    }
+
+    [Fact]
+    public void Binds_the_grant_administrator_command_handler()
+    {
+        var services = new ServiceCollection();
+
+        services.AddIdentityUseCases();
+
+        var registration = services
+            .Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<GrantAdministrator>));
+        registration.ImplementationType.ShouldBe(typeof(GrantAdministratorHandler));
         registration.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
 }

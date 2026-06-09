@@ -26,6 +26,7 @@ public static class IdentityInfrastructureServiceCollectionExtensions
 
         services.AddRoomyDbContext<IdentityDbContext>(connectionString);
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUnitOfWork, IdentityUnitOfWork>();
 
         return services;
     }
@@ -56,6 +57,7 @@ public static class IdentityInfrastructureServiceCollectionExtensions
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ICommandHandler<RegisterUser>, RegisterUserHandler>();
+        services.AddScoped<ICommandHandler<GrantAdministrator>, GrantAdministratorHandler>();
 
         return services;
     }
