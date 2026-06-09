@@ -8,11 +8,16 @@
 
   <ItemGroup>
     <ProjectReference Include="../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+    <!-- The minimal Aspire app host the testing builder boots as the entry point: Postgres + the
+         organization database, so the EF mapping is verified against the real provider. -->
+    <ProjectReference Include="../organization-integration-apphost/Roomy.Organization.TestAppHost.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The Npgsql EF provider, so the context model builds against the real provider (offline — model
-         building does not open a connection). The live round-trip lands with the host slice. -->
+    <!-- Stands up a real PostgreSQL through the same Aspire resource model the app host uses, so the
+         EF mapping, value converters, the owned Room collection, and unique indexes are verified
+         against the actual provider. Needs Docker — available on the CI ubuntu-latest runner. -->
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
   </ItemGroup>
 

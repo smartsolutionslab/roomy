@@ -83,6 +83,9 @@
   <Folder Name="/tests/organization-integration/">
     <Project Path="tests/organization-integration/Roomy.Organization.IntegrationTests.csproj" />
   </Folder>
+  <Folder Name="/tests/organization-integration-apphost/">
+    <Project Path="tests/organization-integration-apphost/Roomy.Organization.TestAppHost.csproj" />
+  </Folder>
   <Folder Name="/tests/identity-integration/">
     <Project Path="tests/identity-integration/Roomy.Identity.IntegrationTests.csproj" />
   </Folder>

@@ -1,0 +1,14 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.2">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SmartSolutionsLab.Roomy.Organization.TestAppHost</RootNamespace>
+    <AssemblyName>Roomy.Organization.TestAppHost</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Only Postgres: the integration tests need the database, none of the rest of the stack. -->
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.2" />
+  </ItemGroup>
+
+</Project>
