@@ -14,10 +14,20 @@ public static class AdminUserEndpoints
 
     public static IEndpointRouteBuilder MapAdminUserEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/admin/users", ListAccountsAsync).RequireAdministrator();
-        endpoints.MapGet("/admin/users/{userId:guid}", GetAccountAsync).RequireAdministrator();
+        endpoints.MapGet("/admin/users", ListAccountsAsync)
+            .RequireAdministrator()
+            .WithName("ListUsers")
+            .Produces<IEnumerable<AdminUserResponse>>();
+        endpoints.MapGet("/admin/users/{userId:guid}", GetAccountAsync)
+            .RequireAdministrator()
+            .WithName("GetUser")
+            .Produces<AdminUserResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
         endpoints.MapPost("/admin/users/{userId:guid}:grant-administrator", GrantAdministratorAsync)
-            .RequireAdministrator();
+            .RequireAdministrator()
+            .WithName("GrantAdministrator")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
         return endpoints;
     }

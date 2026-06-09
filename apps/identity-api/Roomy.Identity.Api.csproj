@@ -3,6 +3,16 @@
   <PropertyGroup>
     <RootNamespace>SmartSolutionsLab.Roomy.Identity.Api</RootNamespace>
     <AssemblyName>Roomy.Identity.Api</AssemblyName>
+    <!--
+      The typed Angular client is generated from a committed OpenAPI spec (ADR-0018/0036). The
+      spec is emitted next to the host. Emitting boots the host to resolve the document, and the
+      host throws without its connection strings/Keycloak config, so the emit is NOT part of the
+      ordinary build (that would force every `dotnet build` to carry dummy config). Instead it is a
+      deliberate step that supplies dummy config — exactly like the Wolverine codegen step
+      (ADR-0034). CI re-runs it and fails if the committed spec drifts.
+    -->
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOnBuild>false</OpenApiGenerateDocumentsOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +29,13 @@
   <ItemGroup>
     <!-- Validates the BFF-forwarded Keycloak access token as a JWT bearer (ADR-0013). -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <!-- Publishes the OpenAPI document the typed Angular client is generated from (ADR-0018/0036). -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+    <!-- Build-time `GetDocument` emit of the static spec to OpenApiDocumentsDirectory (ADR-0036). -->
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

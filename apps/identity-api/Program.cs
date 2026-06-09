@@ -1,4 +1,5 @@
 using JasperFx;
+using JasperFx.CommandLine;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,12 @@ using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
+
+// The host dispatches startup through JasperFx (RunJasperFxCommands, ADR-0034). AutoStartHost lets
+// HostFactoryResolver-based tooling — EF design-time and the OpenAPI `getdocument` emit (ADR-0036) —
+// obtain the built service provider instead of the command dispatcher disposing it first. With no
+// command (how Aspire launches the service) the host still just runs.
+JasperFxEnvironment.AutoStartHost = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,24 +72,36 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
+// Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
+builder.Services.AddOpenApi();
+
 // The provisioning use cases (US3, ADR-0025), bound to their owned command-handler ports — the
 // EmployeeHired consumer resolves RegisterUser through these.
 builder.Services.AddIdentityUseCases();
+
+// Emitting the OpenAPI spec (ADR-0036) boots the host through `getdocument` with AutoStartHost, which
+// starts hosted services. The document is built from endpoint metadata alone, so during an emit the
+// messaging runtime and the DefaultAdmin seeder — the two startups that open a broker/database
+// connection — are skipped, letting the spec emit with no Postgres or RabbitMQ.
+var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
 
 // Wolverine's durable transactional outbox/inbox over the identity database, with RabbitMQ as the
 // default transport (ADR-0005/0012/0015). The outbox shares the database with the User write so a
 // published integration event commits atomically with the aggregate. The identity infrastructure
 // assembly is scanned for consumers so EmployeeHired (organization's published language) is handled.
-builder.AddRoomyMessaging(
-    new MessagingOptions
-    {
-        Transport = MessagingTransport.RabbitMq,
-        PostgresConnectionString = identityConnectionString,
-        ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-            ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
-    },
-    applicationAssembly: typeof(IdentityApiHost).Assembly,
-    typeof(EmployeeHiredConsumer).Assembly);
+if (!emittingOpenApiDocument)
+{
+    builder.AddRoomyMessaging(
+        new MessagingOptions
+        {
+            Transport = MessagingTransport.RabbitMq,
+            PostgresConnectionString = identityConnectionString,
+            ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
+                ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+        },
+        applicationAssembly: typeof(IdentityApiHost).Assembly,
+        typeof(EmployeeHiredConsumer).Assembly);
+}
 
 // Seed the DefaultAdmin at startup so the system is administrable from first run (FR-004, research
 // R4). The seeder is idempotent, so it is safe on every restart.
@@ -100,7 +119,10 @@ builder.Services.AddScoped<DefaultAdminSeeder>();
 
 // The schema is applied out-of-process by the db-migrator before this host starts (Aspire
 // WaitForCompletion, ADR-0033), so the seeder can query the users table straight away.
-builder.Services.AddHostedService<DefaultAdminSeederHostedService>();
+if (!emittingOpenApiDocument)
+{
+    builder.Services.AddHostedService<DefaultAdminSeederHostedService>();
+}
 
 var app = builder.Build();
 
@@ -111,6 +133,10 @@ app.UseAuthorization();
 
 app.MapAccountEndpoints();
 app.MapAdminUserEndpoints();
+
+// Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
+// route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.
+app.MapOpenApi();
 
 // RunJasperFxCommands instead of Run so the Wolverine code-generation commands are available
 // (ADR-0034): `dotnet run -- codegen write` regenerates the committed handler code. With no arguments
