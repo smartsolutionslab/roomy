@@ -15,6 +15,7 @@
     "importHelpers": true,
     "paths": {
       "@roomy/util": ["./libs/shared/util/src/index.ts"],
+      "@roomy/identity-data-access": ["./libs/identity/data-access/src/index.ts"],
       "@roomy/identity-feature": ["./libs/identity/feature/src/index.ts"],
       "@roomy/shared-data-access": ["./libs/shared/data-access/src/index.ts"]
     }
