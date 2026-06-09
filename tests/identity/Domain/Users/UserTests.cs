@@ -85,7 +85,7 @@ public sealed class UserTests
     {
         var user = RegisterEmployee();
 
-        user.GrantAdministrator(GrantedAt);
+        user.GrantAdministrator(grantedAt);
 
         user.IsAdministrator.ShouldBeTrue();
         user.IsEmployee.ShouldBeTrue();
@@ -96,11 +96,11 @@ public sealed class UserTests
     {
         var user = RegisterEmployee();
 
-        user.GrantAdministrator(GrantedAt);
+        user.GrantAdministrator(grantedAt);
 
         var raised = user.DomainEvents.ShouldHaveSingleItem().ShouldBeOfType<AdministratorGranted>();
         raised.UserId.ShouldBe(user.Identifier);
-        raised.OccurredAt.ShouldBe(GrantedAt);
+        raised.OccurredAt.ShouldBe(grantedAt);
     }
 
     [Fact]
@@ -108,8 +108,8 @@ public sealed class UserTests
     {
         var user = RegisterEmployee();
 
-        user.GrantAdministrator(GrantedAt);
-        user.GrantAdministrator(GrantedAt.AddMinutes(1));
+        user.GrantAdministrator(grantedAt);
+        user.GrantAdministrator(grantedAt.AddMinutes(1));
 
         user.IsAdministrator.ShouldBeTrue();
         user.DomainEvents.ShouldHaveSingleItem();
@@ -123,7 +123,7 @@ public sealed class UserTests
             DisplayName.From("Grace Hopper"),
             Role.Employee.GrantAdministrator());
 
-        user.GrantAdministrator(GrantedAt);
+        user.GrantAdministrator(grantedAt);
 
         user.DomainEvents.ShouldBeEmpty();
     }
@@ -132,12 +132,12 @@ public sealed class UserTests
     public void ClearDomainEvents_empties_the_recorded_events()
     {
         var user = RegisterEmployee();
-        user.GrantAdministrator(GrantedAt);
+        user.GrantAdministrator(grantedAt);
 
         user.ClearDomainEvents();
 
         user.DomainEvents.ShouldBeEmpty();
     }
 
-    private static readonly DateTimeOffset GrantedAt = new(2026, 6, 9, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset grantedAt = new(2026, 6, 9, 12, 0, 0, TimeSpan.Zero);
 }
