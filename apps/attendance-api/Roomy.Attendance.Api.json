@@ -269,10 +269,67 @@
           }
         }
       }
+    },
+    "/rooms": {
+      "get": {
+        "tags": [
+          "RoomCatalogueEndpoints"
+        ],
+        "operationId": "ViewBookableRooms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookableRoomResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "BookableRoomResponse": {
+        "required": [
+          "officeId",
+          "officeName",
+          "roomId",
+          "roomName",
+          "capacity"
+        ],
+        "type": "object",
+        "properties": {
+          "officeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "officeName": {
+            "type": "string"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomName": {
+            "type": "string"
+          },
+          "capacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "MyReservationResponse": {
         "required": [
           "reservationId",
@@ -540,6 +597,9 @@
     },
     {
       "name": "OccupancyEndpoints"
+    },
+    {
+      "name": "RoomCatalogueEndpoints"
     }
   ]
 }
