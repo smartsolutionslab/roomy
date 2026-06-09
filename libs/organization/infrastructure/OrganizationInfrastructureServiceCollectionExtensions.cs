@@ -43,6 +43,11 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
         services.AddScoped<ICommandHandler<ChangeOfficeLocation>, ChangeOfficeLocationHandler>();
         services.AddScoped<ICommandHandler<RenameRoom>, RenameRoomHandler>();
 
+        // Hiring (008): hire publishes EmployeeHired; the saga acks complete or compensate the employee.
+        services.AddScoped<ICommandHandler<HireEmployee, HiredEmployee>, HireEmployeeHandler>();
+        services.AddScoped<ICommandHandler<CompleteEmployeeProvisioning>, CompleteEmployeeProvisioningHandler>();
+        services.AddScoped<ICommandHandler<FailEmployeeProvisioning>, FailEmployeeProvisioningHandler>();
+
         return services;
     }
 }

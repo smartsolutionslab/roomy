@@ -3,6 +3,7 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
+using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
@@ -42,6 +43,31 @@ public sealed class OrganizationUnitOfWorkTests
         added.Capacity.ShouldBe(8);
 
         office.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Saving_drains_employee_hired_to_the_outbox_with_the_user_and_password()
+    {
+        await using var context = NewContext();
+        var user = UserIdentifier.New();
+        var employee = Employee.Hire(
+            CompanyIdentifier.New(), user, EmployeeName.From("Ada"), WorkEmail.From("ada@example.com"),
+            EmployeeRole.Administrator, "transient-pw");
+        context.Add(employee);
+        var outbox = new CapturingOutbox();
+
+        await new OrganizationUnitOfWork(context, outbox, new FixedTimeProvider(occurredAt))
+            .SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var hired = outbox.Published.OfType<SmartSolutionsLab.Roomy.Contracts.Organization.EmployeeHired>().ShouldHaveSingleItem();
+        hired.EmployeeId.ShouldBe(employee.Identifier.Value);
+        hired.UserId.ShouldBe(user.Value);
+        hired.Email.ShouldBe("ada@example.com");
+        hired.DisplayName.ShouldBe("Ada");
+        hired.Role.ShouldBe(SmartSolutionsLab.Roomy.Contracts.Organization.HiredRole.Administrator);
+        hired.InitialPassword.ShouldBe("transient-pw");
+        hired.OccurredAt.ShouldBe(occurredAt);
+        employee.DomainEvents.ShouldBeEmpty();
     }
 
     private static OrganizationDbContext NewContext() =>
