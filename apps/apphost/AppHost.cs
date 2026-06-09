@@ -113,9 +113,11 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
 // (ADR-0014). It validates the BFF-forwarded token against Keycloak to authorize (no admin
 // provisioning — it only reads roles). It starts after the migrator has applied the schema
 // (WaitForCompletion, ADR-0033); the single company is then seeded at startup so offices have a company
-// to belong to (research.md D2). No RabbitMQ — this slice publishes and consumes nothing.
+// to belong to (research.md D2). It publishes OfficeOpened/RoomAdded over the RabbitMQ outbox (ADR-0037,
+// 003 US2) so the attendance context can mirror the capacity feed; it still consumes nothing.
 var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organization-api")
     .WithReference(organizationDatabase).WaitForCompletion(dbMigrator)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
