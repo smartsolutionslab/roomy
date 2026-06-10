@@ -37,6 +37,10 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
         services.AddScoped<IReservationProjection, ReservationProjection>();
         services.AddScoped<IAttendanceDayRepository, AttendanceDayRepository>();
 
+        // The offline rebuild routine re-derives the Reservations read model from the streams (research R5);
+        // it reuses the scoped projection + event store + context so a rebuild commits atomically.
+        services.AddScoped<ReservationsReadModelRebuilder>();
+
         return services;
     }
 

@@ -54,6 +54,14 @@ public sealed class PostgresEventStoreFixture : IAsyncLifetime
         return new(CreateEventStore(context), new ReservationProjection(context), context);
     }
 
+    // The offline read-model rebuilder over its own context + event store + projection, wired like the
+    // repository (one shared context so the truncate, replay, and save commit together).
+    public ReservationsReadModelRebuilder CreateRebuilder()
+    {
+        var context = CreateDbContext();
+        return new(CreateEventStore(context), new ReservationProjection(context), context);
+    }
+
     public AttendanceDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<AttendanceDbContext>()
