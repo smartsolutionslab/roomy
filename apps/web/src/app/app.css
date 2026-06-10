@@ -122,7 +122,7 @@
   background:
     radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.1), transparent 60%),
     radial-gradient(30rem 20rem at -6% 8%, rgba(244, 63, 94, 0.07), transparent 60%),
-    var(--roomy-color-background);
+    transparent;
 }
 
 .appbar {

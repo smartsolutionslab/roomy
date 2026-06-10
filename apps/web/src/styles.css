@@ -42,6 +42,9 @@
   --roomy-glass-border: rgba(24, 24, 27, 0.08);
   --roomy-blur: saturate(160%) blur(12px);
 
+  /* Background texture — a faint dot grid painted on the page background */
+  --roomy-texture-dot: rgba(24, 24, 27, 0.05);
+
   /* Spacing scale */
   --roomy-space-xs: 0.25rem;
   --roomy-space-sm: 0.5rem;
@@ -85,13 +88,13 @@
    or whenever the user explicitly selects dark via the toggle (data-theme wins). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --roomy-color-background: #09090b;
-    --roomy-color-background-muted: #18181b;
-    --roomy-color-surface: #18181b;
-    --roomy-color-surface-raised: #27272a;
+    --roomy-color-background: #16161b;
+    --roomy-color-background-muted: #1e1e24;
+    --roomy-color-surface: #1f1f26;
+    --roomy-color-surface-raised: #2a2a31;
     --roomy-color-text: #fafafa;
     --roomy-color-text-muted: #a1a1aa;
-    --roomy-color-border: #3f3f46;
+    --roomy-color-border: #35353d;
 
     --roomy-color-accent: #fb923c;
     --roomy-color-accent-strong: #f97316;
@@ -104,19 +107,20 @@
     --roomy-color-danger-subtle: #2a1416;
 
     --roomy-gradient-soft: linear-gradient(135deg, #1c1206 0%, #1e0f12 100%);
-    --roomy-glass-bg: rgba(24, 24, 27, 0.6);
+    --roomy-glass-bg: rgba(31, 31, 38, 0.55);
     --roomy-glass-border: rgba(255, 255, 255, 0.08);
+    --roomy-texture-dot: rgba(255, 255, 255, 0.035);
   }
 }
 
 :root[data-theme='dark'] {
-  --roomy-color-background: #09090b;
-  --roomy-color-background-muted: #18181b;
-  --roomy-color-surface: #18181b;
-  --roomy-color-surface-raised: #27272a;
+  --roomy-color-background: #16161b;
+  --roomy-color-background-muted: #1e1e24;
+  --roomy-color-surface: #1f1f26;
+  --roomy-color-surface-raised: #2a2a31;
   --roomy-color-text: #fafafa;
   --roomy-color-text-muted: #a1a1aa;
-  --roomy-color-border: #3f3f46;
+  --roomy-color-border: #35353d;
 
   --roomy-color-accent: #fb923c;
   --roomy-color-accent-strong: #f97316;
@@ -129,8 +133,9 @@
   --roomy-color-danger-subtle: #2a1416;
 
   --roomy-gradient-soft: linear-gradient(135deg, #1c1206 0%, #1e0f12 100%);
-  --roomy-glass-bg: rgba(24, 24, 27, 0.6);
+  --roomy-glass-bg: rgba(31, 31, 38, 0.55);
   --roomy-glass-border: rgba(255, 255, 255, 0.08);
+  --roomy-texture-dot: rgba(255, 255, 255, 0.035);
 }
 
 * {
@@ -143,7 +148,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--roomy-color-background);
+  background-color: var(--roomy-color-background);
+  background-image: radial-gradient(circle at center, var(--roomy-texture-dot) 1px, transparent 1.6px);
+  background-size: 22px 22px;
   color: var(--roomy-color-text);
   font-family: var(--roomy-font-family);
   font-size: var(--roomy-font-size-base);
