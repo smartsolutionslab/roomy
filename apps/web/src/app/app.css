@@ -141,16 +141,6 @@
   -webkit-backdrop-filter: var(--roomy-blur);
 }
 
-.appbar__user {
-  margin-inline-end: var(--roomy-space-xs);
-  color: var(--roomy-color-text-muted);
-  font-size: var(--roomy-font-size-sm);
-}
-
-.appbar__signout {
-  margin: 0;
-}
-
 .shell__main {
   flex: 1;
   padding: var(--roomy-space-xl) var(--roomy-space-lg);

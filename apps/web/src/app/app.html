@@ -74,12 +74,9 @@
 
     <div class="shell__body">
       <header class="appbar">
-        <span class="appbar__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
         <roomy-theme-toggle />
         <roomy-language-switcher />
-        <form class="appbar__signout" method="post" action="/bff/logout">
-          <button class="btn" type="submit">{{ translate('shell.signOut') }}</button>
-        </form>
+        <roomy-user-menu />
       </header>
       <main id="main-content" class="shell__main" tabindex="-1">
         <router-outlet />

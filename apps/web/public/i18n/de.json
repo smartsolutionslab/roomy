@@ -221,6 +221,11 @@
     "theme": {
       "toLight": "Zu hellem Design wechseln",
       "toDark": "Zu dunklem Design wechseln"
+    },
+    "account": {
+      "menu": "Kontomenü",
+      "signedIn": "Angemeldet",
+      "signOut": "Abmelden"
     }
   }
 }
