@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Gateway.Authentication;
 using SmartSolutionsLab.Roomy.Gateway.Bff;
 using SmartSolutionsLab.Roomy.Gateway.Proxy;

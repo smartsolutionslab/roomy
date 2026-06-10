@@ -1,8 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using SmartSolutionsLab.Roomy.Gateway.Authentication;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Bff;
@@ -27,8 +24,7 @@ public static class BffEndpoints
     // validated as a local path to avoid open-redirects.
     private static IResult Login(HttpContext httpContext, string? returnUrl)
     {
-        if (httpContext.User.Identity?.IsAuthenticated == true)
-            return Results.Redirect(SafeReturnUrl(returnUrl));
+        if (httpContext.User.Identity?.IsAuthenticated == true) return Results.Redirect(SafeReturnUrl(returnUrl));
 
         var properties = new AuthenticationProperties { RedirectUri = SafeReturnUrl(returnUrl) };
         return Results.Challenge(properties, [BffAuthenticationExtensions.OidcScheme]);
@@ -37,15 +33,12 @@ public static class BffEndpoints
     private static IResult Logout(HttpContext httpContext, string? returnUrl)
     {
         var properties = new AuthenticationProperties { RedirectUri = SafeReturnUrl(returnUrl) };
-        return Results.SignOut(
-            properties,
-            [BffAuthenticationExtensions.CookieScheme, BffAuthenticationExtensions.OidcScheme]);
+        return Results.SignOut(properties, [BffAuthenticationExtensions.CookieScheme, BffAuthenticationExtensions.OidcScheme]);
     }
 
     private static IResult WhoAmI(HttpContext httpContext)
     {
-        if (httpContext.User.Identity?.IsAuthenticated != true)
-            return Results.Unauthorized();
+        if (httpContext.User.Identity?.IsAuthenticated != true) return Results.Unauthorized();
 
         return Results.Ok(httpContext.User.ToCurrentUser());
     }

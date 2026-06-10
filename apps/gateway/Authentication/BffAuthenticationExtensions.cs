@@ -2,8 +2,6 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -107,9 +105,7 @@ public static class BffAuthenticationExtensions
         options.Events.OnTokenValidated = FlattenRealmRoles;
     }
 
-    private static void ApplyKeycloakOptions(
-        OpenIdConnectOptions options,
-        IOptions<KeycloakOidcOptions> keycloakOptions)
+    private static void ApplyKeycloakOptions(OpenIdConnectOptions options, IOptions<KeycloakOidcOptions> keycloakOptions)
     {
         var keycloak = keycloakOptions.Value;
 
@@ -120,33 +116,29 @@ public static class BffAuthenticationExtensions
     }
 
     private static string BuildAuthority(KeycloakOidcOptions keycloak) =>
-        string.Create(
-            CultureInfo.InvariantCulture,
-            $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}");
+        string.Create(CultureInfo.InvariantCulture, $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}");
 
     // Keycloak nests realm roles inside the realm_access JSON claim. Promote each to a flat
     // role claim so authorization policies and the whoami endpoint can read them directly.
     private static Task FlattenRealmRoles(TokenValidatedContext context)
     {
-        if (context.Principal?.Identity is not ClaimsIdentity identity)
-            return Task.CompletedTask;
+        if (context.Principal?.Identity is not ClaimsIdentity identity) return Task.CompletedTask;
 
         var realmAccess = identity.FindFirst(RealmAccessClaim);
-        if (realmAccess is null)
-            return Task.CompletedTask;
+        if (realmAccess is null) return Task.CompletedTask;
 
         foreach (var role in RealmRoleReader.ReadRoles(realmAccess.Value))
         {
             if (!identity.HasClaim(ClaimTypes.Role, role))
+            {
                 identity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
         }
 
         return Task.CompletedTask;
     }
 
-    private static Task ReplyWithStatus(
-        Microsoft.AspNetCore.Authentication.RedirectContext<CookieAuthenticationOptions> context,
-        int statusCode)
+    private static Task ReplyWithStatus(Microsoft.AspNetCore.Authentication.RedirectContext<CookieAuthenticationOptions> context, int statusCode)
     {
         context.Response.StatusCode = statusCode;
         return Task.CompletedTask;

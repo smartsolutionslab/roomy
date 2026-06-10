@@ -11,12 +11,10 @@ public static class RealmRoleReader
 
     public static IReadOnlyList<string> ReadRoles(string? realmAccessJson)
     {
-        if (string.IsNullOrWhiteSpace(realmAccessJson))
-            return [];
+        if (string.IsNullOrWhiteSpace(realmAccessJson)) return [];
 
         using var document = TryParse(realmAccessJson);
-        if (document is null)
-            return [];
+        if (document is null) return [];
 
         if (!document.RootElement.TryGetProperty(RolesProperty, out var roles)
             || roles.ValueKind != JsonValueKind.Array)
@@ -27,12 +25,13 @@ public static class RealmRoleReader
         var result = new List<string>(roles.GetArrayLength());
         foreach (var role in roles.EnumerateArray())
         {
-            if (role.ValueKind != JsonValueKind.String)
-                continue;
+            if (role.ValueKind != JsonValueKind.String) continue;
 
             var value = role.GetString();
             if (!string.IsNullOrWhiteSpace(value))
+            {
                 result.Add(value);
+            }
         }
 
         return result;
