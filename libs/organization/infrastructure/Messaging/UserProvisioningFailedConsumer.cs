@@ -1,6 +1,6 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Contracts.Identity;
-using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
+using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging;

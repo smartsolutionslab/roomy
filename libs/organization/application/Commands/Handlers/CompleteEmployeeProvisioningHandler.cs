@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Organization.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
 // Completes provisioning on the identity ack (ADR-0025): load the employee, transition it Active, and
 // commit. The transition is idempotent (a re-delivered UserRegistered is a no-op), so at-least-once
