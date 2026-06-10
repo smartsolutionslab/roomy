@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
@@ -134,24 +133,3 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             row => new EmployeeSearchCursor(row.Similarity, row.DisplayName, row.EmployeeId));
     }
 }
-
-// The opaque cursor for the unfiltered directory: the (name, id) of the last returned employee (ADR-0044).
-// The id breaks ties so duplicate display names still page deterministically. Disallow unmapped members so a
-// search cursor (which also carries a similarity) replayed with a blank q fails to decode — a 400, not a
-// silent wrong-mode read (ADR-0047 §2).
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-internal sealed record EmployeeCursor(string Name, Guid EmployeeId);
-
-// The opaque cursor for a name search: the (similarity, name, id) of the last returned employee (ADR-0047).
-// Similarity is the primary descending key; (name, id) breaks the frequent similarity ties into a stable total
-// order. Similarity is required and unmapped members are disallowed, so an unfiltered cursor replayed with a
-// query (no similarity) — or any cursor of the wrong shape — fails to decode and is rejected as a malformed
-// cursor (ADR-0044 path).
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-internal sealed record EmployeeSearchCursor(
-    [property: JsonRequired] double Similarity,
-    string Name,
-    Guid EmployeeId);
-
-// The projected search row: the employee plus its computed word-similarity, used to build the next cursor.
-internal sealed record EmployeeSearchRow(Guid EmployeeId, string DisplayName, double Similarity);
