@@ -13,7 +13,7 @@
 }
 
 .roomy-logo__wordmark {
-  color: var(--roomy-color-text);
+  color: currentColor;
   font-size: var(--roomy-font-size-xl);
   font-weight: var(--roomy-font-weight-bold);
   letter-spacing: -0.02em;

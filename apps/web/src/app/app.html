@@ -5,7 +5,7 @@
   <div class="shell">
     <aside class="sidebar">
       <a class="sidebar__brand" routerLink="/" [attr.aria-label]="translate('shell.appName')">
-        <roomy-logo [showWordmark]="true" />
+        <roomy-logo [showWordmark]="true" [onAccent]="true" />
       </a>
 
       <nav class="sidebar__nav" [attr.aria-label]="translate('shell.appName')">
@@ -70,21 +70,21 @@
         }
       </nav>
 
-      <div class="sidebar__footer">
-        <span class="sidebar__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
-        <div class="sidebar__controls">
-          <roomy-theme-toggle />
-          <roomy-language-switcher />
-        </div>
-        <form class="sidebar__signout" method="post" action="/bff/logout">
-          <button class="btn btn--block" type="submit">{{ translate('shell.signOut') }}</button>
-        </form>
-      </div>
     </aside>
 
-    <main id="main-content" class="shell__main" tabindex="-1">
-      <router-outlet />
-    </main>
+    <div class="shell__body">
+      <header class="appbar">
+        <span class="appbar__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
+        <roomy-theme-toggle />
+        <roomy-language-switcher />
+        <form class="appbar__signout" method="post" action="/bff/logout">
+          <button class="btn" type="submit">{{ translate('shell.signOut') }}</button>
+        </form>
+      </header>
+      <main id="main-content" class="shell__main" tabindex="-1">
+        <router-outlet />
+      </main>
+    </div>
   </div>
   } @else {
   <div class="public">
