@@ -89,7 +89,19 @@ schemes do not affect `ng-openapi-gen` output.
 - Adding the OAuth2 scheme + examples to the committed specs requires a client regen on change (ADR-0036).
 
 **Follow-ups**
-- Spec + tasks for the implementation (this ADR is the prerequisite, golden rule 4): wire Scalar in each host
-  behind the Development gate, add the document transformer for the security scheme + examples, add the
-  `roomy-scalar` realm client, regenerate clients, and add a check that `/scalar` is absent in production.
+- Spec + tasks for the implementation (this ADR is the prerequisite, golden rule 4): the OAuth2 document
+  transformer (security scheme + examples), the `roomy-scalar` realm client, the Scalar OAuth config, and
+  regenerated clients.
 - Optionally a single dev-only docs entry point through the gateway (a future ADR-0030 exception).
+
+## Update (2026-06-10): dashboard delivery via the Scalar.Aspire aggregator
+
+Rather than mounting Scalar in each host behind a Development gate, the dev-facing docs are delivered by the
+**`Scalar.Aspire`** aggregator: a single Scalar reference **hosted by the app host** that aggregates all three
+APIs' OpenAPI documents and is listed in the **Aspire dashboard** (one resource, one pane). This is **dev-only
+by construction** — the app host is never deployed — so it needs no per-host environment gating, and it is the
+natural entry point developers already use. Each API resource also carries a direct **OpenAPI** dashboard link
+(`WithUrlForEndpoint`). Per-host `Scalar.AspNetCore` is therefore **not** required for the dev workflow. The
+OAuth2 decision is unchanged: the aggregator will be configured for the Keycloak authorization-code + PKCE flow
+once the OAuth2 security scheme is added to the documents (the `roomy-scalar` client + transformer follow-ups
+above). Composition is guarded by `AppHostCompositionTests`.
