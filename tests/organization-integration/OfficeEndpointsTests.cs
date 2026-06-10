@@ -141,6 +141,8 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
             .PostAsJsonAsync("/offices", OfficeNamed(name), TestContext.Current.CancellationToken);
 
         second.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        var body = await second.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
+        body.ShouldNotBeNull().Code.ShouldNotBeNullOrEmpty();
     }
 
     [Fact]
@@ -312,7 +314,11 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        var body = await response.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
+        body.ShouldNotBeNull().Code.ShouldNotBeNullOrEmpty();
     }
 
     public void Dispose() => app.Dispose();
+
+    private sealed record ErrorDto(string Code, string Message);
 }

@@ -1,6 +1,7 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
@@ -47,7 +48,7 @@ public static class EmployeeEndpoints
             new HireEmployee(name, email, role, request.InitialPassword), cancellationToken);
         if (result.IsFailure)
         {
-            return Results.Problem(result.Error.Message);
+            return result.Error.ToHttpResult();
         }
 
         var hired = result.Value;

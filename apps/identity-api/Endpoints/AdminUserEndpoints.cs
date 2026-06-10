@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 
@@ -49,25 +50,22 @@ public static class AdminUserEndpoints
         var request = PageRequest.From(cursor, limit);
         if (request.IsFailure)
         {
-            return BadRequest(request.Error);
+            return request.Error.ToBadRequest();
         }
 
         var page = await users.GetPageAsync(request.Value, cancellationToken);
 
         return page.Match(
             accounts => Results.Ok(new AdminUserPage(accounts.Items.Select(Project).ToList(), accounts.NextCursor)),
-            BadRequest);
+            error => error.ToBadRequest());
     }
-
-    private static IResult BadRequest(Error error) =>
-        Results.Problem(detail: error.Message, statusCode: StatusCodes.Status400BadRequest);
 
     // GET /admin/users/{userId} — a single account, or 404 if no account has that identifier.
     private static async Task<IResult> GetAccountAsync(
         Guid userId, IUserRepository users, CancellationToken cancellationToken)
     {
         var lookup = await users.GetByIdentifierAsync(UserIdentifier.From(userId), cancellationToken);
-        return lookup.Match(user => Results.Ok(Project(user)), _ => Results.NotFound());
+        return lookup.Match(user => Results.Ok(Project(user)), error => error.ToHttpResult());
     }
 
     // POST /admin/users/{userId}:grant-administrator — elevates the account (IA-4). Idempotent: a
@@ -80,9 +78,7 @@ public static class AdminUserEndpoints
         var result = await grantAdministrator.HandleAsync(
             new GrantAdministrator(UserIdentifier.From(userId)), cancellationToken);
 
-        return result.Match(
-            Results.NoContent,
-            error => error.Type == ErrorType.NotFound ? Results.NotFound() : Results.Problem(error.Message));
+        return result.Match(Results.NoContent, error => error.ToHttpResult());
     }
 
     private static AdminUserResponse Project(User user) =>

@@ -67,3 +67,4 @@ ADRs are written **before** the implementing code, not after.
 | [0043](0043-central-package-management.md) | Central Package Management for NuGet versions | Accepted |
 | [0044](0044-cursor-keyset-pagination.md) | Cursor/keyset pagination for endless lists | Accepted |
 | [0045](0045-shared-keycloak-auth-and-unit-of-work-contract.md) | Share the Keycloak JWT bearer composition and the IUnitOfWork port | Accepted |
+| [0046](0046-shared-error-to-http-mapping.md) | One shared domain-Error → HTTP mapping at the API edge | Accepted |

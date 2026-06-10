@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Http;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
+namespace SmartSolutionsLab.Roomy.Web.Http;
 
-// Maps a domain Error to its HTTP response (contract: attendance-api.md). The body carries only the
-// domain error code and a human message — no domain detail leaks beyond that.
-internal static class ErrorResults
+// The single domain-Error → HTTP-response mapping for every context API (ADR-0046). The error kind picks the
+// status; the body is always an ErrorResponse(code, message). Request-shape validation (a malformed cursor,
+// a missing body) is a 400 via ToBadRequest — it is not a domain rule, so it stays distinct from the kinds
+// the use cases return.
+public static class ErrorResults
 {
     public static IResult ToHttpResult(this Error error)
     {
@@ -20,6 +23,7 @@ internal static class ErrorResults
 
         return Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: status);
     }
-}
 
-internal sealed record ErrorResponse(string Code, string Message);
+    public static IResult ToBadRequest(this Error error) =>
+        Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: StatusCodes.Status400BadRequest);
+}

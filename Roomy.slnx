@@ -82,6 +82,9 @@
   <Folder Name="/libs/service-defaults/">
     <Project Path="libs/service-defaults/Roomy.ServiceDefaults.csproj" />
   </Folder>
+  <Folder Name="/libs/web-http/src/">
+    <Project Path="libs/web-http/src/Roomy.Web.Http.csproj" />
+  </Folder>
   <Folder Name="/libs/shared-kernel/" />
   <Folder Name="/libs/shared-kernel/src/">
     <Project Path="libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
