@@ -1,0 +1,8 @@
+<roomy-form-field [label]="label()">
+  <select #control (change)="selected.emit(control.value)">
+    <option value="">{{ placeholder() }}</option>
+    @for (option of options(); track option.value) {
+    <option [value]="option.value">{{ option.label }}</option>
+    }
+  </select>
+</roomy-form-field>
