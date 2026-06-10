@@ -22,15 +22,16 @@ describe('LanguageSwitcher', () => {
   it('marks the active language as pressed', async () => {
     await renderSwitcher();
 
-    expect(screen.getByRole('button', { name: 'English', pressed: true })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'German', pressed: false })).toBeTruthy();
+    // German is the default language, so its option is active and the labels render in German.
+    expect(screen.getByRole('button', { name: 'Deutsch', pressed: true })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Englisch', pressed: false })).toBeTruthy();
   });
 
   it('activates the chosen language when its option is clicked', async () => {
     const { transloco } = await renderSwitcher();
 
-    await userEvent.click(screen.getByRole('button', { name: 'German' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Englisch' }));
 
-    expect(transloco.getActiveLang()).toBe('de');
+    expect(transloco.getActiveLang()).toBe('en');
   });
 });

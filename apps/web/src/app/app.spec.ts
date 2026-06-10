@@ -38,45 +38,46 @@ describe('App shell', () => {
   it('renders the branding and a skip link', async () => {
     await renderShell();
 
-    expect(screen.getByText('Plan who is in which office, on which day.')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Skip to main content' })).toBeTruthy();
+    // German is the default language (ADR-0045 / spec 012), so the shell renders in German.
+    expect(screen.getByText('Planen Sie, wer an welchem Tag in welchem Büro ist.')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Zum Hauptinhalt springen' })).toBeTruthy();
     expect(screen.getByRole('main')).toBeTruthy();
   });
 
   it('switches the rendered language at runtime', async () => {
     const { fixture } = await renderShell();
 
-    expect(screen.getByText('Plan who is in which office, on which day.')).toBeTruthy();
+    expect(screen.getByText('Planen Sie, wer an welchem Tag in welchem Büro ist.')).toBeTruthy();
 
-    fixture.debugElement.injector.get(TranslocoService).setActiveLang('de');
+    fixture.debugElement.injector.get(TranslocoService).setActiveLang('en');
     await fixture.whenStable();
 
-    expect(screen.getByText('Planen Sie, wer an welchem Tag in welchem Büro ist.')).toBeTruthy();
+    expect(screen.getByText('Plan who is in which office, on which day.')).toBeTruthy();
   });
 
   it('offers a sign-in link when there is no session', async () => {
     await renderShell(null);
 
-    expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Anmelden' })).toBeTruthy();
   });
 
   it('shows the signed-in user and a sign-out control when the BFF returns one', async () => {
     await renderShell({ name: 'Ada Lovelace', roles: ['employee'] });
 
-    expect(screen.getByText('Signed in as Ada Lovelace')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Sign out' })).toBeTruthy();
+    expect(screen.getByText('Angemeldet als Ada Lovelace')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
   });
 
   it('offers an administration link to administrators', async () => {
     await renderShell({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
 
-    expect(screen.getByRole('link', { name: 'Administration' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Verwaltung' })).toBeTruthy();
   });
 
   it('does not offer the administration link to a non-administrator', async () => {
     await renderShell({ name: 'Grace Hopper', roles: ['employee'] });
 
-    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Verwaltung' })).toBeNull();
   });
 
   it('has no detectable accessibility violations', async () => {
