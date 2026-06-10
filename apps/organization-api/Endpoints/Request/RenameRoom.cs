@@ -1,3 +1,3 @@
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
 
-public sealed record RenameRoomRequest(string Name);
+public sealed record RenameRoom(string Name);

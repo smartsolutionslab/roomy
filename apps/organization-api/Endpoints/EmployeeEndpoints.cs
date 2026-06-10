@@ -1,6 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Web.Http;
@@ -20,7 +18,7 @@ public static class EmployeeEndpoints
         endpoints.MapPost("/employees", HireEmployeeAsync)
             .RequireAuthorization(policy => policy.RequireRole(AdministratorRole))
             .WithName("HireEmployee")
-            .Produces<HiredEmployeeResponse>(StatusCodes.Status202Accepted)
+            .Produces<Response.HiredEmployee>(StatusCodes.Status202Accepted)
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
         return endpoints;
@@ -30,7 +28,7 @@ public static class EmployeeEndpoints
     // missing/invalid field; 202 with the recorded employee + the pre-allocated user id and Provisioning
     // state. Administrator-only (403 otherwise, enforced by the policy).
     private static async Task<IResult> HireEmployeeAsync(
-        HireEmployeeRequest request,
+        Request.HireEmployee request,
         ICommandHandler<HireEmployee, HiredEmployee> hireEmployee,
         CancellationToken cancellationToken)
     {
@@ -55,6 +53,6 @@ public static class EmployeeEndpoints
         var hired = result.Value;
         return Results.Accepted(
             $"/employees/{hired.Employee.Value}",
-            new HiredEmployeeResponse(hired.Employee.Value, hired.User.Value, ProvisioningState.Provisioning.ToString()));
+            new Response.HiredEmployee(hired.Employee.Value, hired.User.Value, ProvisioningState.Provisioning.ToString()));
     }
 }
