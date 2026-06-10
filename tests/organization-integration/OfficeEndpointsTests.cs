@@ -11,7 +11,6 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.TestSupport;
 using Request = SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;

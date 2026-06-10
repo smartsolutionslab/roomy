@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 

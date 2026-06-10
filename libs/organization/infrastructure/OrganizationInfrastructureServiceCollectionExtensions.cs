@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
-using SmartSolutionsLab.Roomy.Organization.Application;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
