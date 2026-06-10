@@ -10,9 +10,10 @@ cursor, `{ items, nextCursor }`, default limit 50 / max 100, 400 on bad input.
 
 ## Bounded contexts touched
 - **shared-kernel** — `Page<T>`, `PageRequest`, `CursorCodec` (`…SharedKernel.Pagination`).
-- **identity** — `GET /admin/users` keyset on `(DisplayName, Identifier)`.
-- **attendance** — `/reservations/mine`, `/reservations/employees`, `/reservations/by-employee/{id}`
-  keyset on their sort keys; `/reservations?date=` envelope-only.
+- **identity** — `GET /admin/users` keyset on `Email` (unique; avoids a non-translatable Guid key).
+- **attendance** — `/reservations/mine` + `/reservations/by-employee/{id}` keyset on `Date` (unique
+  per employee); `/reservations/employees` keyset on `(Name, EmployeeId)`; `/reservations?date=`
+  envelope-only.
 - **web** — `@roomy/shared-ui` infinite-scroll; per-context `data-access` facades + feature list
   views.
 
