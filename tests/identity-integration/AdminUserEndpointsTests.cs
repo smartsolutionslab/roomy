@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Api;
-using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;

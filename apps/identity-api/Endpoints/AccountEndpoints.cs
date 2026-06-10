@@ -21,10 +21,7 @@ public static class AccountEndpoints
 
     // GET /account/me — the current user's account/role projection (IA-2/IA-5). 401 is enforced by the
     // authorization policy; a valid session whose subject has no account record is a 404.
-    private static async Task<IResult> GetCurrentAccountAsync(
-        ClaimsPrincipal principal,
-        IUserRepository users,
-        CancellationToken cancellationToken)
+    private static async Task<IResult> GetCurrentAccountAsync(ClaimsPrincipal principal, IUserRepository users, CancellationToken cancellationToken)
     {
         var subjectClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? principal.FindFirstValue("sub");
@@ -33,8 +30,8 @@ public static class AccountEndpoints
             return Results.Unauthorized();
         }
 
-        var lookup = await users.GetByKeycloakSubjectAsync(
-            KeycloakSubjectIdentifier.From(subjectValue), cancellationToken);
+        var subject = KeycloakSubjectIdentifier.From(subjectValue);
+        var lookup = await users.GetByKeycloakSubjectAsync(subject, cancellationToken);
 
         return lookup.Match(
             user => Results.Ok(new Response.Account(

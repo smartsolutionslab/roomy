@@ -1,7 +1,6 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Contracts.Identity;
-using SmartSolutionsLab.Roomy.Identity.Application.Commands;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
