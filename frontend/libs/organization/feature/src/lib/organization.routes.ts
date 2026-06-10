@@ -15,4 +15,18 @@ export const organizationRoutes: Routes = [
     },
     loadComponent: () => import('./offices/offices-page').then((module) => module.OfficesPage),
   },
+  {
+    path: 'employees/hire',
+    canActivate: [authGuard, adminGuard],
+    data: {
+      nav: {
+        labelKey: 'shell.hireLink',
+        icon: 'hire',
+        order: 65,
+        descKey: 'home.cards.hire',
+      } satisfies NavMeta,
+    },
+    loadComponent: () =>
+      import('./hire/hire-employee-page').then((module) => module.HireEmployeePage),
+  },
 ];

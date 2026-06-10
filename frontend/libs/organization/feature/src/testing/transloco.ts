@@ -51,6 +51,27 @@ const english = {
       added: 'Room {{name}} added.',
       renamed: 'Room {{name}} renamed.',
     },
+    hire: {
+      title: 'Hire a colleague',
+      intro:
+        'Record a colleague and provision their login. They can sign in once provisioning completes.',
+      nameLabel: 'Display name',
+      emailLabel: 'Work email',
+      roleLabel: 'Role',
+      rolePlaceholder: 'Select a role',
+      roleEmployee: 'Employee',
+      roleAdministrator: 'Administrator',
+      passwordLabel: 'Initial password',
+      submit: 'Hire',
+      nameRequired: 'A display name is required.',
+      emailInvalid: 'A valid work email is required.',
+      roleRequired: 'Please choose a role.',
+      passwordRequired: 'An initial password is required.',
+      started:
+        '{{name}} was hired. Their login is being provisioned — they can sign in once it is ready.',
+      invalid: 'Please check the details and try again.',
+      error: 'We could not complete the hire. Please try again.',
+    },
   },
 };
 
@@ -100,6 +121,27 @@ const german = {
       error: 'Der Raum konnte nicht gespeichert werden. Bitte erneut versuchen.',
       added: 'Raum {{name}} hinzugefügt.',
       renamed: 'Raum {{name}} umbenannt.',
+    },
+    hire: {
+      title: 'Kollegen einstellen',
+      intro:
+        'Erfassen Sie einen Kollegen und stellen Sie dessen Zugang bereit. Die Anmeldung ist möglich, sobald die Bereitstellung abgeschlossen ist.',
+      nameLabel: 'Anzeigename',
+      emailLabel: 'Arbeits-E-Mail',
+      roleLabel: 'Rolle',
+      rolePlaceholder: 'Rolle auswählen',
+      roleEmployee: 'Mitarbeiter',
+      roleAdministrator: 'Administrator',
+      passwordLabel: 'Initiales Passwort',
+      submit: 'Einstellen',
+      nameRequired: 'Ein Anzeigename ist erforderlich.',
+      emailInvalid: 'Eine gültige Arbeits-E-Mail ist erforderlich.',
+      roleRequired: 'Bitte wählen Sie eine Rolle.',
+      passwordRequired: 'Ein initiales Passwort ist erforderlich.',
+      started:
+        '{{name}} wurde eingestellt. Der Zugang wird bereitgestellt — die Anmeldung ist möglich, sobald er bereit ist.',
+      invalid: 'Bitte überprüfen Sie die Angaben und versuchen Sie es erneut.',
+      error: 'Die Einstellung konnte nicht abgeschlossen werden. Bitte erneut versuchen.',
     },
   },
 };

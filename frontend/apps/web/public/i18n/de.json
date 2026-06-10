@@ -15,7 +15,8 @@
     "myReservationsLink": "Meine Reservierungen",
     "occupancyLink": "Belegung",
     "calendarLink": "Kalender",
-    "onBehalfLink": "Im Namen"
+    "onBehalfLink": "Im Namen",
+    "hireLink": "Kollegen einstellen"
   },
   "home": {
     "title": "Willkommen bei Roomy",
@@ -34,7 +35,8 @@
       "calendar": "Durchsuchen Sie die Anwesenheit über den Monat.",
       "onBehalf": "Reservieren Sie einen Platz für eine andere Person.",
       "offices": "Verwalten Sie Büros, Räume und Kapazität.",
-      "admin": "Verwalten Sie Benutzerkonten und Rollen."
+      "admin": "Verwalten Sie Benutzerkonten und Rollen.",
+      "hire": "Stellen Sie Kollegen ein und stellen Sie deren Zugang bereit."
     }
   },
   "account": {
@@ -116,6 +118,25 @@
       "error": "Der Raum konnte nicht gespeichert werden. Bitte erneut versuchen.",
       "added": "Raum {{name}} hinzugefügt.",
       "renamed": "Raum {{name}} umbenannt."
+    },
+    "hire": {
+      "title": "Kollegen einstellen",
+      "intro": "Erfassen Sie einen Kollegen und stellen Sie dessen Zugang bereit. Die Anmeldung ist möglich, sobald die Bereitstellung abgeschlossen ist.",
+      "nameLabel": "Anzeigename",
+      "emailLabel": "Arbeits-E-Mail",
+      "roleLabel": "Rolle",
+      "rolePlaceholder": "Rolle auswählen",
+      "roleEmployee": "Mitarbeiter",
+      "roleAdministrator": "Administrator",
+      "passwordLabel": "Initiales Passwort",
+      "submit": "Einstellen",
+      "nameRequired": "Ein Anzeigename ist erforderlich.",
+      "emailInvalid": "Eine gültige Arbeits-E-Mail ist erforderlich.",
+      "roleRequired": "Bitte wählen Sie eine Rolle.",
+      "passwordRequired": "Ein initiales Passwort ist erforderlich.",
+      "started": "{{name}} wurde eingestellt. Der Zugang wird bereitgestellt — die Anmeldung ist möglich, sobald er bereit ist.",
+      "invalid": "Bitte überprüfen Sie die Angaben und versuchen Sie es erneut.",
+      "error": "Die Einstellung konnte nicht abgeschlossen werden. Bitte erneut versuchen."
     }
   },
   "attendance": {
