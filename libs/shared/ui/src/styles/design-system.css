@@ -45,6 +45,15 @@
   --roomy-gradient-soft: linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%);
   --roomy-shadow-glow: 0 18px 50px -12px rgba(249, 115, 22, 0.45);
 
+  /* Logo mark gradient stops — an SVG <stop> paints from its own colour, not the CSS gradient
+     tokens above, so the brand (flat orange) and sunset (hero) stop colours are exposed
+     individually. Kept theme-invariant so the mark reads identically in light and dark. */
+  --roomy-logo-brand-from: #ea580c;
+  --roomy-logo-brand-to: #f97316;
+  --roomy-logo-sunset-from: #fb923c;
+  --roomy-logo-sunset-mid: #f97316;
+  --roomy-logo-sunset-to: #f43f5e;
+
   /* Glass (translucent + blur) */
   --roomy-glass-bg: rgba(255, 255, 255, 0.72);
   --roomy-glass-border: rgba(24, 24, 27, 0.08);

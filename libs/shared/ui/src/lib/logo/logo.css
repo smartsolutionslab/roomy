@@ -6,10 +6,31 @@
 
 .roomy-logo__mark {
   display: block;
-  inline-size: 2rem;
-  block-size: 2rem;
-  border-radius: var(--roomy-radius-md);
-  box-shadow: var(--roomy-shadow-sm);
+  inline-size: var(--roomy-logo-size, 2rem);
+  block-size: var(--roomy-logo-size, 2rem);
+  border-radius: var(--roomy-logo-radius, var(--roomy-radius-md));
+  box-shadow: var(--roomy-logo-shadow, var(--roomy-shadow-sm));
+}
+
+/* SVG <stop> takes its colour from CSS, so the gradient recolours per variant from the design tokens. */
+.roomy-logo__stop-from {
+  stop-color: var(--roomy-logo-brand-from);
+}
+
+.roomy-logo__stop-to {
+  stop-color: var(--roomy-logo-brand-to);
+}
+
+.roomy-logo__mark--sunset .roomy-logo__stop-from {
+  stop-color: var(--roomy-logo-sunset-from);
+}
+
+.roomy-logo__mark--sunset .roomy-logo__stop-mid {
+  stop-color: var(--roomy-logo-sunset-mid);
+}
+
+.roomy-logo__mark--sunset .roomy-logo__stop-to {
+  stop-color: var(--roomy-logo-sunset-to);
 }
 
 .roomy-logo__wordmark {

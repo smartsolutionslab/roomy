@@ -28,10 +28,9 @@
 }
 
 .hero__mark {
-  inline-size: 5.5rem;
-  block-size: 5.5rem;
-  border-radius: var(--roomy-radius-lg);
-  box-shadow: var(--roomy-shadow-glow);
+  --roomy-logo-size: 5.5rem;
+  --roomy-logo-radius: var(--roomy-radius-lg);
+  --roomy-logo-shadow: var(--roomy-shadow-glow);
   margin-block-end: var(--roomy-space-sm);
 }
 

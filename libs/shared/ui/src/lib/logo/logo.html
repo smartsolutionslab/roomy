@@ -1,12 +1,21 @@
 <span class="roomy-logo">
-  <svg class="roomy-logo__mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <svg
+    class="roomy-logo__mark"
+    [class.roomy-logo__mark--sunset]="variant() === 'sunset'"
+    viewBox="0 0 64 64"
+    aria-hidden="true"
+    focusable="false"
+  >
     <defs>
-      <linearGradient id="roomyLogoTile" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#ea580c" />
-        <stop offset="1" stop-color="#f97316" />
+      <linearGradient [attr.id]="gradientId()" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+        <stop class="roomy-logo__stop-from" offset="0" />
+        @if (variant() === 'sunset') {
+        <stop class="roomy-logo__stop-mid" offset="0.5" />
+        }
+        <stop class="roomy-logo__stop-to" offset="1" />
       </linearGradient>
     </defs>
-    <rect width="64" height="64" rx="14" [attr.fill]="onAccent() ? '#ffffff' : 'url(#roomyLogoTile)'" />
+    <rect width="64" height="64" rx="14" [attr.fill]="tileFill()" />
     <g fill="none" [attr.stroke]="onAccent() ? '#f97316' : '#ffffff'" stroke-width="9" stroke-linecap="round"
       stroke-linejoin="round">
       <path d="M22 18 V48" />
