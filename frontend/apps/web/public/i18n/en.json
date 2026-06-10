@@ -15,7 +15,8 @@
     "myReservationsLink": "My reservations",
     "occupancyLink": "Occupancy",
     "calendarLink": "Calendar",
-    "onBehalfLink": "On behalf"
+    "onBehalfLink": "On behalf",
+    "hireLink": "Hire colleague"
   },
   "home": {
     "title": "Welcome to Roomy",
@@ -34,7 +35,8 @@
       "calendar": "Browse attendance across the month.",
       "onBehalf": "Reserve a place for another employee.",
       "offices": "Manage offices, rooms and capacity.",
-      "admin": "Manage user accounts and roles."
+      "admin": "Manage user accounts and roles.",
+      "hire": "Hire a colleague and provision their login."
     }
   },
   "account": {
@@ -116,6 +118,25 @@
       "error": "We could not save the room. Please try again.",
       "added": "Room {{name}} added.",
       "renamed": "Room {{name}} renamed."
+    },
+    "hire": {
+      "title": "Hire a colleague",
+      "intro": "Record a colleague and provision their login. They can sign in once provisioning completes.",
+      "nameLabel": "Display name",
+      "emailLabel": "Work email",
+      "roleLabel": "Role",
+      "rolePlaceholder": "Select a role",
+      "roleEmployee": "Employee",
+      "roleAdministrator": "Administrator",
+      "passwordLabel": "Initial password",
+      "submit": "Hire",
+      "nameRequired": "A display name is required.",
+      "emailInvalid": "A valid work email is required.",
+      "roleRequired": "Please choose a role.",
+      "passwordRequired": "An initial password is required.",
+      "started": "{{name}} was hired. Their login is being provisioned — they can sign in once it is ready.",
+      "invalid": "Please check the details and try again.",
+      "error": "We could not complete the hire. Please try again."
     }
   },
   "attendance": {

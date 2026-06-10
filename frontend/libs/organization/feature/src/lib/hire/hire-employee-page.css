@@ -1,0 +1,8 @@
+/* The page container, fields, select, button, and messages come from the shared design system
+   (roomyPage / roomy-form-field / roomy-select / roomyButton / roomy-message). Only the form's own
+   vertical rhythm is page-specific. */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-sm);
+}
