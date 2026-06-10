@@ -8,6 +8,7 @@ export type IconName =
   | 'on-behalf'
   | 'offices'
   | 'admin'
+  | 'hire'
   | 'sun'
   | 'moon';
 
