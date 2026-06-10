@@ -17,14 +17,12 @@
     } @else if (offices(); as items) { @if (items.length === 0) {
     <p>{{ translate('attendance.reserve.empty') }}</p>
     } @else {
-    <roomy-form-field [label]="translate('attendance.reserve.officeLabel')">
-      <select #officeSelect (change)="chooseOffice(officeSelect.value)">
-        <option value="">{{ translate('attendance.reserve.officePlaceholder') }}</option>
-        @for (office of items; track office.id) {
-        <option [value]="office.id">{{ office.name }}</option>
-        }
-      </select>
-    </roomy-form-field>
+    <roomy-select
+      [label]="translate('attendance.reserve.officeLabel')"
+      [placeholder]="translate('attendance.reserve.officePlaceholder')"
+      [options]="officeOptions()"
+      (selected)="chooseOffice($event)"
+    />
 
     <roomy-day-select
       [label]="translate('attendance.reserve.dayLabel')"

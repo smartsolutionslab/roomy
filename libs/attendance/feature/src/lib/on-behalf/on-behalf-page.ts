@@ -18,7 +18,7 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-data-access';
 import { cursorList } from '@roomy/shared-data-access';
-import { Button, FormField, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
+import { Button, InfiniteScroll, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 import { EMPTY } from 'rxjs';
 
 import { ReservePage } from '../reserve/reserve-page';
@@ -32,7 +32,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-on-behalf-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReservePage, InfiniteScroll, Page, FormField, Message, Button],
+  imports: [TranslocoDirective, ReservePage, InfiniteScroll, Page, Message, Button, Select],
   templateUrl: './on-behalf-page.html',
   styleUrl: './on-behalf-page.css',
 })
@@ -55,6 +55,12 @@ export class OnBehalfPage {
     () =>
       this.employeesList.items()?.find((employee) => employee.id === this.selectedEmployeeId()) ??
       null,
+  );
+  protected readonly employeeOptions = computed<SelectOption[]>(() =>
+    (this.employeesList.items() ?? []).map((employee) => ({
+      value: employee.id,
+      label: employee.name,
+    })),
   );
 
   // The chosen employee's reservations (ADR-0044/0049): deferred until a pick, then reloaded from the

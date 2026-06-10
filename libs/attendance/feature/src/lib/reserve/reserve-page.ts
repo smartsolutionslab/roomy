@@ -22,7 +22,7 @@ import {
   bookableDaysFrom,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
-import { Button, DaySelect, FormField, Message, Page } from '@roomy/shared-ui';
+import { Button, DaySelect, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
 
@@ -34,7 +34,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-reserve-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, FormField, Message, Button, DaySelect],
+  imports: [TranslocoDirective, Page, Message, Button, DaySelect, Select],
   templateUrl: './reserve-page.html',
   styleUrl: './reserve-page.css',
 })
@@ -64,6 +64,9 @@ export class ReservePage {
   protected readonly bookableDays = computed(() => bookableDaysFrom(this.today()));
   protected readonly selectedOffice = computed<BookableOffice | null>(
     () => this.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
+  );
+  protected readonly officeOptions = computed<SelectOption[]>(() =>
+    (this.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
   );
 
   constructor() {

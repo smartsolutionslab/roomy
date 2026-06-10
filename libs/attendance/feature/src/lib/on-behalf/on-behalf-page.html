@@ -21,14 +21,12 @@
       [loading]="employeesList.loading()"
       (loadMore)="employeesList.loadMore()"
     >
-    <roomy-form-field [label]="translate('attendance.onBehalf.employeeLabel')">
-      <select #employeeSelect (change)="chooseEmployee(employeeSelect.value)">
-        <option value="">{{ translate('attendance.onBehalf.employeePlaceholder') }}</option>
-        @for (employee of items; track employee.id) {
-        <option [value]="employee.id">{{ employee.name }}</option>
-        }
-      </select>
-    </roomy-form-field>
+    <roomy-select
+      [label]="translate('attendance.onBehalf.employeeLabel')"
+      [placeholder]="translate('attendance.onBehalf.employeePlaceholder')"
+      [options]="employeeOptions()"
+      (selected)="chooseEmployee($event)"
+    />
     </roomy-infinite-scroll>
 
     @if (selectedEmployee(); as employee) {

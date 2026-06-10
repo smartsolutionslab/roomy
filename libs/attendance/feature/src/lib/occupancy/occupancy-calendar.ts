@@ -21,7 +21,7 @@ import {
   roomId,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
-import { Button, FormField, Message, Page } from '@roomy/shared-ui';
+import { Button, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
 
 // The occupancy calendar (OC-3, FR-004): a month grid where each in-month day shows its occupancy figure
@@ -31,7 +31,7 @@ import { EMPTY, expand, reduce } from 'rxjs';
 @Component({
   selector: 'roomy-occupancy-calendar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, FormField, Message, Button],
+  imports: [TranslocoDirective, Page, Message, Button, Select],
   templateUrl: './occupancy-calendar.html',
   styleUrl: './occupancy-calendar.css',
 })
@@ -56,6 +56,12 @@ export class OccupancyCalendar {
 
   protected readonly selectedOffice = computed<BookableOffice | null>(
     () => this.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
+  );
+  protected readonly officeOptions = computed<SelectOption[]>(() =>
+    (this.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
+  );
+  protected readonly roomOptions = computed<SelectOption[]>(() =>
+    (this.selectedOffice()?.rooms ?? []).map((room) => ({ value: room.id, label: room.name })),
   );
   protected readonly month = computed(() => this.anchorMonth() ?? rangeFor('month', this.today()).from);
   protected readonly weeks = computed(() => monthGrid(this.month()));
