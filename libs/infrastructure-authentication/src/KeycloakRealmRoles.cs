@@ -13,16 +13,10 @@ public static class KeycloakRealmRoles
 
     public static void AddRoleClaims(ClaimsPrincipal? principal)
     {
-        if (principal?.Identity is not ClaimsIdentity identity)
-        {
-            return;
-        }
+        if (principal?.Identity is not ClaimsIdentity identity) return;
 
         var realmAccess = identity.FindFirst(RealmAccessClaim)?.Value;
-        if (string.IsNullOrEmpty(realmAccess))
-        {
-            return;
-        }
+        if (string.IsNullOrEmpty(realmAccess)) return;
 
         using var document = JsonDocument.Parse(realmAccess);
         if (!document.RootElement.TryGetProperty("roles", out var roles)

@@ -18,8 +18,5 @@ public interface IIntegrationEventOutbox
     /// the events are staged in the outbox on the same transaction as the save, then flushed for relay.
     /// An empty event set is a plain save.
     /// </summary>
-    Task SaveAndPublishAsync(
-        DbContext context,
-        IReadOnlyCollection<IIntegrationEvent> integrationEvents,
-        CancellationToken cancellationToken);
+    Task SaveAndPublishAsync(DbContext context, IReadOnlyCollection<IIntegrationEvent> integrationEvents, CancellationToken cancellationToken);
 }

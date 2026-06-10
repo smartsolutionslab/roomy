@@ -13,10 +13,7 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 /// </summary>
 public sealed class WolverineIntegrationEventOutbox(IDbContextOutbox outbox) : IIntegrationEventOutbox
 {
-    public async Task SaveAndPublishAsync(
-        DbContext context,
-        IReadOnlyCollection<IIntegrationEvent> integrationEvents,
-        CancellationToken cancellationToken)
+    public async Task SaveAndPublishAsync(DbContext context, IReadOnlyCollection<IIntegrationEvent> integrationEvents, CancellationToken cancellationToken)
     {
         outbox.Enroll(context);
 

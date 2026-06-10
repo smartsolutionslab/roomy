@@ -21,10 +21,7 @@ public static class SnakeCaseNamingConvention
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             var tableName = entity.GetTableName();
-            if (tableName is not null)
-            {
-                entity.SetTableName(ToSnakeCase(tableName));
-            }
+            if (tableName is not null) entity.SetTableName(ToSnakeCase(tableName));
 
             foreach (var property in entity.GetProperties())
             {
@@ -72,11 +69,11 @@ public static class SnakeCaseNamingConvention
 
         var builder = new StringBuilder(name.Length + 8);
 
-        for (var i = 0; i < name.Length; i++)
+        for (var index = 0; index < name.Length; index++)
         {
-            var current = name[i];
+            var current = name[index];
 
-            if (char.IsUpper(current) && i > 0 && name[i - 1] != '_' && NeedsSeparatorBefore(name, i))
+            if (char.IsUpper(current) && index > 0 && name[index - 1] != '_' && NeedsSeparatorBefore(name, index))
             {
                 builder.Append('_');
             }
@@ -92,10 +89,7 @@ public static class SnakeCaseNamingConvention
         var previous = name[index - 1];
 
         // lower/digit → Upper always starts a new word (e.g. "streamId" → "stream_id").
-        if (!char.IsUpper(previous))
-        {
-            return true;
-        }
+        if (!char.IsUpper(previous)) return true;
 
         // Upper → Upper only splits when the next char is lower, i.e. the end of an acronym run
         // beginning a new word (e.g. the "S" in "HTTPServer" → "http_server").

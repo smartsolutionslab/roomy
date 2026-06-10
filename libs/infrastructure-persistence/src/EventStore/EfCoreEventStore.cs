@@ -15,23 +15,10 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 /// the context's <c>SaveChanges</c>, keeping them atomic in one Postgres transaction (ADR-0012,
 /// ADR-0005). Snapshots and async catch-up projections are deferred.
 /// </remarks>
-public sealed class EfCoreEventStore : IEventStore
+public sealed class EfCoreEventStore(EventStoreDbContext dbContext, IEventSerializer serializer, TimeProvider timeProvider)
+    : IEventStore
 {
     private static readonly JsonSerializerOptions metadataOptions = new(JsonSerializerDefaults.Web);
-
-    private readonly EventStoreDbContext dbContext;
-    private readonly IEventSerializer serializer;
-    private readonly TimeProvider timeProvider;
-
-    public EfCoreEventStore(
-        EventStoreDbContext dbContext,
-        IEventSerializer serializer,
-        TimeProvider timeProvider)
-    {
-        this.dbContext = dbContext;
-        this.serializer = serializer;
-        this.timeProvider = timeProvider;
-    }
 
     public async Task AppendAsync(
         StreamId streamId,
@@ -40,17 +27,11 @@ public sealed class EfCoreEventStore : IEventStore
         EventMetadata metadata,
         CancellationToken cancellationToken)
     {
-        if (events.Count == 0)
-        {
-            return;
-        }
+        if (events.Count == 0) return;
 
         var currentVersion = await CurrentVersionAsync(streamId, cancellationToken).ConfigureAwait(false);
 
-        if (currentVersion != expectedVersion)
-        {
-            throw new EventStoreConcurrencyException(streamId, expectedVersion, currentVersion);
-        }
+        if (currentVersion != expectedVersion) throw new EventStoreConcurrencyException(streamId, expectedVersion, currentVersion);
 
         var occurredOnUtc = timeProvider.GetUtcNow();
         var metadataJson = JsonSerializer.Serialize(metadata, metadataOptions);
@@ -83,9 +64,7 @@ public sealed class EfCoreEventStore : IEventStore
         }
     }
 
-    public async Task<IReadOnlyList<EventEnvelope>> ReadStreamAsync(
-        StreamId streamId,
-        CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<EventEnvelope>> ReadStreamAsync(StreamId streamId, CancellationToken cancellationToken)
     {
         var rows = await dbContext.Events
             .AsNoTracking()
@@ -112,8 +91,7 @@ public sealed class EfCoreEventStore : IEventStore
     private EventEnvelope ToEnvelope(StoredEvent storedEvent)
     {
         var @event = serializer.Deserialize(storedEvent.EventType, storedEvent.Payload);
-        var metadata = JsonSerializer.Deserialize<EventMetadata>(storedEvent.Metadata, metadataOptions)
-            ?? EventMetadata.None;
+        var metadata = JsonSerializer.Deserialize<EventMetadata>(storedEvent.Metadata, metadataOptions) ?? EventMetadata.None;
 
         return new EventEnvelope(
             @event,
@@ -134,10 +112,7 @@ public sealed class EfCoreEventStore : IEventStore
         for (var inner = exception.InnerException; inner is not null; inner = inner.InnerException)
         {
             var sqlState = inner.GetType().GetProperty("SqlState")?.GetValue(inner) as string;
-            if (sqlState == "23505")
-            {
-                return true;
-            }
+            if (sqlState == "23505") return true;
         }
 
         return false;

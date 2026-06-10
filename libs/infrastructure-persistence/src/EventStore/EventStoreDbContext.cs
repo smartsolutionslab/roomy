@@ -9,13 +9,8 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 /// table; an event-sourced one derives from this and pairs it with
 /// <see cref="EfCoreEventStore"/> (ADR-0012).
 /// </summary>
-public abstract class EventStoreDbContext : EfCore.RoomyDbContext
+public abstract class EventStoreDbContext(DbContextOptions options) : EfCore.RoomyDbContext(options)
 {
-    protected EventStoreDbContext(DbContextOptions options)
-        : base(options)
-    {
-    }
-
     public DbSet<StoredEvent> Events => Set<StoredEvent>();
 
     protected override void ConfigureContext(ModelBuilder modelBuilder)
