@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 
@@ -42,6 +43,6 @@ public static class AccountEndpoints
                 user.Email.Value,
                 user.DisplayName.Value,
                 user.IsAdministrator ? "administrator" : "employee")),
-            _ => Results.NotFound());
+            error => error.ToHttpResult());
     }
 }

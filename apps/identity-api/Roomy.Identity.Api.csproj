@@ -25,6 +25,7 @@
     <ProjectReference Include="../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
     <ProjectReference Include="../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="..\..\libs\infrastructure-authentication\src\Roomy.Infrastructure.Authentication.csproj" />
+    <ProjectReference Include="..\..\libs\web-http\src\Roomy.Web.Http.csproj" />
   </ItemGroup>
 
   <ItemGroup>

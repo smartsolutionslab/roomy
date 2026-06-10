@@ -27,6 +27,7 @@
          integration events over RabbitMQ (publish-only — this context consumes nothing). -->
     <ProjectReference Include="../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="..\..\libs\infrastructure-authentication\src\Roomy.Infrastructure.Authentication.csproj" />
+    <ProjectReference Include="..\..\libs\web-http\src\Roomy.Web.Http.csproj" />
   </ItemGroup>
 
   <ItemGroup>

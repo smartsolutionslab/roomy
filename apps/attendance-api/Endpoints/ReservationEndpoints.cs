@@ -5,6 +5,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 

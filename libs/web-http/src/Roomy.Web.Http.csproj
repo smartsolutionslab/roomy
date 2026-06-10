@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Web.Http</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Web.Http</AssemblyName>
+  </PropertyGroup>
+
+  <!--
+    Shared HTTP-edge helper for the context API hosts: the single domain-Error → HTTP-result mapping and its
+    {code,message} response body (ADR-0046). Depends only on shared-kernel + ASP.NET; it carries no Domain/
+    Application/Infrastructure namespace segment, so the architecture layer rules never select it.
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

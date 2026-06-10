@@ -2,6 +2,7 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
@@ -82,15 +83,13 @@ public static class OfficeEndpoints
         var result = await createOffice.HandleAsync(new CreateOffice(name, location), cancellationToken);
         if (result.IsFailure)
         {
-            return result.Error.Type == ErrorType.Conflict
-                ? Results.Conflict(result.Error.Message)
-                : Results.Problem(result.Error.Message);
+            return result.Error.ToHttpResult();
         }
 
         var created = await offices.GetByIdentifierAsync(result.Value, cancellationToken);
         return created.Match(
             office => Results.Created($"/offices/{office.Identifier.Value}", Project(office)),
-            error => Results.Problem(error.Message));
+            error => error.ToHttpResult());
     }
 
     // GET /offices — every office with its rooms and derived capacity.
@@ -109,7 +108,7 @@ public static class OfficeEndpoints
         CancellationToken cancellationToken)
     {
         var office = await offices.GetByIdentifierAsync(OfficeIdentifier.From(officeId), cancellationToken);
-        return office.Match(found => Results.Ok(Project(found)), _ => Results.NotFound());
+        return office.Match(found => Results.Ok(Project(found)), error => error.ToHttpResult());
     }
 
     // PATCH /offices/{officeId}/name — renames the office. 400 blank, 404 unknown, 409 name taken.
@@ -172,7 +171,7 @@ public static class OfficeEndpoints
             new AddRoomToOffice(identifier, name, capacity.Value), cancellationToken);
         if (result.IsFailure)
         {
-            return MapError(result.Error);
+            return result.Error.ToHttpResult();
         }
 
         var office = await offices.GetByIdentifierAsync(identifier, cancellationToken);
@@ -216,19 +215,12 @@ public static class OfficeEndpoints
     {
         if (result.IsFailure)
         {
-            return MapError(result.Error);
+            return result.Error.ToHttpResult();
         }
 
         var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
-        return office.Match(found => Results.Ok(Project(found)), _ => Results.NotFound());
+        return office.Match(found => Results.Ok(Project(found)), error => error.ToHttpResult());
     }
-
-    private static IResult MapError(Error error) => error.Type switch
-    {
-        ErrorType.NotFound => Results.NotFound(),
-        ErrorType.Conflict => Results.Conflict(error.Message),
-        _ => Results.Problem(error.Message),
-    };
 
     private static OfficeResponse Project(Office office) =>
         new(
