@@ -150,52 +150,6 @@
   color: var(--roomy-color-text-muted);
 }
 
-/* ---------- Buttons (shared) ---------- */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--roomy-space-sm) var(--roomy-space-md);
-  border: 1px solid var(--roomy-color-border);
-  border-radius: var(--roomy-radius-md);
-  background: var(--roomy-color-surface);
-  color: var(--roomy-color-text);
-  font: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    color var(--roomy-transition),
-    border-color var(--roomy-transition),
-    background var(--roomy-transition),
-    box-shadow var(--roomy-transition),
-    transform var(--roomy-transition);
-}
-
-.btn:hover {
-  border-color: var(--roomy-color-accent);
-  color: var(--roomy-color-accent-strong);
-}
-
-.btn:focus-visible {
-  outline: var(--roomy-focus-outline);
-  outline-offset: var(--roomy-focus-outline-offset);
-}
-
-.btn--accent {
-  border-color: transparent;
-  background: var(--roomy-color-accent-strong);
-  color: var(--roomy-color-on-accent);
-}
-
-.btn--accent:hover {
-  border-color: transparent;
-  color: var(--roomy-color-on-accent);
-  background: var(--roomy-gradient-accent);
-  box-shadow: var(--roomy-shadow-glow);
-  transform: translateY(-1px);
-}
-
 @media (max-width: 640px) {
   .topbar__tagline {
     display: none;

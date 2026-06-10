@@ -5,7 +5,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { SessionService } from '@roomy/shared-data-access';
 import { ThemeToggle, UserMenu } from '@roomy/shared-feature';
-import { AppLayout, RoomyLogo } from '@roomy/shared-ui';
+import { AppLayout, Button, RoomyLogo } from '@roomy/shared-ui';
 
 import { LanguageSwitcher } from './shell/language-switcher';
 
@@ -22,6 +22,7 @@ import { LanguageSwitcher } from './shell/language-switcher';
     UserMenu,
     RoomyLogo,
     AppLayout,
+    Button,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

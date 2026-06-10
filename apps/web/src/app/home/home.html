@@ -7,7 +7,7 @@
     </header>
 
     <div class="dash__grid">
-      <a class="card" routerLink="/attendance/reserve">
+      <a roomyCard interactive routerLink="/attendance/reserve">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -19,7 +19,7 @@
         <span class="card__desc">{{ translate('home.cards.reserve') }}</span>
       </a>
 
-      <a class="card" routerLink="/attendance/mine">
+      <a roomyCard interactive routerLink="/attendance/mine">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -31,7 +31,7 @@
         <span class="card__desc">{{ translate('home.cards.mine') }}</span>
       </a>
 
-      <a class="card" routerLink="/attendance/occupancy">
+      <a roomyCard interactive routerLink="/attendance/occupancy">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -43,7 +43,7 @@
         <span class="card__desc">{{ translate('home.cards.occupancy') }}</span>
       </a>
 
-      <a class="card" routerLink="/attendance/calendar">
+      <a roomyCard interactive routerLink="/attendance/calendar">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -56,7 +56,7 @@
       </a>
 
       @if (user.roles.includes('administrator')) {
-      <a class="card" routerLink="/attendance/on-behalf">
+      <a roomyCard interactive routerLink="/attendance/on-behalf">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -68,7 +68,7 @@
         <span class="card__desc">{{ translate('home.cards.onBehalf') }}</span>
       </a>
 
-      <a class="card" routerLink="/offices">
+      <a roomyCard interactive routerLink="/offices">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -80,7 +80,7 @@
         <span class="card__desc">{{ translate('home.cards.offices') }}</span>
       </a>
 
-      <a class="card" routerLink="/admin/users">
+      <a roomyCard interactive routerLink="/admin/users">
         <span class="card__icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

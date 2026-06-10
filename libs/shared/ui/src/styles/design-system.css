@@ -1,0 +1,371 @@
+/*
+ * Roomy design system — the single global stylesheet (ADR-0048).
+ * Owns the design tokens, the web font, base element styling, and the low-level utility
+ * classes the shared-ui primitives (roomyButton/roomyCard/roomyPage) and feature pages
+ * compose. Loaded once by the app build (apps/web/project.json `styles`). Evolves the
+ * "vanilla, component-local CSS" baseline of ADR-0019/0021 with a deliberate global layer.
+ */
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/manrope-variable.woff2') format('woff2-variations');
+}
+
+:root {
+  /* Surfaces & text — cool zinc neutrals */
+  --roomy-color-background: #fafafa;
+  --roomy-color-background-muted: #f4f4f5;
+  --roomy-color-surface: #ffffff;
+  --roomy-color-surface-raised: #ffffff;
+  --roomy-color-text: #18181b;
+  --roomy-color-text-muted: #71717a;
+  --roomy-color-border: #e4e4e7;
+
+  /* Brand accent — vivid orange. `accent` is the brand/decorative tone (logo, gradients,
+     large/icon use); text-bearing controls use `accent-strong` so white-on-orange clears
+     WCAG 2.2 AA (~5:1). The sunset gradient is reserved for hero/large surfaces. */
+  --roomy-color-accent: #f97316;
+  --roomy-color-accent-strong: #c2410c;
+  --roomy-color-accent-hover: #9a3412;
+  --roomy-color-accent-subtle: #fff7ed;
+  --roomy-color-accent-muted: #ffedd5;
+  --roomy-color-on-accent: #ffffff;
+  --roomy-color-rose: #f43f5e;
+
+  /* Functional */
+  --roomy-color-danger: #dc2626;
+  --roomy-color-danger-subtle: #fef2f2;
+
+  /* Sunset gradients + glow */
+  --roomy-gradient-accent: linear-gradient(135deg, #fb923c 0%, #f97316 45%, #f43f5e 100%);
+  --roomy-gradient-sidebar: linear-gradient(180deg, #fb923c 0%, #f97316 52%, #ea580c 100%);
+  --roomy-gradient-soft: linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%);
+  --roomy-shadow-glow: 0 18px 50px -12px rgba(249, 115, 22, 0.45);
+
+  /* Glass (translucent + blur) */
+  --roomy-glass-bg: rgba(255, 255, 255, 0.72);
+  --roomy-glass-border: rgba(24, 24, 27, 0.08);
+  --roomy-blur: saturate(160%) blur(12px);
+  --roomy-blur-strong: saturate(180%) blur(26px);
+  --roomy-glass-card: rgba(255, 255, 255, 0.4);
+  --roomy-glass-highlight: rgba(255, 255, 255, 0.6);
+
+  /* Ambient page background — a warm sunset aurora + glow, kept airy (more transparent in
+     light; the dark blocks below use a stronger warm aurora). */
+  --roomy-shell-image: url('/aurora-soft.svg');
+  --roomy-shell-tint:
+    radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.07), transparent 60%),
+    radial-gradient(30rem 20rem at -6% 8%, rgba(251, 191, 36, 0.05), transparent 60%);
+  --roomy-hero-glow:
+    radial-gradient(40rem 28rem at 70% -10%, rgba(249, 115, 22, 0.18), transparent 60%),
+    radial-gradient(34rem 24rem at 10% 110%, rgba(251, 191, 36, 0.12), transparent 60%);
+  --roomy-texture-dot: rgba(24, 24, 27, 0.05);
+
+  /* Spacing scale */
+  --roomy-space-xs: 0.25rem;
+  --roomy-space-sm: 0.5rem;
+  --roomy-space-md: 1rem;
+  --roomy-space-lg: 2rem;
+  --roomy-space-xl: 3rem;
+
+  /* Radius scale */
+  --roomy-radius-sm: 0.375rem;
+  --roomy-radius-md: 0.625rem;
+  --roomy-radius-lg: 1rem;
+  --roomy-radius-xl: 1.5rem;
+  --roomy-radius-full: 9999px;
+
+  /* Elevation — subtle, layered (low-opacity zinc) */
+  --roomy-shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.06), 0 1px 1px rgba(24, 24, 27, 0.04);
+  --roomy-shadow-md: 0 4px 12px rgba(24, 24, 27, 0.08), 0 2px 4px rgba(24, 24, 27, 0.05);
+  --roomy-shadow-lg: 0 12px 32px rgba(24, 24, 27, 0.12), 0 4px 8px rgba(24, 24, 27, 0.06);
+
+  --roomy-transition: 150ms ease;
+
+  /* Typography */
+  --roomy-font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --roomy-font-size-sm: 0.875rem;
+  --roomy-font-size-base: 1rem;
+  --roomy-font-size-lg: 1.25rem;
+  --roomy-font-size-xl: 1.5rem;
+  --roomy-font-size-2xl: 2rem;
+  --roomy-font-size-3xl: 2.75rem;
+  --roomy-font-size-4xl: 3.5rem;
+  --roomy-font-weight-medium: 500;
+  --roomy-font-weight-semibold: 600;
+  --roomy-font-weight-bold: 700;
+
+  /* Focus & accessibility */
+  --roomy-focus-outline: 2px solid var(--roomy-color-accent-strong);
+  --roomy-focus-outline-offset: 2px;
+}
+
+/* Dark theme. Applies when the OS prefers dark and the user has not forced light,
+   or whenever the user explicitly selects dark via the toggle (data-theme wins). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --roomy-color-background: #16161b;
+    --roomy-color-background-muted: #1e1e24;
+    --roomy-color-surface: #1f1f26;
+    --roomy-color-surface-raised: #2a2a31;
+    --roomy-color-text: #fafafa;
+    --roomy-color-text-muted: #a1a1aa;
+    --roomy-color-border: #35353d;
+
+    --roomy-color-accent: #fb923c;
+    --roomy-color-accent-strong: #f97316;
+    --roomy-color-accent-hover: #fdba74;
+    --roomy-color-accent-subtle: #27170b;
+    --roomy-color-accent-muted: #3a1e0a;
+    --roomy-color-on-accent: #18181b;
+
+    --roomy-color-danger: #f87171;
+    --roomy-color-danger-subtle: #2a1416;
+
+    --roomy-gradient-soft: linear-gradient(135deg, #1c1206 0%, #1e0f12 100%);
+    --roomy-glass-bg: rgba(31, 31, 38, 0.5);
+    --roomy-glass-border: rgba(255, 255, 255, 0.16);
+    --roomy-glass-card: rgba(255, 255, 255, 0.07);
+    --roomy-glass-highlight: rgba(255, 255, 255, 0.14);
+    --roomy-texture-dot: rgba(255, 255, 255, 0.035);
+    --roomy-shell-image: url('/aurora.svg');
+    --roomy-shell-tint:
+      radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.12), transparent 60%),
+      radial-gradient(30rem 20rem at -6% 8%, rgba(251, 146, 60, 0.08), transparent 60%);
+    --roomy-hero-glow:
+      radial-gradient(40rem 28rem at 70% -10%, rgba(249, 115, 22, 0.28), transparent 60%),
+      radial-gradient(34rem 24rem at 10% 110%, rgba(251, 191, 36, 0.18), transparent 60%);
+  }
+}
+
+:root[data-theme='dark'] {
+  --roomy-color-background: #16161b;
+  --roomy-color-background-muted: #1e1e24;
+  --roomy-color-surface: #1f1f26;
+  --roomy-color-surface-raised: #2a2a31;
+  --roomy-color-text: #fafafa;
+  --roomy-color-text-muted: #a1a1aa;
+  --roomy-color-border: #35353d;
+
+  --roomy-color-accent: #fb923c;
+  --roomy-color-accent-strong: #f97316;
+  --roomy-color-accent-hover: #fdba74;
+  --roomy-color-accent-subtle: #27170b;
+  --roomy-color-accent-muted: #3a1e0a;
+  --roomy-color-on-accent: #18181b;
+
+  --roomy-color-danger: #f87171;
+  --roomy-color-danger-subtle: #2a1416;
+
+  --roomy-gradient-soft: linear-gradient(135deg, #1c1206 0%, #1e0f12 100%);
+  --roomy-glass-bg: rgba(31, 31, 38, 0.5);
+  --roomy-glass-border: rgba(255, 255, 255, 0.16);
+  --roomy-glass-card: rgba(255, 255, 255, 0.07);
+  --roomy-glass-highlight: rgba(255, 255, 255, 0.14);
+  --roomy-texture-dot: rgba(255, 255, 255, 0.035);
+  --roomy-shell-image: url('/aurora.svg');
+  --roomy-shell-tint:
+    radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.12), transparent 60%),
+    radial-gradient(30rem 20rem at -6% 8%, rgba(251, 146, 60, 0.08), transparent 60%);
+  --roomy-hero-glow:
+    radial-gradient(40rem 28rem at 70% -10%, rgba(249, 115, 22, 0.28), transparent 60%),
+    radial-gradient(34rem 24rem at 10% 110%, rgba(251, 191, 36, 0.18), transparent 60%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background-color: var(--roomy-color-background);
+  background-image: var(--roomy-shell-image, none),
+    radial-gradient(circle at center, var(--roomy-texture-dot) 1px, transparent 1.6px);
+  background-repeat: no-repeat, repeat;
+  background-position: top center, top left;
+  background-size: 100% auto, 22px 22px;
+  background-attachment: fixed, scroll;
+  color: var(--roomy-color-text);
+  font-family: var(--roomy-font-family);
+  font-size: var(--roomy-font-size-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* One consistent focus ring for every interactive element (zero-specificity so components
+   can still override). Replaces the per-page focus rules that had drifted. */
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: var(--roomy-focus-outline-offset);
+}
+
+/* ---------- Utility primitives (composed by directives + feature pages) ---------- */
+
+/* Button — roomyButton directive applies .roomy-button (+ --accent). */
+.roomy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  background: var(--roomy-color-surface);
+  color: var(--roomy-color-text);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color var(--roomy-transition),
+    border-color var(--roomy-transition),
+    background var(--roomy-transition),
+    box-shadow var(--roomy-transition),
+    transform var(--roomy-transition);
+}
+
+.roomy-button:hover {
+  border-color: var(--roomy-color-accent);
+  color: var(--roomy-color-accent-strong);
+}
+
+.roomy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.roomy-button--accent {
+  border-color: transparent;
+  background: var(--roomy-color-accent-strong);
+  color: var(--roomy-color-on-accent);
+}
+
+.roomy-button--accent:hover {
+  border-color: transparent;
+  color: var(--roomy-color-on-accent);
+  background: var(--roomy-gradient-accent);
+  box-shadow: var(--roomy-shadow-glow);
+  transform: translateY(-1px);
+}
+
+/* Card — roomyCard directive applies .roomy-card (+ --interactive for link/button cards). */
+.roomy-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+  padding: var(--roomy-space-lg);
+  border: 1px solid var(--roomy-glass-border);
+  border-radius: var(--roomy-radius-lg);
+  background: var(--roomy-glass-card);
+  backdrop-filter: var(--roomy-blur-strong);
+  -webkit-backdrop-filter: var(--roomy-blur-strong);
+  box-shadow:
+    inset 0 1px 0 var(--roomy-glass-highlight),
+    var(--roomy-shadow-md);
+  color: var(--roomy-color-text);
+  text-decoration: none;
+}
+
+.roomy-card--interactive {
+  transition:
+    transform var(--roomy-transition),
+    box-shadow var(--roomy-transition),
+    border-color var(--roomy-transition);
+}
+
+.roomy-card--interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--roomy-color-accent);
+  box-shadow:
+    inset 0 1px 0 var(--roomy-glass-highlight),
+    var(--roomy-shadow-lg);
+}
+
+/* Page container — roomyPage directive applies .roomy-page (+ size modifier). */
+.roomy-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-md);
+}
+
+.roomy-page--form {
+  max-inline-size: 40rem;
+}
+
+.roomy-page--content {
+  max-inline-size: 48rem;
+}
+
+.roomy-page--wide {
+  max-inline-size: 64rem;
+}
+
+/* Lists */
+.roomy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-sm);
+}
+
+.roomy-list-item {
+  display: flex;
+  gap: var(--roomy-space-md);
+  align-items: center;
+}
+
+.roomy-list-item--card {
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+}
+
+/* Data table */
+.roomy-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.roomy-table th,
+.roomy-table td {
+  text-align: start;
+  padding: var(--roomy-space-xs) var(--roomy-space-sm);
+  border-block-end: 1px solid var(--roomy-color-border);
+  vertical-align: top;
+}
+
+/* Description list (key/value pairs) */
+.roomy-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--roomy-space-xs) var(--roomy-space-sm);
+  margin: 0;
+}
+
+.roomy-dl dt {
+  font-weight: var(--roomy-font-weight-semibold);
+}
+
+.roomy-dl dd {
+  margin: 0;
+}
+
+.roomy-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

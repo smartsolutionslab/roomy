@@ -19,7 +19,7 @@
             "input": "apps/web/public"
           }
         ],
-        "styles": ["apps/web/src/styles.css"]
+        "styles": ["libs/shared/ui/src/styles/design-system.css", "apps/web/src/styles.css"]
       },
       "configurations": {
         "production": {
