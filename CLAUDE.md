@@ -271,6 +271,10 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   `ArgumentNullException.ThrowIfNull(...)` / the `ThrowIf*` helpers.
 - **One type per file** (a generic + non-generic overload of one concept may share a file);
   a single-statement guard clause may be one line without braces (`if (x) return;`).
+- **API-host endpoint DTOs live in `Endpoints/Request/` and `Endpoints/Response/`** subfolders
+  with matching sub-namespaces (gateway BFF: `Bff/Request`, `Bff/Response`); `*Response` records
+  and `*Page` wrappers under `Response/`, `*Request` under `Request/`, endpoint classes stay in
+  `Endpoints/` (ADR-0049).
 - **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`.
 - **No framework in `domain`/`application`** — owned abstractions only (ADR-0005).
 - **C#:** root namespace `SmartSolutionsLab.Roomy` · file-scoped namespaces · `nullable`
