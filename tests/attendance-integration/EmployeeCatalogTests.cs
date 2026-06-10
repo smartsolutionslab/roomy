@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
+using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
@@ -22,7 +23,7 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
         });
 
         await using var query = fixture.CreateDbContext();
-        var page = await new EmployeeCatalog(query).GetAsync(FirstPage, TestContext.Current.CancellationToken);
+        var page = await new EmployeeCatalog(query).GetAsync(SearchTerm.None, FirstPage, TestContext.Current.CancellationToken);
 
         var employees = page.Value.Items;
         employees.Select(employee => employee.Name).ShouldContain("Ada");
@@ -53,7 +54,7 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
         var guard = 0;
         do
         {
-            var page = await catalog.GetAsync(Page(limit: 2, cursor), TestContext.Current.CancellationToken);
+            var page = await catalog.GetAsync(SearchTerm.None, Page(limit: 2, cursor), TestContext.Current.CancellationToken);
             if (page.Value.NextCursor is not null)
             {
                 page.Value.Items.Count.ShouldBe(2);
@@ -76,7 +77,7 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
     {
         await using var query = fixture.CreateDbContext();
         var page = await new EmployeeCatalog(query)
-            .GetAsync(Page(limit: 2, cursor: "not-a-cursor"), TestContext.Current.CancellationToken);
+            .GetAsync(SearchTerm.None, Page(limit: 2, cursor: "not-a-cursor"), TestContext.Current.CancellationToken);
 
         page.IsFailure.ShouldBeTrue();
     }

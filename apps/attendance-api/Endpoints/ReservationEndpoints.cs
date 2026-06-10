@@ -5,6 +5,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.SharedKernel.Search;
 using SmartSolutionsLab.Roomy.Web.Http;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
@@ -123,8 +124,11 @@ public static class ReservationEndpoints
     }
 
     // GET /reservations/employees — the directory an administrator picks from to act on behalf (009,
-    // AT-6). Administrator-only on the server (FR-009), not merely UI-hidden.
+    // AT-6). Administrator-only on the server (FR-009), not merely UI-hidden. An optional q searches by name
+    // similarity, best match first; a blank q lists in the existing keyset order (012, ADR-0047). An over-long
+    // q is rejected here as a 400 before any query runs.
     private static async Task<IResult> ViewEmployeesAsync(
+        string? q,
         string? cursor,
         int? limit,
         ClaimsPrincipal principal,
@@ -136,13 +140,19 @@ public static class ReservationEndpoints
             return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
         }
 
+        var searchTerm = SearchTerm.From(q);
+        if (searchTerm.IsFailure)
+        {
+            return BadRequest(searchTerm.Error);
+        }
+
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure)
         {
             return BadRequest(pageRequest.Error);
         }
 
-        var result = await view.HandleAsync(new ViewEmployees(pageRequest.Value), cancellationToken);
+        var result = await view.HandleAsync(new ViewEmployees(searchTerm.Value, pageRequest.Value), cancellationToken);
 
         return result.Match(
             employees => Results.Ok(new EmployeePage(

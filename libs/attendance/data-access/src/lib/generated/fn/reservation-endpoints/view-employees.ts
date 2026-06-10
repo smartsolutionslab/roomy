@@ -10,6 +10,7 @@ import { RequestBuilder } from '../../request-builder';
 import { EmployeePage } from '../../models/employee-page';
 
 export interface ViewEmployees$Params {
+  q?: string;
   cursor?: string;
   limit?: (number | string);
 }
@@ -17,6 +18,7 @@ export interface ViewEmployees$Params {
 export function viewEmployees(http: HttpClient, rootUrl: string, params?: ViewEmployees$Params, context?: HttpContext): Observable<StrictHttpResponse<EmployeePage>> {
   const rb = new RequestBuilder(rootUrl, viewEmployees.PATH, 'get');
   if (params) {
+    rb.query('q', params.q, {});
     rb.query('cursor', params.cursor, {});
     rb.query('limit', params.limit, {});
   }
