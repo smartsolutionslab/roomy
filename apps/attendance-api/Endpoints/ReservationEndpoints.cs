@@ -299,25 +299,3 @@ public static class ReservationEndpoints
     }
 }
 
-internal sealed record ReserveRequest(Guid OfficeId, Guid RoomId, DateOnly Date, Guid? OnBehalfOf = null);
-
-internal sealed record ReservationResponse(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
-
-internal sealed record EmployeeResponse(Guid EmployeeId, string Name);
-
-internal sealed record MyReservationResponse(
-    Guid ReservationId,
-    Guid OfficeId,
-    string OfficeName,
-    Guid RoomId,
-    string RoomName,
-    DateOnly Date);
-
-// One keyset-paginated page per list (ADR-0044): the items in their stable sort order plus the opaque
-// cursor that locates the next page — null when the list is exhausted. Concrete per-list records keep
-// the emitted OpenAPI schema names stable for the drift gate (ADR-0036).
-internal sealed record ReservationPage(IReadOnlyList<ReservationResponse> Items, string? NextCursor);
-
-internal sealed record MyReservationPage(IReadOnlyList<MyReservationResponse> Items, string? NextCursor);
-
-internal sealed record EmployeePage(IReadOnlyList<EmployeeResponse> Items, string? NextCursor);

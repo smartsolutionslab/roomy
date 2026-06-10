@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
@@ -95,19 +94,3 @@ public static class OccupancyEndpoints
                     .ToList())).ToList());
 }
 
-internal sealed record OccupancyDayResponse(
-    DateOnly Date,
-    OfficeOccupancyResponse Office,
-    IReadOnlyList<RoomOccupancyResponse> Rooms);
-
-internal sealed record OfficeOccupancyResponse(Guid OfficeId, string Name, int Occupied, int Capacity, bool IsFull);
-
-internal sealed record RoomOccupancyResponse(
-    Guid RoomId,
-    string Name,
-    int Occupied,
-    int Capacity,
-    bool IsFull,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<OccupantResponse>? Occupants);
-
-internal sealed record OccupantResponse(Guid EmployeeId, string Name);
