@@ -49,22 +49,16 @@ public static class OccupancyEndpoints
         var rangeFrom = from ?? today;
         var rangeTo = to ?? rangeFrom;
 
-        if (rangeTo < rangeFrom || rangeTo.DayNumber - rangeFrom.DayNumber + 1 > MaxRangeDays)
+        if (BookingDateRange.TryParse(rangeFrom, rangeTo) is not { } range || range.LengthInDays > MaxRangeDays)
         {
-            return Error.Validation(
-                "range_too_large",
-                $"The range must be a non-empty span of at most {MaxRangeDays} days.").ToHttpResult();
+            return Error.Validation("range_too_large", $"The range must be a non-empty span of at most {MaxRangeDays} days.").ToHttpResult();
         }
 
         var scope = officeId is { } office
             ? OccupancyScope.ForOffice(OfficeIdentifier.From(office))
             : OccupancyScope.ForRoom(RoomIdentifier.From(roomId!.Value));
 
-        var query = new ViewOccupancy(
-            CompanyIdentifier.From(options.CompanyId),
-            scope,
-            BookingDate.From(rangeFrom),
-            BookingDate.From(rangeTo));
+        var query = new ViewOccupancy(CompanyIdentifier.From(options.CompanyId), scope, range);
 
         var result = await view.HandleAsync(query, cancellationToken);
 

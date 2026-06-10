@@ -14,7 +14,6 @@ public interface IOccupancyReadModel
     Task<Result<OccupancyData>> GetAsync(
         CompanyIdentifier company,
         OccupancyScope scope,
-        BookingDate from,
-        BookingDate to,
+        BookingDateRange range,
         CancellationToken cancellationToken);
 }

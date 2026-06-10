@@ -18,8 +18,8 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProv
 
     public async Task<Result<IReadOnlyList<OccupancyView>>> HandleAsync(ViewOccupancy query, CancellationToken cancellationToken)
     {
-        var (company, scope, from, to) = query;
-        var data = await readModel.GetAsync(company, scope, from, to, cancellationToken);
+        var (company, scope, range) = query;
+        var data = await readModel.GetAsync(company, scope, range, cancellationToken);
 
         if (data.IsFailure) return data.Error;
 
@@ -27,10 +27,10 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProv
         var tomorrow = today.AddDays(1);
 
         var views = new List<OccupancyView>();
-        for (var date = query.From.Value; date <= query.To.Value; date = date.AddDays(1))
+        foreach (var date in range.Days())
         {
-            var showNames = date == today || date == tomorrow;
-            views.Add(BuildDay(BookingDate.From(date), data.Value, showNames));
+            var showNames = date.Value == today || date.Value == tomorrow;
+            views.Add(BuildDay(date, data.Value, showNames));
         }
 
         return Result.Success<IReadOnlyList<OccupancyView>>(views);

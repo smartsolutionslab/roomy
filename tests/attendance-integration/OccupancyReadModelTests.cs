@@ -76,8 +76,7 @@ public sealed class OccupancyReadModelTests(PostgresEventStoreFixture fixture)
         var result = await new OccupancyReadModel(fixture.CreateDbContext()).GetAsync(
             CompanyIdentifier.New(),
             OccupancyScope.ForOffice(OfficeIdentifier.New()),
-            BookingDate.From(date),
-            BookingDate.From(date),
+            BookingDateRange.Between(date, date),
             TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
@@ -90,8 +89,7 @@ public sealed class OccupancyReadModelTests(PostgresEventStoreFixture fixture)
         var result = await new OccupancyReadModel(fixture.CreateDbContext()).GetAsync(
             CompanyIdentifier.New(),
             OccupancyScope.ForRoom(RoomIdentifier.New()),
-            BookingDate.From(date),
-            BookingDate.From(date),
+            BookingDateRange.Between(date, date),
             TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
@@ -104,8 +102,7 @@ public sealed class OccupancyReadModelTests(PostgresEventStoreFixture fixture)
         var result = await new OccupancyReadModel(query).GetAsync(
             CompanyIdentifier.From(company),
             scope,
-            BookingDate.From(date),
-            BookingDate.From(date),
+            BookingDateRange.Between(date, date),
             TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();

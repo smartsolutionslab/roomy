@@ -9,5 +9,4 @@ namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 public sealed record ViewOccupancy(
     CompanyIdentifier Company,
     OccupancyScope Scope,
-    BookingDate From,
-    BookingDate To) : IQuery<IReadOnlyList<OccupancyView>>;
+    BookingDateRange Range) : IQuery<IReadOnlyList<OccupancyView>>;
