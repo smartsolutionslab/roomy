@@ -5,9 +5,10 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { SessionService } from '@roomy/shared-data-access';
 import { ThemeToggle, UserMenu } from '@roomy/shared-feature';
-import { AppLayout, Button, RoomyLogo } from '@roomy/shared-ui';
+import { AppLayout, Icon, RoomyLogo } from '@roomy/shared-ui';
 
 import { LanguageSwitcher } from './shell/language-switcher';
+import { Topbar } from './shell/topbar';
 
 @Component({
   selector: 'roomy-root',
@@ -22,7 +23,8 @@ import { LanguageSwitcher } from './shell/language-switcher';
     UserMenu,
     RoomyLogo,
     AppLayout,
-    Button,
+    Icon,
+    Topbar,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

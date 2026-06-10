@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ThemeService } from '@roomy/shared-data-access';
+import { Icon } from '@roomy/shared-ui';
 
 // A single accessible control that flips the colour theme. The button's accessible name announces the
 // action it performs (switch to the other theme) and `aria-pressed` reflects whether dark is active, so
@@ -8,7 +9,7 @@ import { ThemeService } from '@roomy/shared-data-access';
 @Component({
   selector: 'roomy-theme-toggle',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, Icon],
   templateUrl: './theme-toggle.html',
   styleUrl: './theme-toggle.css',
 })

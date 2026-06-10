@@ -7,3 +7,5 @@ export { Card } from './lib/card/card';
 export { Page } from './lib/page/page';
 export { FormField } from './lib/form-field/form-field';
 export { Message } from './lib/message/message';
+export { Icon, type IconName } from './lib/icon/icon';
+export { DaySelect } from './lib/day-select/day-select';

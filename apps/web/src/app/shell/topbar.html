@@ -1,0 +1,11 @@
+<header class="topbar" *transloco="let translate">
+  <a class="topbar__brand" routerLink="/" [attr.aria-label]="translate('shell.appName')">
+    <roomy-logo [showWordmark]="true" />
+  </a>
+  <span class="topbar__tagline">{{ translate('shell.tagline') }}</span>
+  <div class="topbar__controls">
+    <roomy-theme-toggle />
+    <roomy-language-switcher />
+    <a roomyButton variant="accent" href="/bff/login?returnUrl=/">{{ translate('shell.signIn') }}</a>
+  </div>
+</header>

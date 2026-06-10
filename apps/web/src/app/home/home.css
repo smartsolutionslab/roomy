@@ -124,6 +124,7 @@
 /* Card surface comes from the shared `roomyCard` primitive; these are the dashboard-specific
    contents projected inside it. */
 .card__icon {
+  --roomy-icon-size: 1.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -133,11 +134,6 @@
   border-radius: var(--roomy-radius-md);
   background: var(--roomy-color-accent-muted);
   color: var(--roomy-color-accent-strong);
-}
-
-.card__icon svg {
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
 }
 
 .card__title {
