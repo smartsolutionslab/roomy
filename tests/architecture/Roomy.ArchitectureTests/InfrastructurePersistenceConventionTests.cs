@@ -42,9 +42,6 @@ public sealed class InfrastructurePersistenceConventionTests
     [Fact]
     public void InfrastructurePersistence_is_allowed_to_depend_on_ef_core()
     {
-        // Documents the infra-vs-core distinction: this is the one place a dependency on EF Core is
-        // legitimate. The assertion confirms the baseline actually uses EF Core (so the allowance is
-        // real, not theoretical) and that no core rule has been mis-scoped to forbid it here.
         var dependsOnEfCore = Types.InAssembly(ArchitectureConventions.InfrastructurePersistenceAssembly)
             .That()
             .HaveDependencyOn("Microsoft.EntityFrameworkCore")

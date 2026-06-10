@@ -11,9 +11,6 @@ using SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// The identity infrastructure registrations are pure DI wiring — no database or Keycloak is contacted
-// by registering or resolving them — so this is a fast, container-free check that the composition root
-// binds the ports to their adapters.
 public sealed class IdentityInfrastructureRegistrationTests
 {
     [Fact]

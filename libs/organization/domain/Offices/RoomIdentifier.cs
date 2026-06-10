@@ -2,8 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// The identity of a Room within an Office: a branded, time-ordered GUIDv7. The implicit Guid
-// conversions keep the EF Core value converter trivial.
 public readonly record struct RoomIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

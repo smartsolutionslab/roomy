@@ -8,10 +8,6 @@ using SmartSolutionsLab.Roomy.Identity.Api;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// The identity host publishes an OpenAPI document (ADR-0018/0036) that the typed Angular client is
-// generated from. This boots the host in-process — no database, no external infra — and asserts the
-// document advertises the account contract with accurate response types, so a drift in endpoint
-// metadata is caught before the generated client is regenerated.
 public sealed class OpenApiDocumentTests : IDisposable
 {
     private readonly WebApplicationFactory<IdentityApiHost> app;
@@ -29,8 +25,6 @@ public sealed class OpenApiDocumentTests : IDisposable
             webHost.UseSetting("DefaultAdmin:DisplayName", "Default Admin");
             webHost.UseSetting("DefaultAdmin:InitialPassword", "default-admin-password");
 
-            // The document is built from endpoint metadata alone; drop the hosted services (Wolverine
-            // runtime, DefaultAdmin seeder) that would otherwise connect to external infra on start.
             webHost.ConfigureTestServices(services => services.RemoveAll<IHostedService>());
         });
     }

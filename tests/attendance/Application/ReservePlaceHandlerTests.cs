@@ -9,10 +9,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
-// The reserve use case: read capacity from the room directory, then load → decide → save inside a
-// bounded optimistic-retry loop (research R2). On a concurrency conflict it reloads and re-decides,
-// so the loser of the last-place race (scenario 12) is rejected as room_full rather than overwriting.
-// Driven here against substituted ports and a fixed clock — no infrastructure.
 public class ReservePlaceHandlerTests
 {
     private static readonly DateOnly mondayDate = BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
@@ -59,14 +55,14 @@ public class ReservePlaceHandlerTests
         var command = NewCommand();
         var repository = Substitute.For<IAttendanceDayRepository>();
         repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
-            .Returns(_ => FullRoomDay(command)); // the room is already full on load
+            .Returns(_ => FullRoomDay(command));
         var handler = NewHandler(repository, capacity: 1);
 
         var result = await handler.HandleAsync(command, CancellationToken.None);
 
         result.Error.Code.ShouldBe("room_full");
         await repository.Received(1).LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>());
-        await repository.DidNotReceive().SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>()); // no save attempted on a domain failure
+        await repository.DidNotReceive().SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -76,27 +72,25 @@ public class ReservePlaceHandlerTests
         repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
             .Returns(_ => AttendanceDay.For(company, bookingDate));
         repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
-            .Returns(ConcurrencyConflict(), Result.Success()); // first save loses the race, then succeeds
+            .Returns(ConcurrencyConflict(), Result.Success());
         var handler = NewHandler(repository, capacity: 8);
 
         var result = await handler.HandleAsync(NewCommand(), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        await repository.Received(2).LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>()); // reloaded after the conflict
+        await repository.Received(2).LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>());
         await repository.Received(2).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task The_loser_of_the_last_place_race_is_rejected_as_room_full_on_reload()
     {
-        // Scenario 12: the first attempt decides "available" but loses the save race; on reload the
-        // winner has taken the last place, so the re-decision is room_full — capacity never exceeded.
         var command = NewCommand();
         var repository = Substitute.For<IAttendanceDayRepository>();
         repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
-            .Returns(_ => AttendanceDay.For(company, bookingDate), _ => FullRoomDay(command)); // empty, then full on reload
+            .Returns(_ => AttendanceDay.For(company, bookingDate), _ => FullRoomDay(command));
         repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
-            .Returns(ConcurrencyConflict()); // first save conflicts
+            .Returns(ConcurrencyConflict());
         var handler = NewHandler(repository, capacity: 1);
 
         var result = await handler.HandleAsync(command, CancellationToken.None);
@@ -119,7 +113,7 @@ public class ReservePlaceHandlerTests
         var result = await handler.HandleAsync(NewCommand(), CancellationToken.None);
 
         result.Error.Code.ShouldBe("concurrency_retry_exhausted");
-        await repository.Received(3).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>()); // the bounded number of attempts
+        await repository.Received(3).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
     private static ReservePlace NewCommand() =>

@@ -10,9 +10,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
-// The on-behalf employee directory use case is a straight read of the catalog (009, 012): the handler returns
-// exactly what the port holds, wrapped in a success Result, and forwards the search term unchanged. The SQL
-// (ordering, similarity) is covered by the read-model integration tests.
 public class ViewEmployeesTests
 {
     [Fact]

@@ -4,8 +4,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// EF Core mapping for the seeded Company. Value objects round-trip through their primitives via value
-// converters (the identifier reuses its implicit Guid conversion).
 public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
 {
     public const string TableName = "Companies";

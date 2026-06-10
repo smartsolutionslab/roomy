@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
-// The identity of the login account an employee is provisioned with — pre-allocated by organization at
-// hire and the 1:1 correlation key across the provisioning saga (ADR-0025). A branded GUIDv7 with
-// implicit Guid conversions for EF Core and the integration-event mapping.
 public readonly record struct UserIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

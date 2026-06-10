@@ -5,12 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 
-// Composes the occupancy figures (research R7): it reads the raw rooms + reservations from the read
-// model, then for each day in the range builds every room's occupied/capacity figure and the office
-// rollup (sum over rooms), marks a room or office full when occupied == capacity (FR-008), and applies
-// the data-minimisation policy — employee names are shown only for today and the following day (FR-007),
-// counts only on every other day. "Today" is the Europe/Berlin calendar day from the injected
-// TimeProvider, so the policy stays clock-free and testable (research R4).
 public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProvider timeProvider)
     : IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>>
 {

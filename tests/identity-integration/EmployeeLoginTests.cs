@@ -13,12 +13,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// US5 / IA-2 (#27) story-level acceptance: a provisioned employee, logged in via the BFF (the forwarded
-// token carries the `employee` realm role), is scoped to employee capabilities. One identity exercises
-// both halves of the story's independent test — `/account/me` reports `employee`, and the admin surface
-// is forbidden (403, FR-007). The constituent behaviours land in US1 (account/me) and US4 (admin policy
-// + realm-role flattening); this pins them together as the employee-login regression guard. The live
-// Keycloak + BFF login round-trip is the deferred Playwright e2e (plan.md).
 public sealed class EmployeeLoginTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly PostgresDatabaseFixture fixture;

@@ -5,9 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
 
-// EF Core implementation of the User persistence port (ADR-0012). It only tracks changes; the
-// unit-of-work commit (and the transactional outbox) is the host's concern. Absence is never a null:
-// a missing identifier is an Error.NotFound, and the uniqueness guard is a boolean existence check.
 public sealed class UserRepository(IdentityDbContext context) : IUserRepository
 {
     public async Task<Result<User>> GetByIdentifierAsync(UserIdentifier identifier, CancellationToken cancellationToken)
@@ -31,11 +28,6 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
         context.Users.AnyAsync(user => user.Email == email, cancellationToken);
 
-    // Keyset pagination over the accounts, ordered by email (ADR-0044). Email is the unique account
-    // key, so a single text column is a stable total order. The keyset predicate is parameterized SQL
-    // (FromSql): Npgsql does not translate string.Compare, but PostgreSQL compares `text` natively with
-    // `>`, so the page is one indexed scan. Fetching limit + 1 rows reveals whether a further page
-    // exists; EF materializes the User aggregate through its value converters as usual.
     public async Task<Result<Page<User>>> GetPageAsync(PageRequest request, CancellationToken cancellationToken)
     {
         var decoded = request.DecodeCursor<UserCursor>();

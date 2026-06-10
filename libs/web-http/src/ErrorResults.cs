@@ -3,10 +3,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Web.Http;
 
-// The single domain-Error → HTTP-response mapping for every context API (ADR-0046). The error kind picks the
-// status; the body is always an ErrorResponse(code, message). Request-shape validation (a malformed cursor,
-// a missing body) is a 400 via ToBadRequest — it is not a domain rule, so it stays distinct from the kinds
-// the use cases return.
 public static class ErrorResults
 {
     public static IResult ToHttpResult(this Error error)

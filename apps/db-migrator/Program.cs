@@ -10,9 +10,6 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Each context contributes its database here (database-per-service, ADR-0014): register its persistence
-// so the DbContext resolves, then add it as a migration target. Aspire injects each connection string by
-// the database resource name.
 var identityConnectionString = builder.Configuration.GetIdentityConnectionString();
 builder.Services.AddIdentityPersistence(identityConnectionString);
 builder.Services.AddMigrationTarget<IdentityDbContext>();

@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 
-// The single seeded company every office belongs to (CLAUDE.md context map). Behaviour-light in the
-// MVP: it exists so office-name uniqueness has a real scope and the offices' company reference has
-// referential integrity. Created once by the startup seeder.
 public sealed class Company : Aggregate
 {
     private Company(CompanyIdentifier identifier, CompanyName name)

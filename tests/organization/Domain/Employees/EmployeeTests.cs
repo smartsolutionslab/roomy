@@ -4,10 +4,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
 namespace SmartSolutionsLab.Roomy.Organization.Tests.Domain.Employees;
 
-// The Employee aggregate is the consistency boundary for the provisioning lifecycle (ADR-0025): Hire
-// records it in Provisioning and raises EmployeeHired; the saga acks drive it to the terminal Active or
-// Failed states. Terminal states are guarded and re-delivered acks are idempotent no-ops, which is what
-// makes "no half-accounts" (FR-007) an enforced invariant rather than a convention.
 public sealed class EmployeeTests
 {
     private static readonly CompanyIdentifier company = CompanyIdentifier.New();

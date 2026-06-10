@@ -14,13 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// The identity context owns its database (ADR-0014); Aspire injects the connection string by name.
 var identityConnectionString = builder.Configuration.GetIdentityConnectionString();
 
 builder.Services.AddIdentityPersistence(identityConnectionString);
 
-// Keycloak owns credentials (ADR-0013); the host binds its base address, realm, and admin credentials
-// from configuration (Aspire / user secrets) — never hard-coded.
 var keycloak = builder.Configuration.GetSection("Keycloak");
 var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
     ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
@@ -37,16 +34,10 @@ builder.Services.AddKeycloakIdentityProvider(
             ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
     });
 
-// The identity API is internal — reached only through the BFF, which forwards the Keycloak access token
-// (ADR-0013). Validate it as a JWT bearer against the realm; the BFF owns login/session. Shared across the
-// context API hosts (ADR-0045).
 builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
-// Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
 builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
-// The provisioning use cases (US3, ADR-0025), bound to their owned command-handler ports — the
-// EmployeeHired consumer resolves RegisterUser through these.
 builder.Services.AddIdentityUseCases();
 
 // Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
@@ -61,10 +52,6 @@ if (emittingOpenApiDocument)
     JasperFxEnvironment.AutoStartHost = true;
 }
 
-// Wolverine's durable transactional outbox/inbox over the identity database, with RabbitMQ as the
-// default transport (ADR-0005/0012/0015). The outbox shares the database with the User write so a
-// published integration event commits atomically with the aggregate. The identity infrastructure
-// assembly is scanned for consumers so EmployeeHired (organization's published language) is handled.
 if (!emittingOpenApiDocument)
 {
     builder.AddRoomyMessaging(
@@ -78,8 +65,6 @@ if (!emittingOpenApiDocument)
         typeof(EmployeeHiredConsumer).Assembly);
 }
 
-// Seed the DefaultAdmin at startup so the system is administrable from first run (FR-004, research
-// R4). The seeder is idempotent, so it is safe on every restart.
 var defaultAdmin = builder.Configuration.GetSection(DefaultAdminOptions.SectionName);
 builder.Services.AddSingleton(new DefaultAdminOptions
 {
@@ -92,8 +77,6 @@ builder.Services.AddSingleton(new DefaultAdminOptions
 });
 builder.Services.AddScoped<DefaultAdminSeeder>();
 
-// The schema is applied out-of-process by the db-migrator before this host starts (Aspire
-// WaitForCompletion, ADR-0033), so the seeder can query the users table straight away.
 if (!emittingOpenApiDocument)
 {
     builder.Services.AddHostedService<DefaultAdminSeederHostedService>();

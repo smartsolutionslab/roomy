@@ -32,8 +32,6 @@ public sealed class UserTests
     [Fact]
     public void Register_with_an_identifier_uses_the_supplied_identifier()
     {
-        // The provisioning saga pre-allocates the UserId as the correlation key for the 1:1
-        // User<->Employee link (ADR-0025), so registration must honour it rather than mint a new one.
         var identifier = UserIdentifier.New();
 
         var user = User.Register(

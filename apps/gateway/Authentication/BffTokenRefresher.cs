@@ -6,18 +6,10 @@ using Microsoft.Extensions.Options;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Authentication;
 
-// Keeps the BFF's stored access token usable across the (longer-lived, sliding) cookie session. The
-// cookie outlives Keycloak's short access-token lifetime, so without this the proxy would forward an
-// expired token and the context APIs reject it ("Bearer was not authenticated … IDX10223 … token is
-// expired"). On every cookie validation, if the access token is at/near expiry we exchange the
-// refresh token (offline_access) for a fresh set at Keycloak's token endpoint and re-issue the cookie,
-// so the token the proxy forwards downstream is always live. A failed refresh rejects the principal,
-// forcing a clean re-login (ADR-0013).
 public static class BffTokenRefresher
 {
     public const string HttpClientName = "keycloak-token";
 
-    // Refresh a little before the actual expiry so an in-flight request never carries a just-expired token.
     private static readonly TimeSpan refreshSkew = TimeSpan.FromSeconds(30);
 
     public static async Task ValidateOrRefreshAsync(CookieValidatePrincipalContext context)
@@ -25,7 +17,7 @@ public static class BffTokenRefresher
         var expiresAtValue = context.Properties.GetTokenValue("expires_at");
         if (expiresAtValue is null)
         {
-            return; // no stored tokens on this principal — nothing to refresh
+            return;
         }
 
         if (!DateTimeOffset.TryParse(
@@ -39,7 +31,7 @@ public static class BffTokenRefresher
 
         if (expiresAt - refreshSkew > DateTimeOffset.UtcNow)
         {
-            return; // still valid
+            return;
         }
 
         var refreshToken = context.Properties.GetTokenValue("refresh_token");
@@ -98,7 +90,6 @@ public static class BffTokenRefresher
         var renewedExpiresAt = DateTimeOffset.UtcNow.AddSeconds(refreshed.ExpiresIn);
         context.Properties.UpdateTokenValue("expires_at", renewedExpiresAt.ToString("o", CultureInfo.InvariantCulture));
 
-        // Persist the refreshed tokens back into the session cookie.
         context.ShouldRenew = true;
     }
 

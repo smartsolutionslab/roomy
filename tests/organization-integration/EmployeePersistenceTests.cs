@@ -7,9 +7,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
-// The Employee aggregate against real PostgreSQL (008): it round-trips with its provisioning state and
-// reason, an unknown employee is NotFound, and the unique User<->Employee index rejects two employees
-// sharing a user (the 1:1 link, ADR-0025).
 public sealed class EmployeePersistenceTests(PostgresDatabaseFixture fixture)
     : IClassFixture<PostgresDatabaseFixture>
 {

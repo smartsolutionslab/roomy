@@ -7,9 +7,6 @@ using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
-// The bookable-rooms use case is a straight read of the catalogue read model (007 US1): the handler
-// returns exactly what the port holds, wrapped in a success Result, with no decision of its own. The SQL
-// — the office/room join and the company scope — is covered by the read-model integration tests.
 public class ViewBookableRoomsTests
 {
     [Fact]

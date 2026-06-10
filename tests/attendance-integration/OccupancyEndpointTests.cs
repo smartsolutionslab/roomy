@@ -18,11 +18,6 @@ using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadMod
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// Boots the attendance host in-process against the real test Postgres, with the BFF token replaced by
-// the test auth scheme and a fixed clock (so "today" is deterministic). Verifies the GET /occupancy
-// contract (attendance-api.md, 004 US6): scope/range validation, the unknown-office 404, and that the
-// figures are returned with occupants present only for today/tomorrow (FR-007). The occupancy read model
-// is the real one over the seeded read-model tables.
 public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFixture>, IDisposable
 {
     private static readonly DateOnly today = new(2026, 6, 8);
@@ -42,8 +37,6 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Attendance:CompanyId", companyId.ToString());
-            // Skip the RabbitMQ inbox: this test exercises the read side only, so the host must not wait
-            // on (and time out against) an absent broker during boot.
             webHost.UseSetting("Messaging:Enabled", "false");
 
             webHost.ConfigureTestServices(services =>
@@ -136,7 +129,6 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
         todayDay.Rooms.Single().Occupants.ShouldNotBeNull();
         todayDay.Rooms.Single().Occupants!.Single().Name.ShouldBe("Ada");
 
-        // Three days out: the count is reported but the names are withheld (absent from the payload).
         var later = days.Single(day => day.Date == laterDay);
         later.Rooms.Single().Occupied.ShouldBe(1);
         later.Rooms.Single().Occupants.ShouldBeNull();

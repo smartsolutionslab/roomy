@@ -3,12 +3,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-// The attendance context's aggregate root and consistency boundary (ADR-0026): one instance per
-// company calendar day, identified by CompanyId + Date. It enforces both reservation invariants in
-// one place — no-overbooking per (room, day) and one reservation per employee per day — plus the
-// bookable-day rule. State is the fold over the stream (EventSourcedAggregate): Reserve raises a
-// ReservationPlaced that Apply folds in. Capacity and "today" are supplied by the caller (research
-// R3/R4), so the aggregate reads no master data and no clock.
 public sealed class AttendanceDay : EventSourcedAggregate
 {
     private readonly List<Reservation> reservations = [];
@@ -25,9 +19,6 @@ public sealed class AttendanceDay : EventSourcedAggregate
 
     public IReadOnlyCollection<Reservation> Reservations => reservations;
 
-    // The way to obtain an instance: the repository builds the day for a (company, date) and replays
-    // its stream onto it via LoadFromHistory. A never-booked day is simply an empty one — there is no
-    // "not found" (research R2).
     public static AttendanceDay For(CompanyIdentifier company, BookingDate date) => new(company, date);
 
     public Result<ReservationIdentifier> Reserve(

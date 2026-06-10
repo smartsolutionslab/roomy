@@ -5,8 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// Rooms are an owned collection, so EF loads them with their office automatically — no explicit
-// Include is needed.
 public sealed class OfficeRepository(OrganizationDbContext context) : IOfficeRepository
 {
     public async Task<Result<Office>> GetByIdentifierAsync(OfficeIdentifier identifier, CancellationToken cancellationToken)

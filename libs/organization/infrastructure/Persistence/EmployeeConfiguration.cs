@@ -5,11 +5,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// EF Core mapping for the Employee aggregate (008). Value objects round-trip through their primitives;
-// the role/state/reason enums persist as readable strings. The UserIdentifier is uniquely indexed — the
-// 1:1 User<->Employee link (ADR-0025). Email is required but NOT uniquely indexed here: authoritative
-// email uniqueness lives on the credential side, surfacing as a provisioning failure (research R4). The
-// initial password is never mapped — it exists only on the EmployeeHired event (FR-009).
 public sealed class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
     public const string TableName = "Employees";

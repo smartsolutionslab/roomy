@@ -84,7 +84,6 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         {
             var store = fixture.CreateEventStore(context, serializer);
 
-            // The stream is now at version 1, but we still assert it is empty (None).
             var conflict = await Should.ThrowAsync<EventStoreConcurrencyException>(() =>
                 store.AppendAsync(
                     streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None));

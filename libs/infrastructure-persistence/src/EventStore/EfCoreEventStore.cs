@@ -3,18 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
-/// <summary>
-/// EF Core / Npgsql implementation of <see cref="IEventStore"/> over the append-only events table
-/// (ADR-0012). Appends are version-checked in code <em>and</em> guaranteed by the unique
-/// <c>(stream_id, version)</c> constraint, so two concurrent writers asserting the same expected
-/// version cannot both commit — the loser surfaces as <see cref="EventStoreConcurrencyException"/>.
-/// </summary>
-/// <remarks>
-/// This is the v1 skeleton: it appends and replays. It does <em>not</em> own a transaction — the
-/// caller commits events, Wolverine's durable outbox records, and inline projections together via
-/// the context's <c>SaveChanges</c>, keeping them atomic in one Postgres transaction (ADR-0012,
-/// ADR-0005). Snapshots and async catch-up projections are deferred.
-/// </remarks>
 public sealed class EfCoreEventStore(EventStoreDbContext dbContext, IEventSerializer serializer, TimeProvider timeProvider)
     : IEventStore
 {

@@ -25,7 +25,6 @@ public readonly struct Result
 
     public static Result<T> Failure<T>(Error error) => Result<T>.Failure(error);
 
-    // Lets a use case write `return error;` instead of `return Result.Failure(error);`.
     public static implicit operator Result(Error error) => Failure(error);
 
     public TResult Match<TResult>(Func<TResult> onSuccess, Func<Error, TResult> onFailure) =>
@@ -58,7 +57,6 @@ public readonly struct Result<T>
 
     public static Result<T> Failure(Error error) => new(false, default, error);
 
-    // Ergonomic returns: `return value;` and `return error;` from a Result<T>-returning method.
     public static implicit operator Result<T>(T value) => Success(value);
 
     public static implicit operator Result<T>(Error error) => Failure(error);

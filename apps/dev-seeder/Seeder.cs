@@ -23,11 +23,6 @@ using ReadModelRoom = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadMode
 
 namespace SmartSolutionsLab.Roomy.DevSeeder;
 
-// Writes the Obex Labs demo dataset directly into the dev databases. Organization aggregates use their
-// domain factories; each colleague is provisioned in Keycloak + identity so they can actually log in
-// (ADR-0025 done synchronously here, not via the saga). Historical reservations are appended straight to
-// the attendance event store — the booking-window rule lives in the aggregate, not the store, so seeding
-// past dates is exactly why this bypasses the API — then the Reservations read model is rebuilt.
 internal sealed class Seeder(
     OrganizationDbContext organizationDb,
     IdentityDbContext identityDb,
@@ -51,8 +46,6 @@ internal sealed class Seeder(
             return;
         }
 
-        // Drop the placeholder company the org host auto-seeds at startup, so Obex Labs owns the configured
-        // CompanyId that attendance is wired to. At this point it has no offices/employees, so it deletes clean.
         await organizationDb.Companies.ExecuteDeleteAsync(cancellationToken);
 
         logger.LogInformation("Seeding company {Company} ({CompanyId}).", SeedData.CompanyName, companyId);
@@ -204,8 +197,6 @@ internal sealed class Seeder(
         logger.LogInformation("Appended {Count} reservations across {Days} days.", placed, total);
     }
 
-    // Daily occupancy as a fraction of office capacity (5-40%), midweek-heavy with a gentle upward trend.
-    // Hamburg is "more or less not present" — only the odd colleague, the odd day.
     private static int TargetReservations(OfficeData office, int staffCount, DateOnly date, int totalDays, Random random)
     {
         var capacity = office.Rooms.Sum(room => room.Capacity);

@@ -10,9 +10,6 @@ using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// Boots a single real Keycloak — only that resource — with the production realm import (roomy realm,
-// roles employee/administrator, unique email, length(8) password policy), once for the test class.
-// Lets the admin adapter run against the real provider. Requires Docker.
 public sealed class KeycloakRealmFixture : IAsyncLifetime
 {
     public const string Realm = "roomy";
@@ -24,14 +21,11 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        var builder = await DistributedApplicationTestingBuilder
-            .CreateAsync<Projects.Roomy_Identity_KeycloakTestAppHost>();
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_Identity_KeycloakTestAppHost>();
 
         application = await builder.BuildAsync();
         await application.StartAsync();
 
-        // Keycloak boots and imports the realm asynchronously; wait until it reports healthy, or the
-        // first admin call races startup. Keycloak's first run can take a while, so allow generously.
         using var readiness = new CancellationTokenSource(TimeSpan.FromMinutes(5));
         var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
         await notifications.WaitForResourceHealthyAsync("keycloak", readiness.Token);
@@ -51,8 +45,6 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
                 AdminPassword = AdminPassword,
             });
 
-    // Reads back the realm roles Keycloak actually mapped to a provisioned subject, so a test can
-    // assert the adapter assigned them rather than trust its return value alone.
     public async Task<IReadOnlyList<string>> GetRealmRoleNamesAsync(
         KeycloakSubjectIdentifier subject,
         CancellationToken cancellationToken)
@@ -98,8 +90,7 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
         response.EnsureSuccessStatusCode();
 
         var payload = await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken);
-        return payload?["access_token"]?.GetValue<string>()
-            ?? throw new InvalidOperationException("Keycloak returned no access token.");
+        return payload?["access_token"]?.GetValue<string>() ?? throw new InvalidOperationException("Keycloak returned no access token.");
     }
 
     public async ValueTask DisposeAsync()

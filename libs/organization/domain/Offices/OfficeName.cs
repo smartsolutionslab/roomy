@@ -2,8 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// Uniqueness within the company is a set-level invariant enforced by persistence (unique index) plus
-// a handler pre-check, not here.
 public sealed record OfficeName : IValueObject
 {
     public string Value { get; }

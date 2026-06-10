@@ -8,10 +8,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// Seeding orchestration against the real database. The real Keycloak provisioning path is already
-// covered by KeycloakIdentityProviderTests (T011), so a recording stub stands in for the provider
-// here, keeping the focus on what the seeder owns: provisioning the administrator role, activating the
-// account, persisting it, and staying idempotent on a restart.
 public sealed class DefaultAdminSeederTests(PostgresDatabaseFixture fixture)
     : IClassFixture<PostgresDatabaseFixture>
 {

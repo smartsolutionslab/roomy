@@ -16,11 +16,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// Boots the attendance host in-process against the real test Postgres, with the BFF token replaced by
-// the test auth scheme, a fixed clock (so "today" is deterministic), and a stub room directory (the
-// real capacity feed is US2). Verifies the POST /reservations contract (attendance-api.md): the
-// Result -> status/code mapping and that the authorization policy enforces 401. Each test uses a
-// distinct bookable date so they never share a company-day stream.
 public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreFixture>, IDisposable
 {
     private static readonly DateOnly monday = BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
@@ -39,15 +34,10 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Attendance:CompanyId", companyId.ToString());
-            // Skip the RabbitMQ inbox: this test exercises the reservation endpoints only, so the host
-            // must not wait on (and time out against) an absent broker during boot.
             webHost.UseSetting("Messaging:Enabled", "false");
 
             webHost.ConfigureTestServices(services =>
             {
-                // Keep the HTTP test free of external infra: drop the Wolverine runtime (it would connect
-                // to RabbitMQ on start), and replace the BFF/Keycloak token validation with the test
-                // scheme, the live clock with a fixed one, and the room directory with a controllable stub.
                 services.RemoveAll<IHostedService>();
 
                 services.AddAuthentication(TestAuthHandler.SchemeName)
@@ -59,8 +49,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
                 services.RemoveAll<IRoomDirectory>();
                 services.AddSingleton<IRoomDirectory>(roomDirectory);
 
-                // Resolve every subject to an employee with the same id, so the acting user owns what it
-                // reserves; the admin-on-behalf cases target a different employee id explicitly.
                 services.RemoveAll<IEmployeeDirectory>();
                 services.AddSingleton<IEmployeeDirectory>(new IdentityEmployeeDirectory());
             });
@@ -118,7 +106,7 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     [Fact]
     public async Task An_unknown_room_returns_404()
     {
-        roomDirectory.Capacity = null; // the room is not known to attendance
+        roomDirectory.Capacity = null;
 
         var response = await ClientForSubject(Guid.NewGuid())
             .PostAsJsonAsync("/reservations", Booking(monday.AddDays(2)), TestContext.Current.CancellationToken);
@@ -178,7 +166,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     [Fact]
     public async Task Reserving_on_behalf_of_another_employee_as_a_non_admin_is_forbidden()
     {
-        // FR-011 (scenario 10) — onBehalfOf is administrator-only.
         roomDirectory.Capacity = 8;
         var body = new ReserveBody(Guid.NewGuid(), Guid.NewGuid(), monday.AddDays(8), OnBehalfOf: Guid.NewGuid());
 
@@ -193,7 +180,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     [Fact]
     public async Task An_administrator_reserves_on_behalf_of_another_employee()
     {
-        // Scenario 10 — an administrator acts on behalf of an employee; the reservation is the target's.
         roomDirectory.Capacity = 8;
         var target = Guid.NewGuid();
         var body = new ReserveBody(Guid.NewGuid(), Guid.NewGuid(), monday.AddDays(9), OnBehalfOf: target);
@@ -209,7 +195,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     [Fact]
     public async Task An_administrator_cancels_another_employees_reservation()
     {
-        // Scenario 10/11 — an administrator may cancel anyone's reservation.
         roomDirectory.Capacity = 8;
         var date = monday.AddDays(10);
         var reservationId = await CreateReservationAsync(Guid.NewGuid(), date);
@@ -223,7 +208,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     [Fact]
     public async Task Viewing_a_day_returns_its_reservations()
     {
-        // Scenario 11 (view) — any authenticated user sees the day's reservations, replayed from the stream.
         roomDirectory.Capacity = 8;
         var date = monday.AddDays(11);
         await CreateReservationAsync(Guid.NewGuid(), date);
@@ -236,7 +220,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         var page = await response.Content.ReadFromJsonAsync<PageDto<ReservationDto>>(TestContext.Current.CancellationToken);
         page!.Items.Length.ShouldBe(2);
         page.Items.All(reservation => reservation.Date == date).ShouldBeTrue();
-        // The day list is bounded by capacity — it adopts the page envelope with no further page (ADR-0044).
         page.NextCursor.ShouldBeNull();
     }
 
@@ -255,8 +238,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     [Fact]
     public async Task Viewing_my_reservations_lists_my_own_bookings()
     {
-        // FR-004 (scenario 6): the caller sees their own reservations. The reserve flow projects into the
-        // Reservations read model (ADR-0038), so a freshly booked place appears in "my reservations".
         roomDirectory.Capacity = 8;
         var subject = Guid.NewGuid();
         await CreateReservationAsync(subject, monday.AddDays(7));

@@ -4,8 +4,6 @@ using Yarp.ReverseProxy.Configuration;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Tests;
 
-// The access token must only be forwarded to resource servers that opt in. In particular the
-// single-origin SPA proxy route (ADR-0030) must never receive it (ADR-0013).
 public sealed class AccessTokenForwardingTests
 {
     [Fact]

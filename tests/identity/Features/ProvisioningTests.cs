@@ -10,9 +10,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Tests.Features;
 
-// Use-case tests for RegisterUser (US3 / IA-3), the identity step of the provisioning saga (ADR-0025).
-// Provisioning is exercised with substituted ports — the real Keycloak + Postgres + broker round-trip is
-// covered by the integration/e2e slices once the Aspire stack runs it.
 public sealed class ProvisioningTests
 {
     private static RegisterUser Command(Role role) =>

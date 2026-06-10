@@ -8,10 +8,6 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The bookable-rooms read-model adapter against real PostgreSQL (007 US1): it lists the company's rooms
-// from the Rooms read model, joined to Offices for their names — attendance's own read models. Here we
-// prove the SQL returns the company's rooms with their office names, scopes to the company, and that a
-// room whose office feed has not arrived is still listed (it is bookable) under an empty office name.
 public sealed class BookableRoomsReadModelTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {

@@ -8,9 +8,6 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EfCore;
 
 public sealed class EventStoreModelTests
 {
-    // The EF model (table/column names, keys, indexes) is built from configuration alone, so it needs no
-    // live database — a context configured for Npgsql with an unused connection string is enough, keeping
-    // these pure-metadata assertions Docker-free.
     private static IModel BuildModel()
     {
         using var context = new TestEventStoreDbContext(

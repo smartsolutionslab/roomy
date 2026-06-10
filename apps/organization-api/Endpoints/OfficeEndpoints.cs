@@ -5,10 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
-// The office/room management surface (contract: organization-api.md). Writes require the administrator
-// role, so an authenticated employee is Forbidden (403, FR-009); reads require any authenticated
-// account. The service is internal — the BFF forwards the Keycloak token whose realm roles the host
-// flattens to role claims.
 public static class OfficeEndpoints
 {
     private const string AdministratorRole = "administrator";
@@ -64,8 +60,6 @@ public static class OfficeEndpoints
     private static RouteHandlerBuilder RequireAdministrator(this RouteHandlerBuilder builder) =>
         builder.RequireAuthorization(policy => policy.RequireRole(AdministratorRole));
 
-    // POST /offices — creates an office under the seeded company. 400 for a blank name/location, 409 if
-    // the name is already taken in the company.
     private static async Task<IResult> CreateOfficeAsync(
         Request.CreateOffice request,
         ICommandHandler<CreateOffice, OfficeIdentifier> createOffice,
@@ -91,7 +85,6 @@ public static class OfficeEndpoints
             error => error.ToHttpResult());
     }
 
-    // GET /offices — every office with its rooms and derived capacity.
     private static async Task<IResult> ListOfficesAsync(
         IOfficeRepository offices,
         CancellationToken cancellationToken)
@@ -100,7 +93,6 @@ public static class OfficeEndpoints
         return Results.Ok(all.Select(office => office.ToResponse()));
     }
 
-    // GET /offices/{officeId} — a single office, or 404 if none has that identifier.
     private static async Task<IResult> GetOfficeAsync(
         Guid officeId,
         IOfficeRepository offices,
@@ -110,7 +102,6 @@ public static class OfficeEndpoints
         return office.Match(found => Results.Ok(found.ToResponse()), error => error.ToHttpResult());
     }
 
-    // PATCH /offices/{officeId}/name — renames the office. 400 blank, 404 unknown, 409 name taken.
     private static async Task<IResult> RenameOfficeAsync(
         Guid officeId,
         Request.RenameOffice request,
@@ -126,7 +117,6 @@ public static class OfficeEndpoints
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
-    // PATCH /offices/{officeId}/location — relocates the office. 400 blank, 404 unknown.
     private static async Task<IResult> ChangeLocationAsync(
         Guid officeId,
         Request.RelocateOffice request,
@@ -144,8 +134,6 @@ public static class OfficeEndpoints
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
-    // POST /offices/{officeId}/rooms — adds a room. 400 blank name or capacity < 1, 404 unknown office,
-    // 409 room name taken.
     private static async Task<IResult> AddRoomAsync(
         Guid officeId,
         Request.AddRoom request,
@@ -171,8 +159,6 @@ public static class OfficeEndpoints
             _ => Results.NotFound());
     }
 
-    // PATCH /offices/{officeId}/rooms/{roomId}/name — renames a room. 400 blank, 404 unknown office/room,
-    // 409 name taken within the office.
     private static async Task<IResult> RenameRoomAsync(
         Guid officeId,
         Guid roomId,
@@ -191,7 +177,6 @@ public static class OfficeEndpoints
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
-    // Maps a mutation result to the refreshed office (200), or the error to its status code.
     private static async Task<IResult> OfficeResultAsync(
         Result result,
         OfficeIdentifier officeIdentifier,

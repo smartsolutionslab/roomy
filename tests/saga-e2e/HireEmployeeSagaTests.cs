@@ -6,11 +6,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
 namespace SmartSolutionsLab.Roomy.Saga.E2ETests;
 
-// The provisioning saga end-to-end across both services over the real transport and credential provider
-// (ADR-0025, 008 US1–US3): an administrator hires a colleague through organization-api; organization
-// publishes EmployeeHired; identity provisions the Keycloak account and acks; organization converges the
-// employee to Active or — on a taken email — Failed. The headline no-half-account guarantee (FR-007) is
-// observed end-to-end. Requires Docker; slow (full stack).
 public sealed class HireEmployeeSagaTests(SagaStackFixture fixture) : IClassFixture<SagaStackFixture>
 {
     [Fact]
@@ -24,16 +19,12 @@ public sealed class HireEmployeeSagaTests(SagaStackFixture fixture) : IClassFixt
         var employee = await fixture.WaitForTerminalStateAsync(hired.EmployeeId, email, TestContext.Current.CancellationToken);
         employee.State.ShouldBe(ProvisioningState.Active);
 
-        // Once provisioning completes the colleague can sign in (FR-004) with the work email + initial
-        // password — the real Keycloak account exists.
         (await fixture.CanAuthenticateAsync(email, Password, TestContext.Current.CancellationToken)).ShouldBeTrue();
     }
 
     [Fact]
     public async Task Hiring_with_an_already_used_email_fails_provisioning_without_a_half_account()
     {
-        // The seeded DefaultAdmin already owns this email, so identity rejects it as email_taken and
-        // organization compensates (FR-007/FR-010).
         var hired = await HireAsync("Imposter", SagaStackFixture.AdminEmail, "Employee", "Imposter.1");
 
         var employee = await fixture.WaitForTerminalStateAsync(
@@ -55,7 +46,6 @@ public sealed class HireEmployeeSagaTests(SagaStackFixture fixture) : IClassFixt
         var second = await HireAsync("Second Hire", email, "Employee", "SecondHire.1");
         var secondEmployee = await fixture.WaitForTerminalStateAsync(second.EmployeeId, email, TestContext.Current.CancellationToken);
 
-        // The email is now taken, so the duplicate hire fails — never a second usable account (US3/FR-010).
         secondEmployee.State.ShouldBe(ProvisioningState.Failed);
         secondEmployee.FailureReason.ShouldBe(ProvisioningFailureReason.EmailTaken);
     }

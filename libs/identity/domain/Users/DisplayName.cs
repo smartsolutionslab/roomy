@@ -2,7 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
-// The user's human-readable name: required and trimmed.
 public sealed record DisplayName : IValueObject
 {
     public string Value { get; }

@@ -6,10 +6,6 @@ using SmartSolutionsLab.Roomy.Contracts.Organization;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The capacity feed against real PostgreSQL (003 US2): organization's RoomAdded is mirrored onto the
-// local Rooms read model by the consumer, and RoomDirectory then answers the reserve use case's
-// capacity lookup from it (ADR-0014/0037). An unknown room is unknown_room; a repeated RoomAdded
-// updates in place (idempotent, so at-least-once delivery is safe).
 public sealed class RoomCapacityFeedTests(PostgresEventStoreFixture fixture) : IClassFixture<PostgresEventStoreFixture>
 {
     private static readonly DateTimeOffset occurredAt = new(2026, 6, 9, 9, 0, 0, TimeSpan.Zero);

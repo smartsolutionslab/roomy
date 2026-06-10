@@ -3,9 +3,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
-// A user's email: trimmed, lower-cased and syntactically validated at the boundary so the rest of
-// the domain can trust it. Equality is by the normalized value; system-wide uniqueness is enforced
-// by the aggregate and a DB constraint (FR-009, research R8).
 public sealed partial record Email : IValueObject
 {
     public string Value { get; }

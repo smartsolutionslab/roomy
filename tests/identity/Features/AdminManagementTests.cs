@@ -9,9 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Tests.Features;
 
-// Use-case tests for GrantAdministrator (US4 / IA-4): elevate an existing account to Administrator,
-// syncing the role to Keycloak (the token authority) and persisting the change. Exercised with
-// substituted ports; the real Keycloak + Postgres round-trip is the integration/e2e slice.
 public sealed class AdminManagementTests
 {
     private static User ActiveEmployee()

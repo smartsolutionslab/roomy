@@ -2,13 +2,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
-/// <summary>
-/// The <see cref="EfCore.RoomyDbContext"/> baseline for an <em>event-sourced</em> context: it adds
-/// the append-only <see cref="StoredEvent"/> table on top of the shared naming policy. A state-based
-/// context derives from <see cref="EfCore.RoomyDbContext"/> directly and never gains the events
-/// table; an event-sourced one derives from this and pairs it with
-/// <see cref="EfCoreEventStore"/> (ADR-0012).
-/// </summary>
 public abstract class EventStoreDbContext(DbContextOptions options) : EfCore.RoomyDbContext(options)
 {
     public DbSet<StoredEvent> Events => Set<StoredEvent>();

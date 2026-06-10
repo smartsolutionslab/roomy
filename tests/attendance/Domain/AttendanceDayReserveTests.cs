@@ -4,10 +4,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Domain;
 
-// The AttendanceDay aggregate enforces both reservation invariants inside one consistency boundary
-// (ADR-0026): no-overbooking per (room, day) and one reservation per employee per day, plus the
-// bookable-day rule. Capacity and "today" are handed in (research R3/R4); the aggregate reads no
-// master data and no clock. These specs cover scenarios 1–7 (US1) against the aggregate directly.
 public class AttendanceDayReserveTests
 {
     private static readonly BookingDate today = BookingDate.From(BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1)));
@@ -36,7 +32,6 @@ public class AttendanceDayReserveTests
     [Fact]
     public void Reserving_today_is_allowed_when_today_is_a_working_day()
     {
-        // Scenario 2 — the same-day (spontaneous) reservation; the window's lower bound is inclusive.
         var day = AttendanceDay.For(company, today);
 
         var result = day.Reserve(EmployeeIdentifier.New(), SomeRoom(), RoomCapacity.From(8), today, occurredAt);
@@ -47,7 +42,6 @@ public class AttendanceDayReserveTests
     [Fact]
     public void A_full_room_rejects_further_reservations()
     {
-        // Scenario 3 — capacity 1, already taken.
         var day = AttendanceDay.For(company, today);
         var room = SomeRoom();
         day.Reserve(EmployeeIdentifier.New(), room, RoomCapacity.From(1), today, occurredAt);
@@ -56,13 +50,12 @@ public class AttendanceDayReserveTests
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("room_full");
-        day.UncommittedEvents.Count.ShouldBe(1); // the rejected reservation leaves no record (edge case)
+        day.UncommittedEvents.Count.ShouldBe(1);
     }
 
     [Fact]
     public void An_employee_may_hold_only_one_reservation_per_day()
     {
-        // Scenario 4 — across all rooms and offices.
         var day = AttendanceDay.For(company, today);
         var employee = EmployeeIdentifier.New();
         day.Reserve(employee, SomeRoom(), RoomCapacity.From(8), today, occurredAt);
@@ -75,10 +68,10 @@ public class AttendanceDayReserveTests
     }
 
     [Theory]
-    [InlineData(-3)] // the previous Friday — a working day, but in the past (scenario 5)
-    [InlineData(5)]  // Saturday (scenario 6)
-    [InlineData(6)]  // Sunday (scenario 6)
-    [InlineData(15)] // a working day just past the 14-day window (scenario 7)
+    [InlineData(-3)]
+    [InlineData(5)]
+    [InlineData(6)]
+    [InlineData(15)]
     public void Reserving_an_unbookable_day_is_rejected(int dayOffset)
     {
         var date = BookingDate.From(today.Value.AddDays(dayOffset));
@@ -94,8 +87,6 @@ public class AttendanceDayReserveTests
     [Fact]
     public void Reserve_counts_capacity_against_the_replayed_history()
     {
-        // The capacity check must fold the persisted stream, not just in-memory raises: a room already
-        // filled by a replayed ReservationPlaced is full.
         var room = SomeRoom();
         var day = AttendanceDay.For(company, today);
         day.LoadFromHistory(

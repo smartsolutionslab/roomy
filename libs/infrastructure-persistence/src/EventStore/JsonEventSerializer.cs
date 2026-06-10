@@ -3,11 +3,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
-/// <summary>
-/// The v1 event serializer: <c>System.Text.Json</c> payloads with the stable type name resolved
-/// through an <see cref="IEventTypeRegistry"/> (ADR-0012). JSON keeps the events table queryable as
-/// Postgres <c>jsonb</c> and avoids a second serialization library.
-/// </summary>
 public sealed class JsonEventSerializer(IEventTypeRegistry typeRegistry, JsonSerializerOptions? serializerOptions = null)
     : IEventSerializer
 {

@@ -2,10 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
-// An employee's work email: required, well-formed, and normalized to trimmed lowercase so equality and
-// the credential-side lookup are case-insensitive. Authoritative uniqueness lives on the credential side
-// (ADR-0025, research R4); this only rejects malformed input. A deliberately conservative check —
-// exactly one '@', a non-empty local part, and a dotted domain.
 public sealed record WorkEmail : IValueObject
 {
     public string Value { get; }

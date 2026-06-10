@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
 namespace SmartSolutionsLab.Roomy.Organization.Tests.Domain.Offices;
 
-// Creating an office and adding a room raise domain events (ADR-0032); the infrastructure unit of work
-// drains these at commit and publishes the matching integration events (OfficeOpened / RoomAdded) so
-// the attendance context can mirror the capacity feed (003 US2, ADR-0037).
 public sealed class OfficeDomainEventTests
 {
     [Fact]
@@ -27,7 +24,7 @@ public sealed class OfficeDomainEventTests
     public void Adding_a_room_raises_room_added()
     {
         var office = Office.Create(CompanyIdentifier.New(), OfficeName.From("HQ"), Location.From("Berlin"));
-        office.ClearDomainEvents(); // ignore the OfficeOpened raised on creation
+        office.ClearDomainEvents();
 
         var result = office.AddRoom(RoomName.From("A1"), Capacity.From(8));
 

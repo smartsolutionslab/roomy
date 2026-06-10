@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
-// Provisions a real PostgreSQL via Aspire and applies the organization migrations, so the persistence tests
-// exercise the real provider (value converters, the owned Room collection, unique indexes) and validate that
-// the InitialCreate migration produces the mapped schema. Requires Docker.
 public sealed class PostgresDatabaseFixture : BasePostgresFixture<Projects.Roomy_Organization_TestAppHost>
 {
     protected override string DatabaseResourceName => "organization";

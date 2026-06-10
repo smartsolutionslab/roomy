@@ -7,11 +7,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 
-// The IOccupancyReadModel adapter (004 US6, ADR-0038): it reads the rooms in scope from the local Rooms
-// read model and the live reservations from the Reservations projection, naming the office from Offices
-// and the occupants from Employees — all attendance's own read models, never a cross-service join
-// (ADR-0014). It returns raw data; the handler turns it into figures. An office/room not yet known to
-// attendance is Error.NotFound (unknown_office / unknown_room).
 public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancyReadModel
 {
     public async Task<Result<OccupancyData>> GetAsync(

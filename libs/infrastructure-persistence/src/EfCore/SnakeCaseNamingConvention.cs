@@ -4,18 +4,8 @@ using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 
-/// <summary>
-/// Applies PostgreSQL-idiomatic <c>snake_case</c> names to every table, column, key, and index
-/// in a model, so EF Core's default PascalCase identifiers do not force quoted identifiers in
-/// Postgres. Applied centrally by <see cref="RoomyDbContext"/> so every Roomy database shares one
-/// naming policy without each context repeating it.
-/// </summary>
 public static class SnakeCaseNamingConvention
 {
-    /// <summary>
-    /// Rewrites all relational names in <paramref name="modelBuilder"/> to snake_case. Call from
-    /// <c>OnModelCreating</c> after the model's entity configurations have been applied.
-    /// </summary>
     public static void Apply(ModelBuilder modelBuilder)
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
@@ -88,7 +78,6 @@ public static class SnakeCaseNamingConvention
     {
         var previous = name[index - 1];
 
-        // lower/digit → Upper always starts a new word (e.g. "streamId" → "stream_id").
         if (!char.IsUpper(previous)) return true;
 
         // Upper → Upper only splits when the next char is lower, i.e. the end of an acronym run

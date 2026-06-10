@@ -9,9 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Tests.Features;
 
-// The hire use case and the two saga-ack use cases (ADR-0025), driven against substituted ports — the
-// publish/consume is exercised by the integration tests. Hiring pre-allocates the login id, records the
-// employee in Provisioning, and commits; the acks transition it to Active / Failed (the compensation).
 public sealed class HireEmployeeTests
 {
     private static readonly Company company = Company.Create(CompanyName.From("Acme"));

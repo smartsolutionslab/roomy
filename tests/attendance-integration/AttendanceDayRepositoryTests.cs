@@ -4,11 +4,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The event-sourced repository against real PostgreSQL: a placed reservation round-trips through the
-// stream, an unbooked day loads empty (never "not found"), and the (stream_id, version) constraint
-// enforces no-overbooking under concurrency (FR-007, scenario 12) — the loser of the last-place race
-// is rejected and the stream keeps exactly one event. A fixed bookable Monday is passed as "today" so
-// each Reserve is self-consistent regardless of the wall clock.
 public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {
@@ -53,7 +48,6 @@ public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixtu
         var company = CompanyIdentifier.New();
         var room = SomeRoom();
 
-        // Both writers load the same empty day (version 0) and each reserves the single place.
         var writerA = fixture.CreateRepository();
         var writerB = fixture.CreateRepository();
         var dayA = await writerA.LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
@@ -68,7 +62,6 @@ public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixtu
         savedB.IsFailure.ShouldBeTrue();
         savedB.Error.Code.ShouldBe("concurrency_conflict");
 
-        // Exactly one event landed — capacity is never exceeded at the store (FR-007).
         var reloaded = await fixture.CreateRepository().LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
         reloaded.Version.ShouldBe(1);
         reloaded.Reservations.Count.ShouldBe(1);

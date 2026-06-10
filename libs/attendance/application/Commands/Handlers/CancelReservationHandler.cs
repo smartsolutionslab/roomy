@@ -4,11 +4,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 
-// Cancels a reservation (FR-008/009). Like reserve, it runs the aggregate's decision inside a bounded
-// optimistic-retry loop (research R2 / ADR-0039): load → cancel → save. A domain rejection (not found,
-// past day, not owner) returns immediately; only a save-time concurrency conflict retries, reloading so
-// the decision re-runs against fresh state. "Today" is the Europe/Berlin calendar day from the injected
-// TimeProvider, so the domain stays clock-free (research R4).
 public sealed class CancelReservationHandler(IAttendanceDayRepository attendanceDays, TimeProvider timeProvider)
     : ICommandHandler<CancelReservation>
 {

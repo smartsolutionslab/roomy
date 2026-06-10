@@ -5,9 +5,6 @@ using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests.EventStore;
 
-// The attendance stream events are the source of truth (ADR-0012), so they must serialize under a
-// stable name and rehydrate identically. This pins the registered names (a rename must not silently
-// invalidate the log) and the JSON round-trip the event store relies on.
 public class AttendanceEventTypeRegistryTests
 {
     private static JsonEventSerializer CreateSerializer() => new(AttendanceEventTypeRegistry.Build());

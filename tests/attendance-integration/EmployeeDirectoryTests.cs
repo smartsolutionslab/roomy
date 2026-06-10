@@ -7,10 +7,6 @@ using SmartSolutionsLab.Roomy.Contracts.Organization;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The actor→employee feed against real PostgreSQL (003 US4): organization's EmployeeHired is mirrored
-// onto the local Employees read model by the consumer, and EmployeeDirectory then resolves the acting
-// user (the token sub) to their EmployeeId for authorization (ADR-0014/0031). An unknown user is
-// unknown_employee; a repeated EmployeeHired is idempotent.
 public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : IClassFixture<PostgresEventStoreFixture>
 {
     private static readonly DateTimeOffset occurredAt = new(2026, 6, 9, 9, 0, 0, TimeSpan.Zero);

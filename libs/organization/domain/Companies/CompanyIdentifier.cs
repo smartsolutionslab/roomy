@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 
-// The identity of the Company: a branded, time-ordered GUIDv7 so it can never be confused with
-// another identifier (no primitive obsession). The implicit Guid conversions keep the EF Core value
-// converter trivial.
 public readonly record struct CompanyIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

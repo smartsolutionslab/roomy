@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests.Search;
 
-// The shared, bounded search term both employee lists parse `q` into (012, ADR-0047): trims, treats
-// blank/whitespace as "no filter" (IsEmpty), and rejects anything past the name length bound as a
-// validation error so a search never runs on unbounded input (FR-005).
 public class SearchTermTests
 {
     [Fact]

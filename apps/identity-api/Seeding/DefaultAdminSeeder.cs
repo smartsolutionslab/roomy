@@ -5,9 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 
-// Seeds the DefaultAdmin so the system is administrable from first start (FR-004, research R4).
-// Provisions the Keycloak user with the Administrator role, then persists the matching Active account
-// record. Idempotent: once the account exists, a restart is a no-op (it never re-provisions).
 public sealed class DefaultAdminSeeder(
     IUserRepository users,
     IIdentityProviderPort identityProvider,

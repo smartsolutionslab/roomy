@@ -9,9 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
-// The "my reservations" use case is a straight read of the read model (FR-004): the handler returns
-// exactly what the port holds, wrapped in a success Result, with no decision of its own. The SQL — the
-// employee filter, the name joins, and the ordering — is covered by the read-model integration tests.
 public class ViewMyReservationsTests
 {
     [Fact]

@@ -9,14 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 
-// The Keycloak adapter for the identity-provider port (ADR-0013, research R1/R2): it provisions the
-// Keycloak user that owns the credentials while the identity context owns the account/role record.
-// Provisioning runs as three admin REST calls — acquire an admin token, create the user with its
-// initial password, assign the realm role(s) — and returns the new Keycloak subject. Expected
-// business outcomes come back as a failed Result whose code matches the UserProvisioningFailed
-// reasons (email_taken / password_rejected / provider_error), never as an exception; only genuine
-// transport faults throw. If role assignment fails after the user is created, the partial user is
-// removed so a retry starts clean.
 public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdminOptions options)
     : IIdentityProviderPort
 {
@@ -158,9 +150,6 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
 
     private async Task RemovePartialUserAsync(string token, KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
     {
-        // Best-effort compensation: the user was created but its roles were not, so roll it back to
-        // keep provisioning idempotent on retry. A failure here is deliberately not surfaced — the
-        // original assignment error is the outcome the caller acts on.
         var requestUrl = $"admin/realms/{options.Realm}/users/{subject.Value}";
         using var request = AdminRequest(HttpMethod.Delete, requestUrl, token, content: null);
         using var response = await httpClient.SendAsync(request, cancellationToken);

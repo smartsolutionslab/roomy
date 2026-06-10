@@ -6,9 +6,6 @@ using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.AppHost.Tests;
 
-// Structural check on the app model: the identity service is wired into the stack with its database
-// and reachable behind the gateway. Builds the model only — no resources are started — so it needs no
-// Docker and stays fast.
 public sealed class AppHostCompositionTests
 {
     [Fact]
@@ -72,10 +69,8 @@ public sealed class AppHostCompositionTests
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
 
-        // One aggregated Scalar reference is composed for the dashboard (ADR-0042).
         model.Resources.OfType<ScalarResource>().ShouldHaveSingleItem();
 
-        // Each context API carries a custom dashboard URL (its OpenAPI link).
         foreach (var apiName in new[] { "identity-api", "organization-api", "attendance-api" })
         {
             var api = model.Resources.Single(resource => resource.Name == apiName);
@@ -86,9 +81,6 @@ public sealed class AppHostCompositionTests
     [Fact]
     public async Task Each_context_api_has_its_own_http_endpoint_so_they_do_not_collide_on_the_default_port()
     {
-        // The context APIs have no launchSettings; without an explicit endpoint they all fall back to
-        // Kestrel's default :5000 and only one can bind it — the others die with AddressInUseException.
-        // Each MUST declare its own HTTP endpoint so Aspire allocates a distinct port per service.
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
             TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);

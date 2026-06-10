@@ -6,9 +6,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// The organization service's own database (ADR-0014). Derives the shared RoomyDbContext baseline for
-// snake_case naming. Rooms are an owned collection of Office, so they have no DbSet — they are only
-// reached through their office. Employees are hired here and provisioned via the saga (008, ADR-0025).
 public sealed class OrganizationDbContext(DbContextOptions<OrganizationDbContext> options)
     : RoomyDbContext(options)
 {

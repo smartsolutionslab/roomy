@@ -2,11 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Search;
 
-// A bounded, optional free-text search term shared by every searchable list (012, ADR-0047). From trims
-// the input, treats blank/whitespace as "no filter" (IsEmpty — the list returns its unfiltered keyset
-// order), and rejects anything past the name length bound with a validation error, so a search never runs
-// on pathological, unbounded input (FR-005). Accent/case folding is the read model's concern (it happens in
-// SQL against the trigram index), so the term itself is only trimmed and length-bounded here.
 public sealed record SearchTerm : IValueObject
 {
     public const int MaxLength = 100;
@@ -15,7 +10,6 @@ public sealed record SearchTerm : IValueObject
 
     private SearchTerm(string value) => Value = value;
 
-    // The normalized term — trimmed, and empty when the caller asked for no filter.
     public string Value { get; }
 
     public bool IsEmpty => Value.Length == 0;

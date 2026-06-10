@@ -17,10 +17,6 @@ using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadMod
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// Boots the attendance host with the test auth scheme. Verifies the administrator on-behalf reads (009):
-// GET /reservations/employees and GET /reservations/by-employee/{id} are administrator-only on the
-// server (403 for a plain employee, 401 with no session), and return the directory / the employee's
-// reservations for an administrator.
 public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFixture>, IDisposable
 {
     private static readonly Guid companyId = Guid.Parse("0199a0b0-0000-7000-8000-000000000003");
@@ -37,8 +33,6 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Attendance:CompanyId", companyId.ToString());
-            // Skip the RabbitMQ inbox: this test seeds the read models directly and never exercises
-            // messaging, so the host must not wait on (and time out against) an absent broker.
             webHost.UseSetting("Messaging:Enabled", "false");
 
             webHost.ConfigureTestServices(services =>
@@ -112,10 +106,8 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
         page.ShouldNotBeNull();
         var names = page.Items.Select(employee => employee.Name).ToList();
 
-        // A name nothing like the query must not appear — search filters, it does not return the whole list.
         names.ShouldNotContain("Ada Lovelace");
 
-        // The closer match outranks the looser one (best-match-first).
         names.ShouldContain(EmployeeNameSamples.TypoTarget);
         names.ShouldContain(EmployeeNameSamples.LooserTypoMatch);
         names.IndexOf(EmployeeNameSamples.TypoTarget)
@@ -143,8 +135,6 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     [Fact]
     public async Task Search_paging_is_stable_when_a_matching_employee_is_inserted_mid_scroll()
     {
-        // A distinctive surname token isolates this family from any rows other tests left in the shared
-        // database: only these match the query, so the keyset walk is over exactly the seeded set.
         var surname = $"Zylit{Guid.NewGuid():N}";
         var family = new[] { "Aaron", "Bea", "Cora", "Dan", "Eve" }
             .Select(given => (Id: Guid.CreateVersion7(), Name: $"{given} {surname}"))
@@ -165,8 +155,6 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
         firstPage.NextCursor.ShouldNotBeNull();
         seen.AddRange(firstPage.Items.Select(employee => employee.EmployeeId));
 
-        // Insert a further matching employee after page 1 is read: keyset paging must not skip or duplicate
-        // an already-returned row because of it.
         await SeedAsync(seed =>
             seed.Employees.Add(new Employee { EmployeeId = Guid.CreateVersion7(), UserId = Guid.CreateVersion7(), DisplayName = $"Zoe {surname}" }));
 
@@ -225,9 +213,6 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     {
         await SeedCorpusAsync();
 
-        // A first page with no query yields an unfiltered-mode cursor (name, id). Replaying it alongside a
-        // query asks the read model to decode it as a similarity cursor — a mode mismatch, rejected like any
-        // malformed cursor (ADR-0044/0047).
         var unfiltered = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
             "/reservations/employees?limit=1", TestContext.Current.CancellationToken);
         unfiltered.ShouldNotBeNull();

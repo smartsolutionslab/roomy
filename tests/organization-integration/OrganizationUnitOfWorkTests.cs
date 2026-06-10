@@ -10,9 +10,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
-// The unit of work realizes ADR-0037: on save it drains the tracked aggregates' domain events, maps them
-// to the published contracts (stamping OccurredAt), hands them to the outbox, and clears them. Verified
-// with a capturing outbox and a tracking-only context — the drain logic needs no database round-trip.
 public sealed class OrganizationUnitOfWorkTests
 {
     private static readonly DateTimeOffset occurredAt = new(2026, 6, 9, 9, 0, 0, TimeSpan.Zero);

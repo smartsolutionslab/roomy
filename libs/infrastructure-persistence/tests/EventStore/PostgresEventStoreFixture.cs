@@ -17,8 +17,6 @@ public sealed class PostgresEventStoreFixture : BasePostgresFixture<Projects.Roo
         await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 
-    // A fresh context over the real database; each call gets an independent context so a test can model two
-    // concurrent writers on one database.
     internal TestEventStoreDbContext CreateContext() => new(NpgsqlOptions<TestEventStoreDbContext>());
 
     internal EfCoreEventStore CreateEventStore(TestEventStoreDbContext context, IEventSerializer serializer) =>

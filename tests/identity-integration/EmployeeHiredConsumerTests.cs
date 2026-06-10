@@ -7,9 +7,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// The messaging edge maps organization's published EmployeeHired (ADR-0031) onto the identity-owned
-// RegisterUser command and invokes the use case. This is the only place the foreign contract is
-// referenced; the application layer never sees it. A pure mapping test — no broker, no database.
 public sealed class EmployeeHiredConsumerTests
 {
     [Fact]

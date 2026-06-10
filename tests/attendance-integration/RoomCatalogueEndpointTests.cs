@@ -15,9 +15,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// Boots the attendance host in-process against the real test Postgres, with the BFF token replaced by
-// the test auth scheme. Verifies the GET /rooms contract (007 US1): any session may read it, no session
-// is unauthorized, and the catalogue lists the company's seeded rooms with their office names.
 public sealed class RoomCatalogueEndpointTests : IClassFixture<PostgresEventStoreFixture>, IDisposable
 {
     private static readonly Guid companyId = Guid.Parse("0199a0b0-0000-7000-8000-000000000002");

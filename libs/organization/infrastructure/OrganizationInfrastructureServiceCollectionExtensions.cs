@@ -12,24 +12,18 @@ using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure;
 
-// Composition-root wiring for the organization context's infrastructure. Keeps EF Core registration
-// out of the host's Program.cs (ADR-0003/0012). No messaging or external-provider adapters this slice
-// (research.md D4) — office/room management publishes nothing and provisions nothing.
 public static class OrganizationInfrastructureServiceCollectionExtensions
 {
-    public static IServiceCollection AddOrganizationPersistence(
-        this IServiceCollection services,
-        string connectionString)
+    public static IServiceCollection AddOrganizationPersistence(this IServiceCollection services, string connectionString)
     {
         Ensure.That(connectionString).IsNotNullOrWhiteSpace();
 
-        services.AddRoomyDbContext<OrganizationDbContext>(connectionString);
-        services.AddScoped<IOfficeRepository, OfficeRepository>();
-        services.AddScoped<ICompanyRepository, CompanyRepository>();
-        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        services.AddScoped<IUnitOfWork, OrganizationUnitOfWork>();
+        services.AddRoomyDbContext<OrganizationDbContext>(connectionString)
+            .AddScoped<IOfficeRepository, OfficeRepository>()
+            .AddScoped<ICompanyRepository, CompanyRepository>()
+            .AddScoped<IEmployeeRepository, EmployeeRepository>()
+            .AddScoped<IUnitOfWork, OrganizationUnitOfWork>();
 
-        // The unit of work stamps OccurredAt on the integration events it drains to the outbox (ADR-0037).
         services.TryAddSingleton(TimeProvider.System);
 
         return services;
@@ -37,16 +31,14 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
 
     public static IServiceCollection AddOrganizationUseCases(this IServiceCollection services)
     {
-        services.AddScoped<ICommandHandler<CreateOffice, OfficeIdentifier>, CreateOfficeHandler>();
-        services.AddScoped<ICommandHandler<AddRoomToOffice, RoomIdentifier>, AddRoomToOfficeHandler>();
-        services.AddScoped<ICommandHandler<RenameOffice>, RenameOfficeHandler>();
-        services.AddScoped<ICommandHandler<ChangeOfficeLocation>, ChangeOfficeLocationHandler>();
-        services.AddScoped<ICommandHandler<RenameRoom>, RenameRoomHandler>();
-
-        // Hiring (008): hire publishes EmployeeHired; the saga acks complete or compensate the employee.
-        services.AddScoped<ICommandHandler<HireEmployee, HiredEmployee>, HireEmployeeHandler>();
-        services.AddScoped<ICommandHandler<CompleteEmployeeProvisioning>, CompleteEmployeeProvisioningHandler>();
-        services.AddScoped<ICommandHandler<FailEmployeeProvisioning>, FailEmployeeProvisioningHandler>();
+        services.AddScoped<ICommandHandler<CreateOffice, OfficeIdentifier>, CreateOfficeHandler>()
+            .AddScoped<ICommandHandler<AddRoomToOffice, RoomIdentifier>, AddRoomToOfficeHandler>()
+            .AddScoped<ICommandHandler<RenameOffice>, RenameOfficeHandler>()
+            .AddScoped<ICommandHandler<ChangeOfficeLocation>, ChangeOfficeLocationHandler>()
+            .AddScoped<ICommandHandler<RenameRoom>, RenameRoomHandler>()
+            .AddScoped<ICommandHandler<HireEmployee, HiredEmployee>, HireEmployeeHandler>()
+            .AddScoped<ICommandHandler<CompleteEmployeeProvisioning>, CompleteEmployeeProvisioningHandler>()
+            .AddScoped<ICommandHandler<FailEmployeeProvisioning>, FailEmployeeProvisioningHandler>();
 
         return services;
     }

@@ -6,10 +6,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// The commit seam that realizes ADR-0037 for organization: it drains the tracked aggregates' domain
-// events, maps the publishable ones to integration contracts, and saves through the transactional
-// outbox so the aggregate rows and the outbox rows commit together (ADR-0012). Domain events are
-// cleared after the commit so a later save in the same scope does not republish them.
 public sealed class OrganizationUnitOfWork(OrganizationDbContext context, IIntegrationEventOutbox outbox, TimeProvider timeProvider)
     : IUnitOfWork
 {
