@@ -263,10 +263,14 @@ justification comment **and** sign-off in the PR.
 Full rules are authoritative in `docs/coding-standards/csharp.md` and
 `docs/coding-standards/typescript.md`. The load-bearing highlights, repeated here:
 
-- **Names reveal intent; comments only when needed** — a comment explains *why*, never
-  *what*; if you need one to explain *what*, rename instead. Default to **no comment**; no
-  ceremonial XML/JSDoc that echoes a name. No abbreviations or single-letter names, including
-  lambda/LINQ parameters.
+- **Names reveal intent; comments are the rare exception, not the norm.** Default to **no
+  comment**. Write one *only* when the code genuinely cannot carry the meaning itself — a
+  platform/library workaround (cite the bug, e.g. `GH-2876`), a security subtlety, a
+  non-obvious algorithm, or a "looks-wrong-but-intentional" note. Do **not** write narrative
+  headers, "what this does" summaries, ceremonial XML/JSDoc that echoes a name, or
+  spec/FR/ADR-reference comments — traceability lives in the spec, the ADR, the commit, and
+  the test name, not in code comments. If you reach for a comment to explain *what*, rename
+  instead. No abbreviations or single-letter names, including lambda/LINQ parameters.
 - **No primitive obsession** — domain concepts are types, not raw primitives: C# value
   objects (invariants enforced with `Ensure.That(...)`) and TypeScript branded types.
 - **Domain modelling** — organize the domain **by aggregate** (a folder + namespace per
