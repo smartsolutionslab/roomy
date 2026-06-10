@@ -1,9 +1,10 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 
 // Lists a page of the on-behalf employee directory (009, ADR-0044): a straight read of the catalog
 // through the port. There is nothing to decide — an empty page is not "not found" — so the handler

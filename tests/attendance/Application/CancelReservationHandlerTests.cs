@@ -1,5 +1,6 @@
 using Shouldly;
-using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
+using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.TestSupport;

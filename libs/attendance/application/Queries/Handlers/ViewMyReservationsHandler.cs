@@ -1,9 +1,10 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 
 // Lists a page of an employee's own reservations (FR-004, ADR-0044): a straight read of the local
 // Reservations read model through the port. There is nothing to decide here — an empty page is not

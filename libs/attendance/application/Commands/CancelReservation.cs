@@ -1,7 +1,7 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 
 // Intent to cancel a reservation, freeing its place (FR-008). The company-day locates the aggregate
 // (ADR-0026); the date is carried because the event-sourced stream is keyed by company-day, so the
