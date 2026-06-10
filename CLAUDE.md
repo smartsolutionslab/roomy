@@ -115,6 +115,7 @@ roomy/
 │     │  ├─ feature/              # routed feature areas / smart components  (type:feature)
 │     │  └─ api/                  # typed OpenAPI client + gateway facade    (type:api)
 │     └─ shared/
+│        ├─ feature/              # cross-cutting smart components (auth guards, theme toggle)  (type:feature)
 │        ├─ data-access/          # shared client-side data utils: session, theme, pagination  (type:data-access)
 │        ├─ ui/                   # presentational design-system components  (type:ui)
 │        └─ util/                 # shared TS utilities (@roomy/util)         (type:util)
