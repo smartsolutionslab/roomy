@@ -1,47 +1,45 @@
 <ng-container *transloco="let translate">
-  <section class="reserve">
-    <h1 class="reserve__title">{{ translate('attendance.reserve.title') }}</h1>
+  <section roomyPage size="form">
+    <h1>{{ translate('attendance.reserve.title') }}</h1>
 
-    <p class="reserve__result" role="status" aria-live="polite">
+    <roomy-message>
       @if (result(); as message) {
       {{ translate(message.key, message.params) }}
       }
-    </p>
+    </roomy-message>
 
     @if (errorKey(); as key) {
-    <p class="reserve__error" role="alert">{{ translate(key) }}</p>
+    <roomy-message variant="error">{{ translate(key) }}</roomy-message>
     }
 
     @if (loadFailed()) {
-    <p class="reserve__error" role="alert">{{ translate('attendance.reserve.loadError') }}</p>
+    <roomy-message variant="error">{{ translate('attendance.reserve.loadError') }}</roomy-message>
     } @else if (offices(); as items) { @if (items.length === 0) {
-    <p class="reserve__empty">{{ translate('attendance.reserve.empty') }}</p>
+    <p>{{ translate('attendance.reserve.empty') }}</p>
     } @else {
-    <label class="reserve__field">
-      <span>{{ translate('attendance.reserve.officeLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.reserve.officeLabel')">
       <select #officeSelect (change)="chooseOffice(officeSelect.value)">
         <option value="">{{ translate('attendance.reserve.officePlaceholder') }}</option>
         @for (office of items; track office.id) {
         <option [value]="office.id">{{ office.name }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
-    <label class="reserve__field">
-      <span>{{ translate('attendance.reserve.dayLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.reserve.dayLabel')">
       <select #daySelect (change)="chooseDay(daySelect.value)">
         <option value="">{{ translate('attendance.reserve.dayPlaceholder') }}</option>
         @for (day of bookableDays(); track day) {
         <option [value]="day">{{ day }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
     @if (selectedOffice(); as office) {
-    <h2 class="reserve__rooms-heading">{{ translate('attendance.reserve.roomsHeading') }}</h2>
-    <ul class="reserve__rooms">
+    <h2>{{ translate('attendance.reserve.roomsHeading') }}</h2>
+    <ul class="roomy-list">
       @for (room of office.rooms; track room.id) {
-      <li class="reserve__room">
+      <li>
         <button
           type="button"
           class="reserve__room-button"
@@ -69,17 +67,12 @@
       }
     </ul>
 
-    <button
-      type="button"
-      class="reserve__confirm"
-      [disabled]="!canReserve()"
-      (click)="reserve()"
-    >
+    <button roomyButton variant="accent" type="button" [disabled]="!canReserve()" (click)="reserve()">
       {{ translate('attendance.reserve.confirm') }}
     </button>
     } }
     } @else {
-    <p class="reserve__loading">{{ translate('attendance.reserve.loading') }}</p>
+    <p>{{ translate('attendance.reserve.loading') }}</p>
     }
   </section>
 </ng-container>

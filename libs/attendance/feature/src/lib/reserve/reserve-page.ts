@@ -22,6 +22,7 @@ import {
   bookableDaysFrom,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { Button, FormField, Message, Page } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
 
@@ -33,7 +34,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-reserve-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, Page, FormField, Message, Button],
   templateUrl: './reserve-page.html',
   styleUrl: './reserve-page.css',
 })

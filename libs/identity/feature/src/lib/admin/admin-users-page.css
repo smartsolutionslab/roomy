@@ -1,26 +1,5 @@
-.admin-users {
-  display: flex;
-  flex-direction: column;
-  gap: var(--roomy-space-md, 1rem);
-}
-
-.admin-users__table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.admin-users__table th,
-.admin-users__table td {
-  text-align: left;
-  padding: var(--roomy-space-xs, 0.25rem) var(--roomy-space-sm, 0.5rem);
-  border-bottom: 1px solid var(--roomy-color-border, #d0d0d0);
-}
-
+/* Container, table, buttons, and messages come from the shared design system; this keeps the
+   small spacing between the two action buttons in a row. */
 .admin-users__table td button {
-  margin-right: var(--roomy-space-xs, 0.25rem);
-}
-
-.admin-users__table td button:focus-visible {
-  outline: var(--roomy-focus-outline);
-  outline-offset: var(--roomy-focus-outline-offset);
+  margin-inline-end: var(--roomy-space-xs);
 }

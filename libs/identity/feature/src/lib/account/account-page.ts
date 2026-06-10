@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { Account, AccountGateway } from '@roomy/identity-data-access';
+import { Message, Page } from '@roomy/shared-ui';
 import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'roomy-account-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, Page, Message],
   templateUrl: './account-page.html',
   styleUrl: './account-page.css',
 })

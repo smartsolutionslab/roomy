@@ -1,16 +1,5 @@
-.occupancy {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 44rem;
-}
-
-.occupancy__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
+/* Container, fields, and error text come from the shared design system. The nested
+   day → rooms → occupants rollup below is specific to this view. */
 .occupancy__days,
 .occupancy__rooms,
 .occupancy__occupants {
@@ -22,7 +11,7 @@
 .occupancy__days {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--roomy-space-md);
 }
 
 .occupancy__room {
@@ -30,8 +19,4 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: baseline;
-}
-
-.occupancy__error {
-  color: var(--roomy-color-danger);
 }

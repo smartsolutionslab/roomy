@@ -1,26 +1,22 @@
 <ng-container *transloco="let translate">
-  <section class="admin-users">
-    <h1 class="admin-users__title">{{ translate('admin.users.title') }}</h1>
+  <section roomyPage>
+    <h1>{{ translate('admin.users.title') }}</h1>
 
     @if (grantSucceeded(); as grantedName) {
-    <p class="admin-users__status" role="status" aria-live="polite">
-      {{ translate('admin.users.grantSuccess', { name: grantedName }) }}
-    </p>
+    <roomy-message>{{ translate('admin.users.grantSuccess', { name: grantedName }) }}</roomy-message>
     } @if (grantFailed()) {
-    <p class="admin-users__error" role="alert" aria-live="assertive">
-      {{ translate('admin.users.grantError') }}
-    </p>
+    <roomy-message variant="error">{{ translate('admin.users.grantError') }}</roomy-message>
     } @if (loadFailed()) {
-    <p class="admin-users__error" role="alert">{{ translate('admin.users.loadError') }}</p>
+    <roomy-message variant="error">{{ translate('admin.users.loadError') }}</roomy-message>
     } @else if (users(); as accounts) { @if (accounts.length === 0) {
-    <p class="admin-users__empty">{{ translate('admin.users.empty') }}</p>
+    <p>{{ translate('admin.users.empty') }}</p>
     } @else {
     <roomy-infinite-scroll
       [hasMore]="nextCursor() !== null"
       [loading]="loadingMore()"
       (loadMore)="loadMore()"
     >
-    <table class="admin-users__table">
+    <table class="roomy-table admin-users__table">
       <thead>
         <tr>
           <th scope="col">{{ translate('admin.users.nameHeader') }}</th>
@@ -39,14 +35,14 @@
           <td>{{ translate('admin.users.status.' + account.status) }}</td>
           <td>
             @if (account.role === 'employee') { @if (confirmingUserId() === account.userId) {
-            <button type="button" (click)="confirmGrant(account)">
+            <button roomyButton variant="accent" type="button" (click)="confirmGrant(account)">
               {{ translate('admin.users.confirm') }}
             </button>
-            <button type="button" (click)="cancelGrant()">
+            <button roomyButton type="button" (click)="cancelGrant()">
               {{ translate('admin.users.cancel') }}
             </button>
             } @else {
-            <button type="button" (click)="requestGrant(account)">
+            <button roomyButton type="button" (click)="requestGrant(account)">
               {{ translate('admin.users.grant') }}
             </button>
             } }
@@ -57,7 +53,7 @@
     </table>
     </roomy-infinite-scroll>
     } } @else {
-    <p class="admin-users__loading">{{ translate('admin.users.loading') }}</p>
+    <p>{{ translate('admin.users.loading') }}</p>
     }
   </section>
 </ng-container>

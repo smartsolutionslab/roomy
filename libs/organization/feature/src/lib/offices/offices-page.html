@@ -1,116 +1,107 @@
 <ng-container *transloco="let translate">
-  <section class="offices">
-    <h1 class="offices__title">{{ translate('organization.offices.title') }}</h1>
+  <section roomyPage>
+    <h1>{{ translate('organization.offices.title') }}</h1>
 
-    <form class="offices__create" [formGroup]="createForm" (ngSubmit)="createOffice()">
+    <form [formGroup]="createForm" (ngSubmit)="createOffice()">
       <h2>{{ translate('organization.create.heading') }}</h2>
-      <label class="offices__field">
-        <span>{{ translate('organization.create.nameLabel') }}</span>
+      <roomy-form-field [label]="translate('organization.create.nameLabel')">
         <input type="text" formControlName="name" />
-      </label>
-      <label class="offices__field">
-        <span>{{ translate('organization.create.locationLabel') }}</span>
+      </roomy-form-field>
+      <roomy-form-field [label]="translate('organization.create.locationLabel')">
         <input type="text" formControlName="location" />
-      </label>
+      </roomy-form-field>
       @if (createConflict()) {
-      <p class="offices__error" role="alert">{{ translate('organization.create.nameConflict') }}</p>
+      <roomy-message variant="error">{{ translate('organization.create.nameConflict') }}</roomy-message>
       } @if (createFailed()) {
-      <p class="offices__error" role="alert">{{ translate('organization.create.error') }}</p>
+      <roomy-message variant="error">{{ translate('organization.create.error') }}</roomy-message>
       }
-      <button type="submit">{{ translate('organization.create.submit') }}</button>
+      <button roomyButton variant="accent" type="submit">{{ translate('organization.create.submit') }}</button>
     </form>
 
-    <p class="offices__result" role="status" aria-live="polite">
+    <roomy-message>
       @if (result(); as message) {
       {{ translate(message.key, message.params) }}
       }
-    </p>
+    </roomy-message>
 
     @if (editNotFound()) {
-    <p class="offices__error" role="alert">{{ translate('organization.edit.notFound') }}</p>
+    <roomy-message variant="error">{{ translate('organization.edit.notFound') }}</roomy-message>
     }
 
     @if (loadFailed()) {
-    <p class="offices__error" role="alert">{{ translate('organization.offices.loadError') }}</p>
+    <roomy-message variant="error">{{ translate('organization.offices.loadError') }}</roomy-message>
     } @else if (offices(); as items) { @if (items.length === 0) {
-    <p class="offices__empty">{{ translate('organization.offices.empty') }}</p>
+    <p>{{ translate('organization.offices.empty') }}</p>
     } @else {
-    <ul class="offices__list">
+    <ul class="roomy-list">
       @for (office of items; track office.id) {
-      <li class="offices__item">
+      <li roomyCard>
         @if (isActive('rename-office', office.id)) {
-        <form class="offices__edit" [formGroup]="textForm" (ngSubmit)="saveOfficeName(office.id)">
-          <label class="offices__field">
-            <span>{{ translate('organization.edit.nameLabel') }}</span>
+        <form [formGroup]="textForm" (ngSubmit)="saveOfficeName(office.id)">
+          <roomy-form-field [label]="translate('organization.edit.nameLabel')">
             <input type="text" formControlName="value" />
-          </label>
+          </roomy-form-field>
           @if (editConflict()) {
-          <p class="offices__error" role="alert">
-            {{ translate('organization.edit.nameConflict') }}
-          </p>
+          <roomy-message variant="error">{{ translate('organization.edit.nameConflict') }}</roomy-message>
           } @if (editFailed()) {
-          <p class="offices__error" role="alert">{{ translate('organization.edit.error') }}</p>
+          <roomy-message variant="error">{{ translate('organization.edit.error') }}</roomy-message>
           }
-          <button type="submit">{{ translate('organization.edit.save') }}</button>
-          <button type="button" (click)="cancelEdit()">
+          <button roomyButton variant="accent" type="submit">{{ translate('organization.edit.save') }}</button>
+          <button roomyButton type="button" (click)="cancelEdit()">
             {{ translate('organization.edit.cancel') }}
           </button>
         </form>
         } @else {
         <h2 class="offices__name">{{ office.name }}</h2>
-        <button type="button" (click)="openRenameOffice(office)">
+        <button roomyButton type="button" (click)="openRenameOffice(office)">
           {{ translate('organization.edit.rename') }}
         </button>
         }
 
         @if (isActive('relocate-office', office.id)) {
-        <form class="offices__edit" [formGroup]="textForm" (ngSubmit)="saveOfficeLocation(office.id)">
-          <label class="offices__field">
-            <span>{{ translate('organization.edit.locationLabel') }}</span>
+        <form [formGroup]="textForm" (ngSubmit)="saveOfficeLocation(office.id)">
+          <roomy-form-field [label]="translate('organization.edit.locationLabel')">
             <input type="text" formControlName="value" />
-          </label>
+          </roomy-form-field>
           @if (editFailed()) {
-          <p class="offices__error" role="alert">{{ translate('organization.edit.error') }}</p>
+          <roomy-message variant="error">{{ translate('organization.edit.error') }}</roomy-message>
           }
-          <button type="submit">{{ translate('organization.edit.save') }}</button>
-          <button type="button" (click)="cancelEdit()">
+          <button roomyButton variant="accent" type="submit">{{ translate('organization.edit.save') }}</button>
+          <button roomyButton type="button" (click)="cancelEdit()">
             {{ translate('organization.edit.cancel') }}
           </button>
         </form>
         } @else {
-        <dl class="offices__meta">
+        <dl class="roomy-dl">
           <dt>{{ translate('organization.offices.locationLabel') }}</dt>
           <dd>{{ office.location }}</dd>
           <dt>{{ translate('organization.offices.capacityLabel') }}</dt>
           <dd>{{ office.capacity }}</dd>
         </dl>
-        <button type="button" (click)="openRelocateOffice(office)">
+        <button roomyButton type="button" (click)="openRelocateOffice(office)">
           {{ translate('organization.edit.relocate') }}
         </button>
         }
 
         <h3 class="offices__rooms-heading">{{ translate('organization.offices.roomsHeading') }}</h3>
         @if (office.rooms.length === 0) {
-        <p class="offices__no-rooms">{{ translate('organization.offices.noRooms') }}</p>
+        <p>{{ translate('organization.offices.noRooms') }}</p>
         } @else {
         <ul class="offices__rooms">
           @for (room of office.rooms; track room.id) {
           <li class="offices__room">
             @if (isRenamingRoom(office.id, room.id)) {
-            <form class="offices__edit" [formGroup]="textForm" (ngSubmit)="saveRoomName(office.id, room.id)">
-              <label class="offices__field">
-                <span>{{ translate('organization.rooms.renameLabel') }}</span>
+            <form [formGroup]="textForm" (ngSubmit)="saveRoomName(office.id, room.id)">
+              <roomy-form-field [label]="translate('organization.rooms.renameLabel')">
                 <input type="text" formControlName="value" />
-              </label>
+              </roomy-form-field>
               @if (editConflict()) {
-              <p class="offices__error" role="alert">
-                {{ translate('organization.rooms.nameConflict') }}
-              </p>
+              <roomy-message variant="error">{{ translate('organization.rooms.nameConflict') }}</roomy-message>
               } @if (editFailed()) {
-              <p class="offices__error" role="alert">{{ translate('organization.edit.error') }}</p>
+              <roomy-message variant="error">{{ translate('organization.edit.error') }}</roomy-message>
               }
-              <button type="submit">{{ translate('organization.edit.save') }}</button>
-              <button type="button" (click)="cancelEdit()">
+              <button roomyButton variant="accent" type="submit">{{ translate('organization.edit.save') }}</button>
+              <button roomyButton type="button" (click)="cancelEdit()">
                 {{ translate('organization.edit.cancel') }}
               </button>
             </form>
@@ -118,6 +109,7 @@
             <span class="offices__room-name">{{ room.name }}</span>
             <span class="offices__room-capacity">{{ room.capacity }}</span>
             <button
+              roomyButton
               type="button"
               [attr.aria-label]="translate('organization.rooms.renameRoom', { name: room.name })"
               (click)="openRenameRoom(office, room)"
@@ -131,35 +123,29 @@
         }
 
         @if (isActive('add-room', office.id)) {
-        <form class="offices__add-room" [formGroup]="roomForm" (ngSubmit)="addRoom(office.id)">
-          <label class="offices__field">
-            <span>{{ translate('organization.rooms.nameLabel') }}</span>
+        <form [formGroup]="roomForm" (ngSubmit)="addRoom(office.id)">
+          <roomy-form-field [label]="translate('organization.rooms.nameLabel')">
             <input type="text" formControlName="name" />
-          </label>
-          <label class="offices__field">
-            <span>{{ translate('organization.rooms.capacityLabel') }}</span>
+          </roomy-form-field>
+          <roomy-form-field [label]="translate('organization.rooms.capacityLabel')">
             <input type="number" formControlName="capacity" min="1" />
-          </label>
+          </roomy-form-field>
           @if (roomAttempted() && roomForm.controls.name.invalid) {
-          <p class="offices__error" role="alert">
-            {{ translate('organization.rooms.nameRequired') }}
-          </p>
+          <roomy-message variant="error">{{ translate('organization.rooms.nameRequired') }}</roomy-message>
           } @if (roomAttempted() && roomForm.controls.capacity.invalid) {
-          <p class="offices__error" role="alert">{{ translate('organization.rooms.capacityMin') }}</p>
+          <roomy-message variant="error">{{ translate('organization.rooms.capacityMin') }}</roomy-message>
           } @if (editConflict()) {
-          <p class="offices__error" role="alert">
-            {{ translate('organization.rooms.nameConflict') }}
-          </p>
+          <roomy-message variant="error">{{ translate('organization.rooms.nameConflict') }}</roomy-message>
           } @if (editFailed()) {
-          <p class="offices__error" role="alert">{{ translate('organization.rooms.error') }}</p>
+          <roomy-message variant="error">{{ translate('organization.rooms.error') }}</roomy-message>
           }
-          <button type="submit">{{ translate('organization.rooms.submit') }}</button>
-          <button type="button" (click)="cancelEdit()">
+          <button roomyButton variant="accent" type="submit">{{ translate('organization.rooms.submit') }}</button>
+          <button roomyButton type="button" (click)="cancelEdit()">
             {{ translate('organization.edit.cancel') }}
           </button>
         </form>
         } @else {
-        <button type="button" (click)="openAddRoom(office)">
+        <button roomyButton type="button" (click)="openAddRoom(office)">
           {{ translate('organization.rooms.add') }}
         </button>
         }
@@ -167,7 +153,7 @@
       }
     </ul>
     } } @else {
-    <p class="offices__loading">{{ translate('organization.offices.loading') }}</p>
+    <p>{{ translate('organization.offices.loading') }}</p>
     }
   </section>
 </ng-container>
