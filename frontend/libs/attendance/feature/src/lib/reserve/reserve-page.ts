@@ -22,7 +22,7 @@ import {
   bookableDaysFrom,
   errorCode,
   todayInBerlin,
-} from '@roomy/attendance-data-access';
+} from '@roomy/attendance-api';
 import { Button, DaySelect, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };

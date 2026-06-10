@@ -19,7 +19,7 @@ import {
   rangeFor,
   roomId,
   todayInBerlin,
-} from '@roomy/attendance-data-access';
+} from '@roomy/attendance-api';
 import { FormField, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 
 // The occupancy list (OC-1/2/4/6): pick an office (optionally a single room) and a day / week / month

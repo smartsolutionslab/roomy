@@ -20,7 +20,7 @@ import {
   rangeFor,
   roomId,
   todayInBerlin,
-} from '@roomy/attendance-data-access';
+} from '@roomy/attendance-api';
 import { Button, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
 

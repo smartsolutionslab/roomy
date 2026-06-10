@@ -1,15 +1,15 @@
 {
-  "name": "organization-data-access",
+  "name": "identity-api",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "frontend/libs/organization/data-access/src",
+  "sourceRoot": "frontend/libs/identity/api/src",
   "prefix": "roomy",
   "projectType": "library",
-  "tags": ["type:data-access", "context:organization"],
+  "tags": ["type:api", "context:identity"],
   "targets": {
     "generate-client": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ng-openapi-gen --config frontend/libs/organization/data-access/ng-openapi-gen.json",
+        "command": "ng-openapi-gen --config frontend/libs/identity/api/ng-openapi-gen.json",
         "cwd": "{workspaceRoot}"
       }
     },
@@ -17,7 +17,7 @@
       "executor": "@nx/vitest:test",
       "outputs": ["{options.reportsDirectory}"],
       "options": {
-        "reportsDirectory": "coverage/libs/organization/data-access"
+        "reportsDirectory": "coverage/libs/identity/api"
       }
     },
     "lint": {

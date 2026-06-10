@@ -7,7 +7,7 @@ import {
   RoomId,
   officeId,
   roomId,
-} from '@roomy/organization-data-access';
+} from '@roomy/organization-api';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of, throwError } from 'rxjs';

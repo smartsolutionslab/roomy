@@ -1,6 +1,6 @@
 {
   "input": "apps/attendance-api/Roomy.Attendance.Api.json",
-  "output": "frontend/libs/attendance/data-access/src/lib/generated",
+  "output": "frontend/libs/attendance/api/src/lib/generated",
   "indexFile": true,
   "ignoreUnusedModels": false
 }

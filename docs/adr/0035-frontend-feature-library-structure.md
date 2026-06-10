@@ -72,3 +72,25 @@ and libs; only the runner wiring differs.
 - A second test runner (`vitest-analog`) now exists alongside the app's `@angular/build:unit-test`.
   Accepted as the supported way to test non-buildable Angular libs; revisit if Angular's
   application unit-test builder gains library support.
+
+## Amendment — 2026-06-11: `frontend/` relocation and `data-access` → `api`
+
+Two structural refinements supersede the paths and type names above:
+
+1. **All Angular/Nx projects moved under `frontend/`.** Libraries now live at
+   `frontend/libs/<context>/<type>` and the app at `frontend/apps/web`; `libs/` and `apps/` hold
+   only .NET projects. Import aliases (`@roomy/<context>-<type>`) and Nx tags are unchanged by the
+   move — only directory paths and the path-relative config (tsconfig/eslint/vite depth,
+   `tsconfig.base.json` aliases, `pnpm-workspace.yaml`, CI generated-client paths) shifted.
+
+2. **Per-context typed API-client libs renamed `data-access` → `api`.** The libs holding the
+   generated OpenAPI client + gateway facade are now `frontend/libs/<context>/api`, project
+   `<context>-api`, alias `@roomy/<context>-api`, Nx tag **`type:api`**. Rationale: `api` names what
+   the lib is (one context's REST client) and disambiguates it from `shared/data-access`, which
+   holds client-side data utilities (session, theme, pagination) and **keeps** `type:data-access`.
+   So the frontend now carries both `type:api` and `type:data-access`.
+
+   Updated frontend dependency rule (`eslint.config.mjs`): `feature → feature, ui, api, data-access,
+   util`; `ui → ui, util`; `api → api, data-access, util`; `data-access → data-access, util`. The
+   app (`type:app`) may additionally depend on `api`. `shared/data-access` is the sole remaining
+   `type:data-access` lib.

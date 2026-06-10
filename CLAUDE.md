@@ -112,10 +112,12 @@ roomy/
 │  │  └─ web/                     # Angular app (the single SPA)
 │  └─ libs/
 │     ├─ <context>/
-│     │  ├─ feature/              # routed feature areas / smart components
-│     │  ├─ ui/                   # presentational components
-│     │  └─ data-access/          # typed API client + generated client
-│     └─ shared/util/             # shared TS utilities (@roomy/util)
+│     │  ├─ feature/              # routed feature areas / smart components  (type:feature)
+│     │  └─ api/                  # typed OpenAPI client + gateway facade    (type:api)
+│     └─ shared/
+│        ├─ data-access/          # shared client-side data utils: session, theme, pagination  (type:data-access)
+│        ├─ ui/                   # presentational design-system components  (type:ui)
+│        └─ util/                 # shared TS utilities (@roomy/util)         (type:util)
 └─ tests/
    └─ architecture/              # NetArchTest rules enforcing the dependency rule
 ```
@@ -184,7 +186,7 @@ lint failures (ADR-0002/0003). The .NET side mirrors this with architecture test
 
 | Tag axis | Values |
 |---|---|
-| `type:*` | backend: `domain` · `application` · `infrastructure` · `app` · `util`; frontend (ADR-0035): `feature` · `ui` · `data-access` |
+| `type:*` | backend: `domain` · `application` · `infrastructure` · `app` · `util`; frontend (ADR-0035): `feature` · `ui` · `api` (per-context OpenAPI client) · `data-access` (shared client-side data utils) |
 | `context:*` | `identity` · `organization` · `attendance` · `shared` · `web` (the single SPA, ADR-0035) |
 
 `depConstraints` (encoded in `eslint.config.mjs`):
@@ -192,9 +194,9 @@ lint failures (ADR-0002/0003). The .NET side mirrors this with architecture test
 - **Backend layer (dependency rule):** `domain` → `domain`, `util`; `application` → `application`,
   `domain`, `util`; `infrastructure` → `infrastructure`, `application`, `domain`, `util`;
   `app` (composition root) → any layer; `util` → `util` only.
-- **Frontend layer (Angular libs, ADR-0035):** `feature` → `feature`, `ui`, `data-access`, `util`;
-  `ui` → `ui`, `util`; `data-access` → `data-access`, `util`. The `app` composition root may also
-  depend on `feature`/`ui`/`data-access`.
+- **Frontend layer (Angular libs, ADR-0035):** `feature` → `feature`, `ui`, `api`, `data-access`,
+  `util`; `ui` → `ui`, `util`; `api` → `api`, `data-access`, `util`; `data-access` → `data-access`,
+  `util`. The `app` composition root may also depend on `feature`/`ui`/`api`/`data-access`.
 - **Context isolation:** each `context:*` may depend only on its own context and
   `context:shared`; `context:shared` depends only on `context:shared`. Cross-context flow
   is by ID + integration events, never by importing another context's libs. **Exception:** the
@@ -291,7 +293,7 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   injection only.
 - **Angular:** standalone + signal-based + zoneless · `OnPush` · `inject()` · signal
   `input()`/`output()` · no `NgModule` · per-context feature libs at `frontend/libs/<context>/<type>`
-  (`@roomy/<context>-<type>`, types `feature`/`ui`/`data-access`) mirror the backend contexts
+  (`@roomy/<context>-<type>`, types `feature`/`api`; shared libs add `ui`/`data-access`/`util`) mirror the backend contexts
   (ADR-0035). Libs are tested with `vitest-analog` + `@testing-library/angular`; the app uses
   `@angular/build:unit-test` — same test code, different runner.
 

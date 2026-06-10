@@ -17,7 +17,7 @@ import {
   errorCode,
   partitionReservationsByDay,
   todayInBerlin,
-} from '@roomy/attendance-data-access';
+} from '@roomy/attendance-api';
 import { cursorList } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 import { EMPTY } from 'rxjs';

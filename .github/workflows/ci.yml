@@ -326,12 +326,12 @@ jobs:
       # was not followed by re-running generate-client cannot drift the client the frontend consumes.
       - name: Verify the generated API client is current
         run: |
-          pnpm nx run identity-data-access:generate-client
-          git diff --exit-code -- frontend/libs/identity/data-access/src/lib/generated
-          pnpm nx run organization-data-access:generate-client
-          git diff --exit-code -- frontend/libs/organization/data-access/src/lib/generated
-          pnpm nx run attendance-data-access:generate-client
-          git diff --exit-code -- frontend/libs/attendance/data-access/src/lib/generated
+          pnpm nx run identity-api:generate-client
+          git diff --exit-code -- frontend/libs/identity/api/src/lib/generated
+          pnpm nx run organization-api:generate-client
+          git diff --exit-code -- frontend/libs/organization/api/src/lib/generated
+          pnpm nx run attendance-api:generate-client
+          git diff --exit-code -- frontend/libs/attendance/api/src/lib/generated
 
       - name: Derive affected SHAs
         uses: nrwl/nx-set-shas@v5

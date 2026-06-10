@@ -1,5 +1,5 @@
 import { provideZonelessChangeDetection } from '@angular/core';
-import { Account, AccountGateway, userId } from '@roomy/identity-data-access';
+import { Account, AccountGateway, userId } from '@roomy/identity-api';
 import { render, screen } from '@testing-library/angular';
 import { Observable, of, throwError } from 'rxjs';
 

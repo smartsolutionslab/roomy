@@ -15,14 +15,14 @@
     "importHelpers": true,
     "paths": {
       "@roomy/util": ["./frontend/libs/shared/util/src/index.ts"],
-      "@roomy/identity-data-access": ["./frontend/libs/identity/data-access/src/index.ts"],
+      "@roomy/identity-api": ["./frontend/libs/identity/api/src/index.ts"],
       "@roomy/identity-feature": ["./frontend/libs/identity/feature/src/index.ts"],
       "@roomy/shared-data-access": ["./frontend/libs/shared/data-access/src/index.ts"],
       "@roomy/shared-ui": ["./frontend/libs/shared/ui/src/index.ts"],
-      "@roomy/organization-data-access": ["./frontend/libs/organization/data-access/src/index.ts"],
+      "@roomy/organization-api": ["./frontend/libs/organization/api/src/index.ts"],
       "@roomy/shared-feature": ["./frontend/libs/shared/feature/src/index.ts"],
       "@roomy/organization-feature": ["./frontend/libs/organization/feature/src/index.ts"],
-      "@roomy/attendance-data-access": ["./frontend/libs/attendance/data-access/src/index.ts"],
+      "@roomy/attendance-api": ["./frontend/libs/attendance/api/src/index.ts"],
       "@roomy/attendance-feature": ["./frontend/libs/attendance/feature/src/index.ts"]
     }
   },
