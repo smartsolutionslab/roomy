@@ -10,6 +10,7 @@ import {
   reservationId,
   roomId,
 } from '@roomy/attendance-data-access';
+import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of } from 'rxjs';
@@ -37,22 +38,26 @@ const adasUpcoming: MyReservation = {
   date: '2026-06-10',
 };
 
+function page<T>(items: T[], nextCursor: string | null = null): Page<T> {
+  return { items, nextCursor };
+}
+
 interface Stub {
-  employees?: () => Observable<Employee[]>;
-  reservationsFor?: (employee: string) => Observable<MyReservation[]>;
+  employees?: (cursor?: string) => Observable<Page<Employee>>;
+  reservationsFor?: (employee: string, cursor?: string) => Observable<Page<MyReservation>>;
   cancel?: (reservation: string, date: string) => Observable<void>;
   reserve?: (...args: unknown[]) => Observable<unknown>;
 }
 
 function renderPage(stub: Stub = {}) {
   const gateway = {
-    listEmployees: stub.employees ?? (() => of([ada])),
-    reservationsFor: stub.reservationsFor ?? (() => of([adasUpcoming])),
+    listEmployees: stub.employees ?? (() => of(page([ada]))),
+    reservationsFor: stub.reservationsFor ?? (() => of(page([adasUpcoming]))),
     cancel: stub.cancel ?? (() => of(undefined)),
     listBookableOffices: () => of([munich]),
     occupancyForOffice: () => of(allFree),
     reserve: stub.reserve ?? (() => of(reservationId('res9'))),
-    myReservations: () => of([]),
+    myReservations: () => of(page<MyReservation>([])),
   };
 
   return render(OnBehalfPage, {
@@ -87,7 +92,7 @@ describe('OnBehalfPage', () => {
     const user = userEvent.setup();
     let received: unknown[] | undefined;
     await renderPage({
-      reservationsFor: () => of([]),
+      reservationsFor: () => of(page<MyReservation>([])),
       reserve: (...args: unknown[]) => {
         received = args;
         return of(reservationId('res9'));
@@ -121,8 +126,25 @@ describe('OnBehalfPage', () => {
   });
 
   it('shows an empty state when there are no employees', async () => {
-    await renderPage({ employees: () => of([]) });
+    await renderPage({ employees: () => of(page<Employee>([])) });
 
     expect(await screen.findByText('There are no employees yet.')).toBeTruthy();
+  });
+
+  it("appends the next page of the chosen employee's reservations on Load more", async () => {
+    const user = userEvent.setup();
+    const later: MyReservation = { ...adasUpcoming, id: reservationId('res2'), roomName: 'C1', date: '2026-06-12' };
+    await renderPage({
+      reservationsFor: (_employee, cursor) =>
+        of(cursor === undefined ? page([adasUpcoming], 'cursor-2') : page([later], null)),
+    });
+
+    await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
+    expect(await screen.findByText('A1')).toBeTruthy();
+    expect(screen.queryByText('C1')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Load more' }));
+
+    expect(await screen.findByText('C1')).toBeTruthy();
   });
 });

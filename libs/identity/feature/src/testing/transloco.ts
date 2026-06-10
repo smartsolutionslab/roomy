@@ -5,6 +5,13 @@ import { TranslocoTestingModule } from '@jsverse/transloco';
 // screens use, so the library's specs stay independent of the app's global translation files
 // (importing those would cross the context:web boundary). Excluded from the library build.
 const english = {
+  shared: {
+    list: {
+      loadMore: 'Load more',
+      loading: 'Loading…',
+      endOfList: 'End of list',
+    },
+  },
   account: {
     title: 'My account',
     nameLabel: 'Name',
@@ -42,6 +49,13 @@ const english = {
 };
 
 const german = {
+  shared: {
+    list: {
+      loadMore: 'Mehr laden',
+      loading: 'Wird geladen…',
+      endOfList: 'Ende der Liste',
+    },
+  },
   account: {
     title: 'Mein Konto',
     nameLabel: 'Name',

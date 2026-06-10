@@ -1,5 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { AdminUser, AdminUsersGateway, UserId, userId } from '@roomy/identity-data-access';
+import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of, throwError } from 'rxjs';
@@ -24,9 +25,14 @@ const administrator: AdminUser = {
   status: 'active',
 };
 
+function page(items: AdminUser[], nextCursor: string | null = null): Page<AdminUser> {
+  return { items, nextCursor };
+}
+
 function renderPage(
   accounts: AdminUser[],
   grant: (user: UserId) => Observable<void> = () => of(undefined),
+  getAll: (cursor?: string) => Observable<Page<AdminUser>> = () => of(page(accounts)),
 ) {
   return render(AdminUsersPage, {
     imports: [importIdentityTestTransloco()],
@@ -34,7 +40,7 @@ function renderPage(
       provideZonelessChangeDetection(),
       {
         provide: AdminUsersGateway,
-        useValue: { getAll: () => of(accounts), grantAdministrator: grant },
+        useValue: { getAll, grantAdministrator: grant },
       },
     ],
   });
@@ -90,8 +96,7 @@ describe('AdminUsersPage', () => {
     expect(screen.queryByRole('button', { name: 'Grant administrator' })).toBeNull();
     expect(grant).toHaveBeenCalledTimes(1);
 
-    const announcement = await screen.findByRole('status');
-    expect(announcement.textContent).toContain('Grace Hopper');
+    expect(await screen.findByText('Granted administrator to Grace Hopper.')).toBeTruthy();
   });
 
   it('keeps the row unchanged and announces an error when granting fails', async () => {
@@ -113,5 +118,24 @@ describe('AdminUsersPage', () => {
     expect(await screen.findByText('Ada Lovelace')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Grant administrator' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Confirm' })).toBeNull();
+  });
+
+  it('appends the next page of accounts when Load more is activated, then stops at the end', async () => {
+    const user = userEvent.setup();
+    await renderPage(
+      [],
+      () => of(undefined),
+      (cursor) =>
+        of(cursor === undefined ? page([employee], 'cursor-2') : page([administrator], null)),
+    );
+
+    expect(await screen.findByText('Grace Hopper')).toBeTruthy();
+    expect(screen.queryByText('Ada Lovelace')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Load more' }));
+
+    expect(await screen.findByText('Ada Lovelace')).toBeTruthy();
+    expect(screen.getByText('End of list')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Load more' })).toBeNull();
   });
 });

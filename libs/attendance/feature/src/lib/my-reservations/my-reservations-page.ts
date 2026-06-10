@@ -17,6 +17,7 @@ import {
   isPastDay,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { InfiniteScroll } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
 
@@ -27,7 +28,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-my-reservations-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, InfiniteScroll],
   templateUrl: './my-reservations-page.html',
   styleUrl: './my-reservations-page.css',
 })
@@ -40,6 +41,8 @@ export class MyReservationsPage {
   readonly today = input<string>(todayInBerlin());
 
   protected readonly reservations = signal<MyReservation[] | null>(null);
+  protected readonly nextCursor = signal<string | null>(null);
+  protected readonly loadingMore = signal(false);
   protected readonly loadFailed = signal(false);
   protected readonly result = signal<ResultMessage | null>(null);
   protected readonly errorKey = signal<string | null>(null);
@@ -56,14 +59,31 @@ export class MyReservationsPage {
   );
 
   constructor() {
+    this.loadMore();
+  }
+
+  // Loads the next page (the first when no cursor yet) and appends it, so the history grows as the
+  // employee scrolls or activates "Load more" (ADR-0042); the upcoming/past split derives from the
+  // accumulated set. nextCursor === null marks the end.
+  protected loadMore(): void {
+    if (this.loadingMore()) {
+      return;
+    }
+
+    this.loadingMore.set(true);
     this.gateway
-      .myReservations()
+      .myReservations(this.nextCursor() ?? undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (reservations) => this.reservations.set(reservations),
+        next: (page) => {
+          this.reservations.update((current) => [...(current ?? []), ...page.items]);
+          this.nextCursor.set(page.nextCursor);
+          this.loadingMore.set(false);
+        },
         error: () => {
           this.loadFailed.set(true);
-          this.reservations.set([]);
+          this.reservations.update((current) => current ?? []);
+          this.loadingMore.set(false);
         },
       });
   }
