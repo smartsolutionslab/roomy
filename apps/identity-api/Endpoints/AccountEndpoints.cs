@@ -33,12 +33,6 @@ public static class AccountEndpoints
         var subject = KeycloakSubjectIdentifier.From(subjectValue);
         var lookup = await users.GetByKeycloakSubjectAsync(subject, cancellationToken);
 
-        return lookup.Match(
-            user => Results.Ok(new Response.Account(
-                user.Identifier.Value,
-                user.Email.Value,
-                user.DisplayName.Value,
-                user.IsAdministrator ? "administrator" : "employee")),
-            error => error.ToHttpResult());
+        return lookup.Match(user => Results.Ok(user.ToAccount()), error => error.ToHttpResult());
     }
 }

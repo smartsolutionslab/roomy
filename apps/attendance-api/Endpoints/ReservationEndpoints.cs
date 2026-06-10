@@ -74,18 +74,8 @@ public static class ReservationEndpoints
 
         var result = await view.HandleAsync(query, cancellationToken);
 
-        // The company-day is bounded by room capacity and replayed from the aggregate in memory, so it
-        // is one page — it adopts the page envelope for contract uniformity with nextCursor always null
-        // (ADR-0044), never keyset-paginated.
         return result.Match(
-            reservations => Results.Ok(new Response.Page.Reservation(
-                reservations.Select(reservation => new Response.Reservation(
-                    reservation.Reservation.Value,
-                    reservation.Office.Value,
-                    reservation.Room.Value,
-                    reservation.Date.Value,
-                    reservation.Employee.Value)).ToList(),
-                NextCursor: null)),
+            reservations => Results.Ok(reservations.ToResponse()),
             error => error.ToHttpResult());
     }
 
@@ -110,7 +100,7 @@ public static class ReservationEndpoints
 
         var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
 
-        return result.Match(MyReservationPageResult, BadRequest);
+        return result.Match(page => Results.Ok(page.ToResponse()), BadRequest);
     }
 
     // GET /reservations/employees — the directory an administrator picks from to act on behalf (009,
@@ -135,11 +125,7 @@ public static class ReservationEndpoints
 
         var result = await view.HandleAsync(new ViewEmployees(searchTerm.Value, pageRequest.Value), cancellationToken);
 
-        return result.Match(
-            employees => Results.Ok(new Response.Page.Employee(
-                employees.Items.Select(employee => new Response.Employee(employee.Employee.Value, employee.Name)).ToList(),
-                employees.NextCursor)),
-            BadRequest);
+        return result.Match(employees => Results.Ok(employees.ToResponse()), BadRequest);
     }
 
     // GET /reservations/by-employee/{employeeId} — a chosen employee's reservations, for the administrator
@@ -152,29 +138,15 @@ public static class ReservationEndpoints
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
-        if (!principal.IsInRole(AdministratorRole))
-        {
-            return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
-        }
+        if (!principal.IsInRole(AdministratorRole)) return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
 
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
 
         var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest.Value), cancellationToken);
 
-        return result.Match(MyReservationPageResult, BadRequest);
+        return result.Match(page => Results.Ok(page.ToResponse()), BadRequest);
     }
-
-    private static IResult MyReservationPageResult(Page<MyReservationView> page) =>
-        Results.Ok(new Response.Page.MyReservation(
-            page.Items.Select(reservation => new Response.MyReservation(
-                reservation.Reservation.Value,
-                reservation.Office.Value,
-                reservation.OfficeName,
-                reservation.Room.Value,
-                reservation.RoomName,
-                reservation.Date.Value)).ToList(),
-            page.NextCursor));
 
     // A bad limit or a malformed cursor is request validation, not a domain rule — a 400, distinct from
     // the 422 the domain Validation errors map to via ToHttpResult (ADR-0044).
@@ -217,7 +189,12 @@ public static class ReservationEndpoints
         return result.Match(
             reservationId => Results.Created(
                 $"/reservations/{reservationId.Value}",
-                new Response.Reservation(reservationId.Value, request.OfficeId, request.RoomId, request.Date, employee.Value)),
+                new Response.Reservation(
+                    reservationId.Value,
+                    request.OfficeId,
+                    request.RoomId,
+                    request.Date,
+                    employee.Value)),
             error => error.ToHttpResult());
     }
 

@@ -54,9 +54,7 @@ public static class AdminUserEndpoints
 
         var page = await users.GetPageAsync(request.Value, cancellationToken);
 
-        return page.Match(
-            accounts => Results.Ok(new Response.Page.AdminUser(accounts.Items.Select(Project).ToList(), accounts.NextCursor)),
-            error => error.ToBadRequest());
+        return page.Match(accounts => Results.Ok(accounts.ToResponse()), error => error.ToBadRequest());
     }
 
     // GET /admin/users/{userId} — a single account, or 404 if no account has that identifier.
@@ -64,7 +62,7 @@ public static class AdminUserEndpoints
         Guid userId, IUserRepository users, CancellationToken cancellationToken)
     {
         var lookup = await users.GetByIdentifierAsync(UserIdentifier.From(userId), cancellationToken);
-        return lookup.Match(user => Results.Ok(Project(user)), error => error.ToHttpResult());
+        return lookup.Match(user => Results.Ok(user.ToAdminUser()), error => error.ToHttpResult());
     }
 
     // POST /admin/users/{userId}:grant-administrator — elevates the account (IA-4). Idempotent: a
@@ -79,12 +77,4 @@ public static class AdminUserEndpoints
 
         return result.Match(Results.NoContent, error => error.ToHttpResult());
     }
-
-    private static Response.AdminUser Project(User user) =>
-        new(
-            user.Identifier.Value,
-            user.Email.Value,
-            user.DisplayName.Value,
-            user.IsAdministrator ? "administrator" : "employee",
-            user.Status == UserStatus.Active ? "active" : "provisioning");
 }

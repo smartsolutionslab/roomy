@@ -31,12 +31,7 @@ public static class RoomCatalogueEndpoints
         var result = await view.HandleAsync(query, cancellationToken);
 
         return result.Match(
-            rooms => Results.Ok(rooms.Select(room => new Response.BookableRoom(
-                room.Office.Value,
-                room.OfficeName,
-                room.Room.Value,
-                room.RoomName,
-                room.Capacity.Value))),
+            rooms => Results.Ok(rooms.Select(room => room.ToResponse())),
             error => error.ToHttpResult());
     }
 }
