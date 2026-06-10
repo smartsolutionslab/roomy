@@ -6,6 +6,9 @@
   <Folder Name="/apps/db-migrator/">
     <Project Path="apps/db-migrator/Roomy.DbMigrator.csproj" />
   </Folder>
+  <Folder Name="/apps/dev-seeder/">
+    <Project Path="apps/dev-seeder/Roomy.DevSeeder.csproj" />
+  </Folder>
   <Folder Name="/apps/gateway/">
     <Project Path="apps/gateway/Roomy.Gateway.csproj" />
   </Folder>

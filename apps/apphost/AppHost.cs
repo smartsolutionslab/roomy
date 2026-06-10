@@ -151,6 +151,25 @@ var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendanc
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Attendance__CompanyId", "0199a0b0-0000-7000-8000-000000000001");
 
+// --- Dev data seeder (on demand) ---------------------------------------------------
+// A run-once tool that loads the "Obex Labs" demo dataset — three offices, ~42 colleagues (each with a real
+// Keycloak login), and ~18 months of reservation history — straight into the dev databases. Explicit-start:
+// it never runs automatically; trigger it from the dashboard once the stack is healthy. It seeds under the
+// same CompanyId attendance uses, so the org and attendance data line up.
+_ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
+    .WithExplicitStart()
+    .WithReference(identityDatabase)
+    .WithReference(organizationDatabase)
+    .WithReference(attendanceDatabase)
+    .WithReference(keycloak).WaitFor(keycloak)
+    .WaitForCompletion(dbMigrator)
+    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
+    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
+    .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
+    .WithEnvironment("Seed__CompanyId", "0199a0b0-0000-7000-8000-000000000001")
+    .WithEnvironment("Seed__EmployeePassword", "ObexLabs.2025");
+
 // --- Scalar API reference (ADR-0042, #135) -----------------------------------------
 // One interactive Scalar reference, hosted by the app host and listed in the Aspire dashboard, that
 // aggregates all three context APIs' OpenAPI documents in a single pane. Dev-only by construction — the

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.DevSeeder</RootNamespace>
+    <AssemblyName>Roomy.DevSeeder</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      A run-once DEV data seeder (NOT for production). A composition root like the db-migrator: it references
+      each context's infrastructure to write the "Obex Labs" demo dataset (company/offices/rooms/employees +
+      ~18 months of reservation events) directly, and the Keycloak admin provider to give each colleague a
+      real login. Wired into the app host as an explicit-start resource, so it runs only when triggered.
+    -->
+    <ProjectReference Include="../../libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+    <ProjectReference Include="../../libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

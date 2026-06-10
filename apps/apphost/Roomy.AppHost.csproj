@@ -29,6 +29,7 @@
     <ProjectReference Include="../attendance-api/Roomy.Attendance.Api.csproj" />
     <!-- The shared schema-rollout runner (ADR-0033); generates Projects.Roomy_DbMigrator. -->
     <ProjectReference Include="../db-migrator/Roomy.DbMigrator.csproj" />
+    <ProjectReference Include="..\dev-seeder\Roomy.DevSeeder.csproj" />
   </ItemGroup>
 
 </Project>
