@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <!-- Only Postgres: the integration tests need the database, none of the rest of the stack. -->
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.2" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
   </ItemGroup>
 
 </Project>

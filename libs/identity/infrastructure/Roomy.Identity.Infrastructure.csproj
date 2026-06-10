@@ -17,10 +17,10 @@
 
   <ItemGroup>
     <!-- EF Core 10 (GA), matching the persistence baseline. The Npgsql provider arrives transitively. -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <!-- IHttpClientFactory, so the Keycloak adapter is registered as a pooled, resilient typed client. -->
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
   </ItemGroup>
 
 </Project>

@@ -28,14 +28,14 @@
       separate package (not in the Microsoft.AspNetCore.App shared framework); 10.0.8 tracks
       the SDK (global.json 10.0.300).
     -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
 
     <!--
       YARP is the reverse proxy that makes the gateway the single public entry point
       (ADR-0006/0018). 2.3.0 is the latest GA line that restores and builds on net10.0;
       the .NET 10 wave of YARP (a 2.4 preview) is not GA, so we pin the stable 2.x.
     -->
-    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+    <PackageReference Include="Yarp.ReverseProxy" />
   </ItemGroup>
 
 </Project>

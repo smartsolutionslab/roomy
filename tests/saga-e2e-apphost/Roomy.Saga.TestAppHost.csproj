@@ -10,9 +10,9 @@
     <!-- The full backing stack the provisioning-saga e2e needs: Postgres (per-service DBs), RabbitMQ
          (the cross-service transport), and Keycloak (real credential provider). Pinned to the AppHost's
          Aspire version, mirroring apps/apphost. -->
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.2" />
-    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.4.2" />
-    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.4.2-preview.1.26303.6" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" />
   </ItemGroup>
 
   <ItemGroup>

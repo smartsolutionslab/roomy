@@ -28,11 +28,11 @@
 
   <ItemGroup>
     <!-- Validates the BFF-forwarded Keycloak access token as a JWT bearer (ADR-0013). -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <!-- Publishes the OpenAPI document the typed Angular client is generated from (ADR-0018/0036). -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <!-- Build-time `GetDocument` emit of the static spec to OpenApiDocumentsDirectory (ADR-0036). -->
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0">
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <!-- EF Core design-time tooling: used only by `dotnet ef` against the design-time factory. -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
