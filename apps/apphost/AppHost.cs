@@ -99,6 +99,7 @@ var dbMigrator = builder.AddProject<Projects.Roomy_DbMigrator>("db-migrator")
 // credentials, so the system is administrable from first run (FR-004); the admin REST calls reuse the
 // Keycloak admin parameters. Dev-only credentials — overridden per environment.
 var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api")
+    .WithHttpEndpoint()
     .WithReference(identityDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
@@ -118,6 +119,7 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
 // to belong to (research.md D2). It publishes OfficeOpened/RoomAdded over the RabbitMQ outbox (ADR-0037,
 // 003 US2) so the attendance context can mirror the capacity feed; it still consumes nothing.
 var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organization-api")
+    .WithHttpEndpoint()
     .WithReference(organizationDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
@@ -133,6 +135,7 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
 // seeded company so the RoomAdded capacity feed lands on the right rooms (US2). It consumes
 // organization's RoomAdded over RabbitMQ into its Rooms read model (ADR-0037).
 var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
+    .WithHttpEndpoint()
     .WithReference(attendanceDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)

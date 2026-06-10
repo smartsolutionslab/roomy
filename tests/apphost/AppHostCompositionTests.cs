@@ -82,4 +82,24 @@ public sealed class AppHostCompositionTests
             api.Annotations.OfType<ResourceUrlsCallbackAnnotation>().ShouldNotBeEmpty();
         }
     }
+
+    [Fact]
+    public async Task Each_context_api_has_its_own_http_endpoint_so_they_do_not_collide_on_the_default_port()
+    {
+        // The context APIs have no launchSettings; without an explicit endpoint they all fall back to
+        // Kestrel's default :5000 and only one can bind it — the others die with AddressInUseException.
+        // Each MUST declare its own HTTP endpoint so Aspire allocates a distinct port per service.
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
+            TestContext.Current.CancellationToken);
+        await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
+
+        var model = application.Services.GetRequiredService<DistributedApplicationModel>();
+
+        foreach (var apiName in new[] { "identity-api", "organization-api", "attendance-api" })
+        {
+            var api = model.Resources.Single(resource => resource.Name == apiName);
+            api.Annotations.OfType<EndpointAnnotation>()
+                .ShouldContain(endpoint => endpoint.Name == "http");
+        }
+    }
 }
