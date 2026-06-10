@@ -61,7 +61,10 @@ We chose **Option C**.
    and glass (translucent + blur)** tokens. Existing token *names* are preserved so
    already-merged component CSS keeps working. The UI font is **Manrope**, self-hosted as a
    variable woff2 in `apps/web/public/fonts` (offline-safe, no external CDN), with a
-   `system-ui` fallback.
+   `system-ui` fallback. The page background carries an ambient, self-fading **aurora image**
+   (`apps/web/public/aurora.svg`, a blurred sunset mesh) over a faint dot texture; the
+   dashboard tiles are **frosted glass** (translucent + strong blur) so the aurora reads
+   through them.
 2. **Dark theme as token overrides** under both `@media (prefers-color-scheme: dark)`
    (scoped to `:root:not([data-theme="light"])`) and `:root[data-theme="dark"]` (explicit
    choice wins). `html { color-scheme: light dark }` so native controls follow the theme.

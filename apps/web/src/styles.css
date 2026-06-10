@@ -41,8 +41,12 @@
   --roomy-glass-bg: rgba(255, 255, 255, 0.72);
   --roomy-glass-border: rgba(24, 24, 27, 0.08);
   --roomy-blur: saturate(160%) blur(12px);
+  --roomy-blur-strong: saturate(180%) blur(20px);
+  --roomy-glass-card: rgba(255, 255, 255, 0.5);
+  --roomy-glass-highlight: rgba(255, 255, 255, 0.6);
 
-  /* Background texture — a faint dot grid painted on the page background */
+  /* Ambient page background — a faded aurora image plus a faint dot grid */
+  --roomy-shell-image: url('/aurora.svg');
   --roomy-texture-dot: rgba(24, 24, 27, 0.05);
 
   /* Spacing scale */
@@ -109,6 +113,8 @@
     --roomy-gradient-soft: linear-gradient(135deg, #1c1206 0%, #1e0f12 100%);
     --roomy-glass-bg: rgba(31, 31, 38, 0.55);
     --roomy-glass-border: rgba(255, 255, 255, 0.08);
+    --roomy-glass-card: rgba(42, 42, 49, 0.42);
+    --roomy-glass-highlight: rgba(255, 255, 255, 0.06);
     --roomy-texture-dot: rgba(255, 255, 255, 0.035);
   }
 }
@@ -135,6 +141,8 @@
   --roomy-gradient-soft: linear-gradient(135deg, #1c1206 0%, #1e0f12 100%);
   --roomy-glass-bg: rgba(31, 31, 38, 0.55);
   --roomy-glass-border: rgba(255, 255, 255, 0.08);
+  --roomy-glass-card: rgba(42, 42, 49, 0.42);
+  --roomy-glass-highlight: rgba(255, 255, 255, 0.06);
   --roomy-texture-dot: rgba(255, 255, 255, 0.035);
 }
 
@@ -149,8 +157,12 @@ html {
 body {
   margin: 0;
   background-color: var(--roomy-color-background);
-  background-image: radial-gradient(circle at center, var(--roomy-texture-dot) 1px, transparent 1.6px);
-  background-size: 22px 22px;
+  background-image: var(--roomy-shell-image, none),
+    radial-gradient(circle at center, var(--roomy-texture-dot) 1px, transparent 1.6px);
+  background-repeat: no-repeat, repeat;
+  background-position: top center, top left;
+  background-size: 100% auto, 22px 22px;
+  background-attachment: fixed, scroll;
   color: var(--roomy-color-text);
   font-family: var(--roomy-font-family);
   font-size: var(--roomy-font-size-base);
