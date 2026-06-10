@@ -6,6 +6,7 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
@@ -87,10 +88,5 @@ public sealed class OrganizationUnitOfWorkTests
             Published.AddRange(integrationEvents);
             return Task.CompletedTask;
         }
-    }
-
-    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
     }
 }

@@ -12,6 +12,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Offices;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
+using SmartSolutionsLab.Roomy.TestSupport;
 using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Reservations.Reservation;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;

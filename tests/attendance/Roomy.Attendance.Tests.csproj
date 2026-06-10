@@ -10,6 +10,7 @@
     <ProjectReference Include="../../libs/attendance/domain/Roomy.Attendance.Domain.csproj" />
     <!-- Use-case tests (ReservePlace / CancelReservation) land here as the application layer grows. -->
     <ProjectReference Include="../../libs/attendance/application/Roomy.Attendance.Application.csproj" />
+    <ProjectReference Include="..\test-support\Roomy.TestSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

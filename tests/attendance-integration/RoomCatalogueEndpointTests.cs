@@ -11,6 +11,7 @@ using SmartSolutionsLab.Roomy.Attendance.Api;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Offices;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 

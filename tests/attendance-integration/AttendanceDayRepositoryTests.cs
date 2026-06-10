@@ -1,5 +1,6 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
@@ -12,7 +13,7 @@ public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixtu
     : IClassFixture<PostgresEventStoreFixture>
 {
     private static readonly BookingDate bookingDate =
-        BookingDate.From(FirstMondayOnOrAfter(new DateOnly(2026, 6, 1)));
+        BookingDate.From(BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1)));
 
     private static readonly DateTimeOffset occurredAt = new(2026, 6, 8, 9, 0, 0, TimeSpan.Zero);
 
@@ -74,15 +75,4 @@ public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixtu
     }
 
     private static RoomReference SomeRoom() => RoomReference.From(OfficeIdentifier.New(), RoomIdentifier.New());
-
-    private static DateOnly FirstMondayOnOrAfter(DateOnly start)
-    {
-        var date = start;
-        while (date.DayOfWeek != DayOfWeek.Monday)
-        {
-            date = date.AddDays(1);
-        }
-
-        return date;
-    }
 }

@@ -1,63 +1,21 @@
-using Aspire.Hosting;
-using Aspire.Hosting.ApplicationModel;
-using Aspire.Hosting.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// Spins up a single real PostgreSQL via Aspire — only the database resource, none of the rest of the
-// app graph — and creates the identity schema from the EF model once for the test class. Lets the
-// persistence tests exercise the real provider (value converters, unique indexes, NULL semantics)
-// against the same Postgres the app host provisions. Requires Docker.
-public sealed class PostgresDatabaseFixture : IAsyncLifetime
+// Provisions a real PostgreSQL via Aspire and applies the identity migrations, so the persistence tests
+// exercise the real provider (value converters, unique indexes, NULL semantics) and validate that the
+// InitialCreate migration produces the mapped schema. Requires Docker.
+public sealed class PostgresDatabaseFixture : BasePostgresFixture<Projects.Roomy_Identity_TestAppHost>
 {
-    private const string ServerResourceName = "postgres";
-    private const string DatabaseResourceName = "identity";
+    protected override string DatabaseResourceName => "identity";
 
-    private DistributedApplication? application;
-    private string connectionString = string.Empty;
-
-    public string ConnectionString => connectionString;
-
-    public async ValueTask InitializeAsync()
+    protected override async Task CreateSchemaAsync(CancellationToken cancellationToken)
     {
-        var builder = await DistributedApplicationTestingBuilder
-            .CreateAsync<Projects.Roomy_Identity_TestAppHost>();
-
-        application = await builder.BuildAsync();
-        await application.StartAsync();
-
-        // The container is provisioned asynchronously; connect only once it accepts connections,
-        // otherwise the first query races the server's startup and fails transiently.
-        using var readiness = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-        var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
-        await notifications.WaitForResourceHealthyAsync(ServerResourceName, readiness.Token);
-
-        connectionString = await application.GetConnectionStringAsync(DatabaseResourceName, readiness.Token)
-            ?? throw new InvalidOperationException("The Postgres resource produced no connection string.");
-
-        // Build the schema by applying the EF migrations, not EnsureCreated, so these tests also
-        // validate that the InitialCreate migration produces the mapped schema.
         await using var context = CreateContext();
-        await context.Database.MigrateAsync(readiness.Token);
+        await context.Database.MigrateAsync(cancellationToken);
     }
 
-    public IdentityDbContext CreateContext()
-    {
-        var options = new DbContextOptionsBuilder<IdentityDbContext>()
-            .UseNpgsql(connectionString)
-            .Options;
-
-        return new IdentityDbContext(options);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (application is not null)
-        {
-            await application.DisposeAsync();
-        }
-    }
+    public IdentityDbContext CreateContext() => new(NpgsqlOptions<IdentityDbContext>());
 }
