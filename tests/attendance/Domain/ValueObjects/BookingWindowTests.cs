@@ -1,5 +1,6 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Domain.ValueObjects;
 
@@ -9,7 +10,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.Tests.Domain.ValueObjects;
 public class BookingWindowTests
 {
     private static readonly BookingDate monday =
-        BookingDate.From(FirstMondayOnOrAfter(new DateOnly(2026, 6, 1)));
+        BookingDate.From(BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1)));
 
     private static BookingDate Plus(int days) => BookingDate.From(monday.Value.AddDays(days));
 
@@ -57,16 +58,5 @@ public class BookingWindowTests
     {
         // Scenario 5 — Monday − 3 is the previous Friday (a working day), but in the past.
         BookingWindow.IsBookable(candidate: Plus(-3), today: monday).ShouldBeFalse();
-    }
-
-    private static DateOnly FirstMondayOnOrAfter(DateOnly start)
-    {
-        var date = start;
-        while (date.DayOfWeek != DayOfWeek.Monday)
-        {
-            date = date.AddDays(1);
-        }
-
-        return date;
     }
 }

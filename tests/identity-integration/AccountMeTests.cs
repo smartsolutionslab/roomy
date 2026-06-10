@@ -10,6 +10,7 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 

@@ -17,6 +17,7 @@
          persistence tests, Keycloak for the admin-adapter tests. -->
     <ProjectReference Include="../identity-integration-apphost/Roomy.Identity.TestAppHost.csproj" />
     <ProjectReference Include="../identity-keycloak-apphost/Roomy.Identity.KeycloakTestAppHost.csproj" />
+    <ProjectReference Include="..\test-support\Roomy.TestSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

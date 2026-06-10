@@ -12,6 +12,7 @@ using SmartSolutionsLab.Roomy.Attendance.Api;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
@@ -22,7 +23,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 // distinct bookable date so they never share a company-day stream.
 public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreFixture>, IDisposable
 {
-    private static readonly DateOnly monday = FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
+    private static readonly DateOnly monday = BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
     private static readonly DateTimeOffset now = new(monday.Year, monday.Month, monday.Day, 8, 0, 0, TimeSpan.Zero);
     private static readonly Guid companyId = Guid.Parse("0199a0b0-0000-7000-8000-000000000001");
 
@@ -316,17 +317,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
 
     private static ReserveBody Booking(DateOnly date) => new(Guid.NewGuid(), Guid.NewGuid(), date);
 
-    private static DateOnly FirstMondayOnOrAfter(DateOnly start)
-    {
-        var date = start;
-        while (date.DayOfWeek != DayOfWeek.Monday)
-        {
-            date = date.AddDays(1);
-        }
-
-        return date;
-    }
-
     private sealed record ReserveBody(Guid OfficeId, Guid RoomId, DateOnly Date, Guid? OnBehalfOf = null);
 
     private sealed record ReservationDto(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
@@ -336,11 +326,6 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     private sealed record PageDto<T>(T[] Items, string? NextCursor);
 
     private sealed record ErrorDto(string Code, string Message);
-
-    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
-    }
 
     private sealed class IdentityEmployeeDirectory : IEmployeeDirectory
     {

@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -180,10 +181,5 @@ public class ViewOccupancyTests
             BookingDate from,
             BookingDate to,
             CancellationToken cancellationToken) => Task.FromResult(result);
-    }
-
-    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
     }
 }

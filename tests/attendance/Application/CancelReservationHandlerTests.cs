@@ -2,6 +2,7 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -11,7 +12,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 // reservation id alone can't address the stream (D: date carried in the request).
 public class CancelReservationHandlerTests
 {
-    private static readonly DateOnly mondayDate = FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
+    private static readonly DateOnly mondayDate = BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
     private static readonly DateTimeOffset now = new(mondayDate.Year, mondayDate.Month, mondayDate.Day, 8, 0, 0, TimeSpan.Zero);
     private static readonly BookingDate bookingDate = BookingDate.From(mondayDate);
     private static readonly CompanyIdentifier company = CompanyIdentifier.New();
@@ -81,22 +82,6 @@ public class CancelReservationHandlerTests
 
         result.Error.Code.ShouldBe("concurrency_retry_exhausted");
         repository.SaveCount.ShouldBe(3);
-    }
-
-    private static DateOnly FirstMondayOnOrAfter(DateOnly start)
-    {
-        var date = start;
-        while (date.DayOfWeek != DayOfWeek.Monday)
-        {
-            date = date.AddDays(1);
-        }
-
-        return date;
-    }
-
-    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
     }
 
     private sealed class FakeRepository(ReservationIdentifier? seededReservation, EmployeeIdentifier seededOwner)

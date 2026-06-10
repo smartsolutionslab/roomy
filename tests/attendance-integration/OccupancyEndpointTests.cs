@@ -13,6 +13,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Offices;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
+using SmartSolutionsLab.Roomy.TestSupport;
 using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Reservations.Reservation;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
@@ -180,9 +181,4 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
     private sealed record OccupantDto(Guid EmployeeId, string Name);
 
     private sealed record ErrorDto(string Code, string Message);
-
-    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
-    }
 }

@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
+using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -12,7 +13,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 // Driven here against an in-memory repository and a fixed clock — no infrastructure.
 public class ReservePlaceHandlerTests
 {
-    private static readonly DateOnly mondayDate = FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
+    private static readonly DateOnly mondayDate = BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));
     private static readonly DateTimeOffset now = new(mondayDate.Year, mondayDate.Month, mondayDate.Day, 8, 0, 0, TimeSpan.Zero);
     private static readonly BookingDate bookingDate = BookingDate.From(mondayDate);
     private static readonly CompanyIdentifier company = CompanyIdentifier.New();
@@ -126,28 +127,12 @@ public class ReservePlaceHandlerTests
     private static Result ConcurrencyConflict() =>
         Error.Conflict("concurrency_conflict", "The day changed concurrently.");
 
-    private static DateOnly FirstMondayOnOrAfter(DateOnly start)
-    {
-        var date = start;
-        while (date.DayOfWeek != DayOfWeek.Monday)
-        {
-            date = date.AddDays(1);
-        }
-
-        return date;
-    }
-
     private sealed class StubRoomDirectory(int? capacity) : IRoomDirectory
     {
         public Task<Result<RoomCapacity>> FindCapacityAsync(RoomIdentifier room, CancellationToken cancellationToken) =>
             Task.FromResult(capacity is null
                 ? Result.Failure<RoomCapacity>(Error.NotFound("unknown_room", "The room is not known."))
                 : Result.Success(RoomCapacity.From(capacity.Value)));
-    }
-
-    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
     }
 
     private sealed class FakeRepository : IAttendanceDayRepository

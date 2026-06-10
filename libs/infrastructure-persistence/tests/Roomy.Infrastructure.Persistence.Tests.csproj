@@ -11,6 +11,7 @@
     <!-- The minimal Aspire app host (Postgres only) the testing builder boots for the concurrency-race
          test, so the unique-index 23505 path is exercised against the real provider (#67). -->
     <ProjectReference Include="../../../tests/eventstore-integration-apphost/Roomy.EventStore.TestAppHost.csproj" />
+    <ProjectReference Include="..\..\..\tests\test-support\Roomy.TestSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

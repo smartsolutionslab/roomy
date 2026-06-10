@@ -13,6 +13,7 @@
     <!-- The minimal Aspire app host the testing builder boots as the entry point: Postgres + the
          organization database, so the EF mapping is verified against the real provider. -->
     <ProjectReference Include="../organization-integration-apphost/Roomy.Organization.TestAppHost.csproj" />
+    <ProjectReference Include="..\test-support\Roomy.TestSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>
