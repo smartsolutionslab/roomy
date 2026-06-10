@@ -100,25 +100,15 @@ public static class ReservationEndpoints
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
-        if (!TryGetSubject(principal, out var subject))
-        {
-            return Results.Unauthorized();
-        }
+        if (!TryGetSubject(principal, out var subject)) return Results.Unauthorized();
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure)
-        {
-            return BadRequest(pageRequest.Error);
-        }
+        if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
 
         var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
-        if (actor.IsFailure)
-        {
-            return actor.Error.ToHttpResult();
-        }
+        if (actor.IsFailure) return actor.Error.ToHttpResult();
 
-        var result = await view.HandleAsync(
-            new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
+        var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
 
         return result.Match(MyReservationPageResult, BadRequest);
     }
@@ -135,22 +125,13 @@ public static class ReservationEndpoints
         IQueryHandler<ViewEmployees, Page<EmployeeView>> view,
         CancellationToken cancellationToken)
     {
-        if (!principal.IsInRole(AdministratorRole))
-        {
-            return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
-        }
+        if (!principal.IsInRole(AdministratorRole)) return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
 
         var searchTerm = SearchTerm.From(q);
-        if (searchTerm.IsFailure)
-        {
-            return BadRequest(searchTerm.Error);
-        }
+        if (searchTerm.IsFailure) return BadRequest(searchTerm.Error);
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure)
-        {
-            return BadRequest(pageRequest.Error);
-        }
+        if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
 
         var result = await view.HandleAsync(new ViewEmployees(searchTerm.Value, pageRequest.Value), cancellationToken);
 
@@ -177,13 +158,9 @@ public static class ReservationEndpoints
         }
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure)
-        {
-            return BadRequest(pageRequest.Error);
-        }
+        if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
 
-        var result = await view.HandleAsync(
-            new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest.Value), cancellationToken);
+        var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest.Value), cancellationToken);
 
         return result.Match(MyReservationPageResult, BadRequest);
     }
@@ -214,16 +191,10 @@ public static class ReservationEndpoints
         ICommandHandler<ReservePlace, ReservationIdentifier> reserve,
         CancellationToken cancellationToken)
     {
-        if (!TryGetSubject(principal, out var subject))
-        {
-            return Results.Unauthorized();
-        }
+        if (!TryGetSubject(principal, out var subject)) return Results.Unauthorized();
 
         var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
-        if (actor.IsFailure)
-        {
-            return actor.Error.ToHttpResult();
-        }
+        if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var employee = request.OnBehalfOf is { } onBehalfOf
             ? EmployeeIdentifier.From(onBehalfOf)
@@ -231,9 +202,7 @@ public static class ReservationEndpoints
 
         if (!MayReserveFor(employee, actor.Value, principal))
         {
-            return Error.Forbidden(
-                "not_authorized",
-                "Only an administrator may reserve on behalf of another employee.").ToHttpResult();
+            return Error.Forbidden("not_authorized", "Only an administrator may reserve on behalf of another employee.").ToHttpResult();
         }
 
         var command = new ReservePlace(
@@ -268,16 +237,10 @@ public static class ReservationEndpoints
         ICommandHandler<CancelReservation> cancel,
         CancellationToken cancellationToken)
     {
-        if (!TryGetSubject(principal, out var subject))
-        {
-            return Results.Unauthorized();
-        }
+        if (!TryGetSubject(principal, out var subject)) return Results.Unauthorized();
 
         var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
-        if (actor.IsFailure)
-        {
-            return actor.Error.ToHttpResult();
-        }
+        if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var command = new CancelReservation(
             CompanyIdentifier.From(options.CompanyId),

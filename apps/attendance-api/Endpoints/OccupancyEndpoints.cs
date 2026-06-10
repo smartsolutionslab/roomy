@@ -40,10 +40,7 @@ public static class OccupancyEndpoints
         IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>> view,
         CancellationToken cancellationToken)
     {
-        if (officeId is null == roomId is null)
-        {
-            return Error.Validation("unknown_scope", "Provide exactly one of officeId or roomId.").ToHttpResult();
-        }
+        if (officeId is null == roomId is null) return Error.Validation("unknown_scope", "Provide exactly one of officeId or roomId.").ToHttpResult();
 
         var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(timeProvider.GetUtcNow(), berlinZone).DateTime);
         var rangeFrom = from ?? today;

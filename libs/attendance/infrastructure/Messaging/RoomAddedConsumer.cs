@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 using SmartSolutionsLab.Roomy.Contracts.Organization;
