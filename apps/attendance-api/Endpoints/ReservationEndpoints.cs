@@ -41,6 +41,16 @@ public static class ReservationEndpoints
             .RequireAuthorization()
             .WithName("ViewMyReservations")
             .Produces<IEnumerable<MyReservationResponse>>();
+        endpoints.MapGet("/reservations/employees", ViewEmployeesAsync)
+            .RequireAuthorization()
+            .WithName("ViewEmployees")
+            .Produces<IEnumerable<EmployeeResponse>>()
+            .ProducesProblem(StatusCodes.Status403Forbidden);
+        endpoints.MapGet("/reservations/by-employee/{employeeId:guid}", ViewForEmployeeAsync)
+            .RequireAuthorization()
+            .WithName("ViewReservationsForEmployee")
+            .Produces<IEnumerable<MyReservationResponse>>()
+            .ProducesProblem(StatusCodes.Status403Forbidden);
         return endpoints;
     }
 
@@ -89,6 +99,51 @@ public static class ReservationEndpoints
         }
 
         var result = await view.HandleAsync(new ViewMyReservations(actor.Value), cancellationToken);
+
+        return result.Match(
+            reservations => Results.Ok(reservations.Select(reservation => new MyReservationResponse(
+                reservation.Reservation.Value,
+                reservation.Office.Value,
+                reservation.OfficeName,
+                reservation.Room.Value,
+                reservation.RoomName,
+                reservation.Date.Value))),
+            error => error.ToHttpResult());
+    }
+
+    // GET /reservations/employees — the directory an administrator picks from to act on behalf (009,
+    // AT-6). Administrator-only on the server (FR-009), not merely UI-hidden.
+    private static async Task<IResult> ViewEmployeesAsync(
+        ClaimsPrincipal principal,
+        IQueryHandler<ViewEmployees, IReadOnlyList<EmployeeView>> view,
+        CancellationToken cancellationToken)
+    {
+        if (!principal.IsInRole(AdministratorRole))
+        {
+            return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
+        }
+
+        var result = await view.HandleAsync(new ViewEmployees(), cancellationToken);
+
+        return result.Match(
+            employees => Results.Ok(employees.Select(employee => new EmployeeResponse(employee.Employee.Value, employee.Name))),
+            error => error.ToHttpResult());
+    }
+
+    // GET /reservations/by-employee/{employeeId} — a chosen employee's reservations, for the administrator
+    // on-behalf view (009). Administrator-only; reuses the "my reservations" query for the target employee.
+    private static async Task<IResult> ViewForEmployeeAsync(
+        Guid employeeId,
+        ClaimsPrincipal principal,
+        IQueryHandler<ViewMyReservations, IReadOnlyList<MyReservationView>> view,
+        CancellationToken cancellationToken)
+    {
+        if (!principal.IsInRole(AdministratorRole))
+        {
+            return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
+        }
+
+        var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId)), cancellationToken);
 
         return result.Match(
             reservations => Results.Ok(reservations.Select(reservation => new MyReservationResponse(
@@ -195,6 +250,8 @@ public static class ReservationEndpoints
 internal sealed record ReserveRequest(Guid OfficeId, Guid RoomId, DateOnly Date, Guid? OnBehalfOf = null);
 
 internal sealed record ReservationResponse(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
+
+internal sealed record EmployeeResponse(Guid EmployeeId, string Name);
 
 internal sealed record MyReservationResponse(
     Guid ReservationId,

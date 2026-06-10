@@ -45,6 +45,10 @@ builder.Services.AddScoped<IMyReservationsReadModel, MyReservationsReadModel>();
 // cross-service join.
 builder.Services.AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>();
 
+// The administrator on-behalf picker lists employees from the local Employees read model (009) — no
+// cross-service join.
+builder.Services.AddScoped<IEmployeeCatalog, EmployeeCatalog>();
+
 // Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
 builder.Services.AddOpenApi();
 
@@ -59,12 +63,18 @@ if (emittingOpenApiDocument)
     JasperFxEnvironment.AutoStartHost = true;
 }
 
+// The messaging runtime is the only startup that opens a RabbitMQ connection. It is skipped during the
+// OpenAPI emit (no broker available) and can be turned off via `Messaging:Enabled=false` for in-process
+// endpoint tests, which seed the read models directly and never exercise the inbox — so the host boots
+// without waiting on (and timing out against) a broker that is not there.
+var messagingEnabled = builder.Configuration.GetValue("Messaging:Enabled", true);
+
 // Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
 // (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
 // assembly) into the Rooms read model; the inbox shares the attendance database so the projection and
 // the dedup commit together. No outbound integration events this slice (occupancy folds the stream
 // locally, 004).
-if (!emittingOpenApiDocument)
+if (!emittingOpenApiDocument && messagingEnabled)
 {
     builder.AddRoomyMessaging(
         new MessagingOptions
