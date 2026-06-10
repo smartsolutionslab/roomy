@@ -1,9 +1,5 @@
 using JasperFx;
 using JasperFx.CommandLine;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Attendance.Api;
 using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
@@ -21,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // The attendance context owns its database (ADR-0014); Aspire injects the connection string by name.
-var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
+var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
 
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 builder.Services.AddAttendanceUseCases();
@@ -80,7 +76,7 @@ if (!emittingOpenApiDocument && messagingEnabled)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = attendanceConnectionString,
-            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
+            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
         },
         applicationAssembly: typeof(AttendanceApiHost).Assembly,
         typeof(RoomAddedConsumer).Assembly);
