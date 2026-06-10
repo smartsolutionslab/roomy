@@ -151,6 +151,7 @@
 }
 
 :root[data-theme='dark'] {
+  color-scheme: dark;
   --roomy-color-background: #16161b;
   --roomy-color-background-muted: #1e1e24;
   --roomy-color-surface: #1f1f26;
@@ -184,6 +185,12 @@
     radial-gradient(34rem 24rem at 10% 110%, rgba(251, 191, 36, 0.18), transparent 60%);
 }
 
+/* An explicit light choice forces the light scheme too, so UA-drawn control popups follow the
+   toggle rather than the OS preference (the dark choice does the same above). */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -214,6 +221,35 @@ body {
 :where(a, button, input, select, textarea, summary):focus-visible {
   outline: var(--roomy-focus-outline);
   outline-offset: var(--roomy-focus-outline-offset);
+}
+
+/* Native text/select controls themed onto the design system so they match the buttons and cards
+   and never keep a light-only look in dark mode (the UA-drawn select/date popups follow the active
+   theme via `color-scheme` above). Zero-specificity (:where) so a future control primitive can
+   override; checkboxes, radios and ranges keep their native rendering. The native select chevron is
+   intentionally kept (no `appearance` reset) — it themes with `color-scheme`. */
+:where(select, textarea, input:not([type='checkbox'], [type='radio'], [type='range'])) {
+  inline-size: 100%;
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  background-color: var(--roomy-color-surface);
+  color: var(--roomy-color-text);
+  font: inherit;
+  transition: border-color var(--roomy-transition);
+}
+
+:where(select, textarea, input:not([type='checkbox'], [type='radio'], [type='range'])):hover {
+  border-color: var(--roomy-color-accent);
+}
+
+:where(input, textarea)::placeholder {
+  color: var(--roomy-color-text-muted);
+}
+
+:where(select, textarea, input:not([type='checkbox'], [type='radio'], [type='range'])):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* ---------- Utility primitives (composed by directives + feature pages) ---------- */
