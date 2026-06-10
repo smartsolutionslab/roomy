@@ -13,6 +13,12 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - File-scoped namespaces. One top-level type per file; the file name matches the type. Sole
   exception: a non-generic type and the generic overload of the same concept may share a file
   (e.g. `ICommand` + `ICommand<TResult>`, `ICommandHandler<T>` + `ICommandHandler<T, TResult>`).
+- **API-host endpoint DTOs live in `Request/` and `Response/` subfolders** of the host's
+  `Endpoints/` folder, with matching sub-namespaces `…Endpoints.Request` / `…Endpoints.Response`
+  (the gateway BFF uses `…Bff.Request` / `…Bff.Response`). Response-body DTOs — the `*Response`
+  records and their `*Page` pagination wrappers — go under `Response/`; request-body DTOs under
+  `Request/`; the endpoint classes stay in `Endpoints/`. Nested `private` DTOs are implementation
+  details and stay with their owner. See ADR-0049.
 - **Root namespace `SmartSolutionsLab.Roomy`** (pattern `SmartSolutionsLab.{ProjectName}`);
   per-project namespaces extend it following the folder structure, e.g.
   `SmartSolutionsLab.Roomy.SharedKernel.Guards`. Set via `<RootNamespace>` in
