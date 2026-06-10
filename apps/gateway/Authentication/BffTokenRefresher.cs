@@ -1,9 +1,7 @@
 using System.Globalization;
-using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Authentication;
@@ -70,9 +68,7 @@ public static class BffTokenRefresher
             }),
         };
 
-        using var response = await httpClient
-            .SendAsync(request, context.HttpContext.RequestAborted)
-            .ConfigureAwait(false);
+        using var response = await httpClient.SendAsync(request, context.HttpContext.RequestAborted);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -80,9 +76,7 @@ public static class BffTokenRefresher
             return;
         }
 
-        var refreshed = await response.Content
-            .ReadFromJsonAsync<TokenResponse>(context.HttpContext.RequestAborted)
-            .ConfigureAwait(false);
+        var refreshed = await response.Content.ReadFromJsonAsync<TokenResponse>(context.HttpContext.RequestAborted);
 
         if (refreshed is null || string.IsNullOrEmpty(refreshed.AccessToken))
         {
@@ -102,9 +96,7 @@ public static class BffTokenRefresher
         }
 
         var renewedExpiresAt = DateTimeOffset.UtcNow.AddSeconds(refreshed.ExpiresIn);
-        context.Properties.UpdateTokenValue(
-            "expires_at",
-            renewedExpiresAt.ToString("o", CultureInfo.InvariantCulture));
+        context.Properties.UpdateTokenValue("expires_at", renewedExpiresAt.ToString("o", CultureInfo.InvariantCulture));
 
         // Persist the refreshed tokens back into the session cookie.
         context.ShouldRenew = true;

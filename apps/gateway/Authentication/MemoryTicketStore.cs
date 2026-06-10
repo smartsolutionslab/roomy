@@ -10,17 +10,10 @@ namespace SmartSolutionsLab.Roomy.Gateway.Authentication;
 // localhost in dev, overflowing its header limit (431 Request Header Fields Too Large). Storing the
 // ticket here leaves only a small session key in the cookie. In-memory is fine for local dev (a single
 // gateway instance; sessions reset on restart); a distributed store (e.g. Redis) is the production swap.
-internal sealed class MemoryTicketStore : ITicketStore
+internal sealed class MemoryTicketStore(IMemoryCache cache) : ITicketStore
 {
     private const string KeyPrefix = "roomy-bff-ticket:";
     private static readonly TimeSpan fallbackLifetime = TimeSpan.FromHours(8);
-
-    private readonly IMemoryCache cache;
-
-    public MemoryTicketStore(IMemoryCache cache)
-    {
-        this.cache = cache;
-    }
 
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
     {
