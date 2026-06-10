@@ -1,4 +1,4 @@
-using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Application.Ports;

@@ -1,4 +1,4 @@
-using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;

@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 
 // Views a company-day's reservations by replaying the AttendanceDay stream (research R6) — no separate
 // read model this slice (the occupancy projection is 004). A never-booked day replays to an empty

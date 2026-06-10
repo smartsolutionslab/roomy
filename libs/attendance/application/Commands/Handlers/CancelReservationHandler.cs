@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 
 // Cancels a reservation (FR-008/009). Like reserve, it runs the aggregate's decision inside a bounded
 // optimistic-retry loop (research R2 / ADR-0039): load → cancel → save. A domain rejection (not found,

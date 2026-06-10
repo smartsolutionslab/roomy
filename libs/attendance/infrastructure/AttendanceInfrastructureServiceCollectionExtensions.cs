@@ -1,7 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
+using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;

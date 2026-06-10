@@ -1,5 +1,5 @@
 using Shouldly;
-using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;

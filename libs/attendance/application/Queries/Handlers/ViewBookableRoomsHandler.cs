@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 
 // Lists the company's bookable rooms (007 US1): a straight read of the catalogue read model through the
 // port. There is nothing to decide — a company with no rooms yields an empty list, never "not found" —

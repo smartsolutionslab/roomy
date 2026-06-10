@@ -1,6 +1,7 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
-using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
+using SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;

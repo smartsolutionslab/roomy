@@ -1,9 +1,10 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 
 // Reserves a place (FR-001..007). It reads the room's capacity, then runs the aggregate's decision
 // inside a bounded optimistic-retry loop (research R2 / ADR-0039): load → decide → save. A domain

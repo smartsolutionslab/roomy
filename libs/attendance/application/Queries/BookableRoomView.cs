@@ -1,6 +1,6 @@
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 
 // One bookable room in the catalogue the reserve flow picks from (007 US1): a room in an office, with
 // the master data needed to render the office → room picker — the office and room names and the room's
