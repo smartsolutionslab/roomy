@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
@@ -10,13 +9,12 @@ public sealed class RenameRoomHandler(IOfficeRepository offices, IUnitOfWork uni
 {
     public async Task<Result> HandleAsync(RenameRoom command, CancellationToken cancellationToken)
     {
-        var lookup = await offices.GetByIdentifierAsync(command.OfficeIdentifier, cancellationToken);
-        if (lookup.IsFailure)
-            return lookup.Error;
+        var (officeIdentifier, roomIdentifier, name) = command;
+        var lookup = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
+        if (lookup.IsFailure) return lookup.Error;
 
-        var result = lookup.Value.RenameRoom(command.RoomIdentifier, command.Name);
-        if (result.IsFailure)
-            return result.Error;
+        var result = lookup.Value.RenameRoom(roomIdentifier, name);
+        if (result.IsFailure) return result.Error;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success();

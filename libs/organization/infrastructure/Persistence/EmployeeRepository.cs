@@ -11,15 +11,11 @@ public sealed class EmployeeRepository(OrganizationDbContext context) : IEmploye
     public async Task AddAsync(Employee employee, CancellationToken cancellationToken) =>
         await context.Employees.AddAsync(employee, cancellationToken);
 
-    public async Task<Result<Employee>> GetByIdentifierAsync(
-        EmployeeIdentifier identifier,
-        CancellationToken cancellationToken)
+    public async Task<Result<Employee>> GetByIdentifierAsync(EmployeeIdentifier identifier, CancellationToken cancellationToken)
     {
-        var employee = await context.Employees
-            .SingleOrDefaultAsync(candidate => candidate.Identifier == identifier, cancellationToken);
+        var employee = await context.Employees.SingleOrDefaultAsync(candidate => candidate.Identifier == identifier, cancellationToken);
 
-        if (employee is null)
-            return Error.NotFound("employee.not_found", $"No employee exists with identifier '{identifier}'.");
+        if (employee is null) return Error.NotFound("employee.not_found", $"No employee exists with identifier '{identifier}'.");
 
         return employee;
     }

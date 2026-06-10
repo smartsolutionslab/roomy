@@ -14,9 +14,10 @@ public sealed class UserProvisioningFailedConsumer(ICommandHandler<FailEmployeeP
 {
     public async Task Handle(UserProvisioningFailed message, CancellationToken cancellationToken)
     {
-        var command = new FailEmployeeProvisioning(
-            EmployeeIdentifier.From(message.EmployeeId),
-            ToReason(message.Reason));
+        var employee = EmployeeIdentifier.From(message.EmployeeId);
+        var reason = ToReason(message.Reason);
+
+        var command = new FailEmployeeProvisioning(employee, reason);
 
         await fail.HandleAsync(command, cancellationToken);
     }
