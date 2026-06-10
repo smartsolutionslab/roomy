@@ -11,19 +11,24 @@ import {
 } from './booking';
 import type {
   BookableOffice,
+  EmployeeId,
   MyReservation,
   OfficeId,
   ReservationId,
   RoomAvailability,
   RoomId,
 } from './booking';
+import { toEmployee } from './employee';
+import type { Employee } from './employee';
 import {
   ApiConfiguration,
   cancelReservation,
   reserve,
   viewBookableRooms,
+  viewEmployees,
   viewMyReservations,
   viewOccupancy,
+  viewReservationsForEmployee,
 } from './generated';
 import { toOccupancyDays } from './occupancy';
 import type { OccupancyDay } from './occupancy';
@@ -71,16 +76,32 @@ export class AttendanceGateway {
 
   // Reserve a place (POST /reservations). Resolves to the new reservation id; rejections (room_full,
   // already_reserved_today, not_bookable, unknown_room, concurrency_retry_exhausted) surface as the
-  // HttpErrorResponse the page maps to a localized message (FR-004).
-  reserve(office: OfficeId, room: RoomId, date: string): Observable<ReservationId> {
+  // HttpErrorResponse the page maps to a localized message (FR-004). `onBehalfOf` is administrator-only
+  // (009 AT-6); omitted ⇒ the caller reserves for themselves.
+  reserve(office: OfficeId, room: RoomId, date: string, onBehalfOf?: EmployeeId): Observable<ReservationId> {
     return reserve(this.http, this.config.rootUrl, {
-      body: { officeId: office, roomId: room, date },
+      body: { officeId: office, roomId: room, date, onBehalfOf },
     }).pipe(map((response) => reservationId(response.body.reservationId)));
   }
 
   // The signed-in employee's own reservations, past and upcoming (GET /reservations/mine, AT-4).
   myReservations(): Observable<MyReservation[]> {
     return viewMyReservations(this.http, this.config.rootUrl).pipe(
+      map((response) => response.body.map(toMyReservation)),
+    );
+  }
+
+  // The administrator on-behalf directory (GET /reservations/employees, admin-only, 009).
+  listEmployees(): Observable<Employee[]> {
+    return viewEmployees(this.http, this.config.rootUrl).pipe(
+      map((response) => response.body.map(toEmployee)),
+    );
+  }
+
+  // A chosen employee's reservations, for the administrator on-behalf view (GET
+  // /reservations/by-employee/{id}, admin-only, 009).
+  reservationsFor(employee: EmployeeId): Observable<MyReservation[]> {
+    return viewReservationsForEmployee(this.http, this.config.rootUrl, { employeeId: employee }).pipe(
       map((response) => response.body.map(toMyReservation)),
     );
   }

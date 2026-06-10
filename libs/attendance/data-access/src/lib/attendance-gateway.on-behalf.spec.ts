@@ -1,0 +1,79 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { AttendanceGateway } from './attendance-gateway';
+import { employeeId, officeId, roomId } from './booking';
+import type { MyReservation } from './booking';
+import type { Employee } from './employee';
+
+describe('AttendanceGateway on-behalf', () => {
+  let gateway: AttendanceGateway;
+  let httpController: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    gateway = TestBed.inject(AttendanceGateway);
+    httpController = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => httpController.verify());
+
+  it('lists the employee directory, mapping the DTOs to branded view models', () => {
+    let received: Employee[] | undefined;
+
+    gateway.listEmployees().subscribe((employees) => (received = employees));
+
+    const request = httpController.expectOne((req) => req.url === '/reservations/employees');
+    expect(request.request.method).toBe('GET');
+    request.flush([{ employeeId: 'e1', name: 'Ada' }]);
+
+    expect(received).toEqual([{ id: 'e1', name: 'Ada' }]);
+  });
+
+  it("reads a chosen employee's reservations", () => {
+    let received: MyReservation[] | undefined;
+
+    gateway.reservationsFor(employeeId('e1')).subscribe((reservations) => (received = reservations));
+
+    const request = httpController.expectOne((req) => req.url === '/reservations/by-employee/e1');
+    expect(request.request.method).toBe('GET');
+    request.flush([
+      {
+        reservationId: 'res1',
+        officeId: 'o1',
+        officeName: 'Munich',
+        roomId: 'r1',
+        roomName: 'A1',
+        date: '2026-06-10',
+      },
+    ]);
+
+    expect(received?.[0]).toEqual({
+      id: 'res1',
+      officeId: 'o1',
+      officeName: 'Munich',
+      roomId: 'r1',
+      roomName: 'A1',
+      date: '2026-06-10',
+    });
+  });
+
+  it('reserves on behalf of an employee, sending onBehalfOf in the body', () => {
+    gateway
+      .reserve(officeId('o1'), roomId('r1'), '2026-06-10', employeeId('e1'))
+      .subscribe();
+
+    const request = httpController.expectOne((req) => req.url === '/reservations');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      officeId: 'o1',
+      roomId: 'r1',
+      date: '2026-06-10',
+      onBehalfOf: 'e1',
+    });
+    request.flush({ reservationId: 'res1', officeId: 'o1', roomId: 'r1', date: '2026-06-10', employeeId: 'e1' });
+  });
+});

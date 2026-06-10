@@ -32,9 +32,9 @@ libs; no gateway change; no backend write change (reserve `onBehalfOf` + admin c
   employee's reservations; a non-admin gets 403; no session → 401. Re-emit the OpenAPI spec.
 
 ## Phase 2: Data-access
-- [ ] T004 [US1] `booking.ts` — add `EmployeeId` brand + `employeeId()`. `employee.ts` — `Employee`
+- [x] T004 [US1] `booking.ts` — add `EmployeeId` brand + `employeeId()`. `employee.ts` — `Employee`
   view model + `toEmployee` (+spec).
-- [ ] T005 [US1/US2] `AttendanceGateway`: `listEmployees()` (GET /reservations/employees),
+- [x] T005 [US1/US2] `AttendanceGateway`: `listEmployees()` (GET /reservations/employees),
   `reservationsFor(employee: EmployeeId)` (GET /reservations/by-employee/{id}), and an optional
   `onBehalfOf` arg on `reserve(office, room, date, onBehalfOf?)`; export `Employee`/`EmployeeId`. Spec
   extension (HttpTestingController): URLs/params and mapping; reserve sends `onBehalfOf` in the body.
