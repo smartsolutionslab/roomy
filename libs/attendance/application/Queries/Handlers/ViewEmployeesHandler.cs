@@ -1,6 +1,5 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
-using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
@@ -12,8 +11,6 @@ namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 public sealed class ViewEmployeesHandler(IEmployeeCatalog catalog)
     : IQueryHandler<ViewEmployees, Page<EmployeeView>>
 {
-    public Task<Result<Page<EmployeeView>>> HandleAsync(
-        ViewEmployees query,
-        CancellationToken cancellationToken) =>
+    public Task<Result<Page<EmployeeView>>> HandleAsync(ViewEmployees query, CancellationToken cancellationToken) =>
         catalog.GetAsync(query.Term, query.Page, cancellationToken);
 }

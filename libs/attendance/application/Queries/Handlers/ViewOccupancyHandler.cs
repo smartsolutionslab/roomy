@@ -1,6 +1,5 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
-using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
@@ -17,17 +16,12 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProv
 {
     private static readonly TimeZoneInfo berlinZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
 
-    public async Task<Result<IReadOnlyList<OccupancyView>>> HandleAsync(
-        ViewOccupancy query,
-        CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<OccupancyView>>> HandleAsync(ViewOccupancy query, CancellationToken cancellationToken)
     {
-        var data = await readModel
-            .GetAsync(query.Company, query.Scope, query.From, query.To, cancellationToken)
-            .ConfigureAwait(false);
-        if (data.IsFailure)
-        {
-            return data.Error;
-        }
+        var (company, scope, from, to) = query;
+        var data = await readModel.GetAsync(company, scope, from, to, cancellationToken);
+
+        if (data.IsFailure) return data.Error;
 
         var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(timeProvider.GetUtcNow(), berlinZone).DateTime);
         var tomorrow = today.AddDays(1);
@@ -44,9 +38,7 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProv
 
     private static OccupancyView BuildDay(BookingDate date, OccupancyData data, bool showNames)
     {
-        var rooms = data.Rooms
-            .Select(room => BuildRoom(date, room, data.Occupants, showNames))
-            .ToList();
+        var rooms = data.Rooms.Select(room => BuildRoom(date, room, data.Occupants, showNames)).ToList();
 
         var occupiedTotal = rooms.Sum(room => room.Occupied);
         var capacityTotal = rooms.Sum(room => room.Capacity);
@@ -60,14 +52,9 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProv
         return new OccupancyView(date, office, rooms);
     }
 
-    private static RoomOccupancy BuildRoom(
-        BookingDate date,
-        RoomDescriptor room,
-        IReadOnlyList<OccupantRecord> occupants,
-        bool showNames)
+    private static RoomOccupancy BuildRoom(BookingDate date, RoomDescriptor room, IReadOnlyList<OccupantRecord> occupants, bool showNames)
     {
-        var booked = occupants
-            .Where(occupant => occupant.Room == room.Room && occupant.Date == date)
+        var booked = occupants.Where(occupant => occupant.Room == room.Room && occupant.Date == date)
             .ToList();
 
         return new RoomOccupancy(
