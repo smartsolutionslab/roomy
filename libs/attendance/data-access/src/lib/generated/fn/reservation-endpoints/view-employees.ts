@@ -7,14 +7,18 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { EmployeeResponse } from '../../models/employee-response';
+import { EmployeePage } from '../../models/employee-page';
 
 export interface ViewEmployees$Params {
+  cursor?: string;
+  limit?: (number | string);
 }
 
-export function viewEmployees(http: HttpClient, rootUrl: string, params?: ViewEmployees$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<EmployeeResponse>>> {
+export function viewEmployees(http: HttpClient, rootUrl: string, params?: ViewEmployees$Params, context?: HttpContext): Observable<StrictHttpResponse<EmployeePage>> {
   const rb = new RequestBuilder(rootUrl, viewEmployees.PATH, 'get');
   if (params) {
+    rb.query('cursor', params.cursor, {});
+    rb.query('limit', params.limit, {});
   }
 
   return http.request(
@@ -22,7 +26,7 @@ export function viewEmployees(http: HttpClient, rootUrl: string, params?: ViewEm
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<EmployeeResponse>>;
+      return r as StrictHttpResponse<EmployeePage>;
     })
   );
 }

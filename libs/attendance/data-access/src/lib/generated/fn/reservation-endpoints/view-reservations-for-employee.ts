@@ -7,16 +7,20 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { MyReservationResponse } from '../../models/my-reservation-response';
+import { MyReservationPage } from '../../models/my-reservation-page';
 
 export interface ViewReservationsForEmployee$Params {
   employeeId: string;
+  cursor?: string;
+  limit?: (number | string);
 }
 
-export function viewReservationsForEmployee(http: HttpClient, rootUrl: string, params: ViewReservationsForEmployee$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<MyReservationResponse>>> {
+export function viewReservationsForEmployee(http: HttpClient, rootUrl: string, params: ViewReservationsForEmployee$Params, context?: HttpContext): Observable<StrictHttpResponse<MyReservationPage>> {
   const rb = new RequestBuilder(rootUrl, viewReservationsForEmployee.PATH, 'get');
   if (params) {
     rb.path('employeeId', params.employeeId, {});
+    rb.query('cursor', params.cursor, {});
+    rb.query('limit', params.limit, {});
   }
 
   return http.request(
@@ -24,7 +28,7 @@ export function viewReservationsForEmployee(http: HttpClient, rootUrl: string, p
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<MyReservationResponse>>;
+      return r as StrictHttpResponse<MyReservationPage>;
     })
   );
 }

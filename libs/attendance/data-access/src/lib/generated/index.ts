@@ -7,12 +7,15 @@ export type { StrictHttpResponse } from './strict-http-response';
 export { Api } from './api';
 
 export type { BookableRoomResponse } from './models/bookable-room-response';
+export type { EmployeePage } from './models/employee-page';
 export type { EmployeeResponse } from './models/employee-response';
+export type { MyReservationPage } from './models/my-reservation-page';
 export type { MyReservationResponse } from './models/my-reservation-response';
 export type { OccupancyDayResponse } from './models/occupancy-day-response';
 export type { OccupantResponse } from './models/occupant-response';
 export type { OfficeOccupancyResponse } from './models/office-occupancy-response';
 export type { ProblemDetails } from './models/problem-details';
+export type { ReservationPage } from './models/reservation-page';
 export type { ReservationResponse } from './models/reservation-response';
 export type { ReserveRequest } from './models/reserve-request';
 export type { RoomOccupancyResponse } from './models/room-occupancy-response';
