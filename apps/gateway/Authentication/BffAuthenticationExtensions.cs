@@ -50,6 +50,13 @@ public static class BffAuthenticationExtensions
         // Back-channel client the cookie validation uses to refresh the access token against Keycloak.
         services.AddHttpClient(BffTokenRefresher.HttpClientName);
 
+        // Keep the auth ticket (which carries the tokens) server-side so the cookie stays small — see
+        // MemoryTicketStore for why a fat cookie breaks the Keycloak login on a shared-localhost dev host.
+        services.AddMemoryCache();
+        services.AddSingleton<ITicketStore, MemoryTicketStore>();
+        services.AddOptions<CookieAuthenticationOptions>(CookieScheme)
+            .Configure<ITicketStore>((options, ticketStore) => options.SessionStore = ticketStore);
+
         services.AddAuthorization();
 
         return services;
