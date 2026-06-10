@@ -25,16 +25,16 @@ public static class ReservationEndpoints
             .WithName("Reserve")
             .Produces<ReservationResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status409Conflict)
-            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
+            .Produces<ErrorResponse>(StatusCodes.Status409Conflict)
+            .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
         endpoints.MapDelete("/reservations/{reservationId:guid}", CancelAsync)
             .RequireAuthorization()
             .WithName("CancelReservation")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
+            .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
         endpoints.MapGet("/reservations", ViewAsync)
             .RequireAuthorization()
             .WithName("ViewDayReservations")

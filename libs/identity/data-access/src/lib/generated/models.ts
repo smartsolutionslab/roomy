@@ -4,4 +4,5 @@
 export type { AccountResponse } from './models/account-response';
 export type { AdminUserPage } from './models/admin-user-page';
 export type { AdminUserResponse } from './models/admin-user-response';
+export type { ErrorResponse } from './models/error-response';
 export type { ProblemDetails } from './models/problem-details';

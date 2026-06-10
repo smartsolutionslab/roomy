@@ -24,8 +24,8 @@ public static class OccupancyEndpoints
             .RequireAuthorization()
             .WithName("ViewOccupancy")
             .Produces<IEnumerable<OccupancyDayResponse>>()
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
+            .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
         return endpoints;
     }
 
