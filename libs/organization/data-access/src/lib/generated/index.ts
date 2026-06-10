@@ -8,6 +8,7 @@ export { Api } from './api';
 
 export type { AddRoomRequest } from './models/add-room-request';
 export type { CreateOfficeRequest } from './models/create-office-request';
+export type { ErrorResponse } from './models/error-response';
 export type { HiredEmployeeResponse } from './models/hired-employee-response';
 export type { HireEmployeeRequest } from './models/hire-employee-request';
 export type { OfficeResponse } from './models/office-response';

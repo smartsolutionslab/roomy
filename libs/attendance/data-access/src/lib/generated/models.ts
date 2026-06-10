@@ -4,6 +4,7 @@
 export type { BookableRoomResponse } from './models/bookable-room-response';
 export type { EmployeePage } from './models/employee-page';
 export type { EmployeeResponse } from './models/employee-response';
+export type { ErrorResponse } from './models/error-response';
 export type { MyReservationPage } from './models/my-reservation-page';
 export type { MyReservationResponse } from './models/my-reservation-response';
 export type { OccupancyDayResponse } from './models/occupancy-day-response';

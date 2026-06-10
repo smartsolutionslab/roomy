@@ -46,11 +46,13 @@ segment, so the architecture layer rules never select it. Request-shape `400`s t
 - New error kinds map correctly everywhere for free.
 
 **Negative / trade-offs**
-- The endpoints' OpenAPI metadata still declares `ProducesProblem` (ProblemDetails) for several error
-  responses, so the **committed specs are unchanged by this PR** (no client regen) but remain inaccurate about
-  the error body — exactly as attendance already was. Aligning `.ProducesProblem` → `.Produces<ErrorResponse>`,
-  re-emitting the three specs, and regenerating the typed Angular clients is a **follow-up** (kept separate so
-  this behaviour fix stays small and the spec/client churn is reviewed on its own).
+- The behaviour fix shipped first with the OpenAPI metadata unchanged, so a separate follow-up aligns the specs
+  to match: every `404`/`409`/`422` response (which always carries an `ErrorResponse` body) now declares
+  `.Produces<ErrorResponse>(status)`, the three committed specs were re-emitted, and the typed Angular clients
+  were regenerated (a new `ErrorResponse` model). The `400`/`401`/`403` responses keep `ProducesProblem`
+  deliberately: those are either an auth-policy challenge (no `ErrorResponse` body) or organization's
+  request-shape `400` (a plain string, not an `Error`), so declaring `ErrorResponse` there would be inaccurate —
+  reconciling them would mean changing those response bodies, a separate decision.
 
 ## Notes
 Third slice of the backend de-duplication pass (after the test-support lib and the shared Keycloak auth lib /

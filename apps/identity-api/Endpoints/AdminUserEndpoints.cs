@@ -25,12 +25,13 @@ public static class AdminUserEndpoints
             .RequireAdministrator()
             .WithName("GetUser")
             .Produces<AdminUserResponse>()
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         endpoints.MapPost("/admin/users/{userId:guid}:grant-administrator", GrantAdministratorAsync)
             .RequireAdministrator()
             .WithName("GrantAdministrator")
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
+            .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
 
         return endpoints;
     }
