@@ -12,6 +12,7 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import {
   AttendanceGateway,
   BookableOffice,
+  MyReservation,
   OccupancyDay,
   addMonths,
   isSameMonth,
@@ -20,6 +21,7 @@ import {
   roomId,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { EMPTY, expand, reduce } from 'rxjs';
 
 // The occupancy calendar (OC-3, FR-004): a month grid where each in-month day shows its occupancy figure
 // (the office rollup for the chosen scope) and the days the viewer holds a reservation are highlighted
@@ -135,9 +137,16 @@ export class OccupancyCalendar {
         error: () => this.occupancyByDate.set(new Map()),
       });
 
+    // The calendar marks every day the viewer holds a reservation, so it walks all pages of the
+    // keyset-paginated history (ADR-0042) — following nextCursor until the list is exhausted — rather
+    // than only the first page (which, being date-ordered, need not include the displayed month).
     this.gateway
       .myReservations()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        expand((page) => (page.nextCursor ? this.gateway.myReservations(page.nextCursor) : EMPTY)),
+        reduce((all, page) => [...all, ...page.items], [] as MyReservation[]),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (reservations) => this.myDays.set(new Set(reservations.map((reservation) => reservation.date))),
         error: () => this.myDays.set(new Set()),
