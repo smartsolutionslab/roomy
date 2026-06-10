@@ -9,7 +9,7 @@
   <ItemGroup>
     <!-- Only Postgres: the event store's concurrency-race test needs the real provider's unique-index
          violation (SQLSTATE 23505), which SQLite cannot emit (#67). -->
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.2" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
   </ItemGroup>
 
 </Project>

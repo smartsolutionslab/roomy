@@ -64,3 +64,4 @@ ADRs are written **before** the implementing code, not after.
 | [0040](0040-shared-frontend-route-guards.md) | Shared frontend route guards and not-authorized view | Accepted |
 | [0041](0041-rabbitmq-conventional-routing-and-no-retry-strategy.md) | Route integration events by convention; no EF retry strategy with the Wolverine outbox | Proposed |
 | [0042](0042-scalar-api-docs-keycloak-oauth.md) | Interactive API docs with Scalar and a dev-only Keycloak OAuth try-it-out | Proposed |
+| [0043](0043-central-package-management.md) | Central Package Management for NuGet versions | Accepted |
