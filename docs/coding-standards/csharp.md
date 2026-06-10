@@ -23,6 +23,13 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   OpenAPI schema id (`EmployeeResponse`, `EmployeePage`, …) is reconstructed from the namespace tail
   by `web-http`'s `EndpointSchemaIds`, so the emitted spec and generated client are unchanged. Nested
   `private` DTOs are implementation details and stay with their owner. See ADR-0049/0050.
+- **Application use cases live in `Commands/` and `Queries/` subfolders**, each with a `Handlers/`
+  subfolder (no flat `UseCases/`). `Commands/` holds the `ICommand` message records and any command
+  *result* record; `Commands/Handlers/` the `ICommandHandler`s. `Queries/` holds the `IQuery` messages,
+  query-input value objects, and the *view/result* records the queries return; `Queries/Handlers/` the
+  `IQueryHandler`s. Namespaces follow the folders — `…Application.Commands` / `…Application.Commands.Handlers`
+  / `…Application.Queries` / `…Application.Queries.Handlers`; a handler `using`s its parent message
+  namespace. A context with no queries (or no commands) omits that folder. See ADR-0051.
 - **Root namespace `SmartSolutionsLab.Roomy`** (pattern `SmartSolutionsLab.{ProjectName}`);
   per-project namespaces extend it following the folder structure, e.g.
   `SmartSolutionsLab.Roomy.SharedKernel.Guards`. Set via `<RootNamespace>` in
