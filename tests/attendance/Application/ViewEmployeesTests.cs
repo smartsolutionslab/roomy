@@ -1,3 +1,4 @@
+using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
@@ -18,7 +19,10 @@ public class ViewEmployeesTests
     public async Task It_returns_the_catalogs_employees()
     {
         var employee = new EmployeeView(EmployeeIdentifier.New(), "Ada");
-        var handler = new ViewEmployeesHandler(new StubCatalog([employee]));
+        var catalog = Substitute.For<IEmployeeCatalog>();
+        catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success(new Page<EmployeeView>([employee], null)));
+        var handler = new ViewEmployeesHandler(catalog);
 
         var result = await handler.HandleAsync(new ViewEmployees(SearchTerm.None, FirstPage), CancellationToken.None);
 
@@ -29,7 +33,10 @@ public class ViewEmployeesTests
     [Fact]
     public async Task No_employees_yields_an_empty_page()
     {
-        var handler = new ViewEmployeesHandler(new StubCatalog([]));
+        var catalog = Substitute.For<IEmployeeCatalog>();
+        catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success(new Page<EmployeeView>([], null)));
+        var handler = new ViewEmployeesHandler(catalog);
 
         var result = await handler.HandleAsync(new ViewEmployees(SearchTerm.None, FirstPage), CancellationToken.None);
 
@@ -40,25 +47,16 @@ public class ViewEmployeesTests
     [Fact]
     public async Task It_forwards_the_search_term_to_the_catalog()
     {
-        var catalog = new StubCatalog([]);
-        var handler = new ViewEmployeesHandler(catalog);
         var term = SearchTerm.From("hanah").Value;
+        var catalog = Substitute.For<IEmployeeCatalog>();
+        catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success(new Page<EmployeeView>([], null)));
+        var handler = new ViewEmployeesHandler(catalog);
 
         await handler.HandleAsync(new ViewEmployees(term, FirstPage), CancellationToken.None);
 
-        catalog.LastTerm.ShouldBe(term);
+        await catalog.Received(1).GetAsync(term, Arg.Any<PageRequest>(), Arg.Any<CancellationToken>());
     }
 
     private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
-
-    private sealed class StubCatalog(IReadOnlyList<EmployeeView> employees) : IEmployeeCatalog
-    {
-        public SearchTerm? LastTerm { get; private set; }
-
-        public Task<Result<Page<EmployeeView>>> GetAsync(SearchTerm term, PageRequest request, CancellationToken cancellationToken)
-        {
-            LastTerm = term;
-            return Task.FromResult<Result<Page<EmployeeView>>>(new Page<EmployeeView>(employees, null));
-        }
-    }
 }

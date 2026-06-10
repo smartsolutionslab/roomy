@@ -33,6 +33,12 @@ cheaply at the seams, so e2e is reserved for genuine end-to-end journeys.
 `Should.Throw<T>(...)` — for readable failures, not raw xUnit `Assert.*`. FluentAssertions v8
 is a paid commercial license and is **not** used. TS/Angular tests use Vitest's built-in `expect`.
 
+**Test doubles.** .NET **unit** tests stub and verify ports with **NSubstitute** (free, MIT;
+ADR-0052) — `Substitute.For<IPort>()`, `port.Method(Arg.Any<…>()).Returns(Result.Success(value))`,
+`await port.Received(1).Method(expected, …)` / `DidNotReceive()`, and `Arg.Do<T>(list.Add)` to
+capture arguments. Assertions stay in the Assert (Shouldly), never inside a double. Integration/e2e
+tests run against the real Aspire-composed stack and do **not** mock.
+
 ## E2e (Playwright)
 
 - **Thin and critical-path only** — e.g. log in → book a desk → see attendance. Not

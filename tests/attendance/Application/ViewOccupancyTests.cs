@@ -1,3 +1,4 @@
+using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
@@ -138,9 +139,10 @@ public class ViewOccupancyTests
     [Fact]
     public async Task A_read_model_error_is_propagated()
     {
-        var handler = new ViewOccupancyHandler(
-            new StubOccupancyReadModel(Error.NotFound("unknown_office", "no such office")),
-            new FixedTimeProvider(now));
+        var readModel = Substitute.For<IOccupancyReadModel>();
+        readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<OccupancyScope>(), Arg.Any<BookingDateRange>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Failure<OccupancyData>(Error.NotFound("unknown_office", "no such office")));
+        var handler = new ViewOccupancyHandler(readModel, new FixedTimeProvider(now));
 
         var result = await handler.HandleAsync(NewQuery(today, today), CancellationToken.None);
 
@@ -150,7 +152,10 @@ public class ViewOccupancyTests
 
     private static async Task<IReadOnlyList<OccupancyView>> ViewAsync(OccupancyData data, DateOnly from, DateOnly to)
     {
-        var handler = new ViewOccupancyHandler(new StubOccupancyReadModel(data), new FixedTimeProvider(now));
+        var readModel = Substitute.For<IOccupancyReadModel>();
+        readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<OccupancyScope>(), Arg.Any<BookingDateRange>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success(data));
+        var handler = new ViewOccupancyHandler(readModel, new FixedTimeProvider(now));
         var result = await handler.HandleAsync(NewQuery(from, to), CancellationToken.None);
         result.IsSuccess.ShouldBeTrue();
         return result.Value;
@@ -167,19 +172,4 @@ public class ViewOccupancyTests
 
     private static OccupantRecord Booked(RoomIdentifier room, DateOnly date) =>
         new(BookingDate.From(date), room, EmployeeIdentifier.New(), "Ada Lovelace");
-
-    private sealed class StubOccupancyReadModel : IOccupancyReadModel
-    {
-        private readonly Result<OccupancyData> result;
-
-        public StubOccupancyReadModel(OccupancyData data) => result = data;
-
-        public StubOccupancyReadModel(Error error) => result = error;
-
-        public Task<Result<OccupancyData>> GetAsync(
-            CompanyIdentifier company,
-            OccupancyScope scope,
-            BookingDateRange range,
-            CancellationToken cancellationToken) => Task.FromResult(result);
-    }
 }
