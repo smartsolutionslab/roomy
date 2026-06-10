@@ -130,10 +130,12 @@
   padding: var(--roomy-space-lg);
   border: 1px solid var(--roomy-glass-border);
   border-radius: var(--roomy-radius-lg);
-  background: var(--roomy-glass-bg);
-  backdrop-filter: var(--roomy-blur);
-  -webkit-backdrop-filter: var(--roomy-blur);
-  box-shadow: var(--roomy-shadow-sm);
+  background: var(--roomy-glass-card);
+  backdrop-filter: var(--roomy-blur-strong);
+  -webkit-backdrop-filter: var(--roomy-blur-strong);
+  box-shadow:
+    inset 0 1px 0 var(--roomy-glass-highlight),
+    var(--roomy-shadow-md);
   color: var(--roomy-color-text);
   text-decoration: none;
   transition:
@@ -145,7 +147,9 @@
 .card:hover {
   transform: translateY(-3px);
   border-color: var(--roomy-color-accent);
-  box-shadow: var(--roomy-shadow-lg);
+  box-shadow:
+    inset 0 1px 0 var(--roomy-glass-highlight),
+    var(--roomy-shadow-lg);
 }
 
 .card:focus-visible {
