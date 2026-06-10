@@ -42,5 +42,3 @@ public static class RoomCatalogueEndpoints
             error => error.ToHttpResult());
     }
 }
-
-internal sealed record BookableRoomResponse(Guid OfficeId, string OfficeName, Guid RoomId, string RoomName, int Capacity);
