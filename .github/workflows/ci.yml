@@ -185,10 +185,27 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Build.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Download build output
         uses: actions/download-artifact@v4
         with:
           name: dotnet-build
+
+      # Packages-only restore — NOT a rebuild. The MSBuild test targets (IsTestProject, the
+      # VSTest target) ship inside the test SDK NuGet packages and are imported through
+      # obj/*.nuget.g.props with Exists() guards. Those packages are not in the build artifact,
+      # so on this fresh runner the guards would fail silently and `dotnet test --no-build`
+      # would run ZERO tests yet exit 0. Restoring (warm from the cache above) makes the
+      # targets resolvable; the compiled output from the artifact is still reused via --no-build.
+      - name: Restore packages
+        run: dotnet restore Roomy.slnx
 
       # Run each project in the shard against the prebuilt output. `--collect "XPlat Code
       # Coverage"` with coverlet.runsettings reports coverage per project (policy exclusions
@@ -205,13 +222,15 @@ jobs:
             echo "::endgroup::"
           done
 
+      # if-no-files-found: error is a deliberate backstop — every shard MUST produce coverage,
+      # so an empty result means tests silently did not run, and that must fail the shard.
       - name: Upload coverage
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.shard }}
           path: ${{ runner.temp }}/coverage/**/coverage.cobertura.xml
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 1
 
   # Human-readable coverage summary merged across all shards, in the job log + step summary.
