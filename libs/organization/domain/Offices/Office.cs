@@ -58,10 +58,14 @@ public sealed class Office : Aggregate
         if (room is null)
             return Error.NotFound("office.room_not_found", $"No room with identifier '{roomIdentifier}' exists in this office.");
 
-        if (rooms.Any(candidate => candidate.Identifier != roomIdentifier && candidate.Name == name))
+        if (IsRoomNameTakenByAnother(roomIdentifier, name))
             return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
 
         room.Rename(name);
         return Result.Success();
     }
+
+    // A room name must be unique within the office — but the room being renamed never collides with itself.
+    private bool IsRoomNameTakenByAnother(RoomIdentifier roomIdentifier, RoomName name) =>
+        rooms.Any(candidate => candidate.Identifier != roomIdentifier && candidate.Name == name);
 }
