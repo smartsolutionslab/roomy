@@ -83,12 +83,16 @@ var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, admi
 // Angular dev server (hot reload in dev). Hosted via core Aspire AddExecutable — the NodeJs
 // hosting integration still lags the 13.x line (ADR-0030, ADR-0027). A fixed dev port keeps
 // the gateway's proxy target and the OIDC redirect URIs stable.
+// Explicit-start: the Angular dev-server cold build is slow and only needed when working on the
+// browser app, so it does not auto-start with the backend. Start it from the dashboard when you
+// need the SPA (the gateway proxies to it in dev). Keeps the default backend startup lean.
 builder.AddExecutable(
         "web",
         OperatingSystem.IsWindows() ? "pnpm.cmd" : "pnpm",
         "../..",
         "nx", "serve", "web", "--port", "4200", "--host", "127.0.0.1")
-    .WithHttpEndpoint(port: 4200, targetPort: 4200, isProxied: false);
+    .WithHttpEndpoint(port: 4200, targetPort: 4200, isProxied: false)
+    .WithExplicitStart();
 
 // --- Database migration runner (ADR-0033) ------------------------------------------
 // Creates each context's database and applies its EF migrations in one pass, then exits. The context
@@ -130,7 +134,11 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
     .WithHttpEndpoint()
     .WithReference(organizationDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
-    .WithReference(keycloak).WaitFor(keycloak)
+    // No WaitFor(keycloak): this API only validates JWTs, and JwtBearer fetches the OIDC metadata
+    // lazily on first request — so it boots in parallel with Keycloak instead of gating on its
+    // (slow) readiness, shortening the startup critical path. (identity-api still waits — it
+    // provisions Keycloak users at startup.)
+    .WithReference(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Company__Name", "Roomy");
@@ -146,7 +154,9 @@ var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendanc
     .WithHttpEndpoint()
     .WithReference(attendanceDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
-    .WithReference(keycloak).WaitFor(keycloak)
+    // No WaitFor(keycloak): validates JWTs only (lazy OIDC metadata), so it starts in parallel with
+    // Keycloak rather than gating on its readiness — see organization-api above.
+    .WithReference(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Attendance__CompanyId", "0199a0b0-0000-7000-8000-000000000001");
