@@ -17,6 +17,7 @@ import {
   isPastDay,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { cursorList } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
@@ -40,53 +41,25 @@ export class MyReservationsPage {
 
   readonly today = input<string>(todayInBerlin());
 
-  protected readonly reservations = signal<MyReservation[] | null>(null);
-  protected readonly nextCursor = signal<string | null>(null);
-  protected readonly loadingMore = signal(false);
-  protected readonly loadFailed = signal(false);
+  // The endless reservation history (ADR-0044/0049): the helper owns the cursor accumulation; the
+  // upcoming/past split derives from its accumulated items.
+  protected readonly list = cursorList<MyReservation>((cursor) =>
+    this.gateway.myReservations(cursor),
+  );
+
   protected readonly result = signal<ResultMessage | null>(null);
   protected readonly errorKey = signal<string | null>(null);
 
   protected readonly upcoming = computed(() =>
-    (this.reservations() ?? [])
+    (this.list.items() ?? [])
       .filter((reservation) => !isPastDay(reservation.date, this.today()))
       .sort((left, right) => left.date.localeCompare(right.date)),
   );
   protected readonly past = computed(() =>
-    (this.reservations() ?? [])
+    (this.list.items() ?? [])
       .filter((reservation) => isPastDay(reservation.date, this.today()))
       .sort((left, right) => right.date.localeCompare(left.date)),
   );
-
-  constructor() {
-    this.loadMore();
-  }
-
-  // Loads the next page (the first when no cursor yet) and appends it, so the history grows as the
-  // employee scrolls or activates "Load more" (ADR-0044); the upcoming/past split derives from the
-  // accumulated set. nextCursor === null marks the end.
-  protected loadMore(): void {
-    if (this.loadingMore()) {
-      return;
-    }
-
-    this.loadingMore.set(true);
-    this.gateway
-      .myReservations(this.nextCursor() ?? undefined)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (page) => {
-          this.reservations.update((current) => [...(current ?? []), ...page.items]);
-          this.nextCursor.set(page.nextCursor);
-          this.loadingMore.set(false);
-        },
-        error: () => {
-          this.loadFailed.set(true);
-          this.reservations.update((current) => current ?? []);
-          this.loadingMore.set(false);
-        },
-      });
-  }
 
   protected cancel(reservation: MyReservation): void {
     this.result.set(null);
@@ -97,8 +70,8 @@ export class MyReservationsPage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.reservations.update((items) =>
-            (items ?? []).filter((candidate) => candidate.id !== reservation.id),
+          this.list.update((items) =>
+            items.filter((candidate) => candidate.id !== reservation.id),
           );
           this.result.set({ key: 'attendance.mine.cancelled' });
         },
@@ -117,8 +90,8 @@ export class MyReservationsPage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.reservations.update((items) =>
-            (items ?? []).filter((candidate) => candidate.id !== reservation.id),
+          this.list.update((items) =>
+            items.filter((candidate) => candidate.id !== reservation.id),
           );
           this.goToReserve();
         },

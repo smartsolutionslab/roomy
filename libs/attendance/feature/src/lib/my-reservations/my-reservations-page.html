@@ -12,18 +12,18 @@
     <roomy-message variant="error">{{ translate(key) }}</roomy-message>
     }
 
-    @if (loadFailed()) {
+    @if (list.failed()) {
     <roomy-message variant="error">{{ translate('attendance.mine.loadError') }}</roomy-message>
-    } @else if (reservations(); as items) { @if (items.length === 0) {
+    } @else if (list.items(); as items) { @if (items.length === 0) {
     <p>{{ translate('attendance.mine.empty') }}</p>
     <button roomyButton type="button" (click)="goToReserve()">
       {{ translate('attendance.mine.reserveLink') }}
     </button>
     } @else {
     <roomy-infinite-scroll
-      [hasMore]="nextCursor() !== null"
-      [loading]="loadingMore()"
-      (loadMore)="loadMore()"
+      [hasMore]="list.hasMore()"
+      [loading]="list.loading()"
+      (loadMore)="list.loadMore()"
     >
     <section class="mine__group">
       <h2>{{ translate('attendance.mine.upcomingHeading') }}</h2>

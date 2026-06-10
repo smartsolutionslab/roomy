@@ -6,15 +6,15 @@
     <roomy-message>{{ translate('admin.users.grantSuccess', { name: grantedName }) }}</roomy-message>
     } @if (grantFailed()) {
     <roomy-message variant="error">{{ translate('admin.users.grantError') }}</roomy-message>
-    } @if (loadFailed()) {
+    } @if (list.failed()) {
     <roomy-message variant="error">{{ translate('admin.users.loadError') }}</roomy-message>
-    } @else if (users(); as accounts) { @if (accounts.length === 0) {
+    } @else if (list.items(); as accounts) { @if (accounts.length === 0) {
     <p>{{ translate('admin.users.empty') }}</p>
     } @else {
     <roomy-infinite-scroll
-      [hasMore]="nextCursor() !== null"
-      [loading]="loadingMore()"
-      (loadMore)="loadMore()"
+      [hasMore]="list.hasMore()"
+      [loading]="list.loading()"
+      (loadMore)="list.loadMore()"
     >
     <table class="roomy-table admin-users__table">
       <thead>
