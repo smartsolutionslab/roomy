@@ -8,16 +8,20 @@
 
   <ItemGroup>
     <ProjectReference Include="../src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- The minimal Aspire app host (Postgres only) the testing builder boots for the concurrency-race
+         test, so the unique-index 23505 path is exercised against the real provider (#67). -->
+    <ProjectReference Include="../../../tests/eventstore-integration-apphost/Roomy.EventStore.TestAppHost.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <!--
-      SQLite is the Docker-free relational provider used for the unit tests: it exercises the real
-      EF model, the unique (stream_id, version) index, and append/replay end to end without a
-      PostgreSQL server. Postgres-only behaviour (jsonb storage, bigserial identity) is verified by
-      Docker-backed integration tests, which are out of this Docker-less environment's reach.
+      PostgreSQL only — no SQLite. The event store is verified against the real provider the app uses
+      (ADR-0012): the append/replay, version-check, and 23505 concurrency tests run against an
+      Aspire-provisioned Postgres; the pure EF-model assertions use a connection-less Npgsql context.
+      Npgsql emits the SQLSTATE 23505 the unique-index race needs, which SQLite cannot.
     -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
     <PackageReference Include="coverlet.collector" Version="10.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
