@@ -14,7 +14,8 @@
     "reserveLink": "Platz reservieren",
     "myReservationsLink": "Meine Reservierungen",
     "occupancyLink": "Belegung",
-    "calendarLink": "Kalender"
+    "calendarLink": "Kalender",
+    "onBehalfLink": "Im Namen"
   },
   "home": {
     "title": "Willkommen bei Roomy",
@@ -169,6 +170,26 @@
       "nextMonth": "Nächster Monat",
       "mine": "Sie haben eine Reservierung",
       "occupied": "{{occupied}}/{{capacity}}"
+    },
+    "onBehalf": {
+      "title": "Im Namen reservieren",
+      "employeeLabel": "Mitarbeiter",
+      "employeePlaceholder": "Mitarbeiter auswählen",
+      "loading": "Wird geladen…",
+      "loadError": "Die Mitarbeiter konnten nicht geladen werden.",
+      "emptyEmployees": "Es gibt noch keine Mitarbeiter.",
+      "prompt": "Wählen Sie einen Mitarbeiter, um in seinem Namen zu reservieren oder zu stornieren.",
+      "reservationsHeading": "Seine Reservierungen",
+      "upcomingHeading": "Bevorstehend",
+      "pastHeading": "Vergangen",
+      "noReservations": "Dieser Mitarbeiter hat keine Reservierungen.",
+      "cancel": "Stornieren",
+      "cancelReservation": "Reservierung für {{room}} am {{date}} stornieren",
+      "cancelled": "Reservierung storniert.",
+      "errors": {
+        "pastImmutable": "Vergangene Reservierungen können nicht geändert werden.",
+        "generic": "Die Reservierung konnte nicht storniert werden. Bitte erneut versuchen."
+      }
     }
   },
   "shared": {
