@@ -1,7 +1,7 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 
-namespace SmartSolutionsLab.Roomy.Organization.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Organization.Application.Commands;
 
 // Internal command raised when identity reports a provisioning failure (UserProvisioningFailed, mapped at
 // the infrastructure edge). Marks the employee Failed with the reason — the compensation that prevents a

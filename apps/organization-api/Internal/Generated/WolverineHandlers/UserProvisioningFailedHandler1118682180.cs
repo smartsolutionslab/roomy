@@ -35,7 +35,7 @@ namespace Internal.Generated.WolverineHandlers
             var organizationDbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence.OrganizationDbContext>(serviceScope.ServiceProvider);
             var organizationUnitOfWork = new SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence.OrganizationUnitOfWork(organizationDbContext, wolverineIntegrationEventOutbox, _timeProvider);
             var employeeRepository = new SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence.EmployeeRepository(organizationDbContext);
-            var failEmployeeProvisioningHandler = new SmartSolutionsLab.Roomy.Organization.Application.UseCases.FailEmployeeProvisioningHandler(employeeRepository, organizationUnitOfWork);
+            var failEmployeeProvisioningHandler = new SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers.FailEmployeeProvisioningHandler(employeeRepository, organizationUnitOfWork);
             // The actual message body
             var userProvisioningFailed = (SmartSolutionsLab.Roomy.Contracts.Identity.UserProvisioningFailed)context.Envelope.Message;
 

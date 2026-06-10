@@ -1,9 +1,10 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Organization.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
 // Hires a colleague under the seeded company (ADR-0025): pre-allocate the login identifier (the saga
 // correlation key, FR-006), create the employee in Provisioning (which raises EmployeeHired), persist,

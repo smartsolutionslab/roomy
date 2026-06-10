@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Organization.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
 public sealed class RenameOfficeHandler(IOfficeRepository offices, IUnitOfWork unitOfWork)
     : ICommandHandler<RenameOffice>

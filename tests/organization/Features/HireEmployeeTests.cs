@@ -1,7 +1,8 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Application;
-using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
+using SmartSolutionsLab.Roomy.Organization.Application.Commands;
+using SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
