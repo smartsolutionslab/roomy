@@ -127,15 +127,19 @@ jobs:
 
       # Publish the compiled output so the test shards run --no-build against it. bin + obj
       # together carry everything `dotnet test --no-build` needs (assemblies plus the restore
-      # markers and project.assets.json under obj). Kept one day — it is only a CI relay.
+      # markers and project.assets.json under obj). Tar it FIRST: the xUnit v3 test assemblies
+      # build a native apphost executable that the runner launches as a child process, and the
+      # upload-artifact zip round-trip strips the Unix executable bit (the shard would then die
+      # with "Permission denied"). tar preserves file modes, so the apphosts stay runnable.
+      - name: Package build output
+        run: >
+          find . \( -path '*/bin/Release/*' -o -path '*/obj/*' \) -print0
+          | tar --null --create --file build-output.tar --files-from=-
       - name: Upload build output
         uses: actions/upload-artifact@v4
         with:
           name: dotnet-build
-          path: |
-            **/bin/Release/**
-            **/obj/**
-          include-hidden-files: true
+          path: build-output.tar
           if-no-files-found: error
           retention-days: 1
 
@@ -197,6 +201,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dotnet-build
+
+      # Restores bin + obj with the executable bit on the xUnit v3 apphosts intact (see the
+      # Package build output step in dotnet-build for why this is tarred rather than raw files).
+      - name: Extract build output
+        run: tar --extract --file build-output.tar
 
       # Packages-only restore — NOT a rebuild. The MSBuild test targets (IsTestProject, the
       # VSTest target) ship inside the test SDK NuGet packages and are imported through
