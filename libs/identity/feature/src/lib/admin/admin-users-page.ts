@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { AdminUser, AdminUsersGateway, UserId } from '@roomy/identity-data-access';
+import { cursorList } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 
 @Component({
@@ -15,42 +16,13 @@ export class AdminUsersPage {
   private readonly adminUsersGateway = inject(AdminUsersGateway);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly users = signal<AdminUser[] | null>(null);
-  protected readonly nextCursor = signal<string | null>(null);
-  protected readonly loadingMore = signal(false);
-  protected readonly loadFailed = signal(false);
+  // The endless account list (ADR-0044/0049): the helper owns the cursor accumulation, so this page
+  // declares only the fetch and binds the helper's signals to roomy-infinite-scroll.
+  protected readonly list = cursorList<AdminUser>((cursor) => this.adminUsersGateway.getAll(cursor));
+
   protected readonly grantFailed = signal(false);
   protected readonly confirmingUserId = signal<UserId | null>(null);
   protected readonly grantSucceeded = signal<string | null>(null);
-
-  constructor() {
-    this.loadMore();
-  }
-
-  // Loads the next page (the first when no cursor yet) and appends it, so the list grows as the
-  // administrator scrolls or activates "Load more" (ADR-0044). nextCursor === null marks the end.
-  protected loadMore(): void {
-    if (this.loadingMore()) {
-      return;
-    }
-
-    this.loadingMore.set(true);
-    this.adminUsersGateway
-      .getAll(this.nextCursor() ?? undefined)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (page) => {
-          this.users.update((current) => [...(current ?? []), ...page.items]);
-          this.nextCursor.set(page.nextCursor);
-          this.loadingMore.set(false);
-        },
-        error: () => {
-          this.loadFailed.set(true);
-          this.users.update((current) => current ?? []);
-          this.loadingMore.set(false);
-        },
-      });
-  }
 
   protected requestGrant(account: AdminUser): void {
     this.grantFailed.set(false);
@@ -69,8 +41,8 @@ export class AdminUsersPage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.users.update((accounts) =>
-            (accounts ?? []).map((candidate) =>
+          this.list.update((accounts) =>
+            accounts.map((candidate) =>
               candidate.userId === account.userId
                 ? { ...candidate, role: 'administrator' }
                 : candidate,
