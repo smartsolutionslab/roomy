@@ -6,6 +6,7 @@ import {
   computed,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,6 +15,7 @@ import {
   AttendanceGateway,
   BookableOffice,
   BookableRoom,
+  EmployeeId,
   OfficeId,
   RoomAvailability,
   RoomId,
@@ -40,6 +42,12 @@ export class ReservePage {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly today = input<string>(todayInBerlin());
+  // When set (administrator on-behalf, 009 AT-6), the reservation is created for that employee; null ⇒
+  // the signed-in caller reserves for themselves (007, unchanged).
+  readonly onBehalfOf = input<EmployeeId | null>(null);
+  // Emitted after a successful reservation so a host (the on-behalf page) can refresh; ignored by the
+  // self-service route.
+  readonly reserved = output<void>();
 
   protected readonly offices = signal<BookableOffice[] | null>(null);
   protected readonly loadFailed = signal(false);
@@ -144,13 +152,14 @@ export class ReservePage {
     const roomName = office.rooms.find((candidate) => candidate.id === room)?.name ?? '';
 
     this.gateway
-      .reserve(office.id as OfficeId, room, day)
+      .reserve(office.id as OfficeId, room, day, this.onBehalfOf() ?? undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.result.set({ key: 'attendance.reserve.reserved', params: { room: roomName, date: day } });
           this.selectedRoomId.set(null);
           this.loadAvailability();
+          this.reserved.emit();
         },
         error: (error: HttpErrorResponse) => this.handleReserveError(error),
       });

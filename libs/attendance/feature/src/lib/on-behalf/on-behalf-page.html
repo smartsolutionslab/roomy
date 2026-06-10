@@ -1,0 +1,81 @@
+<ng-container *transloco="let translate">
+  <section class="on-behalf">
+    <h1 class="on-behalf__title">{{ translate('attendance.onBehalf.title') }}</h1>
+
+    <p class="on-behalf__result" role="status" aria-live="polite">
+      @if (result(); as message) {
+      {{ translate(message.key, message.params) }}
+      }
+    </p>
+    @if (errorKey(); as key) {
+    <p class="on-behalf__error" role="alert">{{ translate(key) }}</p>
+    }
+
+    @if (loadFailed()) {
+    <p class="on-behalf__error" role="alert">{{ translate('attendance.onBehalf.loadError') }}</p>
+    } @else if (employees(); as items) { @if (items.length === 0) {
+    <p class="on-behalf__empty">{{ translate('attendance.onBehalf.emptyEmployees') }}</p>
+    } @else {
+    <label class="on-behalf__field">
+      <span>{{ translate('attendance.onBehalf.employeeLabel') }}</span>
+      <select #employeeSelect (change)="chooseEmployee(employeeSelect.value)">
+        <option value="">{{ translate('attendance.onBehalf.employeePlaceholder') }}</option>
+        @for (employee of items; track employee.id) {
+        <option [value]="employee.id">{{ employee.name }}</option>
+        }
+      </select>
+    </label>
+
+    @if (selectedEmployee(); as employee) {
+    <roomy-reserve-page [onBehalfOf]="employee.id" [today]="today()" (reserved)="onReserved()" />
+
+    <section class="on-behalf__reservations">
+      <h2>{{ translate('attendance.onBehalf.reservationsHeading') }}</h2>
+      @if (reservations(); as rows) { @if (rows.length === 0) {
+      <p class="on-behalf__empty">{{ translate('attendance.onBehalf.noReservations') }}</p>
+      } @else {
+      <h3>{{ translate('attendance.onBehalf.upcomingHeading') }}</h3>
+      <ul class="on-behalf__list">
+        @for (reservation of upcoming(); track reservation.id) {
+        <li class="on-behalf__item">
+          <span>{{ reservation.officeName }}</span>
+          <span>{{ reservation.roomName }}</span>
+          <span>{{ reservation.date }}</span>
+          <button
+            type="button"
+            [attr.aria-label]="
+              translate('attendance.onBehalf.cancelReservation', {
+                room: reservation.roomName,
+                date: reservation.date
+              })
+            "
+            (click)="cancel(reservation)"
+          >
+            {{ translate('attendance.onBehalf.cancel') }}
+          </button>
+        </li>
+        }
+      </ul>
+      @if (past().length > 0) {
+      <h3>{{ translate('attendance.onBehalf.pastHeading') }}</h3>
+      <ul class="on-behalf__list">
+        @for (reservation of past(); track reservation.id) {
+        <li class="on-behalf__item on-behalf__item--past">
+          <span>{{ reservation.officeName }}</span>
+          <span>{{ reservation.roomName }}</span>
+          <span>{{ reservation.date }}</span>
+        </li>
+        }
+      </ul>
+      } } } @else {
+      <p class="on-behalf__loading">{{ translate('attendance.onBehalf.loading') }}</p>
+      }
+    </section>
+    } @else {
+    <p class="on-behalf__prompt">{{ translate('attendance.onBehalf.prompt') }}</p>
+    }
+    } } @else {
+    <p class="on-behalf__loading">{{ translate('attendance.onBehalf.loading') }}</p>
+    }
+  </section>
+</ng-container>

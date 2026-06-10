@@ -7,6 +7,7 @@ import {
   ReservationId,
   RoomAvailability,
   RoomId,
+  employeeId,
   officeId,
   reservationId,
   roomId,
@@ -141,4 +142,32 @@ describe('ReservePage', () => {
       expect(await screen.findByText(message)).toBeTruthy();
     },
   );
+
+  it('reserves on behalf of another employee when onBehalfOf is set', async () => {
+    const user = userEvent.setup();
+    let received: unknown[] | undefined;
+    const gateway = {
+      listBookableOffices: () => of([munich]),
+      occupancyForOffice: () => of(allFree),
+      reserve: (...args: unknown[]) => {
+        received = args;
+        return of(reservationId('res1'));
+      },
+      myReservations: () => of([]),
+      cancel: () => of(undefined),
+    };
+
+    await render(ReservePage, {
+      imports: [importAttendanceTestTransloco()],
+      inputs: { today: '2026-06-08', onBehalfOf: employeeId('e9') },
+      providers: [provideZonelessChangeDetection(), { provide: AttendanceGateway, useValue: gateway }],
+    });
+
+    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await user.click(await screen.findByRole('button', { name: /A1/ }));
+    await user.click(screen.getByRole('button', { name: 'Reserve' }));
+
+    expect(received).toEqual(['o1', 'r1', '2026-06-08', 'e9']);
+  });
 });
