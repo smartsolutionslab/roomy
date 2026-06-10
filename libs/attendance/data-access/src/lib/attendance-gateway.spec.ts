@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import type { Page } from '@roomy/shared-data-access';
 
 import { AttendanceGateway } from './attendance-gateway';
 import { officeId, reservationId, roomId } from './booking';
@@ -87,24 +88,28 @@ describe('AttendanceGateway', () => {
   });
 
   it('lists my reservations, mapping the DTOs to branded view models', () => {
-    let received: MyReservation[] | undefined;
+    let received: Page<MyReservation> | undefined;
 
-    gateway.myReservations().subscribe((reservations) => (received = reservations));
+    gateway.myReservations().subscribe((page) => (received = page));
 
     const request = httpController.expectOne((req) => req.url === '/reservations/mine');
     expect(request.request.method).toBe('GET');
-    request.flush([
-      {
-        reservationId: 'res1',
-        officeId: 'o1',
-        officeName: 'Munich',
-        roomId: 'r1',
-        roomName: 'A1',
-        date: '2026-06-08',
-      },
-    ]);
+    request.flush({
+      items: [
+        {
+          reservationId: 'res1',
+          officeId: 'o1',
+          officeName: 'Munich',
+          roomId: 'r1',
+          roomName: 'A1',
+          date: '2026-06-08',
+        },
+      ],
+      nextCursor: 'next',
+    });
 
-    expect(received).toEqual([
+    expect(received?.nextCursor).toBe('next');
+    expect(received?.items).toEqual([
       {
         id: 'res1',
         officeId: 'o1',

@@ -17,6 +17,7 @@ import {
   isPastDay,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { InfiniteScroll } from '@roomy/shared-ui';
 
 import { ReservePage } from '../reserve/reserve-page';
 
@@ -29,7 +30,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-on-behalf-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReservePage],
+  imports: [TranslocoDirective, ReservePage, InfiniteScroll],
   templateUrl: './on-behalf-page.html',
   styleUrl: './on-behalf-page.css',
 })
@@ -40,9 +41,13 @@ export class OnBehalfPage {
   readonly today = input<string>(todayInBerlin());
 
   protected readonly employees = signal<Employee[] | null>(null);
+  protected readonly employeesCursor = signal<string | null>(null);
+  protected readonly loadingEmployees = signal(false);
   protected readonly loadFailed = signal(false);
   protected readonly selectedEmployeeId = signal<string | null>(null);
   protected readonly reservations = signal<MyReservation[] | null>(null);
+  protected readonly reservationsCursor = signal<string | null>(null);
+  protected readonly loadingReservations = signal(false);
   protected readonly result = signal<ResultMessage | null>(null);
   protected readonly errorKey = signal<string | null>(null);
 
@@ -61,14 +66,30 @@ export class OnBehalfPage {
   );
 
   constructor() {
+    this.loadMoreEmployees();
+  }
+
+  // Appends the next page of the employee directory (ADR-0042) — the picker grows as the administrator
+  // scrolls or activates "Load more". nextCursor === null marks the end of the directory.
+  protected loadMoreEmployees(): void {
+    if (this.loadingEmployees()) {
+      return;
+    }
+
+    this.loadingEmployees.set(true);
     this.gateway
-      .listEmployees()
+      .listEmployees(this.employeesCursor() ?? undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (employees) => this.employees.set(employees),
+        next: (page) => {
+          this.employees.update((current) => [...(current ?? []), ...page.items]);
+          this.employeesCursor.set(page.nextCursor);
+          this.loadingEmployees.set(false);
+        },
         error: () => {
           this.loadFailed.set(true);
-          this.employees.set([]);
+          this.employees.update((current) => current ?? []);
+          this.loadingEmployees.set(false);
         },
       });
   }
@@ -77,28 +98,42 @@ export class OnBehalfPage {
     this.selectedEmployeeId.set(employeeValue || null);
     this.result.set(null);
     this.errorKey.set(null);
-    this.loadReservations();
+    this.reservations.set(null);
+    this.reservationsCursor.set(null);
+    this.loadMoreReservations();
   }
 
-  private loadReservations(): void {
+  // Appends the next page of the chosen employee's reservations (ADR-0042); the upcoming/past split
+  // derives from the accumulated set. No selection ⇒ nothing to load.
+  protected loadMoreReservations(): void {
     const employee = this.selectedEmployee();
-    if (employee === null) {
-      this.reservations.set(null);
+    if (employee === null || this.loadingReservations()) {
       return;
     }
 
+    this.loadingReservations.set(true);
     this.gateway
-      .reservationsFor(employee.id)
+      .reservationsFor(employee.id, this.reservationsCursor() ?? undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (reservations) => this.reservations.set(reservations),
-        error: () => this.reservations.set([]),
+        next: (page) => {
+          this.reservations.update((current) => [...(current ?? []), ...page.items]);
+          this.reservationsCursor.set(page.nextCursor);
+          this.loadingReservations.set(false);
+        },
+        error: () => {
+          this.reservations.update((current) => current ?? []);
+          this.loadingReservations.set(false);
+        },
       });
   }
 
-  // The embedded reserve flow announces its own success; here we just refresh the employee's list.
+  // The embedded reserve flow announces its own success; here we reload the employee's reservations
+  // from the first page so the new booking appears.
   protected onReserved(): void {
-    this.loadReservations();
+    this.reservations.set(null);
+    this.reservationsCursor.set(null);
+    this.loadMoreReservations();
   }
 
   protected cancel(reservation: MyReservation): void {

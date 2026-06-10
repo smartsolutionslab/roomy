@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { Page, mapPage } from '@roomy/shared-data-access';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -16,9 +17,11 @@ export class AdminUsersGateway {
   private readonly http = inject(HttpClient);
   private readonly config = inject(ApiConfiguration);
 
-  getAll(): Observable<AdminUser[]> {
-    return listUsers(this.http, this.config.rootUrl).pipe(
-      map((response) => response.body.map(toAdminUser)),
+  // One keyset-paginated page of accounts, ordered by email (GET /admin/users, admin-only; ADR-0042).
+  // Absent cursor = the first page; the page carries the opaque nextCursor (null at the end).
+  getAll(cursor?: string): Observable<Page<AdminUser>> {
+    return listUsers(this.http, this.config.rootUrl, { cursor }).pipe(
+      map((response) => mapPage(response.body, toAdminUser)),
     );
   }
 

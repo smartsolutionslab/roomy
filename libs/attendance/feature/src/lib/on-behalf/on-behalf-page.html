@@ -16,6 +16,11 @@
     } @else if (employees(); as items) { @if (items.length === 0) {
     <p class="on-behalf__empty">{{ translate('attendance.onBehalf.emptyEmployees') }}</p>
     } @else {
+    <roomy-infinite-scroll
+      [hasMore]="employeesCursor() !== null"
+      [loading]="loadingEmployees()"
+      (loadMore)="loadMoreEmployees()"
+    >
     <label class="on-behalf__field">
       <span>{{ translate('attendance.onBehalf.employeeLabel') }}</span>
       <select #employeeSelect (change)="chooseEmployee(employeeSelect.value)">
@@ -25,6 +30,7 @@
         }
       </select>
     </label>
+    </roomy-infinite-scroll>
 
     @if (selectedEmployee(); as employee) {
     <roomy-reserve-page [onBehalfOf]="employee.id" [today]="today()" (reserved)="onReserved()" />
@@ -34,6 +40,11 @@
       @if (reservations(); as rows) { @if (rows.length === 0) {
       <p class="on-behalf__empty">{{ translate('attendance.onBehalf.noReservations') }}</p>
       } @else {
+      <roomy-infinite-scroll
+        [hasMore]="reservationsCursor() !== null"
+        [loading]="loadingReservations()"
+        (loadMore)="loadMoreReservations()"
+      >
       <h3>{{ translate('attendance.onBehalf.upcomingHeading') }}</h3>
       <ul class="on-behalf__list">
         @for (reservation of upcoming(); track reservation.id) {
@@ -67,7 +78,9 @@
         </li>
         }
       </ul>
-      } } } @else {
+      }
+      </roomy-infinite-scroll>
+      } } @else {
       <p class="on-behalf__loading">{{ translate('attendance.onBehalf.loading') }}</p>
       }
     </section>

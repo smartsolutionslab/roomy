@@ -6,6 +6,13 @@ import { TranslocoTestingModule } from '@jsverse/transloco';
 // those would cross the context:web boundary). Excluded from the library build. Kept in key parity with
 // apps/web/public/i18n/{en,de}.json (FR-010).
 const english = {
+  shared: {
+    list: {
+      loadMore: 'Load more',
+      loading: 'Loading…',
+      endOfList: 'End of list',
+    },
+  },
   attendance: {
     reserve: {
       title: 'Reserve a place',
@@ -99,6 +106,13 @@ const english = {
 };
 
 const german = {
+  shared: {
+    list: {
+      loadMore: 'Mehr laden',
+      loading: 'Wird geladen…',
+      endOfList: 'Ende der Liste',
+    },
+  },
   attendance: {
     reserve: {
       title: 'Platz reservieren',

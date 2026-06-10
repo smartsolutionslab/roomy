@@ -9,6 +9,7 @@ import {
   reservationId,
   roomId,
 } from '@roomy/attendance-data-access';
+import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of, throwError } from 'rxjs';
@@ -31,8 +32,12 @@ function reservation(id: string, date: string, roomName: string): MyReservation 
 const upcoming = reservation('res-up', '2026-06-10', 'A1');
 const past = reservation('res-past', '2026-06-05', 'B1');
 
+function page(items: MyReservation[], nextCursor: string | null = null): Page<MyReservation> {
+  return { items, nextCursor };
+}
+
 interface Stub {
-  list?: () => Observable<MyReservation[]>;
+  list?: (cursor?: string) => Observable<Page<MyReservation>>;
   cancel?: (reservation: ReservationId, date: string) => Observable<void>;
 }
 
@@ -42,7 +47,7 @@ function renderPage(reservations: MyReservation[], stub: Stub = {}) {
     listBookableOffices: () => of([]),
     occupancyForOffice: () => of([]),
     reserve: () => of(reservationId('res1')),
-    myReservations: stub.list ?? (() => of(reservations)),
+    myReservations: stub.list ?? (() => of(page(reservations))),
     cancel: stub.cancel ?? (() => of(undefined)),
   };
   const router = {
@@ -138,5 +143,23 @@ describe('MyReservationsPage', () => {
     await user.click(screen.getByRole('button', { name: 'Reserve a place' }));
 
     expect(navigated).toEqual([{ commands: ['..', 'reserve'] }]);
+  });
+
+  it('appends the next page when Load more is activated, then stops at the end', async () => {
+    const user = userEvent.setup();
+    const second = reservation('res-up-2', '2026-06-12', 'C1');
+    renderPage([], {
+      list: (cursor) =>
+        of(cursor === undefined ? page([upcoming], 'cursor-2') : page([second], null)),
+    });
+
+    expect(await screen.findByText('A1')).toBeTruthy();
+    expect(screen.queryByText('C1')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Load more' }));
+
+    expect(await screen.findByText('C1')).toBeTruthy();
+    expect(screen.getByText('End of list')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Load more' })).toBeNull();
   });
 });

@@ -20,6 +20,11 @@
       {{ translate('attendance.mine.reserveLink') }}
     </button>
     } @else {
+    <roomy-infinite-scroll
+      [hasMore]="nextCursor() !== null"
+      [loading]="loadingMore()"
+      (loadMore)="loadMore()"
+    >
     <section class="mine__group">
       <h2>{{ translate('attendance.mine.upcomingHeading') }}</h2>
       <ul class="mine__list">
@@ -61,7 +66,9 @@
         }
       </ul>
     </section>
-    } } } @else {
+    }
+    </roomy-infinite-scroll>
+    } } @else {
     <p class="mine__loading">{{ translate('attendance.mine.loading') }}</p>
     }
   </section>
