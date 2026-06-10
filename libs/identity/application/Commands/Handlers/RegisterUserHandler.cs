@@ -1,10 +1,11 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Contracts.Identity;
+using SmartSolutionsLab.Roomy.Identity.Application.Commands;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Identity.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 
 // Provisions an account for a hired employee (US3 / IA-3). Provider first, then persist: Keycloak owns
 // credentials (ADR-0013), so it is the authority for the two business failures — a taken email and a

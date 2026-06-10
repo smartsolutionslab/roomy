@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Identity.Application.Commands;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
-namespace SmartSolutionsLab.Roomy.Identity.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 
 // Elevates an existing account to Administrator (US4 / IA-4). Keycloak is the token authority (ADR-0013),
 // so the realm role is assigned there first; only on success is the elevation recorded on the aggregate

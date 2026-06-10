@@ -28,7 +28,7 @@ namespace Internal.Generated.WolverineHandlers
             * Dependency: Descriptor: ServiceType: SmartSolutionsLab.Roomy.Identity.Application.IIdentityProviderPort Lifetime: Transient ImplementationFactory: Microsoft.Extensions.DependencyInjection.HttpClientBuilderExtensions+<>c__DisplayClass16_0"2.<AddTypedClientCore>b__0
             * The service registration for SmartSolutionsLab.Roomy.Identity.Application.IIdentityProviderPort is an 'opaque' lambda factory with the Transient lifetime and requires service location
             */
-            var commandHandlerOfRegisterUser = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<SmartSolutionsLab.Roomy.Application.Contracts.Messaging.ICommandHandler<SmartSolutionsLab.Roomy.Identity.Application.UseCases.RegisterUser>>(serviceScope.ServiceProvider);
+            var commandHandlerOfRegisterUser = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<SmartSolutionsLab.Roomy.Application.Contracts.Messaging.ICommandHandler<SmartSolutionsLab.Roomy.Identity.Application.Commands.RegisterUser>>(serviceScope.ServiceProvider);
             // The actual message body
             var employeeHired = (SmartSolutionsLab.Roomy.Contracts.Organization.EmployeeHired)context.Envelope.Message;
 
