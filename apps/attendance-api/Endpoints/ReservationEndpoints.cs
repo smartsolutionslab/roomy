@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Request;
+using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
@@ -7,7 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.SharedKernel.Search;
 using SmartSolutionsLab.Roomy.Web.Http;
-
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 
 // The reservation surface (contract: attendance-api.md). The service is internal — reached only through
