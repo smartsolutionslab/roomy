@@ -128,7 +128,13 @@ public static class MessagingServiceCollectionExtensions
             case MessagingTransport.RabbitMq:
                 var connectionString = Ensure.That(options.ConnectionString).IsNotNullOrWhiteSpace().Value;
                 wolverine.UseRabbitMq(new Uri(connectionString))
-                    .AutoProvision();
+                    .AutoProvision()
+                    // Route integration events across services by message type (ADR-0015/0041): each event
+                    // type maps to an exchange named for it, and a consumer's queue binds to that exchange.
+                    // Without this, a published event has no cross-process route and is dropped — the
+                    // publisher and consumer never meet. This is what carries EmployeeHired to identity,
+                    // the provisioning acks back to organization, and RoomAdded to attendance.
+                    .UseConventionalRouting();
                 break;
 
             case MessagingTransport.AzureServiceBus:
