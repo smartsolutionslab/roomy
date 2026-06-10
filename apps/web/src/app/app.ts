@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { SessionService } from '@roomy/shared-data-access';
@@ -35,11 +35,14 @@ export class App {
   private readonly session = inject(SessionService);
 
   protected readonly currentUser = this.session.currentUser;
+  private readonly activeLang = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang(),
+  });
 
   constructor() {
-    this.transloco.langChanges$
-      .pipe(takeUntilDestroyed())
-      .subscribe((language) => this.document.documentElement.setAttribute('lang', language));
+    // Reflect the active language onto <html lang> for assistive tech; the effect also sets it on the
+    // first run, not only on a later change.
+    effect(() => this.document.documentElement.setAttribute('lang', this.activeLang()));
 
     this.session.load();
   }
