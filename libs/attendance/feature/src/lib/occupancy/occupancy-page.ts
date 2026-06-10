@@ -19,7 +19,7 @@ import {
   roomId,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
-import { FormField, Message, Page } from '@roomy/shared-ui';
+import { FormField, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
 
 // The occupancy list (OC-1/2/4/6): pick an office (optionally a single room) and a day / week / month
 // range, and read each day's office rollup + per-room figures. Occupant names render only when the
@@ -29,7 +29,7 @@ import { FormField, Message, Page } from '@roomy/shared-ui';
 @Component({
   selector: 'roomy-occupancy-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, FormField, Message],
+  imports: [TranslocoDirective, Page, FormField, Message, Select],
   templateUrl: './occupancy-page.html',
   styleUrl: './occupancy-page.css',
 })
@@ -55,6 +55,12 @@ export class OccupancyPage {
   protected readonly effectiveAnchor = computed(() => this.anchor() ?? this.today());
   protected readonly selectedOffice = computed<BookableOffice | null>(
     () => this.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
+  );
+  protected readonly officeOptions = computed<SelectOption[]>(() =>
+    (this.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
+  );
+  protected readonly roomOptions = computed<SelectOption[]>(() =>
+    (this.selectedOffice()?.rooms ?? []).map((room) => ({ value: room.id, label: room.name })),
   );
 
   constructor() {

@@ -7,24 +7,20 @@
     } @else if (offices(); as items) { @if (items.length === 0) {
     <p>{{ translate('attendance.occupancy.empty') }}</p>
     } @else {
-    <roomy-form-field [label]="translate('attendance.occupancy.officeLabel')">
-      <select #officeSelect (change)="chooseOffice(officeSelect.value)">
-        <option value="">{{ translate('attendance.occupancy.officePlaceholder') }}</option>
-        @for (office of items; track office.id) {
-        <option [value]="office.id">{{ office.name }}</option>
-        }
-      </select>
-    </roomy-form-field>
+    <roomy-select
+      [label]="translate('attendance.occupancy.officeLabel')"
+      [placeholder]="translate('attendance.occupancy.officePlaceholder')"
+      [options]="officeOptions()"
+      (selected)="chooseOffice($event)"
+    />
 
-    @if (selectedOffice(); as office) {
-    <roomy-form-field [label]="translate('attendance.occupancy.roomLabel')">
-      <select #roomSelect (change)="chooseRoom(roomSelect.value)">
-        <option value="">{{ translate('attendance.occupancy.allRooms') }}</option>
-        @for (room of office.rooms; track room.id) {
-        <option [value]="room.id">{{ room.name }}</option>
-        }
-      </select>
-    </roomy-form-field>
+    @if (selectedOffice()) {
+    <roomy-select
+      [label]="translate('attendance.occupancy.roomLabel')"
+      [placeholder]="translate('attendance.occupancy.allRooms')"
+      [options]="roomOptions()"
+      (selected)="chooseRoom($event)"
+    />
 
     <div class="calendar__nav">
       <button
