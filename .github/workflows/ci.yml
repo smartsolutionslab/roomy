@@ -107,9 +107,17 @@ jobs:
       - name: Test (with coverage)
         run: >
           dotnet test Roomy.slnx --configuration Release --no-build
+          --filter "FullyQualifiedName!~Roomy.Saga.E2ETests"
           --collect "XPlat Code Coverage"
           --settings coverlet.runsettings
           --results-directory ${{ runner.temp }}/coverage
+
+      # The provisioning-saga e2e boots the full stack (Postgres x2 + RabbitMQ + Keycloak + both API
+      # hosts), so it runs in isolation after the main pass rather than contending for Docker containers
+      # with every other integration fixture in the parallel run (ADR-0041; e2e tier, ADR-0022). It is not
+      # coverage-gated. Its app host carries fixed test credentials, so it needs no extra environment.
+      - name: Saga e2e (isolated full-stack round-trip)
+        run: dotnet test tests/saga-e2e/Roomy.Saga.E2ETests.csproj --configuration Release --no-build
 
       # Human-readable coverage summary in the job log + step summary. Reporting only —
       # the merge-blocking floor is the step above.
