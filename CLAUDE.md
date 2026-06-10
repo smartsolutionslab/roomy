@@ -284,9 +284,13 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
 - **One type per file** (a generic + non-generic overload of one concept may share a file);
   a single-statement guard clause may be one line without braces (`if (x) return;`).
 - **API-host endpoint DTOs live in `Endpoints/Request/` and `Endpoints/Response/`** subfolders
-  with matching sub-namespaces (gateway BFF: `Bff/Request`, `Bff/Response`); `*Response` records
-  and `*Page` wrappers under `Response/`, `*Request` under `Request/`, endpoint classes stay in
-  `Endpoints/` (ADR-0049).
+  with matching sub-namespaces (gateway BFF: `Bff/Request`, `Bff/Response`); response bodies under
+  `Response/`, their keyset `Page` wrappers under `Response/Page/`, request bodies under `Request/`,
+  endpoint classes stay in `Endpoints/` (ADR-0049). The DTO type names **drop the folder-redundant
+  suffix** — `Response.Employee`, `Response.Page.Employee`, `Request.Reserve`, referenced from endpoint
+  code by the qualified short form; the stable OpenAPI schema id (`EmployeeResponse`, `EmployeePage`, …)
+  is reconstructed from the namespace tail by `web-http`'s `EndpointSchemaIds`, so the wire contract and
+  generated client are unchanged (ADR-0050).
 - **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`.
 - **No framework in `domain`/`application`** — owned abstractions only (ADR-0005).
 - **C#:** root namespace `SmartSolutionsLab.Roomy` · file-scoped namespaces · `nullable`

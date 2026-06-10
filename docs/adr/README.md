@@ -70,3 +70,5 @@ ADRs are written **before** the implementing code, not after.
 | [0046](0046-shared-error-to-http-mapping.md) | One shared domain-Error → HTTP mapping at the API edge | Accepted |
 | [0047](0047-brand-identity-orange-tokens-dark-theme.md) | Brand identity: vivid-orange two-accent tokens, sunset gradients, dark theme, sidebar shell, and monogram logo | Accepted |
 | [0048](0048-frontend-design-system-shared-ui.md) | Frontend design system in shared-ui: global tokens/base + primitive directives and components | Accepted |
+| [0049](0049-endpoint-dto-request-response-subfolders.md) | API-host endpoint DTOs live in Request/ and Response/ subfolders | Accepted |
+| [0050](0050-endpoint-dto-short-names-reconstructed-schema-ids.md) | Endpoint DTOs drop the folder-redundant suffix; the OpenAPI schema id is reconstructed | Accepted |

@@ -15,10 +15,14 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   (e.g. `ICommand` + `ICommand<TResult>`, `ICommandHandler<T>` + `ICommandHandler<T, TResult>`).
 - **API-host endpoint DTOs live in `Request/` and `Response/` subfolders** of the host's
   `Endpoints/` folder, with matching sub-namespaces `…Endpoints.Request` / `…Endpoints.Response`
-  (the gateway BFF uses `…Bff.Request` / `…Bff.Response`). Response-body DTOs — the `*Response`
-  records and their `*Page` pagination wrappers — go under `Response/`; request-body DTOs under
-  `Request/`; the endpoint classes stay in `Endpoints/`. Nested `private` DTOs are implementation
-  details and stay with their owner. See ADR-0049.
+  (the gateway BFF uses `…Bff.Request` / `…Bff.Response`). Response-body DTOs go under `Response/`;
+  their keyset pagination wrappers under `Response/Page/` (sub-namespace `…Response.Page`);
+  request-body DTOs under `Request/`; the endpoint classes stay in `Endpoints/`. The type names
+  **drop the folder-redundant suffix** — `Response.Employee`, `Response.Page.Employee`,
+  `Request.Reserve` — and endpoint code references them by the qualified short form. The wire-stable
+  OpenAPI schema id (`EmployeeResponse`, `EmployeePage`, …) is reconstructed from the namespace tail
+  by `web-http`'s `EndpointSchemaIds`, so the emitted spec and generated client are unchanged. Nested
+  `private` DTOs are implementation details and stay with their owner. See ADR-0049/0050.
 - **Root namespace `SmartSolutionsLab.Roomy`** (pattern `SmartSolutionsLab.{ProjectName}`);
   per-project namespaces extend it following the folder structure, e.g.
   `SmartSolutionsLab.Roomy.SharedKernel.Guards`. Set via `<RootNamespace>` in
