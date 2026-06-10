@@ -57,7 +57,3 @@ public static class EmployeeEndpoints
             new HiredEmployeeResponse(hired.Employee.Value, hired.User.Value, ProvisioningState.Provisioning.ToString()));
     }
 }
-
-internal sealed record HireEmployeeRequest(string DisplayName, string Email, string Role, string InitialPassword);
-
-internal sealed record HiredEmployeeResponse(Guid EmployeeId, Guid UserId, string State);
