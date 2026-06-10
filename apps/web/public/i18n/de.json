@@ -19,7 +19,23 @@
   },
   "home": {
     "title": "Willkommen bei Roomy",
-    "intro": "Koordinieren Sie die Büroanwesenheit über Ihre Teams und Räume hinweg."
+    "intro": "Koordinieren Sie die Büroanwesenheit über Ihre Teams und Räume hinweg.",
+    "greeting": "Willkommen zurück, {{name}}",
+    "dashboardIntro": "Steigen Sie wieder in die Planung Ihrer Bürotage ein.",
+    "hero": {
+      "eyebrow": "Büroanwesenheit, geplant",
+      "title": "Planen Sie Ihre Bürotage mühelos",
+      "subtitle": "Sehen Sie, wer da ist, buchen Sie Ihren Platz und koordinieren Sie Ihre Teams über alle Büros hinweg — alles an einem Ort."
+    },
+    "cards": {
+      "reserve": "Buchen Sie einen Platz oder Raum für einen kommenden Tag.",
+      "mine": "Sehen und verwalten Sie Ihre anstehenden Reservierungen.",
+      "occupancy": "Sehen Sie, wie voll jedes Büro und jeder Raum ist.",
+      "calendar": "Durchsuchen Sie die Anwesenheit über den Monat.",
+      "onBehalf": "Reservieren Sie einen Platz für eine andere Person.",
+      "offices": "Verwalten Sie Büros, Räume und Kapazität.",
+      "admin": "Verwalten Sie Benutzerkonten und Rollen."
+    }
   },
   "account": {
     "title": "Mein Konto",

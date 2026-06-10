@@ -19,7 +19,23 @@
   },
   "home": {
     "title": "Welcome to Roomy",
-    "intro": "Coordinate office attendance across your teams and spaces."
+    "intro": "Coordinate office attendance across your teams and spaces.",
+    "greeting": "Welcome back, {{name}}",
+    "dashboardIntro": "Jump back into planning your office days.",
+    "hero": {
+      "eyebrow": "Office attendance, planned",
+      "title": "Plan your office days with ease",
+      "subtitle": "See who's in, book your spot, and coordinate your teams across every office — all in one place."
+    },
+    "cards": {
+      "reserve": "Book a desk or room for an upcoming day.",
+      "mine": "View and manage your upcoming reservations.",
+      "occupancy": "See how full each office and room is.",
+      "calendar": "Browse attendance across the month.",
+      "onBehalf": "Reserve a place for another employee.",
+      "offices": "Manage offices, rooms and capacity.",
+      "admin": "Manage user accounts and roles."
+    }
   },
   "account": {
     "title": "My account",
