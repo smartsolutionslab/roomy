@@ -41,6 +41,9 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Attendance:CompanyId", companyId.ToString());
+            // Skip the RabbitMQ inbox: this test exercises the read side only, so the host must not wait
+            // on (and time out against) an absent broker during boot.
+            webHost.UseSetting("Messaging:Enabled", "false");
 
             webHost.ConfigureTestServices(services =>
             {
