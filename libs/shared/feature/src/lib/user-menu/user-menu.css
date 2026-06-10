@@ -1,0 +1,93 @@
+.user-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.user-menu__trigger {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: var(--roomy-radius-full);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color var(--roomy-transition),
+    box-shadow var(--roomy-transition);
+}
+
+.user-menu__trigger:hover {
+  border-color: var(--roomy-color-accent);
+}
+
+.user-menu__trigger:focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: var(--roomy-focus-outline-offset);
+}
+
+.user-menu__dropdown {
+  position: absolute;
+  inset-block-start: calc(100% + var(--roomy-space-sm));
+  inset-inline-end: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+  min-inline-size: 13rem;
+  padding: var(--roomy-space-xs);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-lg);
+  background: var(--roomy-color-surface-raised);
+  box-shadow: var(--roomy-shadow-lg);
+}
+
+.user-menu__identity {
+  display: flex;
+  gap: var(--roomy-space-sm);
+  align-items: center;
+  padding: var(--roomy-space-sm);
+  border-block-end: 1px solid var(--roomy-color-border);
+}
+
+.user-menu__detail {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.user-menu__name {
+  font-weight: var(--roomy-font-weight-semibold);
+}
+
+.user-menu__caption {
+  color: var(--roomy-color-text-muted);
+  font-size: var(--roomy-font-size-sm);
+}
+
+.user-menu__signout {
+  margin: 0;
+}
+
+.user-menu__item {
+  inline-size: 100%;
+  padding: var(--roomy-space-sm);
+  border: none;
+  border-radius: var(--roomy-radius-md);
+  background: transparent;
+  color: var(--roomy-color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    color var(--roomy-transition),
+    background var(--roomy-transition);
+}
+
+.user-menu__item:hover {
+  background: var(--roomy-color-accent-muted);
+  color: var(--roomy-color-accent-strong);
+}
+
+.user-menu__item:focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: -2px;
+}

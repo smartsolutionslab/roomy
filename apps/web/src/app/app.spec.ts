@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { CurrentUser } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 
 import { App } from './app';
@@ -61,10 +62,13 @@ describe('App shell', () => {
     expect(screen.getByRole('link', { name: 'Anmelden' })).toBeTruthy();
   });
 
-  it('shows the signed-in user and a sign-out control when the BFF returns one', async () => {
+  it('shows the signed-in user and a sign-out control behind the account menu', async () => {
     await renderShell({ name: 'Ada Lovelace', roles: ['employee'] });
 
-    expect(screen.getByText('Angemeldet als Ada Lovelace')).toBeTruthy();
+    // The account avatar opens a menu revealing the user's name and a sign-out action.
+    await userEvent.click(screen.getByRole('button', { name: 'Kontomenü' }));
+
+    expect(screen.getByText('Ada Lovelace')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
   });
 

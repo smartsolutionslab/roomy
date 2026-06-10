@@ -1,0 +1,30 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--roomy-radius-full);
+  background: var(--roomy-gradient-accent);
+  color: #ffffff;
+  font-weight: var(--roomy-font-weight-semibold);
+  line-height: 1;
+  user-select: none;
+  box-shadow: var(--roomy-shadow-sm);
+}
+
+.avatar--sm {
+  inline-size: 1.875rem;
+  block-size: 1.875rem;
+  font-size: 0.75rem;
+}
+
+.avatar--md {
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  font-size: 0.875rem;
+}
+
+.avatar--lg {
+  inline-size: 3rem;
+  block-size: 3rem;
+  font-size: 1.125rem;
+}

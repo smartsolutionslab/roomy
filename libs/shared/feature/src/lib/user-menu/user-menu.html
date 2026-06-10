@@ -1,0 +1,29 @@
+@if (currentUser(); as user) {
+<div class="user-menu" *transloco="let translate">
+  <button
+    type="button"
+    class="user-menu__trigger"
+    [attr.aria-label]="translate('shared.account.menu')"
+    aria-haspopup="true"
+    [attr.aria-expanded]="open()"
+    (click)="toggle()"
+  >
+    <roomy-avatar [name]="user.name" size="sm" />
+  </button>
+
+  @if (open()) {
+  <div class="user-menu__dropdown">
+    <div class="user-menu__identity">
+      <roomy-avatar [name]="user.name" size="md" />
+      <span class="user-menu__detail">
+        <span class="user-menu__name">{{ user.name }}</span>
+        <span class="user-menu__caption">{{ translate('shared.account.signedIn') }}</span>
+      </span>
+    </div>
+    <form class="user-menu__signout" method="post" action="/bff/logout">
+      <button class="user-menu__item" type="submit">{{ translate('shared.account.signOut') }}</button>
+    </form>
+  </div>
+  }
+</div>
+}

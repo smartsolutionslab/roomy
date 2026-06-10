@@ -221,6 +221,11 @@
     "theme": {
       "toLight": "Switch to light theme",
       "toDark": "Switch to dark theme"
+    },
+    "account": {
+      "menu": "Account menu",
+      "signedIn": "Signed in",
+      "signOut": "Sign out"
     }
   }
 }

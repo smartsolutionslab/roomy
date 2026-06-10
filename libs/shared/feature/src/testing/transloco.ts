@@ -14,6 +14,11 @@ const english = {
       toLight: 'Switch to light theme',
       toDark: 'Switch to dark theme',
     },
+    account: {
+      menu: 'Account menu',
+      signedIn: 'Signed in',
+      signOut: 'Sign out',
+    },
   },
 };
 
@@ -26,6 +31,11 @@ const german = {
     theme: {
       toLight: 'Zu hellem Design wechseln',
       toDark: 'Zu dunklem Design wechseln',
+    },
+    account: {
+      menu: 'Kontomenü',
+      signedIn: 'Angemeldet',
+      signOut: 'Abmelden',
     },
   },
 };
