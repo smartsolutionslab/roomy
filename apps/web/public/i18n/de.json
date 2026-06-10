@@ -201,6 +201,10 @@
       "loadMore": "Mehr laden",
       "loading": "Wird geladen…",
       "endOfList": "Ende der Liste"
+    },
+    "theme": {
+      "toLight": "Zu hellem Design wechseln",
+      "toDark": "Zu dunklem Design wechseln"
     }
   }
 }

@@ -1,0 +1,33 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-full);
+  background: var(--roomy-color-surface);
+  color: var(--roomy-color-text-muted);
+  cursor: pointer;
+  transition:
+    color var(--roomy-transition),
+    border-color var(--roomy-transition),
+    background var(--roomy-transition);
+}
+
+.theme-toggle:hover {
+  border-color: var(--roomy-color-accent);
+  color: var(--roomy-color-accent);
+  background: var(--roomy-color-accent-muted);
+}
+
+.theme-toggle:focus-visible {
+  outline: var(--roomy-focus-outline);
+  outline-offset: var(--roomy-focus-outline-offset);
+}
+
+.theme-toggle__icon {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}

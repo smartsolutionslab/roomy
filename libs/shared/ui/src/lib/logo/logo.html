@@ -1,0 +1,21 @@
+<span class="roomy-logo">
+  <svg class="roomy-logo__mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="roomyLogoTile" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#ea580c" />
+        <stop offset="1" stop-color="#f97316" />
+      </linearGradient>
+    </defs>
+    <rect width="64" height="64" rx="14" fill="url(#roomyLogoTile)" />
+    <g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 18 V48" />
+      <path d="M22 18 H34 A6 6 0 0 1 34 30 H22" />
+      <path d="M26 30 L41 48" />
+    </g>
+  </svg>
+  @if (showWordmark()) {
+  <span class="roomy-logo__wordmark">Roomy</span>
+  } @else {
+  <span class="roomy-logo__sr-only">Roomy</span>
+  }
+</span>
