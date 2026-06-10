@@ -21,22 +21,18 @@ var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionSt
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 
 var keycloak = builder.Configuration.GetSection("Keycloak");
-var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
-    ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
+var keycloakBaseAddress = new Uri(keycloak["BaseAddress"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
 builder.Services.AddKeycloakIdentityProvider(
     keycloakBaseAddress,
     new KeycloakAdminOptions
     {
         Realm = keycloak["Realm"] ?? "roomy",
-        AdminUsername = keycloak["AdminUsername"]
-            ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
-        AdminPassword = keycloak["AdminPassword"]
-            ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
+        AdminUsername = keycloak["AdminUsername"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
+        AdminPassword = keycloak["AdminPassword"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
     });
 
 var seed = builder.Configuration.GetSection("Seed");
-var companyId = Guid.Parse(seed["CompanyId"]
-    ?? throw new InvalidOperationException("Missing configuration 'Seed:CompanyId'."));
+var companyId = Guid.Parse(seed["CompanyId"] ?? throw new InvalidOperationException("Missing configuration 'Seed:CompanyId'."));
 builder.Services.AddSingleton(new SeedOptions(companyId, seed["EmployeePassword"] ?? "ObexLabs.2025"));
 builder.Services.AddScoped<Seeder>();
 
