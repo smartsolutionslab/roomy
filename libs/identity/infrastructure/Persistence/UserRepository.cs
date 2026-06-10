@@ -71,11 +71,11 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-        var hasMore = rows.Count > request.Limit;
-        var items = hasMore ? rows.Take(request.Limit).ToList() : rows;
-        var nextCursor = hasMore ? CursorCodec.Encode(new UserCursor(items[^1].Email.Value)) : null;
-
-        return new Page<User>(items, nextCursor);
+        return Page<User>.FromProbe(
+            rows,
+            request.Limit,
+            row => row,
+            row => new UserCursor(row.Email.Value));
     }
 
     public async Task AddAsync(User user, CancellationToken cancellationToken) =>

@@ -58,20 +58,17 @@ public sealed class MyReservationsReadModel(AttendanceDbContext context) : IMyRe
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        var hasMore = rows.Count > request.Limit;
-        var pageRows = hasMore ? rows.Take(request.Limit).ToList() : rows;
-        var items = pageRows
-            .Select(row => new MyReservationView(
+        return Page<MyReservationView>.FromProbe(
+            rows,
+            request.Limit,
+            row => new MyReservationView(
                 ReservationIdentifier.From(row.ReservationId),
                 OfficeIdentifier.From(row.OfficeId),
                 row.OfficeName,
                 RoomIdentifier.From(row.RoomId),
                 row.RoomName,
-                BookingDate.From(row.Date)))
-            .ToList();
-        var nextCursor = hasMore ? CursorCodec.Encode(new ReservationCursor(pageRows[^1].Date)) : null;
-
-        return new Page<MyReservationView>(items, nextCursor);
+                BookingDate.From(row.Date)),
+            row => new ReservationCursor(row.Date));
     }
 }
 
