@@ -128,9 +128,11 @@
   flex-direction: column;
   gap: var(--roomy-space-xs);
   padding: var(--roomy-space-lg);
-  border: 1px solid var(--roomy-color-border);
+  border: 1px solid var(--roomy-glass-border);
   border-radius: var(--roomy-radius-lg);
-  background: var(--roomy-color-surface-raised);
+  background: var(--roomy-glass-bg);
+  backdrop-filter: var(--roomy-blur);
+  -webkit-backdrop-filter: var(--roomy-blur);
   box-shadow: var(--roomy-shadow-sm);
   color: var(--roomy-color-text);
   text-decoration: none;

@@ -59,7 +59,9 @@ We chose **Option C**.
    tokens complete the ramp, alongside a refreshed cool-zinc neutral palette and new
    `radius`, `shadow`, `transition`, type-scale, **sunset `gradient-accent`, `shadow-glow`,
    and glass (translucent + blur)** tokens. Existing token *names* are preserved so
-   already-merged component CSS keeps working.
+   already-merged component CSS keeps working. The UI font is **Manrope**, self-hosted as a
+   variable woff2 in `apps/web/public/fonts` (offline-safe, no external CDN), with a
+   `system-ui` fallback.
 2. **Dark theme as token overrides** under both `@media (prefers-color-scheme: dark)`
    (scoped to `:root:not([data-theme="light"])`) and `:root[data-theme="dark"]` (explicit
    choice wins). `html { color-scheme: light dark }` so native controls follow the theme.
@@ -75,12 +77,14 @@ We chose **Option C**.
 4. **Tokenize stranded literals.** The hard-coded colours in attendance feature CSS are
    replaced with `--roomy-color-danger` / `-border` / `-background-muted` so dark theme is
    correct everywhere.
-5. **Richer layout.** The shell branches on the session: signed-in users get a **left
-   sidebar** (brand, icon navigation, and a footer with the user, theme toggle, language
-   switcher, and sign-out) over a content area; signed-out visitors get a **glass top bar**
-   and a **gradient hero landing**. The signed-in home is a **dashboard** of navigation
-   cards. The sidebar/hero/dashboard live in the `context:web` app shell + `home` component
-   (the one frontend composition root, ADR-0035) and reuse the shared tokens.
+5. **Richer layout.** The shell branches on the session. Signed-in users get an **inverted
+   (orange-gradient) left sidebar** — the brand and icon navigation in white over the accent
+   — beside a content area whose **glass top app bar** (right-aligned) holds the current
+   user, theme toggle, language switcher, and sign-out. Signed-out visitors get a **glass top
+   bar** and a **gradient hero landing**. The signed-in home is a **dashboard** of glass
+   navigation cards over a faintly tinted background. The sidebar/app-bar/hero/dashboard live
+   in the `context:web` app shell + `home` component (the one frontend composition root,
+   ADR-0035) and reuse the shared tokens.
 
 ## Consequences
 

@@ -13,4 +13,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 })
 export class RoomyLogo {
   readonly showWordmark = input<boolean>(false);
+
+  // Inverts the mark for use on a coloured (accent) surface: a white tile with an orange "R".
+  // The wordmark follows `currentColor`, so the host sets it (e.g. white on an orange sidebar).
+  readonly onAccent = input<boolean>(false);
 }

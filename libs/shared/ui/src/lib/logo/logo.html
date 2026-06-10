@@ -6,8 +6,9 @@
         <stop offset="1" stop-color="#f97316" />
       </linearGradient>
     </defs>
-    <rect width="64" height="64" rx="14" fill="url(#roomyLogoTile)" />
-    <g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="64" height="64" rx="14" [attr.fill]="onAccent() ? '#ffffff' : 'url(#roomyLogoTile)'" />
+    <g fill="none" [attr.stroke]="onAccent() ? '#f97316' : '#ffffff'" stroke-width="9" stroke-linecap="round"
+      stroke-linejoin="round">
       <path d="M22 18 V48" />
       <path d="M22 18 H34 A6 6 0 0 1 34 30 H22" />
       <path d="M26 30 L41 48" />

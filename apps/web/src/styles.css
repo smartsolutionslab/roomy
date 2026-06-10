@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/manrope-variable.woff2') format('woff2-variations');
+}
+
 :root {
   /* Surfaces & text — cool zinc neutrals */
   --roomy-color-background: #fafafa;
@@ -25,6 +33,7 @@
 
   /* Sunset gradients + glow */
   --roomy-gradient-accent: linear-gradient(135deg, #fb923c 0%, #f97316 45%, #f43f5e 100%);
+  --roomy-gradient-sidebar: linear-gradient(180deg, #fb923c 0%, #f97316 52%, #ea580c 100%);
   --roomy-gradient-soft: linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%);
   --roomy-shadow-glow: 0 18px 50px -12px rgba(249, 115, 22, 0.45);
 
@@ -55,7 +64,7 @@
   --roomy-transition: 150ms ease;
 
   /* Typography */
-  --roomy-font-family: system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --roomy-font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
   --roomy-font-size-sm: 0.875rem;
   --roomy-font-size-base: 1rem;
   --roomy-font-size-lg: 1.25rem;

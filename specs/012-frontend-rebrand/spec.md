@@ -81,9 +81,10 @@ purpose-built and comfortable to use in any lighting.
 
 10. **Sidebar + dashboard for signed-in users**
    - GIVEN a signed-in user
-   - THEN navigation is a left sidebar (brand, icon links, and user/theme/language/sign-out
-     in its footer), and the home page is a dashboard of cards linking to the user's
-     available sections (admin-only cards only for administrators).
+   - THEN navigation is an orange (inverted) left sidebar with white brand + icon links,
+     while the current user, theme toggle, language switcher, and sign-out sit in a glass
+     top app bar at the right edge; the home page is a dashboard of cards linking to the
+     user's available sections (admin-only cards only for administrators).
 
 ### Edge Cases
 - `localStorage` unavailable (private mode / SSR) → theme still resolves and applies; the
