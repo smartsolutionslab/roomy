@@ -97,17 +97,25 @@ roomy/
 │  ├─ adr/                        # architecture decision records
 │  └─ architecture.md             # living high-level overview  (FILL IN)
 ├─ specs/                         # Spec Kit specs, plans, tasks
-├─ apps/
+├─ apps/                         # .NET hosts only
 │  ├─ gateway/                    # YARP gateway / BFF
-│  ├─ <context>-api/              # one host per bounded context
-│  └─ web/                        # Angular app
-├─ libs/
+│  └─ <context>-api/              # one host per bounded context
+├─ libs/                         # .NET libraries only
 │  ├─ <context>/
 │  │  ├─ domain/                  # entities, aggregates, value objects, domain events  (no infra deps)
 │  │  ├─ application/             # use cases, handlers, ports
 │  │  ├─ infrastructure/          # persistence, messaging, external adapters
 │  │  └─ contracts/              # this context's published integration events  (ADR-0031)
 │  └─ shared-kernel/              # only truly shared, stable primitives
+├─ frontend/                     # ALL Angular/Nx projects live here (ADR-0016/0035)
+│  ├─ apps/
+│  │  └─ web/                     # Angular app (the single SPA)
+│  └─ libs/
+│     ├─ <context>/
+│     │  ├─ feature/              # routed feature areas / smart components
+│     │  ├─ ui/                   # presentational components
+│     │  └─ data-access/          # typed API client + generated client
+│     └─ shared/util/             # shared TS utilities (@roomy/util)
 └─ tests/
    └─ architecture/              # NetArchTest rules enforcing the dependency rule
 ```
@@ -123,8 +131,9 @@ occupancy below).
 | `organization` — Organization | Supporting (master data, admin-managed) | `Company` (seeded root), `Office` (name, location), `Room` (name, capacity), `Employee` (refs `CompanyId`, refs `UserId`) | `002-office-management` |
 | `attendance` — Attendance | **Core** | `AttendanceDay` aggregate (identity = `CompanyId` + `Date`; consistency boundary for no-overbooking and one-reservation-per-employee-per-day), `Reservation` entity, **`Occupancy` read model** (per-room + office rollup) | `003-attendance`, `004-occupancy` |
 
-Hosts are `apps/identity-api`, `apps/organization-api`, `apps/attendance-api`; feature
-libs follow `@roomy/<context>-<type>` (ADR-0016).
+Hosts are `apps/identity-api`, `apps/organization-api`, `apps/attendance-api`; frontend
+feature libs live at `frontend/libs/<context>/<type>` and follow `@roomy/<context>-<type>`
+(ADR-0016).
 
 - **Occupancy is not a fourth service.** `004-occupancy` is a read model / projection that
   lives inside the **attendance** context. Its office rollup needs `Room`/`Office` capacity
@@ -281,7 +290,7 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   on · warnings-as-errors · async all the way with `CancellationToken` · constructor
   injection only.
 - **Angular:** standalone + signal-based + zoneless · `OnPush` · `inject()` · signal
-  `input()`/`output()` · no `NgModule` · per-context feature libs at `libs/<context>/<type>`
+  `input()`/`output()` · no `NgModule` · per-context feature libs at `frontend/libs/<context>/<type>`
   (`@roomy/<context>-<type>`, types `feature`/`ui`/`data-access`) mirror the backend contexts
   (ADR-0035). Libs are tested with `vitest-analog` + `@testing-library/angular`; the app uses
   `@angular/build:unit-test` — same test code, different runner.

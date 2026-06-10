@@ -1,0 +1,6 @@
+{
+  "input": "apps/identity-api/Roomy.Identity.Api.json",
+  "output": "frontend/libs/identity/data-access/src/lib/generated",
+  "indexFile": true,
+  "ignoreUnusedModels": true
+}
