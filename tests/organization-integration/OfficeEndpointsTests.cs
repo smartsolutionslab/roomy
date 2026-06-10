@@ -12,10 +12,10 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.TestSupport;
+using Request = SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
+using Response = SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
 // Boots the organization host in-process against the real test Postgres, with the BFF token replaced by
@@ -86,7 +86,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         return client;
     }
 
-    private static CreateOfficeRequest OfficeNamed(string name) => new(name, "Berlin");
+    private static Request.CreateOffice OfficeNamed(string name) => new(name, "Berlin");
 
     [Fact]
     public async Task An_administrator_creates_an_office()
@@ -96,7 +96,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
 
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         var office = await response.Content
-            .ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+            .ReadFromJsonAsync<Response.Office>(TestContext.Current.CancellationToken);
         office.ShouldNotBeNull();
         office.Capacity.ShouldBe(0);
         office.Rooms.ShouldBeEmpty();
@@ -124,7 +124,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
     public async Task A_blank_name_is_rejected()
     {
         var response = await ClientWithRoles("administrator")
-            .PostAsJsonAsync("/offices", new CreateOfficeRequest("   ", "Berlin"), TestContext.Current.CancellationToken);
+            .PostAsJsonAsync("/offices", new Request.CreateOffice("   ", "Berlin"), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -153,25 +153,25 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var created = await administrator
             .PostAsJsonAsync("/offices", OfficeNamed($"Listed-{Guid.NewGuid():N}"), TestContext.Current.CancellationToken);
         var office = await created.Content
-            .ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+            .ReadFromJsonAsync<Response.Office>(TestContext.Current.CancellationToken);
         office.ShouldNotBeNull();
 
         var byId = await administrator.GetAsync($"/offices/{office.Id}", TestContext.Current.CancellationToken);
         byId.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var all = await administrator
-            .GetFromJsonAsync<OfficeResponse[]>("/offices", TestContext.Current.CancellationToken);
+            .GetFromJsonAsync<Response.Office[]>("/offices", TestContext.Current.CancellationToken);
         all.ShouldNotBeNull();
         all.ShouldContain(entry => entry.Id == office.Id);
     }
 
-    private async Task<OfficeResponse> CreateOfficeAsync(HttpClient client, string name)
+    private async Task<Response.Office> CreateOfficeAsync(HttpClient client, string name)
     {
         var response = await client
             .PostAsJsonAsync("/offices", OfficeNamed(name), TestContext.Current.CancellationToken);
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         var office = await response.Content
-            .ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+            .ReadFromJsonAsync<Response.Office>(TestContext.Current.CancellationToken);
         office.ShouldNotBeNull();
         return office;
     }
@@ -184,16 +184,16 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
 
         var response = await administrator.PostAsJsonAsync(
             $"/offices/{office.Id}/rooms",
-            new AddRoomRequest("Aurora", 8),
+            new Request.AddRoom("Aurora", 8),
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        var room = await response.Content.ReadFromJsonAsync<RoomResponse>(TestContext.Current.CancellationToken);
+        var room = await response.Content.ReadFromJsonAsync<Response.Room>(TestContext.Current.CancellationToken);
         room.ShouldNotBeNull();
         room.Capacity.ShouldBe(8);
 
         var reloaded = await administrator
-            .GetFromJsonAsync<OfficeResponse>($"/offices/{office.Id}", TestContext.Current.CancellationToken);
+            .GetFromJsonAsync<Response.Office>($"/offices/{office.Id}", TestContext.Current.CancellationToken);
         reloaded.ShouldNotBeNull();
         reloaded.Capacity.ShouldBe(8);
         reloaded.Rooms.ShouldHaveSingleItem();
@@ -207,7 +207,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
 
         var response = await administrator.PostAsJsonAsync(
             $"/offices/{office.Id}/rooms",
-            new AddRoomRequest("Aurora", 0),
+            new Request.AddRoom("Aurora", 0),
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -219,10 +219,10 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var administrator = ClientWithRoles("administrator");
         var office = await CreateOfficeAsync(administrator, $"DupRoom-{Guid.NewGuid():N}");
         await administrator.PostAsJsonAsync(
-            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 8), TestContext.Current.CancellationToken);
+            $"/offices/{office.Id}/rooms", new Request.AddRoom("Aurora", 8), TestContext.Current.CancellationToken);
 
         var response = await administrator.PostAsJsonAsync(
-            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 4), TestContext.Current.CancellationToken);
+            $"/offices/{office.Id}/rooms", new Request.AddRoom("Aurora", 4), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
     }
@@ -233,7 +233,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var office = await CreateOfficeAsync(ClientWithRoles("administrator"), $"RoomAuthz-{Guid.NewGuid():N}");
 
         var response = await ClientWithRoles("employee").PostAsJsonAsync(
-            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 8), TestContext.Current.CancellationToken);
+            $"/offices/{office.Id}/rooms", new Request.AddRoom("Aurora", 8), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
@@ -246,10 +246,10 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var newName = $"Renamed-{Guid.NewGuid():N}";
 
         var response = await administrator.PatchAsJsonAsync(
-            $"/offices/{office.Id}/name", new RenameOfficeRequest(newName), TestContext.Current.CancellationToken);
+            $"/offices/{office.Id}/name", new Request.RenameOffice(newName), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        var updated = await response.Content.ReadFromJsonAsync<Response.Office>(TestContext.Current.CancellationToken);
         updated.ShouldNotBeNull();
         updated.Name.ShouldBe(newName);
     }
@@ -262,7 +262,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var other = await CreateOfficeAsync(administrator, $"Other-{Guid.NewGuid():N}");
 
         var response = await administrator.PatchAsJsonAsync(
-            $"/offices/{other.Id}/name", new RenameOfficeRequest(taken.Name), TestContext.Current.CancellationToken);
+            $"/offices/{other.Id}/name", new Request.RenameOffice(taken.Name), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
     }
@@ -274,10 +274,10 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var office = await CreateOfficeAsync(administrator, $"Relocate-{Guid.NewGuid():N}");
 
         var response = await administrator.PatchAsJsonAsync(
-            $"/offices/{office.Id}/location", new RelocateOfficeRequest("Munich"), TestContext.Current.CancellationToken);
+            $"/offices/{office.Id}/location", new Request.RelocateOffice("Munich"), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        var updated = await response.Content.ReadFromJsonAsync<Response.Office>(TestContext.Current.CancellationToken);
         updated.ShouldNotBeNull();
         updated.Location.ShouldBe("Munich");
     }
@@ -288,17 +288,17 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         var administrator = ClientWithRoles("administrator");
         var office = await CreateOfficeAsync(administrator, $"RenameRoom-{Guid.NewGuid():N}");
         var added = await administrator.PostAsJsonAsync(
-            $"/offices/{office.Id}/rooms", new AddRoomRequest("Aurora", 8), TestContext.Current.CancellationToken);
-        var room = await added.Content.ReadFromJsonAsync<RoomResponse>(TestContext.Current.CancellationToken);
+            $"/offices/{office.Id}/rooms", new Request.AddRoom("Aurora", 8), TestContext.Current.CancellationToken);
+        var room = await added.Content.ReadFromJsonAsync<Response.Room>(TestContext.Current.CancellationToken);
         room.ShouldNotBeNull();
 
         var response = await administrator.PatchAsJsonAsync(
             $"/offices/{office.Id}/rooms/{room.Id}/name",
-            new RenameRoomRequest("Polaris"),
+            new Request.RenameRoom("Polaris"),
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<OfficeResponse>(TestContext.Current.CancellationToken);
+        var updated = await response.Content.ReadFromJsonAsync<Response.Office>(TestContext.Current.CancellationToken);
         updated.ShouldNotBeNull();
         updated.Rooms.ShouldContain(entry => entry.Name == "Polaris");
     }
@@ -311,7 +311,7 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
 
         var response = await administrator.PatchAsJsonAsync(
             $"/offices/{office.Id}/rooms/{Guid.NewGuid()}/name",
-            new RenameRoomRequest("Polaris"),
+            new Request.RenameRoom("Polaris"),
             TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

@@ -10,6 +10,7 @@ using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Organization.Api.Seeding;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +36,7 @@ builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 builder.Services.AddOrganizationUseCases();
 
 // Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
 // Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
 // HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher

@@ -1,6 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
-using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
@@ -20,42 +18,42 @@ public static class OfficeEndpoints
         endpoints.MapPost("/offices", CreateOfficeAsync)
             .RequireAdministrator()
             .WithName("CreateOffice")
-            .Produces<OfficeResponse>(StatusCodes.Status201Created)
+            .Produces<Response.Office>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
         endpoints.MapGet("/offices", ListOfficesAsync)
             .RequireAuthorization()
             .WithName("ListOffices")
-            .Produces<IEnumerable<OfficeResponse>>();
+            .Produces<IEnumerable<Response.Office>>();
         endpoints.MapGet("/offices/{officeId:guid}", GetOfficeAsync)
             .RequireAuthorization()
             .WithName("GetOffice")
-            .Produces<OfficeResponse>()
+            .Produces<Response.Office>()
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         endpoints.MapPatch("/offices/{officeId:guid}/name", RenameOfficeAsync)
             .RequireAdministrator()
             .WithName("RenameOffice")
-            .Produces<OfficeResponse>()
+            .Produces<Response.Office>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
         endpoints.MapPatch("/offices/{officeId:guid}/location", ChangeLocationAsync)
             .RequireAdministrator()
             .WithName("ChangeOfficeLocation")
-            .Produces<OfficeResponse>()
+            .Produces<Response.Office>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         endpoints.MapPost("/offices/{officeId:guid}/rooms", AddRoomAsync)
             .RequireAdministrator()
             .WithName("AddRoom")
-            .Produces<RoomResponse>(StatusCodes.Status201Created)
+            .Produces<Response.Room>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
         endpoints.MapPatch("/offices/{officeId:guid}/rooms/{roomId:guid}/name", RenameRoomAsync)
             .RequireAdministrator()
             .WithName("RenameRoom")
-            .Produces<OfficeResponse>()
+            .Produces<Response.Office>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
@@ -69,7 +67,7 @@ public static class OfficeEndpoints
     // POST /offices — creates an office under the seeded company. 400 for a blank name/location, 409 if
     // the name is already taken in the company.
     private static async Task<IResult> CreateOfficeAsync(
-        CreateOfficeRequest request,
+        Request.CreateOffice request,
         ICommandHandler<CreateOffice, OfficeIdentifier> createOffice,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
@@ -115,7 +113,7 @@ public static class OfficeEndpoints
     // PATCH /offices/{officeId}/name — renames the office. 400 blank, 404 unknown, 409 name taken.
     private static async Task<IResult> RenameOfficeAsync(
         Guid officeId,
-        RenameOfficeRequest request,
+        Request.RenameOffice request,
         ICommandHandler<RenameOffice> renameOffice,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
@@ -134,7 +132,7 @@ public static class OfficeEndpoints
     // PATCH /offices/{officeId}/location — relocates the office. 400 blank, 404 unknown.
     private static async Task<IResult> ChangeLocationAsync(
         Guid officeId,
-        RelocateOfficeRequest request,
+        Request.RelocateOffice request,
         ICommandHandler<ChangeOfficeLocation> changeLocation,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
@@ -155,7 +153,7 @@ public static class OfficeEndpoints
     // 409 room name taken.
     private static async Task<IResult> AddRoomAsync(
         Guid officeId,
-        AddRoomRequest request,
+        Request.AddRoom request,
         ICommandHandler<AddRoomToOffice, RoomIdentifier> addRoom,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
@@ -180,7 +178,7 @@ public static class OfficeEndpoints
             found => found.Rooms.FirstOrDefault(room => room.Identifier == result.Value) is { } room
                 ? Results.Created(
                     $"/offices/{officeId}/rooms/{room.Identifier.Value}",
-                    new RoomResponse(room.Identifier.Value, room.Name.Value, room.Capacity))
+                    new Response.Room(room.Identifier.Value, room.Name.Value, room.Capacity))
                 : Results.NotFound(),
             _ => Results.NotFound());
     }
@@ -190,7 +188,7 @@ public static class OfficeEndpoints
     private static async Task<IResult> RenameRoomAsync(
         Guid officeId,
         Guid roomId,
-        RenameRoomRequest request,
+        Request.RenameRoom request,
         ICommandHandler<RenameRoom> renameRoom,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
@@ -223,13 +221,13 @@ public static class OfficeEndpoints
         return office.Match(found => Results.Ok(Project(found)), error => error.ToHttpResult());
     }
 
-    private static OfficeResponse Project(Office office) =>
+    private static Response.Office Project(Office office) =>
         new(
             office.Identifier.Value,
             office.Name.Value,
             office.Location.Value,
             office.Capacity,
             office.Rooms
-                .Select(room => new RoomResponse(room.Identifier.Value, room.Name.Value, room.Capacity))
+                .Select(room => new Response.Room(room.Identifier.Value, room.Name.Value, room.Capacity))
                 .ToList());
 }

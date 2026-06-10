@@ -1,3 +1,3 @@
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
 
-public sealed record AddRoomRequest(string Name, int Capacity);
+public sealed record AddRoom(string Name, int Capacity);
