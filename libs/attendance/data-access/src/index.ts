@@ -21,7 +21,10 @@ export {
   isWorkingDay,
   todayInBerlin,
 } from './lib/bookable-day';
+export { errorCode } from './lib/gateway-error';
 export type { Occupant, OccupancyDay, OccupancyOffice, OccupancyRoom } from './lib/occupancy';
 export { toOccupancyDays } from './lib/occupancy';
+export { partitionReservationsByDay } from './lib/reservation-partition';
+export type { PartitionedReservations } from './lib/reservation-partition';
 export type { DateRange, RangePreset } from './lib/occupancy-range';
 export { addMonths, isSameMonth, monthGrid, rangeFor } from './lib/occupancy-range';

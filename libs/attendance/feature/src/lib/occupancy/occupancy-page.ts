@@ -15,6 +15,7 @@ import {
   BookableOffice,
   OccupancyDay,
   RangePreset,
+  errorCode,
   rangeFor,
   roomId,
   todayInBerlin,
@@ -121,7 +122,7 @@ export class OccupancyPage {
       .subscribe({
         next: (days) => this.days.set(days),
         error: (error: HttpErrorResponse) => {
-          const code = (error.error as { code?: string } | null)?.code;
+          const code = errorCode(error);
           if (code === 'unknown_office' || code === 'unknown_room') {
             this.errorKey.set('attendance.occupancy.unknownScope');
             this.loadCatalogue();
