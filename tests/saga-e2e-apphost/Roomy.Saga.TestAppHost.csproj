@@ -1,0 +1,26 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.2">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SmartSolutionsLab.Roomy.Saga.TestAppHost</RootNamespace>
+    <AssemblyName>Roomy.Saga.TestAppHost</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The full backing stack the provisioning-saga e2e needs: Postgres (per-service DBs), RabbitMQ
+         (the cross-service transport), and Keycloak (real credential provider). Pinned to the AppHost's
+         Aspire version, mirroring apps/apphost. -->
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.2" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.4.2" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.4.2-preview.1.26303.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The two saga participants + the schema-rollout runner; generate the Projects.* metadata the
+         host model references. No gateway/web/attendance-api — the saga is organization <-> identity. -->
+    <ProjectReference Include="../../apps/identity-api/Roomy.Identity.Api.csproj" />
+    <ProjectReference Include="../../apps/organization-api/Roomy.Organization.Api.csproj" />
+    <ProjectReference Include="../../apps/db-migrator/Roomy.DbMigrator.csproj" />
+  </ItemGroup>
+
+</Project>
