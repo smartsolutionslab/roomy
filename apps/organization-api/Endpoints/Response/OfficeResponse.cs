@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
+namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 
 // The office projection (contract: organization-api.md). Capacity is the derived sum of the rooms'
 // capacities.

@@ -1,8 +1,9 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
+using SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Organization.Application.UseCases;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Web.Http;
-
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
 // The hiring surface (contract: organization-api.md, 008). Hiring requires the administrator role, so an
