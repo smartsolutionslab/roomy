@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withDisabledInitialNavigation } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { CurrentUser } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 
 import { App } from './app';
+import { appRoutes } from './app.routes';
 import { importTestTransloco } from './i18n/transloco-testing';
 
 async function renderShell(session: CurrentUser | null = null) {
@@ -17,7 +18,9 @@ async function renderShell(session: CurrentUser | null = null) {
     imports: [importTestTransloco()],
     providers: [
       provideZonelessChangeDetection(),
-      provideRouter([]),
+      // The real routes carry the nav metadata the sidebar is built from; initial navigation is
+      // disabled so the shell test stays isolated from the feature pages' lazy loads.
+      provideRouter(appRoutes, withDisabledInitialNavigation()),
       provideHttpClient(),
       provideHttpClientTesting(),
     ],
@@ -59,7 +62,8 @@ describe('App shell', () => {
   it('offers a sign-in link when there is no session', async () => {
     await renderShell(null);
 
-    expect(screen.getByRole('link', { name: 'Anmelden' })).toBeTruthy();
+    // The public view offers sign-in both in the top bar and as the landing hero call to action.
+    expect(screen.getAllByRole('link', { name: 'Anmelden' }).length).toBeGreaterThan(0);
   });
 
   it('shows the signed-in user and a sign-out control behind the account menu', async () => {
@@ -72,16 +76,29 @@ describe('App shell', () => {
     expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
   });
 
-  it('offers an administration link to administrators', async () => {
+  it('shows the self-service destinations to any signed-in employee', async () => {
+    await renderShell({ name: 'Grace Hopper', roles: ['employee'] });
+
+    expect(screen.getByRole('link', { name: 'Platz reservieren' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Meine Reservierungen' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Belegung' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Kalender' })).toBeTruthy();
+  });
+
+  it('offers the administration section to administrators', async () => {
     await renderShell({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
 
+    expect(screen.getByRole('link', { name: 'Im Namen' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Büros' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Verwaltung' })).toBeTruthy();
   });
 
-  it('does not offer the administration link to a non-administrator', async () => {
+  it('does not offer the administrator-only links to a non-administrator', async () => {
     await renderShell({ name: 'Grace Hopper', roles: ['employee'] });
 
     expect(screen.queryByRole('link', { name: 'Verwaltung' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Im Namen' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Büros' })).toBeNull();
   });
 
   it('has no detectable accessibility violations', async () => {

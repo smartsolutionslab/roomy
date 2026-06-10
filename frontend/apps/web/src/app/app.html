@@ -1,45 +1,31 @@
 <ng-container *transloco="let translate">
   <a class="shell__skip-link" href="#main-content">{{ translate('shell.skipToContent') }}</a>
 
-  @if (currentUser(); as user) {
+  @if (currentUser()) {
   <roomy-app-layout>
-    <a roomy-brand class="sidebar__brand" routerLink="/" [attr.aria-label]="translate('shell.appName')">
+    <a
+      roomy-brand
+      class="sidebar__brand"
+      routerLink="/"
+      [attr.aria-label]="translate('shell.appName')"
+    >
       <roomy-logo [showWordmark]="true" [onAccent]="true" />
     </a>
 
     <nav roomy-nav class="sidebar__nav" [attr.aria-label]="translate('shell.appName')">
-      <a class="navlink" routerLink="/attendance/reserve" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="reserve" />
-        <span>{{ translate('shell.reserveLink') }}</span>
+      @for (item of mainNav(); track item.path) {
+      <a class="navlink" [routerLink]="item.path" routerLinkActive="navlink--active">
+        <roomy-icon class="navlink__icon" [name]="item.icon" />
+        <span>{{ translate(item.labelKey) }}</span>
       </a>
-      <a class="navlink" routerLink="/attendance/mine" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="my-reservations" />
-        <span>{{ translate('shell.myReservationsLink') }}</span>
-      </a>
-      <a class="navlink" routerLink="/attendance/occupancy" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="occupancy" />
-        <span>{{ translate('shell.occupancyLink') }}</span>
-      </a>
-      <a class="navlink" routerLink="/attendance/calendar" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="calendar" />
-        <span>{{ translate('shell.calendarLink') }}</span>
-      </a>
-
-      @if (user.roles.includes('administrator')) {
+      } @if (adminNav().length) {
       <span class="sidebar__section">{{ translate('shell.adminLink') }}</span>
-      <a class="navlink" routerLink="/attendance/on-behalf" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="on-behalf" />
-        <span>{{ translate('shell.onBehalfLink') }}</span>
+      @for (item of adminNav(); track item.path) {
+      <a class="navlink" [routerLink]="item.path" routerLinkActive="navlink--active">
+        <roomy-icon class="navlink__icon" [name]="item.icon" />
+        <span>{{ translate(item.labelKey) }}</span>
       </a>
-      <a class="navlink" routerLink="/offices" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="offices" />
-        <span>{{ translate('shell.officesLink') }}</span>
-      </a>
-      <a class="navlink" routerLink="/admin/users" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" name="admin" />
-        <span>{{ translate('shell.adminLink') }}</span>
-      </a>
-      }
+      } }
     </nav>
 
     <div roomy-top class="topbar-controls">

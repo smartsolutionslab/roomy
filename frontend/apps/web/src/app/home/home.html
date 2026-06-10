@@ -7,61 +7,15 @@
     </header>
 
     <div class="dash__grid">
-      <a roomyCard interactive routerLink="/attendance/reserve">
+      @for (item of navItems(); track item.path) {
+      <a roomyCard interactive [routerLink]="item.path">
         <span class="card__icon">
-          <roomy-icon name="reserve" />
+          <roomy-icon [name]="item.icon" />
         </span>
-        <span class="card__title">{{ translate('shell.reserveLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.reserve') }}</span>
-      </a>
-
-      <a roomyCard interactive routerLink="/attendance/mine">
-        <span class="card__icon">
-          <roomy-icon name="my-reservations" />
-        </span>
-        <span class="card__title">{{ translate('shell.myReservationsLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.mine') }}</span>
-      </a>
-
-      <a roomyCard interactive routerLink="/attendance/occupancy">
-        <span class="card__icon">
-          <roomy-icon name="occupancy" />
-        </span>
-        <span class="card__title">{{ translate('shell.occupancyLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.occupancy') }}</span>
-      </a>
-
-      <a roomyCard interactive routerLink="/attendance/calendar">
-        <span class="card__icon">
-          <roomy-icon name="calendar" />
-        </span>
-        <span class="card__title">{{ translate('shell.calendarLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.calendar') }}</span>
-      </a>
-
-      @if (user.roles.includes('administrator')) {
-      <a roomyCard interactive routerLink="/attendance/on-behalf">
-        <span class="card__icon">
-          <roomy-icon name="on-behalf" />
-        </span>
-        <span class="card__title">{{ translate('shell.onBehalfLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.onBehalf') }}</span>
-      </a>
-
-      <a roomyCard interactive routerLink="/offices">
-        <span class="card__icon">
-          <roomy-icon name="offices" />
-        </span>
-        <span class="card__title">{{ translate('shell.officesLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.offices') }}</span>
-      </a>
-
-      <a roomyCard interactive routerLink="/admin/users">
-        <span class="card__icon">
-          <roomy-icon name="admin" />
-        </span>
-        <span class="card__title">{{ translate('shell.adminLink') }}</span>
-        <span class="card__desc">{{ translate('home.cards.admin') }}</span>
+        <span class="card__title">{{ translate(item.labelKey) }}</span>
+        @if (item.descKey; as descKey) {
+        <span class="card__desc">{{ translate(descKey) }}</span>
+        }
       </a>
       }
     </div>
