@@ -24,11 +24,12 @@ OpenAPI specs and the generated Angular clients are regenerated and drift-gated 
 
 ## Affected endpoints
 
-Keyset-paginated (genuinely unbounded):
-- `GET /admin/users` (identity) — sort `(DisplayName, Identifier)`.
-- `GET /reservations/employees` (attendance) — sort `(Name, EmployeeId)`.
-- `GET /reservations/mine` (attendance) — sort `(Date, ReservationId)`.
-- `GET /reservations/by-employee/{employeeId}` (attendance) — sort `(Date, ReservationId)`.
+Keyset-paginated (genuinely unbounded). Each sort key is unique and EF-translatable (a `Guid`
+tiebreaker is avoided where a unique column exists; C# `Guid` has no comparison operator):
+- `GET /admin/users` (identity) — sort `Email` (the unique account key).
+- `GET /reservations/employees` (attendance) — sort `(Name, EmployeeId)` (names collide; id breaks ties).
+- `GET /reservations/mine` (attendance) — sort `Date` (unique per employee — one reservation per day).
+- `GET /reservations/by-employee/{employeeId}` (attendance) — sort `Date` (same invariant).
 
 Envelope only, `nextCursor` always `null` (bounded by daily room capacity; replays the
 `AttendanceDay` aggregate in memory, no SQL projection to keyset — ADR-0042):

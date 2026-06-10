@@ -52,10 +52,14 @@ This is a cross-cutting structural change, so it is recorded here **before** the
 4. **Keyset predicate in the query.** Read models push
    `WHERE (sortKey) > @cursor ORDER BY sortKey LIMIT @limit + 1` into SQL — fetching `limit + 1`
    rows to detect whether a further page exists — and never load-then-slice. Each list picks a
-   **stable, total** sort order so the cursor is deterministic across inserts:
-   - reservation history (`mine`, `by-employee`) by `(Date, ReservationId)`;
-   - the employee directory by `(Name, EmployeeId)`;
-   - users by `(DisplayName, Identifier)`.
+   **stable, total** sort order so the cursor is deterministic across inserts. The key is chosen to
+   be both meaningful and **EF-translatable** — a single unique column where one exists, avoiding a
+   `Guid` tiebreaker (C# `Guid` has no comparison operator to translate):
+   - reservation history (`mine`, `by-employee`) by `Date` alone — the *one reservation per employee
+     per day* invariant makes `Date` unique per employee, so no tiebreaker is needed;
+   - the employee directory by `(Name, EmployeeId)` — names can collide, so the id is the tiebreaker
+     (compared as text so it translates);
+   - users by `Email` — the unique account key, a single text column.
 
 **Shared primitives live in `shared-kernel`** (`SmartSolutionsLab.Roomy.SharedKernel.Pagination`)
 so the domain layer may use them (a domain repository signature returns `Page<User>`), which a
