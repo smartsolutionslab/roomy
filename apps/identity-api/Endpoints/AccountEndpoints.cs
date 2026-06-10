@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
@@ -14,7 +13,7 @@ public static class AccountEndpoints
         endpoints.MapGet("/account/me", GetCurrentAccountAsync)
             .RequireAuthorization()
             .WithName("GetCurrentAccount")
-            .Produces<AccountResponse>()
+            .Produces<Response.Account>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         return endpoints;
@@ -38,7 +37,7 @@ public static class AccountEndpoints
             KeycloakSubjectIdentifier.From(subjectValue), cancellationToken);
 
         return lookup.Match(
-            user => Results.Ok(new AccountResponse(
+            user => Results.Ok(new Response.Account(
                 user.Identifier.Value,
                 user.Email.Value,
                 user.DisplayName.Value,

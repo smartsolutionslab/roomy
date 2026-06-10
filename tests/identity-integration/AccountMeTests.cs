@@ -9,9 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
-using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.TestSupport;
+using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
 // Boots the identity host in-process against the real test Postgres, with the external infra removed
@@ -78,7 +78,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
             .GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var account = await response.Content.ReadFromJsonAsync<AccountResponse>(TestContext.Current.CancellationToken);
+        var account = await response.Content.ReadFromJsonAsync<Response.Account>(TestContext.Current.CancellationToken);
         account.ShouldNotBeNull();
         account.Role.ShouldBe("administrator");
     }
@@ -94,7 +94,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
             .GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var account = await response.Content.ReadFromJsonAsync<AccountResponse>(TestContext.Current.CancellationToken);
+        var account = await response.Content.ReadFromJsonAsync<Response.Account>(TestContext.Current.CancellationToken);
         account.ShouldNotBeNull();
         account.Role.ShouldBe("employee");
     }

@@ -12,6 +12,7 @@ using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddKeycloakIdentityProvider(
 builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
 // Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
 // The provisioning use cases (US3, ADR-0025), bound to their owned command-handler ports — the
 // EmployeeHired consumer resolves RegisterUser through these.

@@ -9,9 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
-using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.TestSupport;
+using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
 // US5 / IA-2 (#27) story-level acceptance: a provisioned employee, logged in via the BFF (the forwarded
@@ -57,7 +57,7 @@ public sealed class EmployeeLoginTests : IClassFixture<PostgresDatabaseFixture>,
         var account = await employee.GetAsync("/account/me", TestContext.Current.CancellationToken);
         account.StatusCode.ShouldBe(HttpStatusCode.OK);
         var projection = await account.Content
-            .ReadFromJsonAsync<AccountResponse>(TestContext.Current.CancellationToken);
+            .ReadFromJsonAsync<Response.Account>(TestContext.Current.CancellationToken);
         projection.ShouldNotBeNull();
         projection.Role.ShouldBe("employee");
 

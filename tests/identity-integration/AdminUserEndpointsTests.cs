@@ -10,11 +10,11 @@ using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
-using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.TestSupport;
+using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
 // Boots the identity host in-process against real Postgres to verify the admin account surface
@@ -101,7 +101,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var page = await response.Content
-            .ReadFromJsonAsync<AdminUserPage>(TestContext.Current.CancellationToken);
+            .ReadFromJsonAsync<Response.Page.AdminUser>(TestContext.Current.CancellationToken);
         var listed = page.ShouldNotBeNull().Items.Single(user => user.UserId == employee.Identifier.Value);
         listed.Role.ShouldBe("employee");
         listed.Status.ShouldBe("active");
@@ -117,7 +117,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         }
 
         var client = AdministratorClient();
-        var collected = new List<AdminUserResponse>();
+        var collected = new List<Response.AdminUser>();
         string? cursor = null;
         var pageCount = 0;
         do
@@ -125,7 +125,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
             var url = cursor is null
                 ? "/admin/users?limit=2"
                 : $"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}";
-            var page = await client.GetFromJsonAsync<AdminUserPage>(url, TestContext.Current.CancellationToken);
+            var page = await client.GetFromJsonAsync<Response.Page.AdminUser>(url, TestContext.Current.CancellationToken);
             page.ShouldNotBeNull();
             // Every page but the last is full — a page is short only when the list is exhausted, even
             // though other tests' rows interleave with the seeded ones.
@@ -160,7 +160,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         }
 
         var client = AdministratorClient();
-        var firstPage = await client.GetFromJsonAsync<AdminUserPage>(
+        var firstPage = await client.GetFromJsonAsync<Response.Page.AdminUser>(
             "/admin/users?limit=2", TestContext.Current.CancellationToken);
         firstPage.ShouldNotBeNull();
         firstPage.NextCursor.ShouldNotBeNull();
@@ -171,11 +171,11 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         // first-page row nor return this already-passed insert — offset paging would shift and do both.
         var inserted = await SeedUserWithEmailAsync($"aaa-{Guid.NewGuid():N}@example.com");
 
-        var remaining = new List<AdminUserResponse>();
+        var remaining = new List<Response.AdminUser>();
         string? cursor = firstPage.NextCursor;
         while (cursor is not null)
         {
-            var page = await client.GetFromJsonAsync<AdminUserPage>(
+            var page = await client.GetFromJsonAsync<Response.Page.AdminUser>(
                 $"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}", TestContext.Current.CancellationToken);
             page.ShouldNotBeNull();
             remaining.AddRange(page.Items);
@@ -209,7 +209,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var user = await response.Content
-            .ReadFromJsonAsync<AdminUserResponse>(TestContext.Current.CancellationToken);
+            .ReadFromJsonAsync<Response.AdminUser>(TestContext.Current.CancellationToken);
         user.ShouldNotBeNull();
         user.Email.ShouldBe(employee.Email.Value);
         user.Role.ShouldBe("employee");
