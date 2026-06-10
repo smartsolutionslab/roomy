@@ -1,6 +1,7 @@
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Scalar.Aspire;
 using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.AppHost.Tests;
@@ -60,5 +61,25 @@ public sealed class AppHostCompositionTests
         var organizationApi = model.Resources.Single(resource => resource.Name == "organization-api");
         organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
             wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
+    }
+
+    [Fact]
+    public async Task Composes_a_scalar_reference_and_an_openapi_link_for_each_context_api()
+    {
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
+            TestContext.Current.CancellationToken);
+        await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
+
+        var model = application.Services.GetRequiredService<DistributedApplicationModel>();
+
+        // One aggregated Scalar reference is composed for the dashboard (ADR-0042).
+        model.Resources.OfType<ScalarResource>().ShouldHaveSingleItem();
+
+        // Each context API carries a custom dashboard URL (its OpenAPI link).
+        foreach (var apiName in new[] { "identity-api", "organization-api", "attendance-api" })
+        {
+            var api = model.Resources.Single(resource => resource.Name == apiName);
+            api.Annotations.OfType<ResourceUrlsCallbackAnnotation>().ShouldNotBeEmpty();
+        }
     }
 }

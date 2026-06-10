@@ -1,3 +1,5 @@
+using Scalar.Aspire;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Local development infrastructure (issue #17). The app host provisions the backing
@@ -137,6 +139,26 @@ var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendanc
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Attendance__CompanyId", "0199a0b0-0000-7000-8000-000000000001");
+
+// --- Scalar API reference (ADR-0042, #135) -----------------------------------------
+// One interactive Scalar reference, hosted by the app host and listed in the Aspire dashboard, that
+// aggregates all three context APIs' OpenAPI documents in a single pane. Dev-only by construction — the
+// app host is never deployed. Keycloak OAuth try-it-out is the follow-up (it needs the OAuth2 security
+// scheme in each document, ADR-0042/#135). Each API also gets a direct dashboard link to its raw spec.
+var apiDocs = builder.AddScalarApiReference()
+    .WithApiReference(identityApi)
+    .WithApiReference(organizationApi)
+    .WithApiReference(attendanceApi);
+_ = apiDocs;
+
+foreach (var api in new[] { identityApi, organizationApi, attendanceApi })
+{
+    api.WithUrlForEndpoint("http", _ => new ResourceUrlAnnotation
+    {
+        Url = "/openapi/v1.json",
+        DisplayText = "OpenAPI",
+    });
+}
 
 // --- YARP gateway / BFF (ADR-0013, ADR-0018) ---------------------------------------
 // The single public entry point. It is the confidential OIDC client (BFF security
