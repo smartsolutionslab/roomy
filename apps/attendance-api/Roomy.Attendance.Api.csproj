@@ -27,11 +27,11 @@
     <!-- The Wolverine messaging backbone (ADR-0005): the durable inbox that consumes organization's
          RoomAdded into the Rooms read model (003 US2). -->
     <ProjectReference Include="../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
+    <ProjectReference Include="..\..\libs\infrastructure-authentication\src\Roomy.Infrastructure.Authentication.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Validates the BFF-forwarded Keycloak access token as a JWT bearer (ADR-0013). -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <!-- Publishes the OpenAPI document the typed Angular client is generated from (ADR-0018/0036). -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <!-- Build-time `GetDocument` emit of the static spec to OpenApiDocumentsDirectory (ADR-0036). -->

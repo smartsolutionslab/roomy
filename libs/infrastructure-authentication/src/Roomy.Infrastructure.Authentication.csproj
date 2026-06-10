@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartSolutionsLab.Roomy.Infrastructure.Authentication</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Infrastructure.Authentication</AssemblyName>
+  </PropertyGroup>
+
+  <!--
+    Shared composition-root helper for the context API hosts' Keycloak JWT bearer validation (ADR-0013/0045).
+    Infrastructure (it binds ASP.NET auth), referenced by the API hosts only; deliberately free of any
+    messaging/EF dependency so it never perturbs a host's Wolverine codegen (ADR-0034).
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+</Project>

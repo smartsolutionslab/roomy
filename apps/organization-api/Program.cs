@@ -1,13 +1,12 @@
 using JasperFx;
 using JasperFx.CommandLine;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
-using SmartSolutionsLab.Roomy.Organization.Api.Authentication;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Organization.Api.Seeding;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure;
@@ -31,23 +30,7 @@ var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
     ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
 var keycloakRealm = keycloak["Realm"] ?? "roomy";
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.ValidateAudience = false;
-
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                KeycloakRealmRoles.AddRoleClaims(context.Principal);
-                return Task.CompletedTask;
-            },
-        };
-    });
-builder.Services.AddAuthorization();
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
 builder.Services.AddOrganizationUseCases();
 

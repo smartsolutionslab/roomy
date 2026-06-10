@@ -1,17 +1,16 @@
 using JasperFx;
 using JasperFx.CommandLine;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Identity.Api;
-using SmartSolutionsLab.Roomy.Identity.Api.Authentication;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,29 +41,10 @@ builder.Services.AddKeycloakIdentityProvider(
             ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
     });
 
-// The identity API is internal — reached only through the BFF, which forwards the Keycloak access
-// token (ADR-0013). Validate it as a JWT bearer against the realm; the BFF owns login/session. The
-// audience is not validated (the gateway gates access, and a Keycloak token's audience varies by
-// client), but the issuer/realm must match.
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.ValidateAudience = false;
-
-        // Keycloak nests realm roles under realm_access.roles; flatten them to role claims so the
-        // administrator-only routes can authorize on RequireRole (ADR-0013).
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                KeycloakRealmRoles.AddRoleClaims(context.Principal);
-                return Task.CompletedTask;
-            },
-        };
-    });
-builder.Services.AddAuthorization();
+// The identity API is internal — reached only through the BFF, which forwards the Keycloak access token
+// (ADR-0013). Validate it as a JWT bearer against the realm; the BFF owns login/session. Shared across the
+// context API hosts (ADR-0045).
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
 // Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
 builder.Services.AddOpenApi();

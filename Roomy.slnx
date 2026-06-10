@@ -64,6 +64,9 @@
   <Folder Name="/libs/attendance/infrastructure/">
     <Project Path="libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/libs/infrastructure-authentication/src/">
+    <Project Path="libs/infrastructure-authentication/src/Roomy.Infrastructure.Authentication.csproj" />
+  </Folder>
   <Folder Name="/libs/infrastructure-messaging/src/">
     <Project Path="libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
   </Folder>

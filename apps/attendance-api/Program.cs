@@ -1,12 +1,10 @@
 using JasperFx;
 using JasperFx.CommandLine;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Attendance.Api;
-using SmartSolutionsLab.Roomy.Attendance.Api.Authentication;
 using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
@@ -14,6 +12,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
+using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,25 +104,7 @@ var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
     ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
 var keycloakRealm = keycloak["Realm"] ?? "roomy";
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{keycloakRealm}";
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.ValidateAudience = false;
-
-        // Keycloak nests realm roles under realm_access.roles; flatten them to role claims so the
-        // reserve/cancel endpoints can authorize the administrator on-behalf path (FR-011, ADR-0013).
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                KeycloakRealmRoles.AddRoleClaims(context.Principal);
-                return Task.CompletedTask;
-            },
-        };
-    });
-builder.Services.AddAuthorization();
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
 var app = builder.Build();
 
