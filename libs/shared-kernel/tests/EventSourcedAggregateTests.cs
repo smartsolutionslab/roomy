@@ -1,5 +1,4 @@
 using Shouldly;
-using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests;
 
