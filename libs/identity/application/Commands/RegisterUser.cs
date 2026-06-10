@@ -1,7 +1,7 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
-namespace SmartSolutionsLab.Roomy.Identity.Application.UseCases;
+namespace SmartSolutionsLab.Roomy.Identity.Application.Commands;
 
 // The identity step of the provisioning saga (ADR-0025): provision an account for a hired employee.
 // The UserIdentifier is pre-allocated upstream as the correlation key for the 1:1 User<->Employee

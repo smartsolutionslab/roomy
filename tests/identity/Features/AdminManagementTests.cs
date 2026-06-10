@@ -1,7 +1,8 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Application;
-using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
+using SmartSolutionsLab.Roomy.Identity.Application.Commands;
+using SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
