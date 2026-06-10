@@ -201,6 +201,10 @@
       "loadMore": "Load more",
       "loading": "Loading…",
       "endOfList": "End of list"
+    },
+    "theme": {
+      "toLight": "Switch to light theme",
+      "toDark": "Switch to dark theme"
     }
   }
 }

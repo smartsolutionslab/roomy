@@ -1,25 +1,104 @@
 :root {
-  --roomy-color-background: #f7f8fa;
+  /* Surfaces & text — cool zinc neutrals (2026 refresh) */
+  --roomy-color-background: #fafafa;
+  --roomy-color-background-muted: #f4f4f5;
   --roomy-color-surface: #ffffff;
-  --roomy-color-text: #1a1c21;
-  --roomy-color-text-muted: #525866;
-  --roomy-color-border: #d4d7dd;
-  --roomy-color-accent: #1d4ed8;
+  --roomy-color-surface-raised: #ffffff;
+  --roomy-color-text: #18181b;
+  --roomy-color-text-muted: #71717a;
+  --roomy-color-border: #e4e4e7;
+
+  /* Brand accent — burnt orange. `accent` is the brand/decorative tone; text-bearing
+     controls use `accent-strong` so white-on-orange clears WCAG 2.2 AA (~5:1). */
+  --roomy-color-accent: #ea580c;
+  --roomy-color-accent-strong: #c2410c;
+  --roomy-color-accent-hover: #9a3412;
+  --roomy-color-accent-subtle: #fff7ed;
+  --roomy-color-accent-muted: #ffedd5;
   --roomy-color-on-accent: #ffffff;
 
+  /* Functional */
+  --roomy-color-danger: #dc2626;
+  --roomy-color-danger-subtle: #fef2f2;
+
+  --roomy-gradient-accent: linear-gradient(135deg, #ea580c, #f97316);
+
+  /* Spacing scale */
   --roomy-space-xs: 0.25rem;
   --roomy-space-sm: 0.5rem;
   --roomy-space-md: 1rem;
   --roomy-space-lg: 2rem;
 
-  --roomy-radius-sm: 0.25rem;
+  /* Radius scale */
+  --roomy-radius-sm: 0.375rem;
+  --roomy-radius-md: 0.625rem;
+  --roomy-radius-lg: 1rem;
+  --roomy-radius-full: 9999px;
 
+  /* Elevation — subtle, layered (low-opacity zinc) */
+  --roomy-shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.06), 0 1px 1px rgba(24, 24, 27, 0.04);
+  --roomy-shadow-md: 0 4px 12px rgba(24, 24, 27, 0.08), 0 2px 4px rgba(24, 24, 27, 0.05);
+  --roomy-shadow-lg: 0 12px 32px rgba(24, 24, 27, 0.12), 0 4px 8px rgba(24, 24, 27, 0.06);
+
+  --roomy-transition: 150ms ease;
+
+  /* Typography */
   --roomy-font-family: system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --roomy-font-size-sm: 0.875rem;
   --roomy-font-size-base: 1rem;
   --roomy-font-size-lg: 1.25rem;
+  --roomy-font-size-xl: 1.5rem;
+  --roomy-font-size-2xl: 2rem;
+  --roomy-font-weight-medium: 500;
+  --roomy-font-weight-bold: 700;
 
-  --roomy-focus-outline: 2px solid var(--roomy-color-accent);
+  /* Focus & accessibility */
+  --roomy-focus-outline: 2px solid var(--roomy-color-accent-strong);
   --roomy-focus-outline-offset: 2px;
+}
+
+/* Dark theme. Applies when the OS prefers dark and the user has not forced light,
+   or whenever the user explicitly selects dark via the toggle (data-theme wins). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --roomy-color-background: #09090b;
+    --roomy-color-background-muted: #18181b;
+    --roomy-color-surface: #18181b;
+    --roomy-color-surface-raised: #27272a;
+    --roomy-color-text: #fafafa;
+    --roomy-color-text-muted: #a1a1aa;
+    --roomy-color-border: #3f3f46;
+
+    --roomy-color-accent: #fb923c;
+    --roomy-color-accent-strong: #f97316;
+    --roomy-color-accent-hover: #fdba74;
+    --roomy-color-accent-subtle: #27170b;
+    --roomy-color-accent-muted: #3a1e0a;
+    --roomy-color-on-accent: #18181b;
+
+    --roomy-color-danger: #f87171;
+    --roomy-color-danger-subtle: #2a1416;
+  }
+}
+
+:root[data-theme='dark'] {
+  --roomy-color-background: #09090b;
+  --roomy-color-background-muted: #18181b;
+  --roomy-color-surface: #18181b;
+  --roomy-color-surface-raised: #27272a;
+  --roomy-color-text: #fafafa;
+  --roomy-color-text-muted: #a1a1aa;
+  --roomy-color-border: #3f3f46;
+
+  --roomy-color-accent: #fb923c;
+  --roomy-color-accent-strong: #f97316;
+  --roomy-color-accent-hover: #fdba74;
+  --roomy-color-accent-subtle: #27170b;
+  --roomy-color-accent-muted: #3a1e0a;
+  --roomy-color-on-accent: #18181b;
+
+  --roomy-color-danger: #f87171;
+  --roomy-color-danger-subtle: #2a1416;
 }
 
 * {
@@ -27,7 +106,7 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 body {
@@ -37,4 +116,6 @@ body {
   font-family: var(--roomy-font-family);
   font-size: var(--roomy-font-size-base);
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

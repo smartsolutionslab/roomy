@@ -1,16 +1,26 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { SessionService } from '@roomy/shared-data-access';
+import { ThemeToggle } from '@roomy/shared-feature';
+import { RoomyLogo } from '@roomy/shared-ui';
 
 import { LanguageSwitcher } from './shell/language-switcher';
 
 @Component({
   selector: 'roomy-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, TranslocoDirective, LanguageSwitcher],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslocoDirective,
+    LanguageSwitcher,
+    ThemeToggle,
+    RoomyLogo,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

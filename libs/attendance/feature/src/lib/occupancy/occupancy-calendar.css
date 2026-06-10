@@ -25,14 +25,14 @@
 
 .calendar__grid th,
 .calendar__cell {
-  border: 1px solid #ccc;
+  border: 1px solid var(--roomy-color-border);
   vertical-align: top;
   padding: 0.25rem;
   height: 4rem;
 }
 
 .calendar__cell--outside {
-  background: #f4f4f4;
+  background: var(--roomy-color-background-muted);
 }
 
 .calendar__cell--mine {

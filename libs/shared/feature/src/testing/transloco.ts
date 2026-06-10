@@ -10,6 +10,10 @@ const english = {
       title: 'Not authorized',
       message: 'You do not have permission to view this page.',
     },
+    theme: {
+      toLight: 'Switch to light theme',
+      toDark: 'Switch to dark theme',
+    },
   },
 };
 
@@ -18,6 +22,10 @@ const german = {
     notAuthorized: {
       title: 'Nicht berechtigt',
       message: 'Sie haben keine Berechtigung, diese Seite anzuzeigen.',
+    },
+    theme: {
+      toLight: 'Zu hellem Design wechseln',
+      toDark: 'Zu dunklem Design wechseln',
     },
   },
 };

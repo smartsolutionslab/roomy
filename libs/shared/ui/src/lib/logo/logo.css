@@ -1,0 +1,32 @@
+.roomy-logo {
+  display: inline-flex;
+  gap: var(--roomy-space-sm);
+  align-items: center;
+}
+
+.roomy-logo__mark {
+  display: block;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--roomy-radius-md);
+  box-shadow: var(--roomy-shadow-sm);
+}
+
+.roomy-logo__wordmark {
+  color: var(--roomy-color-text);
+  font-size: var(--roomy-font-size-xl);
+  font-weight: var(--roomy-font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.roomy-logo__sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

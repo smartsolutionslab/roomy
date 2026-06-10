@@ -31,5 +31,5 @@
 }
 
 .mine__error {
-  color: #b00020;
+  color: var(--roomy-color-danger);
 }

@@ -3,29 +3,34 @@
 
   <header class="app__header">
     <div class="app__branding">
-      <span class="app__name">{{ translate('shell.appName') }}</span>
+      <roomy-logo [showWordmark]="true" />
       <span class="app__tagline">{{ translate('shell.tagline') }}</span>
     </div>
     <div class="app__session">
       @if (currentUser(); as user) {
       <span class="app__user">{{ translate('shell.signedInAs', { name: user.name }) }}</span>
-      <a class="app__nav-link" routerLink="/attendance/reserve">{{ translate('shell.reserveLink') }}</a>
-      <a class="app__nav-link" routerLink="/attendance/mine">{{ translate('shell.myReservationsLink') }}</a>
-      <a class="app__nav-link" routerLink="/attendance/occupancy">{{ translate('shell.occupancyLink') }}</a>
-      <a class="app__nav-link" routerLink="/attendance/calendar">{{ translate('shell.calendarLink') }}</a>
-      @if (user.roles.includes('administrator')) {
-      <a class="app__admin-link" routerLink="/attendance/on-behalf">{{ translate('shell.onBehalfLink') }}</a>
-      <a class="app__admin-link" routerLink="/offices">{{ translate('shell.officesLink') }}</a>
-      <a class="app__admin-link" routerLink="/admin/users">{{ translate('shell.adminLink') }}</a>
-      }
+      <nav class="app__nav" [attr.aria-label]="translate('shell.appName')">
+        <a class="app__nav-link" routerLink="/attendance/reserve" routerLinkActive="app__nav-link--active">{{ translate('shell.reserveLink') }}</a>
+        <a class="app__nav-link" routerLink="/attendance/mine" routerLinkActive="app__nav-link--active">{{ translate('shell.myReservationsLink') }}</a>
+        <a class="app__nav-link" routerLink="/attendance/occupancy" routerLinkActive="app__nav-link--active">{{ translate('shell.occupancyLink') }}</a>
+        <a class="app__nav-link" routerLink="/attendance/calendar" routerLinkActive="app__nav-link--active">{{ translate('shell.calendarLink') }}</a>
+        @if (user.roles.includes('administrator')) {
+        <a class="app__nav-link" routerLink="/attendance/on-behalf" routerLinkActive="app__nav-link--active">{{ translate('shell.onBehalfLink') }}</a>
+        <a class="app__nav-link" routerLink="/offices" routerLinkActive="app__nav-link--active">{{ translate('shell.officesLink') }}</a>
+        <a class="app__nav-link" routerLink="/admin/users" routerLinkActive="app__nav-link--active">{{ translate('shell.adminLink') }}</a>
+        }
+      </nav>
       <form class="app__signout" method="post" action="/bff/logout">
-        <button type="submit">{{ translate('shell.signOut') }}</button>
+        <button class="app__button" type="submit">{{ translate('shell.signOut') }}</button>
       </form>
       } @else {
-      <a class="app__signin" href="/bff/login?returnUrl=/">{{ translate('shell.signIn') }}</a>
+      <a class="app__button app__button--accent" href="/bff/login?returnUrl=/">{{ translate('shell.signIn') }}</a>
       }
     </div>
-    <roomy-language-switcher />
+    <div class="app__controls">
+      <roomy-theme-toggle />
+      <roomy-language-switcher />
+    </div>
   </header>
 
   <main id="main-content" class="app__main" tabindex="-1">
