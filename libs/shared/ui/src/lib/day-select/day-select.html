@@ -1,0 +1,8 @@
+<roomy-form-field [label]="label()">
+  <select #daySelect (change)="daySelected.emit(daySelect.value)">
+    <option value="">{{ placeholder() }}</option>
+    @for (day of days(); track day) {
+    <option [value]="day">{{ day }}</option>
+    }
+  </select>
+</roomy-form-field>

@@ -26,14 +26,12 @@
       </select>
     </roomy-form-field>
 
-    <roomy-form-field [label]="translate('attendance.reserve.dayLabel')">
-      <select #daySelect (change)="chooseDay(daySelect.value)">
-        <option value="">{{ translate('attendance.reserve.dayPlaceholder') }}</option>
-        @for (day of bookableDays(); track day) {
-        <option [value]="day">{{ day }}</option>
-        }
-      </select>
-    </roomy-form-field>
+    <roomy-day-select
+      [label]="translate('attendance.reserve.dayLabel')"
+      [placeholder]="translate('attendance.reserve.dayPlaceholder')"
+      [days]="bookableDays()"
+      (daySelected)="chooseDay($event)"
+    />
 
     @if (selectedOffice(); as office) {
     <h2>{{ translate('attendance.reserve.roomsHeading') }}</h2>
