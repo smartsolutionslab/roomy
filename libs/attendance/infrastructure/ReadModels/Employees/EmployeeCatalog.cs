@@ -63,16 +63,11 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-        var hasMore = rows.Count > request.Limit;
-        var pageRows = hasMore ? rows.Take(request.Limit).ToList() : rows;
-        var items = pageRows
-            .Select(row => new EmployeeView(EmployeeIdentifier.From(row.EmployeeId), row.DisplayName))
-            .ToList();
-        var nextCursor = hasMore
-            ? CursorCodec.Encode(new EmployeeCursor(pageRows[^1].DisplayName, pageRows[^1].EmployeeId))
-            : null;
-
-        return new Page<EmployeeView>(items, nextCursor);
+        return Page<EmployeeView>.FromProbe(
+            rows,
+            request.Limit,
+            row => new EmployeeView(EmployeeIdentifier.From(row.EmployeeId), row.DisplayName),
+            row => new EmployeeCursor(row.DisplayName, row.EmployeeId));
     }
 
     private async Task<Result<Page<EmployeeView>>> SearchAsync(
@@ -100,22 +95,29 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             .ExecuteSqlRawAsync(setThresholdSql, cancellationToken)
             .ConfigureAwait(false);
 
+        // word_similarity is computed once in the ranked subquery and referenced by alias in the outer
+        // keyset/order — PostgreSQL flattens this simple derived table, so the `<%` pre-filter still hits
+        // the trigram GIN index. Only the outer keyset predicate differs between the first and later pages.
         var sql = after is { } cursor
             ? (FormattableString)
-                $@"SELECT ""employee_id"" AS ""EmployeeId"", ""display_name"" AS ""DisplayName"",
-                          word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name""))::double precision AS ""Similarity""
-                   FROM ""employees""
-                   WHERE immutable_unaccent({query}) <% immutable_unaccent(""display_name"")
-                     AND ( word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name"")) < {cursor.Similarity}
-                        OR ( word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name"")) = {cursor.Similarity}
-                             AND (""display_name"", ""employee_id"") > ({cursor.Name}, {cursor.EmployeeId}) ) )
-                   ORDER BY word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name"")) DESC, ""display_name"", ""employee_id""
+                $@"SELECT * FROM (
+                       SELECT ""employee_id"" AS ""EmployeeId"", ""display_name"" AS ""DisplayName"",
+                              word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name""))::double precision AS ""Similarity""
+                       FROM ""employees""
+                       WHERE immutable_unaccent({query}) <% immutable_unaccent(""display_name"")
+                   ) AS ""ranked""
+                   WHERE ""Similarity"" < {cursor.Similarity}
+                      OR ( ""Similarity"" = {cursor.Similarity}
+                           AND (""DisplayName"", ""EmployeeId"") > ({cursor.Name}, {cursor.EmployeeId}) )
+                   ORDER BY ""Similarity"" DESC, ""DisplayName"", ""EmployeeId""
                    LIMIT {probeLimit}"
-            : $@"SELECT ""employee_id"" AS ""EmployeeId"", ""display_name"" AS ""DisplayName"",
-                        word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name""))::double precision AS ""Similarity""
-                 FROM ""employees""
-                 WHERE immutable_unaccent({query}) <% immutable_unaccent(""display_name"")
-                 ORDER BY word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name"")) DESC, ""display_name"", ""employee_id""
+            : $@"SELECT * FROM (
+                     SELECT ""employee_id"" AS ""EmployeeId"", ""display_name"" AS ""DisplayName"",
+                            word_similarity(immutable_unaccent({query}), immutable_unaccent(""display_name""))::double precision AS ""Similarity""
+                     FROM ""employees""
+                     WHERE immutable_unaccent({query}) <% immutable_unaccent(""display_name"")
+                 ) AS ""ranked""
+                 ORDER BY ""Similarity"" DESC, ""DisplayName"", ""EmployeeId""
                  LIMIT {probeLimit}";
 
         var rows = await context.Database
@@ -125,16 +127,11 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
 
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
 
-        var hasMore = rows.Count > request.Limit;
-        var pageRows = hasMore ? rows.Take(request.Limit).ToList() : rows;
-        var items = pageRows
-            .Select(row => new EmployeeView(EmployeeIdentifier.From(row.EmployeeId), row.DisplayName))
-            .ToList();
-        var nextCursor = hasMore
-            ? CursorCodec.Encode(new EmployeeSearchCursor(pageRows[^1].Similarity, pageRows[^1].DisplayName, pageRows[^1].EmployeeId))
-            : null;
-
-        return new Page<EmployeeView>(items, nextCursor);
+        return Page<EmployeeView>.FromProbe(
+            rows,
+            request.Limit,
+            row => new EmployeeView(EmployeeIdentifier.From(row.EmployeeId), row.DisplayName),
+            row => new EmployeeSearchCursor(row.Similarity, row.DisplayName, row.EmployeeId));
     }
 }
 
