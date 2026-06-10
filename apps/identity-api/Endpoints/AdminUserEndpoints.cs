@@ -38,7 +38,7 @@ public static class AdminUserEndpoints
         builder.RequireAuthorization(policy => policy.RequireRole(AdministratorRole));
 
     // GET /admin/users — the account overview (identity-api.md). Administrator-only; keyset-paginated
-    // by email (ADR-0042). A bad limit or a malformed cursor is a 400 (request validation, not a
+    // by email (ADR-0044). A bad limit or a malformed cursor is a 400 (request validation, not a
     // domain rule).
     private static async Task<IResult> ListAccountsAsync(
         string? cursor,

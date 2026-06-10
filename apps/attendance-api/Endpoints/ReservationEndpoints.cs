@@ -74,7 +74,7 @@ public static class ReservationEndpoints
 
         // The company-day is bounded by room capacity and replayed from the aggregate in memory, so it
         // is one page — it adopts the page envelope for contract uniformity with nextCursor always null
-        // (ADR-0042), never keyset-paginated.
+        // (ADR-0044), never keyset-paginated.
         return result.Match(
             reservations => Results.Ok(new ReservationPage(
                 reservations.Select(reservation => new ReservationResponse(
@@ -189,7 +189,7 @@ public static class ReservationEndpoints
             page.NextCursor));
 
     // A bad limit or a malformed cursor is request validation, not a domain rule — a 400, distinct from
-    // the 422 the domain Validation errors map to via ToHttpResult (ADR-0042).
+    // the 422 the domain Validation errors map to via ToHttpResult (ADR-0044).
     private static IResult BadRequest(Error error) =>
         Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: StatusCodes.Status400BadRequest);
 
@@ -298,7 +298,7 @@ internal sealed record MyReservationResponse(
     string RoomName,
     DateOnly Date);
 
-// One keyset-paginated page per list (ADR-0042): the items in their stable sort order plus the opaque
+// One keyset-paginated page per list (ADR-0044): the items in their stable sort order plus the opaque
 // cursor that locates the next page — null when the list is exhausted. Concrete per-list records keep
 // the emitted OpenAPI schema names stable for the drift gate (ADR-0036).
 internal sealed record ReservationPage(IReadOnlyList<ReservationResponse> Items, string? NextCursor);

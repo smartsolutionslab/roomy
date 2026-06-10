@@ -28,7 +28,7 @@ export class AdminUsersPage {
   }
 
   // Loads the next page (the first when no cursor yet) and appends it, so the list grows as the
-  // administrator scrolls or activates "Load more" (ADR-0042). nextCursor === null marks the end.
+  // administrator scrolls or activates "Load more" (ADR-0044). nextCursor === null marks the end.
   protected loadMore(): void {
     if (this.loadingMore()) {
       return;

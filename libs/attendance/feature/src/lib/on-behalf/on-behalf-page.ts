@@ -69,7 +69,7 @@ export class OnBehalfPage {
     this.loadMoreEmployees();
   }
 
-  // Appends the next page of the employee directory (ADR-0042) — the picker grows as the administrator
+  // Appends the next page of the employee directory (ADR-0044) — the picker grows as the administrator
   // scrolls or activates "Load more". nextCursor === null marks the end of the directory.
   protected loadMoreEmployees(): void {
     if (this.loadingEmployees()) {
@@ -103,7 +103,7 @@ export class OnBehalfPage {
     this.loadMoreReservations();
   }
 
-  // Appends the next page of the chosen employee's reservations (ADR-0042); the upcoming/past split
+  // Appends the next page of the chosen employee's reservations (ADR-0044); the upcoming/past split
   // derives from the accumulated set. No selection ⇒ nothing to load.
   protected loadMoreReservations(): void {
     const employee = this.selectedEmployee();

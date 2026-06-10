@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 
-// Encodes a list's sort-key tuple as the opaque pagination cursor (ADR-0042): base64url of the
+// Encodes a list's sort-key tuple as the opaque pagination cursor (ADR-0044): base64url of the
 // key's JSON, so the cursor is URL-safe and the sort key stays a server detail clients cannot
 // depend on. TryDecode is total — a cursor that is not valid base64url, or whose JSON is not the
 // expected key shape, fails rather than throwing, so a tampered/stale cursor becomes a 400.
