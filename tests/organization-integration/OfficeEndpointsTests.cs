@@ -17,10 +17,6 @@ using Request = SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Request;
 using Response = SmartSolutionsLab.Roomy.Organization.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
-// Boots the organization host in-process against the real test Postgres, with the BFF token replaced by
-// the test auth scheme, to verify the office endpoints and their authorization (organization-api.md).
-// The Wolverine runtime is dropped (it would connect to RabbitMQ on start, ADR-0037), so the company the
-// seeder would create is seeded here instead, giving CreateOffice a company to create offices under.
 public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly WebApplicationFactory<OrganizationApiHost> app;
@@ -39,9 +35,6 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
 
             webHost.ConfigureTestServices(services =>
             {
-                // Keep the HTTP test free of external infra: drop the Wolverine runtime (and the company
-                // seeder, replaced by SeedCompany above), replace the Wolverine outbox with one that just
-                // saves (the drain is covered by OrganizationUnitOfWorkTests), and use the test auth scheme.
                 services.RemoveAll<IHostedService>();
                 services.RemoveAll<IIntegrationEventOutbox>();
                 services.AddScoped<IIntegrationEventOutbox, SavingOnlyOutbox>();
@@ -63,8 +56,6 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
         context.SaveChanges();
     }
 
-    // Saves the work but skips the Wolverine relay (removed with the runtime above); these tests assert
-    // the HTTP/office behaviour, while OrganizationUnitOfWorkTests covers the domain-event drain.
     private sealed class SavingOnlyOutbox : IIntegrationEventOutbox
     {
         public Task SaveAndPublishAsync(

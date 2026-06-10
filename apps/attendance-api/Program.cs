@@ -16,59 +16,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// The attendance context owns its database (ADR-0014); Aspire injects the connection string by name.
 var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
 
-builder.Services.AddAttendancePersistence(attendanceConnectionString);
-builder.Services.AddAttendanceUseCases();
-
-// Capacity comes from the local Rooms read model, fed by organization's RoomAdded (ADR-0014/0037).
-builder.Services.AddScoped<IRoomDirectory, RoomDirectory>();
-
-// The acting user resolves to their EmployeeId via the local Employees read model, fed by EmployeeHired
-// (003 US4). Used by the endpoints to authorize reserve/cancel.
-builder.Services.AddScoped<IEmployeeDirectory, EmployeeDirectory>();
-
-// Occupancy reads the local Reservations/Rooms/Offices/Employees read models for the view (004 US6,
-// ADR-0038) — no cross-service join.
-builder.Services.AddScoped<IOccupancyReadModel, OccupancyReadModel>();
-
-// "My reservations" reads the caller's rows from the local Reservations read model (004 US9).
-builder.Services.AddScoped<IMyReservationsReadModel, MyReservationsReadModel>();
-
-// The reserve picker's bookable catalogue reads the local Offices/Rooms read models (007 US1) — no
-// cross-service join.
-builder.Services.AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>();
-
-// The administrator on-behalf picker lists employees from the local Employees read model (009) — no
-// cross-service join.
-builder.Services.AddScoped<IEmployeeCatalog, EmployeeCatalog>();
-
-// Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
-builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
-
-// Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
-// HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher
-// disposing it first; it is scoped to the emit so normal startup is unaffected. The document is built
-// from endpoint metadata alone, so during an emit the messaging runtime — the only startup that opens a
-// broker/database connection — is skipped, letting the spec emit with no Postgres or RabbitMQ.
+builder.Services.AddAttendancePersistence(attendanceConnectionString)
+    .AddAttendanceUseCases()
+    .AddScoped<IRoomDirectory, RoomDirectory>()
+    .AddScoped<IEmployeeDirectory, EmployeeDirectory>()
+    .AddScoped<IOccupancyReadModel, OccupancyReadModel>()
+    .AddScoped<IMyReservationsReadModel, MyReservationsReadModel>()
+    .AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>()
+    .AddScoped<IEmployeeCatalog, EmployeeCatalog>()
+    .AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+
 if (emittingOpenApiDocument)
 {
     JasperFxEnvironment.AutoStartHost = true;
 }
 
-// The messaging runtime is the only startup that opens a RabbitMQ connection. It is skipped during the
-// OpenAPI emit (no broker available) and can be turned off via `Messaging:Enabled=false` for in-process
-// endpoint tests, which seed the read models directly and never exercise the inbox — so the host boots
-// without waiting on (and timing out against) a broker that is not there.
 var messagingEnabled = builder.Configuration.GetValue("Messaging:Enabled", true);
 
-// Wolverine's durable transactional inbox over the attendance database, RabbitMQ transport
-// (ADR-0005/0015). It consumes organization's RoomAdded (the RoomAddedConsumer in the infrastructure
-// assembly) into the Rooms read model; the inbox shares the attendance database so the projection and
-// the dedup commit together. No outbound integration events this slice (occupancy folds the stream
-// locally, 004).
 if (!emittingOpenApiDocument && messagingEnabled)
 {
     builder.AddRoomyMessaging(
@@ -82,17 +49,12 @@ if (!emittingOpenApiDocument && messagingEnabled)
         typeof(RoomAddedConsumer).Assembly);
 }
 
-// Single-tenant v1 (ADR-0011): the company that owns every AttendanceDay (ADR-0026) is configured.
 var attendance = builder.Configuration.GetSection(AttendanceApiOptions.SectionName);
 builder.Services.AddSingleton(new AttendanceApiOptions
 {
     CompanyId = Guid.Parse(attendance["CompanyId"] ?? throw new InvalidOperationException("Missing configuration 'Attendance:CompanyId'."))
 });
 
-// The attendance API is internal — reached only through the BFF, which forwards the Keycloak access
-// token (ADR-0013). Validate it as a JWT bearer against the realm; the audience is not validated (the
-// gateway gates access, and a Keycloak token's audience varies by client), but the issuer/realm must
-// match. The BFF owns login/session.
 var keycloak = builder.Configuration.GetSection("Keycloak");
 var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
     ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
@@ -104,17 +66,15 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication()
+    .UseAuthorization();
 
-app.MapReservationEndpoints();
-app.MapOccupancyEndpoints();
-app.MapRoomCatalogueEndpoints();
+app.MapReservationEndpoints()
+    .MapOccupancyEndpoints()
+    .MapRoomCatalogueEndpoints();
 
 // Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
 // route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.
 app.MapOpenApi();
 
-// RunJasperFxCommands so the Wolverine code-generation commands are available (ADR-0034): the host runs
-// from committed, pre-generated code (TypeLoadMode.Static). With no arguments it just runs the host.
 return await app.RunJasperFxCommands(args);

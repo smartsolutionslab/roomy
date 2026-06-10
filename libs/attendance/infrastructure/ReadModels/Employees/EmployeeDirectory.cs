@@ -6,10 +6,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 
-// The IEmployeeDirectory adapter over the Employees read model (003 US4): it resolves the acting user
-// (the token sub) to their EmployeeId from attendance's local mirror, fed by EmployeeHired
-// (ADR-0014/0031), never by a cross-service join. A user whose EmployeeHired has not arrived is
-// unknown_employee.
 public sealed class EmployeeDirectory(AttendanceDbContext context) : IEmployeeDirectory
 {
     public async Task<Result<EmployeeIdentifier>> FindByUserAsync(

@@ -4,10 +4,6 @@ using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadMod
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 
-// The occupancy projection (ADR-0038): a total mapping from the AttendanceDay stream events to rows of
-// the Reservations read model, staged on the shared AttendanceDbContext so the event append's
-// SaveChanges commits them in one transaction. ReservationPlaced inserts a row; ReservationCancelled
-// removes it. It performs no SaveChanges of its own and ignores every other event type.
 public sealed class ReservationProjection(AttendanceDbContext context) : IReservationProjection
 {
     public async Task ApplyAsync(IReadOnlyList<object> events, CancellationToken cancellationToken)

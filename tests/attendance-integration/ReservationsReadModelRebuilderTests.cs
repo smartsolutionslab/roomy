@@ -5,11 +5,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The Reservations read model is a derived cache with no invariants (ADR-0026/0038, research R5): inline
-// projection only moves it forward, so a projector fix or recovery needs a rebuild that re-derives it from
-// the source of truth — the company-day event streams. This pins that the rebuild is a pure function of
-// the log: after truncating and replaying every stream, the read model is identical to the one the inline
-// forward projection produced. Runs against real PostgreSQL (the streams + the read model).
 public sealed class ReservationsReadModelRebuilderTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {
@@ -21,8 +16,6 @@ public sealed class ReservationsReadModelRebuilderTests(PostgresEventStoreFixtur
     [Fact]
     public async Task Rebuild_reproduces_the_forward_projected_read_model()
     {
-        // Seed several company-day streams via the write path (inline forward projection), including a
-        // cancellation so the net read-model state is non-trivial and spans more than one stream.
         var company = CompanyIdentifier.New();
         var room = SomeRoom();
         await ReserveAsync(company, EmployeeIdentifier.New(), room);

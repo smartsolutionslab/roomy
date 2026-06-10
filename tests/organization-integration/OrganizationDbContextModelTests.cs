@@ -5,9 +5,6 @@ using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
-// Container-free validation of the EF Core model. Accessing Model forces OnModelCreating, which throws
-// if any value converter or the owned Room mapping is misconfigured — so this catches mapping mistakes
-// without a database. The live round-trip against real PostgreSQL lands with the host slice (T012).
 public sealed class OrganizationDbContextModelTests
 {
     private static OrganizationDbContext BuildContext()

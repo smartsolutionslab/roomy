@@ -2,8 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// A room's capacity: a positive whole number of places, at least 1 (FR-007), fixed at creation in the
-// MVP. The implicit int conversion keeps the EF Core value converter trivial.
 public readonly record struct Capacity : IValueObject
 {
     public int Value { get; private init; }

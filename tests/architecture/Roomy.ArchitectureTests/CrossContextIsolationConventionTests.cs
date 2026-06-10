@@ -3,17 +3,6 @@ using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
-/// <summary>
-/// FORWARD-LOOKING (convention-based, dormant until context projects exist). Encodes context
-/// isolation (ADR-0003 / constitution Principle III): a bounded context must not reference
-/// another context's types — cross-context communication is by ID and integration events only.
-/// </summary>
-/// <remarks>
-/// HONESTY NOTE: the three contexts (<c>identity</c>, <c>organization</c>, <c>attendance</c>)
-/// do not exist as assemblies yet, so this rule currently inspects zero context types and is
-/// dormant. It activates automatically once the context assemblies are added — for each known
-/// context it forbids any dependency on the others' namespaces.
-/// </remarks>
 public sealed class CrossContextIsolationConventionTests
 {
     private static readonly string[] contexts = ["Identity", "Organization", "Attendance"];
@@ -53,7 +42,6 @@ public sealed class CrossContextIsolationConventionTests
 
         if (inspectedContextTypes == 0)
         {
-            // DORMANT: no context assemblies present yet; rule is wired for when they arrive.
             inspectedContextTypes.ShouldBe(
                 0,
                 "Forward-looking cross-context isolation rule is dormant: 0 context types found "

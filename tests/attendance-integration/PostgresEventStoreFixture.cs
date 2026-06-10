@@ -23,17 +23,12 @@ public sealed class PostgresEventStoreFixture : BasePostgresFixture<Projects.Roo
         await context.Database.MigrateAsync(cancellationToken);
     }
 
-    // A fresh repository over its own DbContext + event store + occupancy projection, as the app resolves it
-    // per request; the projection and event store share the one context so the read-model rows and the events
-    // commit in a single transaction (ADR-0038).
     public AttendanceDayRepository CreateRepository()
     {
         var context = CreateDbContext();
         return new(CreateEventStore(context), new ReservationProjection(context), context);
     }
 
-    // The offline read-model rebuilder, wired like the repository (one shared context so the truncate, replay,
-    // and save commit together).
     public ReservationsReadModelRebuilder CreateRebuilder()
     {
         var context = CreateDbContext();

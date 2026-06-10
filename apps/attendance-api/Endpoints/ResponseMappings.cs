@@ -15,9 +15,6 @@ internal static class ResponseMappings
                 reservation.Employee.Value);
     }
 
-    // The company-day is bounded by room capacity and replayed from the aggregate in memory, so it is
-    // one page — it adopts the page envelope for contract uniformity with nextCursor always null
-    // (ADR-0044), never keyset-paginated.
     extension(IReadOnlyList<ReservationView> reservations)
     {
         public Response.Page.Reservation ToResponse() =>

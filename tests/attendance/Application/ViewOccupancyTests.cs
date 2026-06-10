@@ -9,10 +9,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
-// The occupancy view use case: compose per-room figures and the office rollup from the read model's raw
-// data, mark full rooms/offices, and apply the data-minimisation policy — names only for today and the
-// following day (FR-007). Driven against a stub read model and a fixed clock so "today" is pinned and no
-// infrastructure is involved; the SQL itself is covered by the read-model integration tests.
 public class ViewOccupancyTests
 {
     private static readonly DateOnly today = new(2026, 6, 8);
@@ -109,7 +105,6 @@ public class ViewOccupancyTests
         Room(days, today).Occupants.ShouldNotBeNull();
         Room(days, today.AddDays(1)).Occupants.ShouldNotBeNull();
 
-        // Three days out: the count is still reported, but the names are withheld (data minimisation).
         var laterDay = Room(days, today.AddDays(3));
         laterDay.Occupied.ShouldBe(1);
         laterDay.Occupants.ShouldBeNull();
@@ -132,7 +127,6 @@ public class ViewOccupancyTests
         Room(days, today.AddDays(-1)).Occupied.ShouldBe(0);
         Room(days, today).Occupied.ShouldBe(2);
 
-        // A past day is read-only history: its figure is shown, but names are withheld.
         Room(days, today.AddDays(-2)).Occupants.ShouldBeNull();
     }
 

@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// An office of the seeded company: a name, a location and the rooms it contains. The aggregate root
-// is the consistency boundary for its rooms — it owns room creation/renaming, enforces room-name
-// uniqueness within itself, and derives its capacity as the sum of its rooms (FR-008).
 public sealed class Office : Aggregate
 {
     private readonly List<Room> rooms = [];
@@ -65,7 +62,6 @@ public sealed class Office : Aggregate
         return Result.Success();
     }
 
-    // A room name must be unique within the office — but the room being renamed never collides with itself.
     private bool IsRoomNameTakenByAnother(RoomIdentifier roomIdentifier, RoomName name) =>
         rooms.Any(candidate => candidate.Identifier != roomIdentifier && candidate.Name == name);
 }

@@ -11,11 +11,6 @@ using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadMod
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The occupancy read-model adapter against real PostgreSQL (004 US6, ADR-0038): it reads the rooms in
-// scope from the Rooms read model and the live reservations from the Reservations projection, naming the
-// office from Offices and occupants from Employees — all attendance's own read models. The figures
-// themselves are the handler's job (unit-tested); here we prove the SQL returns the right rooms and
-// occupant rows, and that an unknown office/room is reported as such.
 public sealed class OccupancyReadModelTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {

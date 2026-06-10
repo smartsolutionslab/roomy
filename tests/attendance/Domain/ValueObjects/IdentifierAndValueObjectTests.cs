@@ -3,9 +3,6 @@ using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Domain.ValueObjects;
 
-// The attendance context's branded identifiers and small value objects (no primitive obsession,
-// CLAUDE.md / data-model.md). Identifiers are GUIDv7, non-empty, with implicit Guid conversions
-// for EF; the others carry their own invariants.
 public class IdentifierAndValueObjectTests
 {
     [Fact]

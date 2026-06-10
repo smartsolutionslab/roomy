@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-// The identity of a Reservation: a branded, time-ordered GUIDv7 minted with New() when a place is
-// reserved, or From()/TryParse() when replaying the stream. The implicit conversions keep the EF Core
-// value converter trivial.
 public readonly record struct ReservationIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

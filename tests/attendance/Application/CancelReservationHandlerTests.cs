@@ -8,10 +8,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
-// The cancel use case: load the company-day, cancel, save — inside the same bounded optimistic-retry
-// as reserve (a concurrent write to the day reloads and re-decides). A domain rejection (not found,
-// past, not owner) returns at once. The day is located by (company, date) from the command — the
-// reservation id alone can't address the stream (D: date carried in the request).
 public class CancelReservationHandlerTests
 {
     private static readonly DateOnly mondayDate = BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1));

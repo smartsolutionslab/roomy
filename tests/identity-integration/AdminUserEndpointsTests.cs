@@ -16,11 +16,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// Boots the identity host in-process against real Postgres to verify the admin account surface
-// (identity-api.md): listing and reading accounts and the grant-administrator elevation, all
-// administrator-only (FR-007). The external infra is removed (no Wolverine, no seeder), the BFF token
-// is the test auth scheme, and the Keycloak provider is a recording stub — the real Keycloak round-trip
-// is the deferred e2e.
 public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly PostgresDatabaseFixture fixture;
@@ -32,21 +27,21 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         this.fixture = fixture;
         app = new WebApplicationFactory<IdentityApiHost>().WithWebHostBuilder(webHost =>
         {
-            webHost.UseSetting("ConnectionStrings:identity", fixture.ConnectionString);
-            webHost.UseSetting("ConnectionStrings:rabbitmq", "amqp://guest:guest@localhost:5672");
-            webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
-            webHost.UseSetting("Keycloak:AdminUsername", "admin");
-            webHost.UseSetting("Keycloak:AdminPassword", "admin");
-            webHost.UseSetting("DefaultAdmin:Email", "default-admin@roomy.test");
-            webHost.UseSetting("DefaultAdmin:DisplayName", "Default Admin");
-            webHost.UseSetting("DefaultAdmin:InitialPassword", "default-admin-password");
+            webHost.UseSetting("ConnectionStrings:identity", fixture.ConnectionString)
+                .UseSetting("ConnectionStrings:rabbitmq", "amqp://guest:guest@localhost:5672")
+                .UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost")
+                .UseSetting("Keycloak:AdminUsername", "admin")
+                .UseSetting("Keycloak:AdminPassword", "admin")
+                .UseSetting("DefaultAdmin:Email", "default-admin@roomy.test")
+                .UseSetting("DefaultAdmin:DisplayName", "Default Admin")
+                .UseSetting("DefaultAdmin:InitialPassword", "default-admin-password");
 
             webHost.ConfigureTestServices(services =>
             {
-                services.RemoveAll<IHostedService>();
-                services.RemoveAll<IIdentityProviderPort>();
-                services.AddSingleton<IIdentityProviderPort>(identityProvider);
-                services.AddAuthentication(TestAuthHandler.SchemeName)
+                services.RemoveAll<IHostedService>()
+                    .RemoveAll<IIdentityProviderPort>()
+                    .AddSingleton<IIdentityProviderPort>(identityProvider)
+                    .AddAuthentication(TestAuthHandler.SchemeName)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             });
         });
@@ -55,7 +50,9 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     private async Task<User> SeedUserAsync(Role role)
     {
         var user = User.Register(
-            Email.From($"admin-ep-{Guid.NewGuid():N}@example.com"), DisplayName.From("Test User"), role);
+            Email.From($"admin-ep-{Guid.NewGuid():N}@example.com"),
+            DisplayName.From("Test User"),
+            role);
         user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
 
         await using var context = fixture.CreateContext();
@@ -66,7 +63,10 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
 
     private async Task<User> SeedUserWithEmailAsync(string email)
     {
-        var user = User.Register(Email.From(email), DisplayName.From("Test User"), Role.Employee);
+        var user = User.Register(
+            Email.From(email),
+            DisplayName.From("Test User"),
+            Role.Employee);
         user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
 
         await using var context = fixture.CreateContext();
@@ -126,8 +126,6 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
                 : $"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}";
             var page = await client.GetFromJsonAsync<Response.Page.AdminUser>(url, TestContext.Current.CancellationToken);
             page.ShouldNotBeNull();
-            // Every page but the last is full — a page is short only when the list is exhausted, even
-            // though other tests' rows interleave with the seeded ones.
             if (page.NextCursor is not null)
             {
                 page.Items.Count.ShouldBe(2);
@@ -139,9 +137,6 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         }
         while (cursor is not null && pageCount < 1000);
 
-        // Walking to a null cursor with no duplicates and every page full (bar the last) is exactly the
-        // keyset guarantee — the server's text collation defines the order, so we assert structure, not
-        // a client-side ordinal sort.
         cursor.ShouldBeNull();
         collected.Select(user => user.UserId).ShouldBeUnique();
         foreach (var user in seeded)
@@ -165,9 +160,6 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         firstPage.NextCursor.ShouldNotBeNull();
         var firstPageIds = firstPage.Items.Select(user => user.UserId).ToList();
 
-        // Insert an account that sorts before the cursor (a "zzz" email would sort after; "aaa" sorts
-        // before the first page's last email). Keyset (WHERE email > cursor) must neither re-surface a
-        // first-page row nor return this already-passed insert — offset paging would shift and do both.
         var inserted = await SeedUserWithEmailAsync($"aaa-{Guid.NewGuid():N}@example.com");
 
         var remaining = new List<Response.AdminUser>();
@@ -303,12 +295,13 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         public List<KeycloakSubjectIdentifier> AssignedSubjects { get; } = [];
 
         public Task<Result<KeycloakSubjectIdentifier>> ProvisionUserAsync(
-            Email email, DisplayName displayName, string initialPassword, Role role,
+            Email email,
+            DisplayName displayName,
+            string initialPassword, Role role,
             CancellationToken cancellationToken) =>
             throw new NotSupportedException("The admin surface does not provision accounts.");
 
-        public Task<Result> AssignAdministratorRoleAsync(
-            KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
+        public Task<Result> AssignAdministratorRoleAsync(KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
         {
             AssignedSubjects.Add(subject);
             return Task.FromResult(Result.Success());

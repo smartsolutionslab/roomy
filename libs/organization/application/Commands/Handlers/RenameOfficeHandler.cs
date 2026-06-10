@@ -15,7 +15,6 @@ public sealed class RenameOfficeHandler(IOfficeRepository offices, IUnitOfWork u
 
         var office = lookup.Value;
 
-        // A no-op rename to the same name is allowed; a clash with another office in the company is not.
         if (command.Name != office.Name && await offices.ExistsByNameAsync(office.CompanyIdentifier, name, cancellationToken))
         {
             return Error.Conflict("office.name_taken", $"An office named '{name}' already exists.");

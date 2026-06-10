@@ -8,12 +8,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 
-// The IMyReservationsReadModel adapter (004 US9, ADR-0038): it reads the employee's rows from the
-// Reservations projection, joined to the local Offices/Rooms read models for their names — all
-// attendance's own read models, never a cross-service join (ADR-0014). Keyset-paginated by day
-// (ADR-0044): the one-reservation-per-employee-per-day invariant makes the day a unique total order,
-// so the cursor is the day alone — a plain `date > @cursor` that the (employee_id, date) index serves.
-// Office/room names default to empty if their feed has not arrived.
 public sealed class MyReservationsReadModel(AttendanceDbContext context) : IMyReservationsReadModel
 {
     public async Task<Result<Page<MyReservationView>>> GetAsync(

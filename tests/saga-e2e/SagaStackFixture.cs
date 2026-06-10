@@ -11,12 +11,6 @@ using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
 namespace SmartSolutionsLab.Roomy.Saga.E2ETests;
 
-// Boots the full provisioning-saga stack once for the test class (ADR-0025): Postgres, RabbitMQ, real
-// Keycloak (production realm import), the schema runner, and both saga participants (identity-api,
-// organization-api). It enables direct-access grants on the roomy-bff client at runtime so a test can
-// mint a real user token, and exposes helpers to call organization-api, acquire tokens, and poll an
-// employee's provisioning state from organization's own database. Requires Docker; first run is slow
-// (Keycloak import + migrations + two hosts).
 public sealed class SagaStackFixture : IAsyncLifetime
 {
     private const string Realm = "roomy";
@@ -40,16 +34,11 @@ public sealed class SagaStackFixture : IAsyncLifetime
         application = await builder.BuildAsync();
         await application.StartAsync();
 
-        // Keycloak import + migrations + two hosts; allow generously.
         using var readiness = new CancellationTokenSource(TimeSpan.FromMinutes(8));
         var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
         await notifications.WaitForResourceHealthyAsync("organization-api", readiness.Token);
         await notifications.WaitForResourceHealthyAsync("identity-api", readiness.Token);
 
-        // A host reports healthy before its Wolverine runtime has finished binding its RabbitMQ listener
-        // queues. Publishing before the consumer's queue exists drops the message (the durable outbox
-        // considers it sent once the broker accepts the publish to the exchange). Production runs both
-        // services continuously, so this only bites at cold start — settle so both sides' listeners bind.
         await Task.Delay(TimeSpan.FromSeconds(30), readiness.Token);
 
         Organization = new HttpClient { BaseAddress = Endpoint("organization-api") };
@@ -60,16 +49,11 @@ public sealed class SagaStackFixture : IAsyncLifetime
         await EnableDirectAccessGrantsAsync(readiness.Token);
     }
 
-    // A bearer token for a user via the BFF client's direct grant (enabled for the test). The DefaultAdmin
-    // is seeded asynchronously at identity startup, so acquiring its token is retried until it appears.
     public async Task<string> AcquireUserTokenAsync(string username, string password, CancellationToken cancellationToken)
     {
         var lastError = "(none)";
         for (var attempt = 1; ; attempt++)
         {
-            // The user is provisioned asynchronously and inherits the realm's default required actions,
-            // which block the direct-grant flow (production login uses the browser flow); clear them once
-            // the user exists, then the grant succeeds.
             await ClearRequiredActionsAsync(username, cancellationToken);
             var (token, error) = await RequestUserTokenAsync(username, password, cancellationToken);
             if (token is not null)
@@ -94,9 +78,6 @@ public sealed class SagaStackFixture : IAsyncLifetime
         return (await RequestUserTokenAsync(username, password, cancellationToken)).Token is not null;
     }
 
-    // Polls organization's own database for the employee's provisioning state until it reaches a terminal
-    // state (Active/Failed) or the timeout — the saga converges asynchronously (FR-004). On timeout it
-    // reports whether identity provisioned the Keycloak account, to localize a stalled round-trip.
     public async Task<Employee> WaitForTerminalStateAsync(Guid employeeId, string email, CancellationToken cancellationToken)
     {
         var deadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromMinutes(2);
@@ -166,11 +147,6 @@ public sealed class SagaStackFixture : IAsyncLifetime
         return (payload?["access_token"]?.GetValue<string>(), body);
     }
 
-    // Completes a provisioned user so the test's direct-grant login is not blocked by "Account is not
-    // fully set up": clears required actions, marks the email verified, and supplies a lastName (Keycloak
-    // 26's declarative user profile requires it, and the provider only sets firstName). Best-effort; a
-    // no-op if the user does not exist yet. This compensates for the browser-flow profile completion that
-    // production login would otherwise handle.
     private async Task ClearRequiredActionsAsync(string username, CancellationToken cancellationToken)
     {
         var adminToken = await AcquireMasterAdminTokenAsync(cancellationToken);

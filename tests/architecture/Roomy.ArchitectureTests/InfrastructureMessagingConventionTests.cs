@@ -43,10 +43,6 @@ public sealed class InfrastructureMessagingConventionTests
     [Fact]
     public void InfrastructureMessaging_is_allowed_to_depend_on_wolverine()
     {
-        // Documents the infra-vs-core distinction: this is the one place a dependency on Wolverine is
-        // legitimate (the deferred messaging adapter, ADR-0005). The assertion confirms the adapter
-        // actually uses Wolverine, so the allowance is real, and that no core rule has been mis-scoped
-        // to forbid it here.
         var dependsOnWolverine = Types.InAssembly(ArchitectureConventions.InfrastructureMessagingAssembly)
             .That()
             .HaveDependencyOn("Wolverine")

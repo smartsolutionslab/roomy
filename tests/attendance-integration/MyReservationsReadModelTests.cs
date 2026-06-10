@@ -9,9 +9,6 @@ using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadMod
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The "my reservations" read-model adapter against real PostgreSQL (004 US9): it returns the caller's
-// reservations — past and future — ordered by day, named from the local Offices/Rooms read models, and
-// excludes other employees' reservations. Another employee's rows must never appear.
 public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {

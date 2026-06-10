@@ -7,11 +7,6 @@ using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 
-// The attendance context's database (ADR-0014, owned per context). It is event-sourced (ADR-0026), so
-// it derives EventStoreDbContext for the append-only events table, and adds the read models: Rooms from
-// organization's RoomAdded (003 US2, capacity) and Offices from OfficeOpened (004, rollup naming);
-// Employees from EmployeeHired (003 US4 + 004 display name); and Reservations, the occupancy projection
-// target maintained inline with the event append (ADR-0038).
 public sealed class AttendanceDbContext(DbContextOptions<AttendanceDbContext> options)
     : EventStoreDbContext(options)
 {

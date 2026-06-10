@@ -9,9 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Authentication;
 
-// Wires the BFF security pattern (ADR-0013): a session cookie for the browser and a
-// server-side OpenID Connect auth-code flow (with PKCE) against Keycloak. Tokens are kept
-// in the encrypted server-side session (SaveTokens) and never handed to the SPA.
 public static class BffAuthenticationExtensions
 {
     public const string CookieScheme = "RoomyBff";
@@ -38,18 +35,11 @@ public static class BffAuthenticationExtensions
             .AddCookie(CookieScheme, ConfigureCookie)
             .AddOpenIdConnect(OidcScheme, ConfigureOpenIdConnect);
 
-        // Apply the Keycloak client settings to the OIDC handler at configuration time. The
-        // handler validates its options (ClientId and Authority are required) the first time it
-        // is initialized for a request, so they must be set before validation runs — not lazily
-        // in a request event, which fires too late and makes every request fail validation.
         services.AddOptions<OpenIdConnectOptions>(OidcScheme)
             .Configure<IOptions<KeycloakOidcOptions>>(ApplyKeycloakOptions);
 
-        // Back-channel client the cookie validation uses to refresh the access token against Keycloak.
         services.AddHttpClient(BffTokenRefresher.HttpClientName);
 
-        // Keep the auth ticket (which carries the tokens) server-side so the cookie stays small — see
-        // MemoryTicketStore for why a fat cookie breaks the Keycloak login on a shared-localhost dev host.
         services.AddMemoryCache();
         services.AddSingleton<ITicketStore, MemoryTicketStore>();
         services.AddOptions<CookieAuthenticationOptions>(CookieScheme)
@@ -62,21 +52,14 @@ public static class BffAuthenticationExtensions
 
     private static void ConfigureCookie(CookieAuthenticationOptions options)
     {
-        // The only artefact the browser ever holds: an HTTP-only, Secure, SameSite session
-        // cookie. No access or refresh token is exposed to client-side script (ADR-0013).
         options.Cookie.Name = "__Host-roomy.bff";
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.SlidingExpiration = true;
 
-        // The cookie session outlives Keycloak's short access token, so refresh it from the stored
-        // refresh token whenever it is at/near expiry — otherwise the proxy forwards an expired token
-        // and the APIs reject it (IDX10223). See BffTokenRefresher.
         options.Events.OnValidatePrincipal = BffTokenRefresher.ValidateOrRefreshAsync;
 
-        // The SPA owns navigation: API calls answer 401/403 rather than redirecting to the
-        // identity provider, so an XHR never follows a login redirect.
         options.Events.OnRedirectToLogin = context => ReplyWithStatus(context, StatusCodes.Status401Unauthorized);
         options.Events.OnRedirectToAccessDenied = context => ReplyWithStatus(context, StatusCodes.Status403Forbidden);
     }
@@ -88,8 +71,6 @@ public static class BffAuthenticationExtensions
         options.ResponseType = OpenIdConnectResponseType.Code;
         options.UsePkce = true;
 
-        // Keep the tokens server-side in the session so the BFF can attach the access token
-        // to downstream context-API calls, while the browser only ever sees the cookie.
         options.SaveTokens = true;
         options.GetClaimsFromUserInfoEndpoint = true;
         options.MapInboundClaims = false;

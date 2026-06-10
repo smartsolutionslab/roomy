@@ -8,14 +8,6 @@ using Wolverine;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging.Tests;
 
-/// <summary>
-/// Verifies the composition-root wiring (ADR-0005, ADR-0015): the owned
-/// <see cref="IIntegrationEventPublisher"/> port is bound to its Wolverine-backed implementation and
-/// the transport-selection seam behaves per ADR-0015 — RabbitMQ wires, the planned transports throw
-/// until they are implemented. Wolverine's configure runs eagerly during <c>UseWolverine</c>, so the
-/// seam is exercised here without starting the host or connecting to a broker (which the Docker-less
-/// CI cannot do; a live round-trip is deferred to #68).
-/// </summary>
 public sealed class MessagingServiceCollectionExtensionsTests
 {
     private const string PostgresConnectionString = "Host=localhost;Database=roomy;Username=roomy;Password=roomy";
@@ -87,8 +79,7 @@ public sealed class MessagingServiceCollectionExtensionsTests
     [Fact]
     public void AddRoomyMessaging_rejects_a_null_builder()
     {
-        Should.Throw<ArgumentNullException>(
-            () => MessagingServiceCollectionExtensions.AddRoomyMessaging(null!, RabbitOptions()));
+        Should.Throw<ArgumentNullException>(() => MessagingServiceCollectionExtensions.AddRoomyMessaging(null!, RabbitOptions()));
     }
 
     [Fact]

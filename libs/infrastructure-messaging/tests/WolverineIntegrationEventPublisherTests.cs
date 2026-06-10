@@ -1,18 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shouldly;
-using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using Wolverine;
 using Wolverine.Tracking;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging.Tests;
 
-/// <summary>
-/// Verifies the owned <see cref="IIntegrationEventPublisher"/> port maps onto Wolverine's bus
-/// (ADR-0005) using Wolverine's in-memory test harness — no live broker or Postgres outbox, which
-/// the Docker-less CI cannot provide. The real RabbitMQ + durable-outbox round-trip is deferred to a
-/// Testcontainers test (#68).
-/// </summary>
 public sealed class WolverineIntegrationEventPublisherTests
 {
     private static async Task<IHost> StartHostAsync() =>
@@ -21,9 +14,6 @@ public sealed class WolverineIntegrationEventPublisherTests
             {
                 opts.Discovery.DisableConventionalDiscovery();
 
-                // Route the test event to an in-memory queue so the publish has a destination without
-                // a live broker — the assertion is that the owned port forwards to Wolverine's bus,
-                // not that a real transport delivers it (that is the deferred #68 round-trip).
                 opts.PublishMessage<TestIntegrationEvent>().ToLocalQueue("test-integration-events");
             })
             .StartAsync();
@@ -48,8 +38,7 @@ public sealed class WolverineIntegrationEventPublisherTests
         using var host = await StartHostAsync();
         var publisher = new WolverineIntegrationEventPublisher(host.Services.GetRequiredService<IMessageBus>());
 
-        await Should.ThrowAsync<ArgumentNullException>(
-            () => publisher.PublishAsync(null!, CancellationToken.None));
+        await Should.ThrowAsync<ArgumentNullException>(() => publisher.PublishAsync(null!, CancellationToken.None));
     }
 
     [Fact]
@@ -60,8 +49,7 @@ public sealed class WolverineIntegrationEventPublisherTests
         using var cancelled = new CancellationTokenSource();
         await cancelled.CancelAsync();
 
-        await Should.ThrowAsync<OperationCanceledException>(
-            () => publisher.PublishAsync(new TestIntegrationEvent(Guid.NewGuid()), cancelled.Token));
+        await Should.ThrowAsync<OperationCanceledException>(() => publisher.PublishAsync(new TestIntegrationEvent(Guid.NewGuid()), cancelled.Token));
     }
 
     [Fact]

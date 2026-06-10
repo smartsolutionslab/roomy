@@ -4,8 +4,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// Persists and fetches Employee aggregates from the organization database. A fetch that may miss returns
-// Error.NotFound (never null), so the ack-handlers handle an unknown employee explicitly.
 public sealed class EmployeeRepository(OrganizationDbContext context) : IEmployeeRepository
 {
     public async Task AddAsync(Employee employee, CancellationToken cancellationToken) =>

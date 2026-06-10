@@ -5,11 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 
-// The occupancy read surface (contract: attendance-api.md, 004 US6). The service is internal — reached
-// only through the YARP BFF, which forwards the Keycloak token — but any authenticated user may view any
-// office or room (FR-005), so there is no owner/admin check. The view is read-only (FR-006); the figures
-// and the today/tomorrow name policy (FR-007) are computed by the query handler. This maps HTTP to the
-// query and the Result to a status code.
 public static class OccupancyEndpoints
 {
     private const int MaxRangeDays = 31;
@@ -27,9 +22,6 @@ public static class OccupancyEndpoints
         return endpoints;
     }
 
-    // GET /occupancy?officeId=…|roomId=…&from=YYYY-MM-DD&to=YYYY-MM-DD — per-room occupancy + office
-    // rollup for each day in the range (FR-001/002, scenarios 1–4, 7–9). Exactly one of officeId/roomId is
-    // required; the range defaults to today and is bounded; past days are allowed (FR-009).
     private static async Task<IResult> ViewAsync(
         Guid? officeId,
         Guid? roomId,
@@ -64,4 +56,3 @@ public static class OccupancyEndpoints
             error => error.ToHttpResult());
     }
 }
-

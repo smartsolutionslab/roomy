@@ -2,12 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
-/// <summary>
-/// A bidirectional, immutable map between domain event CLR types and their stable persisted names.
-/// A context registers its events once at composition; the registry then resolves either direction
-/// for the serializer. Names are explicit rather than derived from the CLR type so a later rename
-/// or namespace move does not invalidate the existing log (ADR-0012).
-/// </summary>
 public sealed class EventTypeRegistry : IEventTypeRegistry
 {
     private readonly IReadOnlyDictionary<Type, string> namesByType;
@@ -44,7 +38,6 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
         private readonly Dictionary<Type, string> namesByType = [];
         private readonly Dictionary<string, Type> typesByName = new(StringComparer.Ordinal);
 
-        /// <exception cref="ArgumentException">The type or name is already registered.</exception>
         public Builder Register<TEvent>(string persistedName)
         {
             Ensure.That(persistedName).IsNotNullOrWhiteSpace();

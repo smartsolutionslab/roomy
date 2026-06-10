@@ -1,10 +1,5 @@
 namespace Microsoft.Extensions.Configuration;
 
-// A connection string that must be present. Each context owns its database and Aspire injects it (and the
-// broker) by name (ADR-0014); a missing one is a fatal misconfiguration, not a recoverable condition.
-// Mirrors the framework's GetConnectionString but fails fast with the resource name instead of returning
-// null. The per-resource named accessors (GetAttendanceConnectionString, GetRabbitMqConnectionString, …)
-// each delegate here so the "missing" failure reads the same everywhere.
 public static class ConnectionStringConfigurationExtensions
 {
     public static string GetRequiredConnectionString(this IConfiguration configuration, string name) =>

@@ -5,10 +5,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
-// EF Core mapping for the Office aggregate. Rooms are mapped as an owned collection in their own
-// table, so they load with their office and are reached only through it (the aggregate boundary).
-// Two invariants live at the database as unique indexes: office names are unique within the company
-// (FR-010) and room names are unique within their office. The derived office capacity is not stored.
 public sealed class OfficeConfiguration : IEntityTypeConfiguration<Office>
 {
     public const string TableName = "Offices";

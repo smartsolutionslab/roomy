@@ -13,9 +13,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
-// Boots the identity host in-process against the real test Postgres, with the external infra removed
-// (no Wolverine runtime, no Keycloak seeder) and the BFF token replaced by the test auth scheme, to
-// verify the GET /account/me contract (identity-api.md).
 public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly PostgresDatabaseFixture fixture;
@@ -37,11 +34,8 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
 
             webHost.ConfigureTestServices(services =>
             {
-                // Keep the HTTP test free of external infra: drop the Wolverine runtime and the
-                // DefaultAdmin seeder (both connect on start), and authenticate via the test scheme
-                // instead of validating a real Keycloak token.
-                services.RemoveAll<IHostedService>();
-                services.AddAuthentication(TestAuthHandler.SchemeName)
+                services.RemoveAll<IHostedService>()
+                    .AddAuthentication(TestAuthHandler.SchemeName)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             });
         });

@@ -6,10 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Tests;
 
-// Stands in for an authenticated BFF session so RequireAuthorization is satisfied without a live
-// Keycloak. A request carrying the X-Test-Authenticated header is treated as signed in; without it the
-// request is anonymous. The real cookie and OIDC schemes stay registered, so logout still clears the
-// BFF session cookie and targets the OIDC sign-out handler.
 internal sealed class GatewayTestAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,

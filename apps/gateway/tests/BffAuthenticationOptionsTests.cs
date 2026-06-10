@@ -7,10 +7,6 @@ using SmartSolutionsLab.Roomy.Gateway.Authentication;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Tests;
 
-// The OIDC handler validates its options (which require ClientId/Authority) when it is first
-// initialized for a request. The Keycloak settings must therefore be applied to the handler at
-// configuration time, not lazily in a request event — otherwise validation throws on every
-// request (ArgumentNullException for ClientId), which is what these tests guard against.
 public sealed class BffAuthenticationOptionsTests
 {
     [Fact]

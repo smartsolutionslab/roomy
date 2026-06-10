@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-// The company (tenant) an attendance day belongs to — part of the AttendanceDay stream identity
-// (CompanyId + Date, ADR-0026). It references organization's Company by id only (ADR-0014): a branded
-// GUIDv7, never a bare Guid. The implicit conversions keep the EF Core value converter trivial.
 public readonly record struct CompanyIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

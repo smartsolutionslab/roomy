@@ -2,10 +2,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmartSolutionsLab.Roomy.DbMigrator;
 
-// Applies the EF migrations for every registered context (ADR-0033): for each target it resolves the
-// DbContext in its own scope and calls MigrateAsync, which creates the database if absent and applies
-// any pending migrations, and is a no-op when the schema is already current (idempotent). A failure for
-// any context propagates so the process exits non-zero and fails the orchestration's completion gate.
 public sealed class DatabaseMigrator(
     IServiceProvider services,
     IEnumerable<MigrationTarget> targets,

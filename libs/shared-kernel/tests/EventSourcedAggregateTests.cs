@@ -2,9 +2,6 @@ using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests;
 
-// The event-sourced write-model base (ADR-0039): state is the fold over a stream. A tiny Counter
-// aggregate exercises the contract — replay, raise (apply + collect), version tracking — without
-// pulling in any context or the event store.
 public class EventSourcedAggregateTests
 {
     private sealed record Incremented(int By);
@@ -49,8 +46,6 @@ public class EventSourcedAggregateTests
     [Fact]
     public void Raise_does_not_advance_the_persisted_version()
     {
-        // Version is the count the store is at — uncommitted events have not been appended yet, so
-        // it is what the repository asserts as the expected version on save (optimistic concurrency).
         var counter = new Counter();
 
         counter.Add(5);

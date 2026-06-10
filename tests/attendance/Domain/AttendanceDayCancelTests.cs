@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Domain;
 
-// Cancelling a reservation (FR-008/009, scenarios 8–11). Cancel frees the place (a full room becomes
-// bookable again), refuses a past day (the past is immutable), and is allowed only for the owner or an
-// administrator. Like Reserve, the aggregate is handed "today" and the timestamp — no clock.
 public class AttendanceDayCancelTests
 {
     private static readonly BookingDate today = BookingDate.From(BookingDates.FirstMondayOnOrAfter(new DateOnly(2026, 6, 1)));
@@ -29,7 +26,6 @@ public class AttendanceDayCancelTests
     [Fact]
     public void A_cancelled_place_can_be_reserved_again()
     {
-        // Scenario 9 — a full (capacity-1) room frees up when its reservation is cancelled.
         var (day, reservationId, owner, room) = DayWithReservation(today);
         day.Cancel(reservationId, owner, actorIsAdmin: false, today, occurredAt);
 
@@ -41,7 +37,6 @@ public class AttendanceDayCancelTests
     [Fact]
     public void Reserving_and_cancelling_on_the_same_day_is_allowed()
     {
-        // Edge case — a same-day reserve then cancel.
         var day = AttendanceDay.For(company, today);
         var employee = EmployeeIdentifier.New();
         var placed = day.Reserve(employee, SomeRoom(), RoomCapacity.From(8), today, occurredAt);
@@ -55,7 +50,6 @@ public class AttendanceDayCancelTests
     [Fact]
     public void Cancelling_a_past_day_is_rejected()
     {
-        // FR-009 — the past is immutable. The reservation sits on a day before "today".
         var pastDay = BookingDate.From(today.Value.AddDays(-3));
         var (day, reservationId, owner, _) = DayWithReservation(pastDay);
 
@@ -80,7 +74,6 @@ public class AttendanceDayCancelTests
     [Fact]
     public void A_non_owner_cannot_cancel_anothers_reservation()
     {
-        // FR-012 (scenario 11) — an employee may not cancel another's reservation.
         var (day, reservationId, _, _) = DayWithReservation(today);
 
         var result = day.Cancel(reservationId, EmployeeIdentifier.New(), actorIsAdmin: false, today, occurredAt);
@@ -93,7 +86,6 @@ public class AttendanceDayCancelTests
     [Fact]
     public void An_administrator_can_cancel_on_behalf_of_anyone()
     {
-        // Scenario 10 — an administrator acts on behalf of an employee.
         var (day, reservationId, _, _) = DayWithReservation(today);
 
         var result = day.Cancel(reservationId, EmployeeIdentifier.New(), actorIsAdmin: true, today, occurredAt);

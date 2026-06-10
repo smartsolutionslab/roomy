@@ -16,10 +16,6 @@ using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 
-// Boots the organization host in-process against the real test Postgres, with the BFF token replaced by
-// the test auth scheme, to verify the POST /employees contract and its authorization (organization-api.md,
-// 008). The Wolverine runtime is dropped (it would connect to RabbitMQ), and the outbox is replaced with
-// one that just saves — the publish/round-trip is covered by the drain and saga integration tests.
 public sealed class EmployeeEndpointsTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly WebApplicationFactory<OrganizationApiHost> app;

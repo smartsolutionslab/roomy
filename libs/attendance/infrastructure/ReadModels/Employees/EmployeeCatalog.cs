@@ -9,14 +9,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 
-// The IEmployeeCatalog adapter (009, 012): lists/searches the employees from attendance's local Employees
-// read model — its own read model fed by EmployeeHired (ADR-0014/0031), never a cross-context join. A blank
-// term keeps the existing (display_name, employee_id) keyset (ADR-0044). A non-blank term searches by pg_trgm
-// word-similarity over the accent-folded trigram index and ranks most-similar first, paging on the
-// (word_similarity DESC, display_name, employee_id) keyset (ADR-0047) — a new opaque cursor shape under the
-// same ADR-0044 contract. The keyset predicate is a parameterized PostgreSQL row-value comparison: Npgsql does
-// not translate string.Compare, but PostgreSQL compares the `(text, uuid)` tuple natively, so each page is one
-// indexed scan.
 public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCatalog
 {
     // The word-similarity floor for the `<%` pre-filter, tuned so a single-typo fragment keeps the intended
@@ -94,9 +86,6 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             .ExecuteSqlRawAsync(setThresholdSql, cancellationToken)
             .ConfigureAwait(false);
 
-        // word_similarity is computed once in the ranked subquery and referenced by alias in the outer
-        // keyset/order — PostgreSQL flattens this simple derived table, so the `<%` pre-filter still hits
-        // the trigram GIN index. Only the outer keyset predicate differs between the first and later pages.
         var sql = after is { } cursor
             ? (FormattableString)
                 $@"SELECT * FROM (

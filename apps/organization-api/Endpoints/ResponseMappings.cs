@@ -22,8 +22,6 @@ internal static class ResponseMappings
             new(room.Identifier.Value, room.Name.Value, room.Capacity);
     }
 
-    // Hiring is eventually consistent: the response reports the recorded employee and the pre-allocated
-    // login id, with provisioning just started — never yet Active (ADR-0025).
     extension(HiredEmployee hired)
     {
         public Response.HiredEmployee ToResponse() =>

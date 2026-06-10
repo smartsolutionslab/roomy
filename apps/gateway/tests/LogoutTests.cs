@@ -4,10 +4,6 @@ using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Tests;
 
-// Pins the BFF logout contract (FR-011, spec scenario 10): logging out ends the session by clearing
-// the BFF cookie and triggers Keycloak RP-initiated end-session, so further actions require logging in
-// again. The cookie scheme cleared here must match the one AddBffAuthentication registers — signing out
-// the framework-default "Cookies" scheme would leave the real session cookie in place.
 public sealed class LogoutTests(GatewayApplicationFactory factory) : IClassFixture<GatewayApplicationFactory>
 {
     private HttpClient AuthenticatedClient()

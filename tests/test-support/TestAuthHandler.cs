@@ -6,10 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace SmartSolutionsLab.Roomy.TestSupport;
 
-// Stands in for the BFF-forwarded Keycloak token. A request carrying the X-Test-Subject header is
-// authenticated with that subject as its name identifier, and any X-Test-Roles become role claims; without
-// the subject header the request is unauthenticated, so RequireAuthorization yields 401. Lets the context
-// endpoints be tested without a live Keycloak or BFF.
 public sealed class TestAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,

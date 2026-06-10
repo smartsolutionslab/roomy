@@ -2,7 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// Uniqueness within the office is enforced by the Office aggregate (and a unique index).
 public sealed record RoomName : IValueObject
 {
     public string Value { get; }

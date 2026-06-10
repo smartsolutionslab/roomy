@@ -3,12 +3,6 @@ using Shouldly;
 
 namespace SmartSolutionsLab.Roomy.ArchitectureTests;
 
-/// <summary>
-/// ENFORCED NOW (repo-wide). MediatR is forbidden anywhere in Roomy — the application layer
-/// owns its own dispatch abstractions instead (ADR-0005, constitution Principle IV). Today
-/// this inspects every loaded Roomy assembly (currently just the shared-kernel); it grows to
-/// cover each context assembly automatically as they are added, with no edit here.
-/// </summary>
 public sealed class NoMediatRTests
 {
     [Fact]

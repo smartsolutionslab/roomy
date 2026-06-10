@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
-// The identity of a User account: a branded, time-ordered GUIDv7 so it can never be confused with
-// another identifier (no primitive obsession). Minted with New() on registration, or From()/TryParse()
-// when rehydrating. The implicit Guid conversions keep the EF Core value converter trivial.
 public readonly record struct UserIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

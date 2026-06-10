@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure;
 
-// A one-shot DEV seeding tool (run on demand, e.g. an explicit-start Aspire resource): it writes the
-// "Obex Labs" demo dataset into the three dev databases and provisions each colleague's Keycloak login.
-// It reuses each context's persistence registration + the Keycloak admin provider, like the db-migrator.
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();

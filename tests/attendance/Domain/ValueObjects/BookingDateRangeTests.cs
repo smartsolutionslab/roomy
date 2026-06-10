@@ -3,8 +3,6 @@ using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Domain.ValueObjects;
 
-// The inclusive [From, To] span the occupancy view is computed over. From must be on or before To; the
-// span enumerates every day inclusive and reports its length, both used by the occupancy query.
 public class BookingDateRangeTests
 {
     private static readonly DateOnly start = new(2026, 6, 1);

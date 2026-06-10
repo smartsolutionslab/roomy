@@ -4,9 +4,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
-// Compensates a failed provisioning (ADR-0025): load the employee and mark it Failed with the reason, so
-// no usable half-account remains (FR-007). The transition is idempotent (a re-delivered failure is a
-// no-op), so at-least-once delivery is safe (FR-008).
 public sealed class FailEmployeeProvisioningHandler(IEmployeeRepository employees, IUnitOfWork unitOfWork)
     : ICommandHandler<FailEmployeeProvisioning>
 {

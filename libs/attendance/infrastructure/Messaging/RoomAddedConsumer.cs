@@ -4,11 +4,6 @@ using SmartSolutionsLab.Roomy.Contracts.Organization;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
 
-// The messaging edge of the capacity feed (ADR-0031/0037, 003 US2): Wolverine delivers organization's
-// RoomAdded through the durable inbox and this consumer mirrors the room onto attendance's local Rooms
-// read model so the reserve flow can enforce no-overbooking against real capacity. The upsert is
-// idempotent, so an at-least-once redelivery is harmless. This is the only place RoomAdded is
-// referenced — the application layer never sees organization's published language.
 public sealed class RoomAddedConsumer(AttendanceDbContext context)
 {
     public async Task Handle(RoomAdded message, CancellationToken cancellationToken)

@@ -7,9 +7,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The employee-catalog adapter against real PostgreSQL (009): it lists the local Employees read model
-// ordered by display name for the administrator on-behalf picker, keyset-paginated by
-// (display_name, employee_id) so duplicate names still page deterministically (ADR-0044).
 public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {
@@ -34,9 +31,6 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
     [Fact]
     public async Task It_keyset_paginates_through_duplicate_names_without_skips_or_duplicates()
     {
-        // Two employees share a name and one sorts after — the (name, id) keyset must page through them
-        // deterministically. Unique names keep the assertion isolated from the shared class fixture, so
-        // a full walk filtered to these three ids exercises the tiebreaker without other rows distorting it.
         var sharedName = $"page-{Guid.NewGuid():N}";
         var laterName = $"{sharedName}-z";
         var seededIds = new HashSet<Guid> { Guid.CreateVersion7(), Guid.CreateVersion7(), Guid.CreateVersion7() };

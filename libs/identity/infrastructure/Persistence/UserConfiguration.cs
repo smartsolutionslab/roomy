@@ -5,11 +5,6 @@ using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 
 namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
 
-// EF Core mapping for the User aggregate. The value objects round-trip through their underlying
-// primitives via value converters (the identifiers reuse their implicit Guid conversions). Two
-// invariants are enforced at the database: Email is globally unique (FR-009), and a Keycloak subject
-// links to at most one account — both as unique indexes. The Keycloak subject is nullable while an
-// account is Provisioning, so its unique index admits many NULLs (one per not-yet-activated account).
 public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public const string TableName = "Users";
@@ -20,8 +15,6 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable(TableName);
 
-        // Domain events are raised state, not persisted columns (ADR-0032); they are drained by the
-        // unit of work, never mapped.
         builder.Ignore(user => user.DomainEvents);
 
         builder.HasKey(user => user.Identifier);

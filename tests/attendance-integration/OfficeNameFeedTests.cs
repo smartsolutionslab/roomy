@@ -5,10 +5,6 @@ using SmartSolutionsLab.Roomy.Contracts.Organization;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
-// The office-name feed against real PostgreSQL (004): organization's OfficeOpened is mirrored onto the
-// local Offices read model by the consumer, so the occupancy rollup can name the office without joining
-// to organization's database (ADR-0014/0031). A repeated OfficeOpened refreshes the name in place
-// (idempotent), so at-least-once delivery is safe.
 public sealed class OfficeNameFeedTests(PostgresEventStoreFixture fixture) : IClassFixture<PostgresEventStoreFixture>
 {
     private static readonly DateTimeOffset occurredAt = new(2026, 6, 9, 9, 0, 0, TimeSpan.Zero);

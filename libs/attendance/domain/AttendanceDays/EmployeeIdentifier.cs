@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-// The employee who holds a reservation. References organization's Employee by id only (ADR-0014):
-// a branded GUIDv7, so it can never be confused with another identifier. The implicit conversions
-// keep the EF Core value converter trivial.
 public readonly record struct EmployeeIdentifier : IValueObject
 {
     public Guid Value { get; private init; }

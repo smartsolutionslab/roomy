@@ -2,9 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 
-// An inclusive span of bookable days [From, To] — the window an occupancy view is computed over
-// (FR-001/002/009). From must be on or before To; an inverted span is not a valid value. How *wide* a
-// range may be is an occupancy-query policy bounded at the endpoint, not an invariant of the range itself.
 public readonly record struct BookingDateRange : IValueObject
 {
     public BookingDate From { get; private init; }

@@ -5,10 +5,6 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
-// Hires a colleague under the seeded company (ADR-0025): pre-allocate the login identifier (the saga
-// correlation key, FR-006), create the employee in Provisioning (which raises EmployeeHired), persist,
-// and commit once. The unit-of-work drain publishes EmployeeHired via the outbox (ADR-0037), so the
-// event commits atomically with the employee row.
 public sealed class HireEmployeeHandler(ICompanyRepository companies, IEmployeeRepository employees, IUnitOfWork unitOfWork)
     : ICommandHandler<HireEmployee, HiredEmployee>
 {

@@ -4,11 +4,6 @@ using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
-// The hiring surface (contract: organization-api.md, 008). Hiring requires the administrator role, so an
-// authenticated employee is Forbidden (403, FR-001); the service is internal — the BFF forwards the
-// Keycloak token whose realm roles the host flattens to role claims. Hiring is eventually consistent: the
-// 202 response means the employee is recorded and provisioning has started, not that the login exists yet
-// (ADR-0025).
 public static class EmployeeEndpoints
 {
     private const string AdministratorRole = "administrator";
@@ -24,9 +19,6 @@ public static class EmployeeEndpoints
         return endpoints;
     }
 
-    // POST /employees — hire a colleague and start provisioning their login (FR-001/002/003). 400 for a
-    // missing/invalid field; 202 with the recorded employee + the pre-allocated user id and Provisioning
-    // state. Administrator-only (403 otherwise, enforced by the policy).
     private static async Task<IResult> HireEmployeeAsync(
         Request.HireEmployee request,
         ICommandHandler<HireEmployee, HiredEmployee> hireEmployee,
