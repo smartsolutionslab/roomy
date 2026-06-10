@@ -10,6 +10,7 @@ import {
   reservationId,
   roomId,
 } from '@roomy/attendance-data-access';
+import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of } from 'rxjs';
@@ -45,7 +46,11 @@ interface Stub {
     from: string,
     to: string,
   ) => Observable<OccupancyDay[]>;
-  mine?: () => Observable<MyReservation[]>;
+  mine?: (cursor?: string) => Observable<Page<MyReservation>>;
+}
+
+function reservationPage(items: MyReservation[], nextCursor: string | null = null): Page<MyReservation> {
+  return { items, nextCursor };
 }
 
 function renderPage(stub: Stub = {}) {
@@ -54,7 +59,7 @@ function renderPage(stub: Stub = {}) {
     occupancy: stub.occupancy ?? (() => of([june10])),
     occupancyForOffice: () => of([]),
     reserve: () => of(undefined),
-    myReservations: stub.mine ?? (() => of([myJune10])),
+    myReservations: stub.mine ?? (() => of(reservationPage([myJune10]))),
     cancel: () => of(undefined),
   };
 

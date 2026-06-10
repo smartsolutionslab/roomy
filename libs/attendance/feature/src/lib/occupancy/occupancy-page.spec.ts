@@ -59,7 +59,7 @@ function renderPage(offices: BookableOffice[], stub: Stub = {}) {
     occupancy: stub.occupancy ?? (() => of([todayDay])),
     occupancyForOffice: () => of([]),
     reserve: () => of(undefined),
-    myReservations: () => of([]),
+    myReservations: () => of({ items: [], nextCursor: null }),
     cancel: () => of(undefined),
   };
 
