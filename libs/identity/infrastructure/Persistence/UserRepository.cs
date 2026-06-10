@@ -81,7 +81,3 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
     public async Task AddAsync(User user, CancellationToken cancellationToken) =>
         await context.Users.AddAsync(user, cancellationToken);
 }
-
-// The opaque cursor for the accounts list: the email of the last returned account (ADR-0044). Email
-// is unique, so it is a stable total order needing no tiebreaker.
-internal sealed record UserCursor(string Email);
