@@ -26,9 +26,7 @@ public sealed record PageRequest
         var effectiveLimit = limit ?? DefaultLimit;
         if (effectiveLimit < 1 || effectiveLimit > MaxLimit)
         {
-            return Error.Validation(
-                "pagination.limit_out_of_range",
-                $"The page limit must be between 1 and {MaxLimit}.");
+            return Error.Validation("pagination.limit_out_of_range", $"The page limit must be between 1 and {MaxLimit}.");
         }
 
         var trimmedCursor = string.IsNullOrWhiteSpace(cursor) ? null : cursor;
@@ -41,15 +39,8 @@ public sealed record PageRequest
     public Result<TCursor?> DecodeCursor<TCursor>()
         where TCursor : class
     {
-        if (Cursor is null)
-        {
-            return Result.Success<TCursor?>(null);
-        }
-
-        if (CursorCodec.TryDecode<TCursor>(Cursor, out var decoded))
-        {
-            return Result.Success<TCursor?>(decoded);
-        }
+        if (Cursor is null) return Result.Success<TCursor?>(null);
+        if (CursorCodec.TryDecode<TCursor>(Cursor, out var decoded)) return Result.Success<TCursor?>(decoded);
 
         return Error.Validation("pagination.cursor_invalid", "The pagination cursor is malformed.");
     }
