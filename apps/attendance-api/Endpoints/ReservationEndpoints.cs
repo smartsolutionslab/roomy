@@ -229,7 +229,7 @@ public static class ReservationEndpoints
             ? EmployeeIdentifier.From(onBehalfOf)
             : actor.Value;
 
-        if (employee != actor.Value && !principal.IsInRole(AdministratorRole))
+        if (!MayReserveFor(employee, actor.Value, principal))
         {
             return Error.Forbidden(
                 "not_authorized",
@@ -251,6 +251,10 @@ public static class ReservationEndpoints
                 new ReservationResponse(reservationId.Value, request.OfficeId, request.RoomId, request.Date, employee.Value)),
             error => error.ToHttpResult());
     }
+
+    // An employee may reserve for themselves; reserving for anyone else is administrator-only (FR-011).
+    private static bool MayReserveFor(EmployeeIdentifier employee, EmployeeIdentifier actor, ClaimsPrincipal principal) =>
+        employee == actor || principal.IsInRole(AdministratorRole);
 
     // DELETE /reservations/{reservationId}?date=YYYY-MM-DD — cancel a reservation, freeing the place
     // (FR-008). The date locates the company-day stream (the id alone cannot). The owner or an

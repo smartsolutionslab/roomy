@@ -88,7 +88,7 @@ public sealed class AttendanceDay : EventSourcedAggregate
             return Error.Validation("past_immutable", "A reservation in the past cannot be cancelled.");
         }
 
-        if (!actorIsAdmin && existing.Employee != actor)
+        if (!MayCancel(existing, actor, actorIsAdmin))
         {
             return Error.Forbidden(
                 "not_owner",
@@ -105,6 +105,10 @@ public sealed class AttendanceDay : EventSourcedAggregate
 
         return Result.Success();
     }
+
+    // The reservation's owner or any administrator may cancel it; no one else.
+    private static bool MayCancel(Reservation reservation, EmployeeIdentifier actor, bool actorIsAdmin) =>
+        actorIsAdmin || reservation.Employee == actor;
 
     protected override void Apply(object @event)
     {
