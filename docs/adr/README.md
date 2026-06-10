@@ -62,3 +62,4 @@ ADRs are written **before** the implementing code, not after.
 | [0038](0038-occupancy-read-side-inline-projection.md) | Occupancy read side: inline synchronous projection into materialized read models | Proposed |
 | [0039](0039-event-sourced-write-model.md) | Event-sourced write model: aggregate base, repository, and optimistic-retry | Proposed |
 | [0040](0040-shared-frontend-route-guards.md) | Shared frontend route guards and not-authorized view | Accepted |
+| [0041](0041-rabbitmq-conventional-routing-and-no-retry-strategy.md) | Route integration events by convention; no EF retry strategy with the Wolverine outbox | Proposed |
