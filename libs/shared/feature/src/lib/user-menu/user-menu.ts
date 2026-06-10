@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { SessionService } from '@roomy/shared-data-access';
 import { Avatar } from '@roomy/shared-ui';
@@ -23,6 +23,7 @@ export class UserMenu {
   private readonly host = inject(ElementRef);
 
   protected readonly currentUser = this.session.currentUser;
+  protected readonly isAdmin = computed(() => this.currentUser()?.roles.includes('administrator') ?? false);
   protected readonly open = signal(false);
 
   protected toggle(): void {

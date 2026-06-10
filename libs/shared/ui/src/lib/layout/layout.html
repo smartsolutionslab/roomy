@@ -1,0 +1,24 @@
+<div class="layout">
+  <aside class="layout__sidebar">
+    <div class="layout__brand">
+      <ng-content select="[roomy-brand]"></ng-content>
+    </div>
+    <div class="layout__nav">
+      <ng-content select="[roomy-nav]"></ng-content>
+    </div>
+  </aside>
+
+  <div class="layout__body">
+    <header class="layout__top">
+      <ng-content select="[roomy-top]"></ng-content>
+    </header>
+
+    <main id="main-content" class="layout__main" tabindex="-1">
+      <ng-content></ng-content>
+    </main>
+
+    <footer class="layout__footer">
+      <ng-content select="[roomy-footer]"></ng-content>
+    </footer>
+  </div>
+</div>

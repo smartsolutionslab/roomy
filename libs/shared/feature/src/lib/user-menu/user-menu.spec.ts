@@ -26,14 +26,23 @@ describe('UserMenu', () => {
     expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
   });
 
-  it('reveals the user name and a sign-out action when opened', async () => {
+  it('reveals the user name, role, and a sign-out action when opened', async () => {
     await renderMenu();
 
     await userEvent.click(screen.getByRole('button', { name: 'Account menu' }));
 
     expect(screen.getByText('Ada Lovelace')).toBeTruthy();
+    expect(screen.getByText('Employee')).toBeTruthy();
     const signOut = screen.getByRole('button', { name: 'Sign out' });
     expect((signOut.closest('form') as HTMLFormElement).getAttribute('action')).toBe('/bff/logout');
+  });
+
+  it('marks administrators with an Administrator role badge', async () => {
+    await renderMenu({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+
+    expect(screen.getByText('Administrator')).toBeTruthy();
   });
 
   it('renders nothing when there is no signed-in user', async () => {
