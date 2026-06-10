@@ -1,0 +1,10 @@
+<!--
+  The control is projected into this <label> via <ng-content>, so it is implicitly associated
+  (verified by getByLabelText in the spec). The lint rule can't see through projection, hence the
+  scoped disable.
+-->
+<!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+<label class="form-field">
+  <span class="form-field__label">{{ label() }}</span>
+  <ng-content></ng-content>
+</label>

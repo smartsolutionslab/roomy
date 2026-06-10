@@ -1,0 +1,9 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+}
+
+.form-field__label {
+  font-weight: var(--roomy-font-weight-medium);
+}

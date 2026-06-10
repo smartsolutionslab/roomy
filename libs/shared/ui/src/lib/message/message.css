@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+:host(.message--error) {
+  color: var(--roomy-color-danger);
+}
