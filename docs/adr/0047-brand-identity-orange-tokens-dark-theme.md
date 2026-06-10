@@ -1,4 +1,4 @@
-# 0045. Brand identity: vivid-orange two-accent token system, sunset gradients, dark theme, sidebar shell, and monogram logo
+# 0047. Brand identity: vivid-orange two-accent token system, sunset gradients, dark theme, sidebar shell, and monogram logo
 
 - **Status:** Accepted
 - **Date:** 2026-06-10
