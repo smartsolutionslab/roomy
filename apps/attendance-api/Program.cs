@@ -56,8 +56,7 @@ builder.Services.AddSingleton(new AttendanceApiOptions
 });
 
 var keycloak = builder.Configuration.GetSection("Keycloak");
-var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
-    ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
+var keycloakBaseAddress = new Uri(keycloak["BaseAddress"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
 var keycloakRealm = keycloak["Realm"] ?? "roomy";
 
 builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);

@@ -90,8 +90,7 @@ internal sealed class Seeder(
         return result;
     }
 
-    private async Task<List<EmployeeData>> SeedEmployeesAsync(
-        Guid companyId, List<OfficeData> offices, CancellationToken cancellationToken)
+    private async Task<List<EmployeeData>> SeedEmployeesAsync(Guid companyId, List<OfficeData> offices, CancellationToken cancellationToken)
     {
         var company = OrgCompanyId.From(companyId);
         var result = new List<EmployeeData>();
@@ -101,19 +100,26 @@ internal sealed class Seeder(
             var email = $"{Slug(seed.DisplayName)}@{SeedData.EmailDomain}";
 
             var provisioned = await identityProvider.ProvisionUserAsync(
-                Email.From(email), DisplayName.From(seed.DisplayName), options.EmployeePassword, Role.Employee, cancellationToken);
-            if (provisioned.IsFailure)
-            {
-                throw new InvalidOperationException(
-                    $"Keycloak provisioning failed for {email}: {provisioned.Error.Code} {provisioned.Error.Message}");
-            }
+                Email.From(email),
+                DisplayName.From(seed.DisplayName),
+                options.EmployeePassword,
+                Role.Employee,
+                cancellationToken);
 
-            var user = User.Register(IdentityUserId.From(userId), Email.From(email), DisplayName.From(seed.DisplayName), Role.Employee);
+            if (provisioned.IsFailure) throw new InvalidOperationException($"Keycloak provisioning failed for {email}: {provisioned.Error.Code} {provisioned.Error.Message}");
+
+            var user = User.Register(
+                IdentityUserId.From(userId),
+                Email.From(email),
+                DisplayName.From(seed.DisplayName),
+                Role.Employee);
             user.Activate(provisioned.Value);
             identityDb.Users.Add(user);
 
             var employee = OrgEmployee.Hire(
-                company, OrgUserId.From(userId), OrgEmployeeName.From(seed.DisplayName), OrgWorkEmail.From(email),
+                company, OrgUserId.From(userId),
+                OrgEmployeeName.From(seed.DisplayName),
+                OrgWorkEmail.From(email),
                 OrgEmployeeRole.Employee, options.EmployeePassword);
             employee.CompleteProvisioning();
             organizationDb.Employees.Add(employee);
@@ -156,21 +162,18 @@ internal sealed class Seeder(
         }
     }
 
-    private async Task SeedReservationsAsync(
-        Guid companyId, List<OfficeData> offices, List<EmployeeData> employees, CancellationToken cancellationToken)
+    private async Task SeedReservationsAsync(Guid companyId, List<OfficeData> offices, List<EmployeeData> employees, CancellationToken cancellationToken)
     {
         var company = AttCompanyId.From(companyId);
         var random = new Random(20260610);
-        var byOffice = employees.GroupBy(employee => employee.Office).ToDictionary(group => group.Key, group => group.ToList());
+        var byOffice = employees.GroupBy(employee => employee.Office)
+            .ToDictionary(group => group.Key, group => group.ToList());
         var total = (end.DayNumber - start.DayNumber) + 1;
         var placed = 0;
 
         for (var date = start; date <= end; date = date.AddDays(1))
         {
-            if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-            {
-                continue;
-            }
+            if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) continue;
 
             var dayEvents = new List<object>();
             foreach (var office in offices)
@@ -220,13 +223,15 @@ internal sealed class Seeder(
     }
 
     private static void AssignDay(
-        Guid companyId, OfficeData office, List<EmployeeData> staff, DateOnly date,
-        int target, Random random, List<object> dayEvents)
+        Guid companyId,
+        OfficeData office,
+        List<EmployeeData> staff,
+        DateOnly date,
+        int target,
+        Random random,
+        List<object> dayEvents)
     {
-        if (target <= 0)
-        {
-            return;
-        }
+        if (target <= 0) return;
 
         var chosen = staff.OrderBy(_ => random.Next()).Take(target).ToList();
         var remaining = office.Rooms.ToDictionary(room => room.RoomId, room => room.Capacity);
@@ -235,14 +240,17 @@ internal sealed class Seeder(
         foreach (var employee in chosen)
         {
             var room = office.Rooms.FirstOrDefault(room => remaining[room.RoomId] > 0);
-            if (room is null)
-            {
-                break;
-            }
+            if (room is null) break;
 
             remaining[room.RoomId]--;
             dayEvents.Add(new ReservationPlaced(
-                Guid.CreateVersion7(), companyId, date, employee.EmployeeId, office.OfficeId, room.RoomId, occurredAt));
+                Guid.CreateVersion7(),
+                companyId,
+                date,
+                employee.EmployeeId,
+                office.OfficeId,
+                room.RoomId,
+                occurredAt));
         }
     }
 
