@@ -270,5 +270,3 @@ internal sealed class Seeder(
 
     private sealed record EmployeeData(Guid EmployeeId, Guid UserId, string DisplayName, string Office);
 }
-
-internal sealed record SeedOptions(Guid CompanyId, string EmployeePassword);

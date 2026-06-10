@@ -48,9 +48,3 @@ internal static class SeedData
         new("Cassian Andor", "Hamburg"),
     ];
 }
-
-internal sealed record OfficeSeed(string Name, string Location, IReadOnlyList<RoomSeed> Rooms);
-
-internal sealed record RoomSeed(string Name, int Capacity);
-
-internal sealed record EmployeeSeed(string DisplayName, string Office);
