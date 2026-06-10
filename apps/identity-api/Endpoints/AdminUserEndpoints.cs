@@ -1,6 +1,7 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
@@ -17,7 +18,8 @@ public static class AdminUserEndpoints
         endpoints.MapGet("/admin/users", ListAccountsAsync)
             .RequireAdministrator()
             .WithName("ListUsers")
-            .Produces<IEnumerable<AdminUserResponse>>();
+            .Produces<AdminUserPage>()
+            .ProducesProblem(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/admin/users/{userId:guid}", GetAccountAsync)
             .RequireAdministrator()
             .WithName("GetUser")
@@ -35,13 +37,30 @@ public static class AdminUserEndpoints
     private static RouteHandlerBuilder RequireAdministrator(this RouteHandlerBuilder builder) =>
         builder.RequireAuthorization(policy => policy.RequireRole(AdministratorRole));
 
-    // GET /admin/users — the account overview (identity-api.md). Administrator-only.
+    // GET /admin/users — the account overview (identity-api.md). Administrator-only; keyset-paginated
+    // by email (ADR-0042). A bad limit or a malformed cursor is a 400 (request validation, not a
+    // domain rule).
     private static async Task<IResult> ListAccountsAsync(
-        IUserRepository users, CancellationToken cancellationToken)
+        string? cursor,
+        int? limit,
+        IUserRepository users,
+        CancellationToken cancellationToken)
     {
-        var accounts = await users.GetAllAsync(cancellationToken);
-        return Results.Ok(accounts.Select(Project));
+        var request = PageRequest.From(cursor, limit);
+        if (request.IsFailure)
+        {
+            return BadRequest(request.Error);
+        }
+
+        var page = await users.GetPageAsync(request.Value, cancellationToken);
+
+        return page.Match(
+            accounts => Results.Ok(new AdminUserPage(accounts.Items.Select(Project).ToList(), accounts.NextCursor)),
+            BadRequest);
     }
+
+    private static IResult BadRequest(Error error) =>
+        Results.Problem(detail: error.Message, statusCode: StatusCodes.Status400BadRequest);
 
     // GET /admin/users/{userId} — a single account, or 404 if no account has that identifier.
     private static async Task<IResult> GetAccountAsync(

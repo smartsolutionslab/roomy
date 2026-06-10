@@ -64,6 +64,17 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         return user;
     }
 
+    private async Task<User> SeedUserWithEmailAsync(string email)
+    {
+        var user = User.Register(Email.From(email), DisplayName.From("Test User"), Role.Employee);
+        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+
+        await using var context = fixture.CreateContext();
+        context.Users.Add(user);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        return user;
+    }
+
     private HttpClient AdministratorClient()
     {
         var client = app.CreateClient();
@@ -88,11 +99,103 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
             .GetAsync("/admin/users", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var users = await response.Content
-            .ReadFromJsonAsync<AdminUserResponse[]>(TestContext.Current.CancellationToken);
-        var listed = users.ShouldNotBeNull().Single(user => user.UserId == employee.Identifier.Value);
+        var page = await response.Content
+            .ReadFromJsonAsync<AdminUserPage>(TestContext.Current.CancellationToken);
+        var listed = page.ShouldNotBeNull().Items.Single(user => user.UserId == employee.Identifier.Value);
         listed.Role.ShouldBe("employee");
         listed.Status.ShouldBe("active");
+    }
+
+    [Fact]
+    public async Task Walks_every_account_in_email_order_without_skips_or_duplicates()
+    {
+        var seeded = new List<User>();
+        for (var index = 0; index < 5; index++)
+        {
+            seeded.Add(await SeedUserAsync(Role.Employee));
+        }
+
+        var client = AdministratorClient();
+        var collected = new List<AdminUserResponse>();
+        string? cursor = null;
+        var pageCount = 0;
+        do
+        {
+            var url = cursor is null
+                ? "/admin/users?limit=2"
+                : $"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}";
+            var page = await client.GetFromJsonAsync<AdminUserPage>(url, TestContext.Current.CancellationToken);
+            page.ShouldNotBeNull();
+            // Every page but the last is full — a page is short only when the list is exhausted, even
+            // though other tests' rows interleave with the seeded ones.
+            if (page.NextCursor is not null)
+            {
+                page.Items.Count.ShouldBe(2);
+            }
+
+            collected.AddRange(page.Items);
+            cursor = page.NextCursor;
+            pageCount++;
+        }
+        while (cursor is not null && pageCount < 1000);
+
+        // Walking to a null cursor with no duplicates and every page full (bar the last) is exactly the
+        // keyset guarantee — the server's text collation defines the order, so we assert structure, not
+        // a client-side ordinal sort.
+        cursor.ShouldBeNull();
+        collected.Select(user => user.UserId).ShouldBeUnique();
+        foreach (var user in seeded)
+        {
+            collected.Count(item => item.UserId == user.Identifier.Value).ShouldBe(1);
+        }
+    }
+
+    [Fact]
+    public async Task Paging_is_stable_when_an_account_is_inserted_between_fetches()
+    {
+        for (var index = 0; index < 3; index++)
+        {
+            await SeedUserAsync(Role.Employee);
+        }
+
+        var client = AdministratorClient();
+        var firstPage = await client.GetFromJsonAsync<AdminUserPage>(
+            "/admin/users?limit=2", TestContext.Current.CancellationToken);
+        firstPage.ShouldNotBeNull();
+        firstPage.NextCursor.ShouldNotBeNull();
+        var firstPageIds = firstPage.Items.Select(user => user.UserId).ToList();
+
+        // Insert an account that sorts before the cursor (a "zzz" email would sort after; "aaa" sorts
+        // before the first page's last email). Keyset (WHERE email > cursor) must neither re-surface a
+        // first-page row nor return this already-passed insert — offset paging would shift and do both.
+        var inserted = await SeedUserWithEmailAsync($"aaa-{Guid.NewGuid():N}@example.com");
+
+        var remaining = new List<AdminUserResponse>();
+        string? cursor = firstPage.NextCursor;
+        while (cursor is not null)
+        {
+            var page = await client.GetFromJsonAsync<AdminUserPage>(
+                $"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}", TestContext.Current.CancellationToken);
+            page.ShouldNotBeNull();
+            remaining.AddRange(page.Items);
+            cursor = page.NextCursor;
+        }
+
+        var remainingIds = remaining.Select(user => user.UserId).ToList();
+        remainingIds.ShouldNotContain(firstPageIds[0]);
+        remainingIds.ShouldNotContain(firstPageIds[1]);
+        remainingIds.ShouldNotContain(inserted.Identifier.Value);
+    }
+
+    [Theory]
+    [InlineData("/admin/users?limit=0")]
+    [InlineData("/admin/users?limit=101")]
+    [InlineData("/admin/users?cursor=not-a-valid-cursor")]
+    public async Task Rejects_a_bad_page_request_with_400(string url)
+    {
+        var response = await AdministratorClient().GetAsync(url, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
