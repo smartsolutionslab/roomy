@@ -47,6 +47,9 @@ public static class BffAuthenticationExtensions
         services.AddOptions<OpenIdConnectOptions>(OidcScheme)
             .Configure<IOptions<KeycloakOidcOptions>>(ApplyKeycloakOptions);
 
+        // Back-channel client the cookie validation uses to refresh the access token against Keycloak.
+        services.AddHttpClient(BffTokenRefresher.HttpClientName);
+
         services.AddAuthorization();
 
         return services;
@@ -61,6 +64,11 @@ public static class BffAuthenticationExtensions
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.SlidingExpiration = true;
+
+        // The cookie session outlives Keycloak's short access token, so refresh it from the stored
+        // refresh token whenever it is at/near expiry — otherwise the proxy forwards an expired token
+        // and the APIs reject it (IDX10223). See BffTokenRefresher.
+        options.Events.OnValidatePrincipal = BffTokenRefresher.ValidateOrRefreshAsync;
 
         // The SPA owns navigation: API calls answer 401/403 rather than redirecting to the
         // identity provider, so an XHR never follows a login redirect.
