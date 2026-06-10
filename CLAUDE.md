@@ -275,6 +275,13 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   are GUIDv7 branded types named `…Identifier` (never `…Id`) with implicit `Guid` conversions
   for EF Core. Value objects implement `IValueObject`; aggregate roots `IAggregate`, other
   entities `IEntity` (markers in `shared-kernel`).
+- **Application use cases split by CQRS** — each `application` library organises use cases into
+  `Commands/` and `Queries/` (no flat `UseCases/`), each with a `Handlers/` subfolder. `Commands/`
+  holds `ICommand` messages and command *result* records; `Commands/Handlers/` the `ICommandHandler`s.
+  `Queries/` holds `IQuery` messages, query-input value objects, and the *view/result* records queries
+  return; `Queries/Handlers/` the `IQueryHandler`s. Namespaces follow the folders
+  (`…Application.Commands[.Handlers]`, `…Application.Queries[.Handlers]`). A context with no queries has
+  no `Queries/` folder (ADR-0051).
 - **No nullable returns on repositories/services** — a contract never returns `T?` to mean
   "not found": a fetch that may miss returns `Result<T>` (`Error.NotFound`), a presence check
   returns `Task<bool>` (`ExistsBy…`). The caller handles absence explicitly.
