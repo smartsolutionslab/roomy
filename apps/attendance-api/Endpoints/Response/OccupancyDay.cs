@@ -1,6 +1,6 @@
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 
-internal sealed record OccupancyDayResponse(
+internal sealed record OccupancyDay(
     DateOnly Date,
-    OfficeOccupancyResponse Office,
-    IReadOnlyList<RoomOccupancyResponse> Rooms);
+    OfficeOccupancy Office,
+    IReadOnlyList<RoomOccupancy> Rooms);

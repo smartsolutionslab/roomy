@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
@@ -17,7 +16,7 @@ public static class RoomCatalogueEndpoints
         endpoints.MapGet("/rooms", ListAsync)
             .RequireAuthorization()
             .WithName("ViewBookableRooms")
-            .Produces<IEnumerable<BookableRoomResponse>>();
+            .Produces<IEnumerable<Response.BookableRoom>>();
         return endpoints;
     }
 
@@ -33,7 +32,7 @@ public static class RoomCatalogueEndpoints
         var result = await view.HandleAsync(query, cancellationToken);
 
         return result.Match(
-            rooms => Results.Ok(rooms.Select(room => new BookableRoomResponse(
+            rooms => Results.Ok(rooms.Select(room => new Response.BookableRoom(
                 room.Office.Value,
                 room.OfficeName,
                 room.Room.Value,

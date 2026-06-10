@@ -14,6 +14,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +50,7 @@ builder.Services.AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>();
 builder.Services.AddScoped<IEmployeeCatalog, EmployeeCatalog>();
 
 // Publish the OpenAPI document the typed Angular client is generated from (ADR-0018/0036).
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
 // Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
 // HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher

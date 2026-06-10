@@ -1,7 +1,5 @@
 using System.Security.Claims;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Request;
-using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
@@ -25,7 +23,7 @@ public static class ReservationEndpoints
         endpoints.MapPost("/reservations", ReserveAsync)
             .RequireAuthorization()
             .WithName("Reserve")
-            .Produces<ReservationResponse>(StatusCodes.Status201Created)
+            .Produces<Response.Reservation>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict)
@@ -40,22 +38,22 @@ public static class ReservationEndpoints
         endpoints.MapGet("/reservations", ViewAsync)
             .RequireAuthorization()
             .WithName("ViewDayReservations")
-            .Produces<ReservationPage>();
+            .Produces<Response.Page.Reservation>();
         endpoints.MapGet("/reservations/mine", ViewMineAsync)
             .RequireAuthorization()
             .WithName("ViewMyReservations")
-            .Produces<MyReservationPage>()
+            .Produces<Response.Page.MyReservation>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/reservations/employees", ViewEmployeesAsync)
             .RequireAuthorization()
             .WithName("ViewEmployees")
-            .Produces<EmployeePage>()
+            .Produces<Response.Page.Employee>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);
         endpoints.MapGet("/reservations/by-employee/{employeeId:guid}", ViewForEmployeeAsync)
             .RequireAuthorization()
             .WithName("ViewReservationsForEmployee")
-            .Produces<MyReservationPage>()
+            .Produces<Response.Page.MyReservation>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);
         return endpoints;
@@ -79,8 +77,8 @@ public static class ReservationEndpoints
         // is one page — it adopts the page envelope for contract uniformity with nextCursor always null
         // (ADR-0044), never keyset-paginated.
         return result.Match(
-            reservations => Results.Ok(new ReservationPage(
-                reservations.Select(reservation => new ReservationResponse(
+            reservations => Results.Ok(new Response.Page.Reservation(
+                reservations.Select(reservation => new Response.Reservation(
                     reservation.Reservation.Value,
                     reservation.Office.Value,
                     reservation.Room.Value,
@@ -156,8 +154,8 @@ public static class ReservationEndpoints
         var result = await view.HandleAsync(new ViewEmployees(searchTerm.Value, pageRequest.Value), cancellationToken);
 
         return result.Match(
-            employees => Results.Ok(new EmployeePage(
-                employees.Items.Select(employee => new EmployeeResponse(employee.Employee.Value, employee.Name)).ToList(),
+            employees => Results.Ok(new Response.Page.Employee(
+                employees.Items.Select(employee => new Response.Employee(employee.Employee.Value, employee.Name)).ToList(),
                 employees.NextCursor)),
             BadRequest);
     }
@@ -190,8 +188,8 @@ public static class ReservationEndpoints
     }
 
     private static IResult MyReservationPageResult(Page<MyReservationView> page) =>
-        Results.Ok(new MyReservationPage(
-            page.Items.Select(reservation => new MyReservationResponse(
+        Results.Ok(new Response.Page.MyReservation(
+            page.Items.Select(reservation => new Response.MyReservation(
                 reservation.Reservation.Value,
                 reservation.Office.Value,
                 reservation.OfficeName,
@@ -208,7 +206,7 @@ public static class ReservationEndpoints
     // POST /reservations — reserve a place in a room for a day (FR-001/011). The acting employee is
     // resolved from the token; onBehalfOf is administrator-only. The Result maps to 201/409/422/404/403.
     private static async Task<IResult> ReserveAsync(
-        ReserveRequest request,
+        Request.Reserve request,
         ClaimsPrincipal principal,
         AttendanceApiOptions options,
         IEmployeeDirectory employees,
@@ -249,7 +247,7 @@ public static class ReservationEndpoints
         return result.Match(
             reservationId => Results.Created(
                 $"/reservations/{reservationId.Value}",
-                new ReservationResponse(reservationId.Value, request.OfficeId, request.RoomId, request.Date, employee.Value)),
+                new Response.Reservation(reservationId.Value, request.OfficeId, request.RoomId, request.Date, employee.Value)),
             error => error.ToHttpResult());
     }
 
