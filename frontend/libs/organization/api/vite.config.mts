@@ -6,10 +6,14 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   root: __dirname,
-  cacheDir: '../../../../node_modules/.vite/libs/identity/data-access',
+  cacheDir: '../../../../node_modules/.vite/libs/organization/api',
   plugins: [angular(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
+  // Uncomment this if you are using workers.
+  // worker: {
+  //   plugins: () => [ nxViteTsPaths() ],
+  // },
   test: {
-    name: 'identity-data-access',
+    name: 'organization-api',
     watch: false,
     globals: true,
     environment: 'jsdom',
@@ -17,7 +21,7 @@ export default defineConfig(() => ({
     setupFiles: ['src/test-setup.ts'],
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../../../coverage/libs/identity/data-access',
+      reportsDirectory: '../../../../coverage/libs/organization/api',
       provider: 'v8' as const,
     },
   },

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { AccountGateway } from '@roomy/identity-data-access';
+import { AccountGateway } from '@roomy/identity-api';
 import { Message, Page } from '@roomy/shared-ui';
 import { catchError, of } from 'rxjs';
 

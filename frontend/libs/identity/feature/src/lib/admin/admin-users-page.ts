@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { AdminUser, AdminUsersGateway, UserId } from '@roomy/identity-data-access';
+import { AdminUser, AdminUsersGateway, UserId } from '@roomy/identity-api';
 import { cursorList } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 

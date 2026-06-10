@@ -35,7 +35,7 @@ export default [
       '**/obj',
       '**/vitest.config.*.timestamp*',
       // Generated OpenAPI clients (ADR-0036) are build artefacts; never lint them.
-      '**/data-access/src/lib/generated',
+      '**/api/src/lib/generated',
     ],
   },
   // TypeScript correctness ruleset (issue #10). typescript-eslint recommended
@@ -119,7 +119,7 @@ export default [
               ],
             },
             // apps/hosts are the composition root: they may wire any layer,
-            // backend or frontend (the SPA composes feature/ui/data-access libs).
+            // backend or frontend (the SPA composes feature/ui/api/data-access libs).
             {
               sourceTag: 'type:app',
               onlyDependOnLibsWithTags: [
@@ -129,17 +129,19 @@ export default [
                 'type:domain',
                 'type:feature',
                 'type:ui',
+                'type:api',
                 'type:data-access',
                 'type:util',
               ],
             },
             // --- Frontend layer rule (Angular feature libraries, ADR-0035) ---
-            // feature (smart, routed UI) → ui, data-access, and util.
+            // feature (smart, routed UI) → ui, api, data-access, and util.
             {
               sourceTag: 'type:feature',
               onlyDependOnLibsWithTags: [
                 'type:feature',
                 'type:ui',
+                'type:api',
                 'type:data-access',
                 'type:util',
               ],
@@ -149,7 +151,14 @@ export default [
               sourceTag: 'type:ui',
               onlyDependOnLibsWithTags: ['type:ui', 'type:util'],
             },
-            // data-access (gateway clients + state) → data-access and util.
+            // api (typed per-context OpenAPI client + gateway) → shared data-access
+            // (session/pagination) and util.
+            {
+              sourceTag: 'type:api',
+              onlyDependOnLibsWithTags: ['type:api', 'type:data-access', 'type:util'],
+            },
+            // data-access (shared client-side data utilities: session, theme,
+            // pagination) → data-access and util.
             {
               sourceTag: 'type:data-access',
               onlyDependOnLibsWithTags: ['type:data-access', 'type:util'],

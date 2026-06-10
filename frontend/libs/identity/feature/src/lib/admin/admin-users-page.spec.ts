@@ -1,5 +1,5 @@
 import { provideZonelessChangeDetection } from '@angular/core';
-import { AdminUser, AdminUsersGateway, UserId, userId } from '@roomy/identity-data-access';
+import { AdminUser, AdminUsersGateway, UserId, userId } from '@roomy/identity-api';
 import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';

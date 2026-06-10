@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { Office, OfficeId, OfficesGateway, Room, RoomId } from '@roomy/organization-data-access';
+import { Office, OfficeId, OfficesGateway, Room, RoomId } from '@roomy/organization-api';
 import { Button, Card, FormField, Message, Page } from '@roomy/shared-ui';
 import { Observable, catchError, of } from 'rxjs';
 

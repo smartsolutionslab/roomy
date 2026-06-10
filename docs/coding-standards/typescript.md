@@ -132,12 +132,13 @@ catch.
 - **Import scope `@roomy/*`.** Libraries are imported by alias — e.g.
   `@roomy/attendance-feature`, `@roomy/shared-ui` — wired in `tsconfig.base.json`.
   Libraries are internal (`private`), not published to a registry.
-- **Library naming `@roomy/<context>-<type>`**, folders `libs/<context>/<type>`, where
-  `type` is the Angular library kind: `feature | ui | data-access | util` (e.g.
-  `libs/attendance/feature` → `@roomy/attendance-feature`). Cross-cutting libraries use
-  the `shared` context: `@roomy/shared-ui`, `@roomy/shared-util`.
+- **Library naming `@roomy/<context>-<type>`**, folders `frontend/libs/<context>/<type>`, where
+  `type` is the Angular library kind: `feature | api | ui | data-access | util` (e.g.
+  `frontend/libs/attendance/feature` → `@roomy/attendance-feature`, `frontend/libs/attendance/api`
+  → `@roomy/attendance-api`). Cross-cutting libraries use the `shared` context: `@roomy/shared-ui`,
+  `@roomy/shared-data-access`, `@roomy/util`.
 - **Tag every project** with `context:<name>` and `type:…`; `@nx/enforce-module-boundaries`
-  defines the allowed dependencies (e.g. `feature` may use `ui`/`data-access`/`util`;
+  defines the allowed dependencies (e.g. `feature` may use `ui`/`api`/`data-access`/`util`;
   `util` depends on nothing), so a forbidden cross-import fails lint. Backend libraries
   carry equivalent layer tags.
 - `nx affected` scopes lint, test, and build to what changed.

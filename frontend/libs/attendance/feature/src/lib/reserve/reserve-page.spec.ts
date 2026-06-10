@@ -11,7 +11,7 @@ import {
   officeId,
   reservationId,
   roomId,
-} from '@roomy/attendance-data-access';
+} from '@roomy/attendance-api';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { Observable, of, throwError } from 'rxjs';

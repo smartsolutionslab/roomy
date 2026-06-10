@@ -58,13 +58,13 @@ turns it into the Angular client, where generated code lives, and how CI keeps i
 - **Client** is generated with **`ng-openapi-gen`** (version-pinned), root URL configured to
   `''` so calls stay relative and same-origin through the gateway. **`orval` is the fallback** if
   ng-openapi-gen's Angular 22 output proves unworkable.
-- **Generated code lives in a per-context `data-access` lib** (ADR-0035), under
-  `libs/<context>/data-access/src/lib/generated`, and is **committed**. The generated tree is
-  excluded from ESLint and Prettier (it is a build artifact, not authored code) but is still
-  type-checked by the lib build. Per ADR-0020 the feature lib never consumes generated DTOs
-  directly: a thin facade in the `data-access` lib maps each DTO to a branded domain type at the
+- **Generated code lives in a per-context `api` lib** (ADR-0035; renamed from `data-access` per its
+  2026-06-11 amendment), under `frontend/libs/<context>/api/src/lib/generated`, and is **committed**.
+  The generated tree is excluded from ESLint and Prettier (it is a build artifact, not authored code)
+  but is still type-checked by the lib build. Per ADR-0020 the feature lib never consumes generated
+  DTOs directly: a thin facade in the `api` lib maps each DTO to a branded domain type at the
   boundary.
-- **Regeneration is an Nx target** — `nx run <context>-data-access:generate-client` — driven from
+- **Regeneration is an Nx target** — `nx run <context>-api:generate-client` — driven from
   the committed spec; it requires no running app and no JRE.
 - **CI gates drift** with the established `git diff --exit-code` pattern (ADR-0034): the .NET job
   re-emits the spec on build and fails if `apps/<host>/<AssemblyName>.json` changed; the Nx job

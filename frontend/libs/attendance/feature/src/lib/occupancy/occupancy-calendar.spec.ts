@@ -9,7 +9,7 @@ import {
   officeId,
   reservationId,
   roomId,
-} from '@roomy/attendance-data-access';
+} from '@roomy/attendance-api';
 import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
