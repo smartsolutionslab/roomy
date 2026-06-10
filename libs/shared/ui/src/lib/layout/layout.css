@@ -34,10 +34,7 @@
   display: flex;
   flex-direction: column;
   min-block-size: 100vh;
-  background:
-    radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.1), transparent 60%),
-    radial-gradient(30rem 20rem at -6% 8%, rgba(251, 191, 36, 0.08), transparent 60%),
-    transparent;
+  background-image: var(--roomy-shell-tint, none);
 }
 
 .layout__top {

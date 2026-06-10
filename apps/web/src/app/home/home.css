@@ -13,9 +13,7 @@
 .hero__glow {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(40rem 28rem at 70% -10%, rgba(249, 115, 22, 0.28), transparent 60%),
-    radial-gradient(34rem 24rem at 10% 110%, rgba(244, 63, 94, 0.22), transparent 60%);
+  background: var(--roomy-hero-glow, none);
   pointer-events: none;
 }
 

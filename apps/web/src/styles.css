@@ -45,8 +45,13 @@
   --roomy-glass-card: rgba(255, 255, 255, 0.5);
   --roomy-glass-highlight: rgba(255, 255, 255, 0.6);
 
-  /* Ambient page background — a faded aurora image plus a faint dot grid */
-  --roomy-shell-image: url('/aurora.svg');
+  /* Ambient page background. Light stays neutral (grey→white mist, no colour tints);
+     dark carries the warm aurora + glow (overridden in the dark blocks below). */
+  --roomy-shell-image: url('/mist.svg');
+  --roomy-shell-tint: none;
+  --roomy-hero-glow:
+    radial-gradient(40rem 28rem at 70% -10%, rgba(24, 24, 27, 0.05), transparent 60%),
+    radial-gradient(34rem 24rem at 10% 110%, rgba(24, 24, 27, 0.04), transparent 60%);
   --roomy-texture-dot: rgba(24, 24, 27, 0.05);
 
   /* Spacing scale */
@@ -116,6 +121,13 @@
     --roomy-glass-card: rgba(255, 255, 255, 0.07);
     --roomy-glass-highlight: rgba(255, 255, 255, 0.14);
     --roomy-texture-dot: rgba(255, 255, 255, 0.035);
+    --roomy-shell-image: url('/aurora.svg');
+    --roomy-shell-tint:
+      radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.12), transparent 60%),
+      radial-gradient(30rem 20rem at -6% 8%, rgba(251, 146, 60, 0.08), transparent 60%);
+    --roomy-hero-glow:
+      radial-gradient(40rem 28rem at 70% -10%, rgba(249, 115, 22, 0.28), transparent 60%),
+      radial-gradient(34rem 24rem at 10% 110%, rgba(251, 191, 36, 0.18), transparent 60%);
   }
 }
 
@@ -144,6 +156,13 @@
   --roomy-glass-card: rgba(255, 255, 255, 0.07);
   --roomy-glass-highlight: rgba(255, 255, 255, 0.14);
   --roomy-texture-dot: rgba(255, 255, 255, 0.035);
+  --roomy-shell-image: url('/aurora.svg');
+  --roomy-shell-tint:
+    radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.12), transparent 60%),
+    radial-gradient(30rem 20rem at -6% 8%, rgba(251, 146, 60, 0.08), transparent 60%);
+  --roomy-hero-glow:
+    radial-gradient(40rem 28rem at 70% -10%, rgba(249, 115, 22, 0.28), transparent 60%),
+    radial-gradient(34rem 24rem at 10% 110%, rgba(251, 191, 36, 0.18), transparent 60%);
 }
 
 * {
