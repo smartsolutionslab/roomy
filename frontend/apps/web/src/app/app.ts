@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { SessionService } from '@roomy/shared-data-access';
-import { ThemeToggle, UserMenu } from '@roomy/shared-feature';
+import { NavigationService, ThemeToggle, UserMenu } from '@roomy/shared-feature';
 import { AppLayout, Icon, RoomyLogo } from '@roomy/shared-ui';
 
 import { LanguageSwitcher } from './shell/language-switcher';
@@ -33,8 +33,11 @@ export class App {
   private readonly document = inject(DOCUMENT);
   private readonly transloco = inject(TranslocoService);
   private readonly session = inject(SessionService);
+  private readonly navigation = inject(NavigationService);
 
   protected readonly currentUser = this.session.currentUser;
+  protected readonly mainNav = this.navigation.mainItems;
+  protected readonly adminNav = this.navigation.adminItems;
   private readonly activeLang = toSignal(this.transloco.langChanges$, {
     initialValue: this.transloco.getActiveLang(),
   });
