@@ -19,6 +19,7 @@ import {
   roomId,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { FormField, Message, Page } from '@roomy/shared-ui';
 
 // The occupancy list (OC-1/2/4/6): pick an office (optionally a single room) and a day / week / month
 // range, and read each day's office rollup + per-room figures. Occupant names render only when the
@@ -28,7 +29,7 @@ import {
 @Component({
   selector: 'roomy-occupancy-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, Page, FormField, Message],
   templateUrl: './occupancy-page.html',
   styleUrl: './occupancy-page.css',
 })

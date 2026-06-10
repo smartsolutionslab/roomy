@@ -17,7 +17,7 @@ import {
   isPastDay,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
-import { InfiniteScroll } from '@roomy/shared-ui';
+import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
 
@@ -28,7 +28,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-my-reservations-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, InfiniteScroll],
+  imports: [TranslocoDirective, InfiniteScroll, Page, Message, Button],
   templateUrl: './my-reservations-page.html',
   styleUrl: './my-reservations-page.css',
 })

@@ -69,3 +69,4 @@ ADRs are written **before** the implementing code, not after.
 | [0045](0045-shared-keycloak-auth-and-unit-of-work-contract.md) | Share the Keycloak JWT bearer composition and the IUnitOfWork port | Accepted |
 | [0046](0046-shared-error-to-http-mapping.md) | One shared domain-Error → HTTP mapping at the API edge | Accepted |
 | [0047](0047-brand-identity-orange-tokens-dark-theme.md) | Brand identity: vivid-orange two-accent tokens, sunset gradients, dark theme, sidebar shell, and monogram logo | Accepted |
+| [0048](0048-frontend-design-system-shared-ui.md) | Frontend design system in shared-ui: global tokens/base + primitive directives and components | Accepted |

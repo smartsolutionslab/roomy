@@ -1,35 +1,34 @@
 <ng-container *transloco="let translate">
-  <section class="on-behalf">
-    <h1 class="on-behalf__title">{{ translate('attendance.onBehalf.title') }}</h1>
+  <section roomyPage size="content">
+    <h1>{{ translate('attendance.onBehalf.title') }}</h1>
 
-    <p class="on-behalf__result" role="status" aria-live="polite">
+    <roomy-message>
       @if (result(); as message) {
       {{ translate(message.key, message.params) }}
       }
-    </p>
+    </roomy-message>
     @if (errorKey(); as key) {
-    <p class="on-behalf__error" role="alert">{{ translate(key) }}</p>
+    <roomy-message variant="error">{{ translate(key) }}</roomy-message>
     }
 
     @if (loadFailed()) {
-    <p class="on-behalf__error" role="alert">{{ translate('attendance.onBehalf.loadError') }}</p>
+    <roomy-message variant="error">{{ translate('attendance.onBehalf.loadError') }}</roomy-message>
     } @else if (employees(); as items) { @if (items.length === 0) {
-    <p class="on-behalf__empty">{{ translate('attendance.onBehalf.emptyEmployees') }}</p>
+    <p>{{ translate('attendance.onBehalf.emptyEmployees') }}</p>
     } @else {
     <roomy-infinite-scroll
       [hasMore]="employeesCursor() !== null"
       [loading]="loadingEmployees()"
       (loadMore)="loadMoreEmployees()"
     >
-    <label class="on-behalf__field">
-      <span>{{ translate('attendance.onBehalf.employeeLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.onBehalf.employeeLabel')">
       <select #employeeSelect (change)="chooseEmployee(employeeSelect.value)">
         <option value="">{{ translate('attendance.onBehalf.employeePlaceholder') }}</option>
         @for (employee of items; track employee.id) {
         <option [value]="employee.id">{{ employee.name }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
     </roomy-infinite-scroll>
 
     @if (selectedEmployee(); as employee) {
@@ -38,7 +37,7 @@
     <section class="on-behalf__reservations">
       <h2>{{ translate('attendance.onBehalf.reservationsHeading') }}</h2>
       @if (reservations(); as rows) { @if (rows.length === 0) {
-      <p class="on-behalf__empty">{{ translate('attendance.onBehalf.noReservations') }}</p>
+      <p>{{ translate('attendance.onBehalf.noReservations') }}</p>
       } @else {
       <roomy-infinite-scroll
         [hasMore]="reservationsCursor() !== null"
@@ -46,13 +45,14 @@
         (loadMore)="loadMoreReservations()"
       >
       <h3>{{ translate('attendance.onBehalf.upcomingHeading') }}</h3>
-      <ul class="on-behalf__list">
+      <ul class="roomy-list">
         @for (reservation of upcoming(); track reservation.id) {
-        <li class="on-behalf__item">
+        <li class="roomy-list-item">
           <span>{{ reservation.officeName }}</span>
           <span>{{ reservation.roomName }}</span>
           <span>{{ reservation.date }}</span>
           <button
+            roomyButton
             type="button"
             [attr.aria-label]="
               translate('attendance.onBehalf.cancelReservation', {
@@ -69,9 +69,9 @@
       </ul>
       @if (past().length > 0) {
       <h3>{{ translate('attendance.onBehalf.pastHeading') }}</h3>
-      <ul class="on-behalf__list">
+      <ul class="roomy-list">
         @for (reservation of past(); track reservation.id) {
-        <li class="on-behalf__item on-behalf__item--past">
+        <li class="roomy-list-item on-behalf__item--past">
           <span>{{ reservation.officeName }}</span>
           <span>{{ reservation.roomName }}</span>
           <span>{{ reservation.date }}</span>
@@ -81,14 +81,14 @@
       }
       </roomy-infinite-scroll>
       } } @else {
-      <p class="on-behalf__loading">{{ translate('attendance.onBehalf.loading') }}</p>
+      <p>{{ translate('attendance.onBehalf.loading') }}</p>
       }
     </section>
     } @else {
-    <p class="on-behalf__prompt">{{ translate('attendance.onBehalf.prompt') }}</p>
+    <p>{{ translate('attendance.onBehalf.prompt') }}</p>
     }
     } } @else {
-    <p class="on-behalf__loading">{{ translate('attendance.onBehalf.loading') }}</p>
+    <p>{{ translate('attendance.onBehalf.loading') }}</p>
     }
   </section>
 </ng-container>

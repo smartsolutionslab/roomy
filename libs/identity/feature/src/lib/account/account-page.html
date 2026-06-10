@@ -1,11 +1,11 @@
 <ng-container *transloco="let translate">
-  <section class="account">
-    <h1 class="account__title">{{ translate('account.title') }}</h1>
+  <section roomyPage>
+    <h1>{{ translate('account.title') }}</h1>
 
     @if (failed()) {
-    <p class="account__error" role="alert">{{ translate('account.error') }}</p>
+    <roomy-message variant="error">{{ translate('account.error') }}</roomy-message>
     } @else if (account(); as currentAccount) {
-    <dl class="account__details">
+    <dl class="roomy-dl">
       <dt>{{ translate('account.nameLabel') }}</dt>
       <dd class="account__name">{{ currentAccount.displayName }}</dd>
 
@@ -16,7 +16,7 @@
       <dd class="account__role">{{ translate('account.role.' + currentAccount.role) }}</dd>
     </dl>
     } @else {
-    <p class="account__loading">{{ translate('account.loading') }}</p>
+    <p>{{ translate('account.loading') }}</p>
     }
   </section>
 </ng-container>

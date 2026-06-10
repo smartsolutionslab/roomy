@@ -21,6 +21,7 @@ import {
   roomId,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
+import { FormField, Message, Page } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
 
 // The occupancy calendar (OC-3, FR-004): a month grid where each in-month day shows its occupancy figure
@@ -30,7 +31,7 @@ import { EMPTY, expand, reduce } from 'rxjs';
 @Component({
   selector: 'roomy-occupancy-calendar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, Page, FormField, Message],
   templateUrl: './occupancy-calendar.html',
   styleUrl: './occupancy-calendar.css',
 })

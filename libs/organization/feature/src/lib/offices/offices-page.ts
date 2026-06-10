@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { Office, OfficeId, OfficesGateway, Room, RoomId } from '@roomy/organization-data-access';
+import { Button, Card, FormField, Message, Page } from '@roomy/shared-ui';
 import { Observable, catchError, of } from 'rxjs';
 
 type ActiveEditor =
@@ -17,7 +18,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-offices-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReactiveFormsModule],
+  imports: [TranslocoDirective, ReactiveFormsModule, Page, Card, FormField, Message, Button],
   templateUrl: './offices-page.html',
   styleUrl: './offices-page.css',
 })

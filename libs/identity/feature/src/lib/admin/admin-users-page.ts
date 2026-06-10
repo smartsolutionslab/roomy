@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { AdminUser, AdminUsersGateway, UserId } from '@roomy/identity-data-access';
-import { InfiniteScroll } from '@roomy/shared-ui';
+import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 
 @Component({
   selector: 'roomy-admin-users-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, InfiniteScroll],
+  imports: [TranslocoDirective, InfiniteScroll, Page, Message, Button],
   templateUrl: './admin-users-page.html',
   styleUrl: './admin-users-page.css',
 })

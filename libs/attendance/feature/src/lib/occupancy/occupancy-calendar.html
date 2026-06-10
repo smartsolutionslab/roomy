@@ -1,32 +1,30 @@
 <ng-container *transloco="let translate">
-  <section class="calendar">
-    <h1 class="calendar__title">{{ translate('attendance.calendar.title') }}</h1>
+  <section roomyPage size="content">
+    <h1>{{ translate('attendance.calendar.title') }}</h1>
 
     @if (loadFailed()) {
-    <p class="calendar__error" role="alert">{{ translate('attendance.occupancy.loadError') }}</p>
+    <roomy-message variant="error">{{ translate('attendance.occupancy.loadError') }}</roomy-message>
     } @else if (offices(); as items) { @if (items.length === 0) {
-    <p class="calendar__empty">{{ translate('attendance.occupancy.empty') }}</p>
+    <p>{{ translate('attendance.occupancy.empty') }}</p>
     } @else {
-    <label class="calendar__field">
-      <span>{{ translate('attendance.occupancy.officeLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.occupancy.officeLabel')">
       <select #officeSelect (change)="chooseOffice(officeSelect.value)">
         <option value="">{{ translate('attendance.occupancy.officePlaceholder') }}</option>
         @for (office of items; track office.id) {
         <option [value]="office.id">{{ office.name }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
     @if (selectedOffice(); as office) {
-    <label class="calendar__field">
-      <span>{{ translate('attendance.occupancy.roomLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.occupancy.roomLabel')">
       <select #roomSelect (change)="chooseRoom(roomSelect.value)">
         <option value="">{{ translate('attendance.occupancy.allRooms') }}</option>
         @for (room of office.rooms; track room.id) {
         <option [value]="room.id">{{ room.name }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
     <div class="calendar__nav">
       <button type="button" (click)="previousMonth()" [attr.aria-label]="translate('attendance.calendar.previousMonth')">
@@ -66,7 +64,7 @@
             }}</span>
             } @if (isMine(date)) {
             <span class="calendar__mine" aria-hidden="true">★</span>
-            <span class="calendar__sr">{{ translate('attendance.calendar.mine') }}</span>
+            <span class="roomy-visually-hidden">{{ translate('attendance.calendar.mine') }}</span>
             } }
           </td>
           }
@@ -76,7 +74,7 @@
     </table>
     }
     } } @else {
-    <p class="calendar__loading">{{ translate('attendance.occupancy.loading') }}</p>
+    <p>{{ translate('attendance.occupancy.loading') }}</p>
     }
   </section>
 </ng-container>

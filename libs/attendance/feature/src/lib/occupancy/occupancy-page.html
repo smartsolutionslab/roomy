@@ -1,39 +1,36 @@
 <ng-container *transloco="let translate">
-  <section class="occupancy">
-    <h1 class="occupancy__title">{{ translate('attendance.occupancy.title') }}</h1>
+  <section roomyPage size="content">
+    <h1>{{ translate('attendance.occupancy.title') }}</h1>
 
     @if (errorKey(); as key) {
-    <p class="occupancy__error" role="alert">{{ translate(key) }}</p>
+    <roomy-message variant="error">{{ translate(key) }}</roomy-message>
     }
 
     @if (loadFailed()) {
-    <p class="occupancy__error" role="alert">{{ translate('attendance.occupancy.loadError') }}</p>
+    <roomy-message variant="error">{{ translate('attendance.occupancy.loadError') }}</roomy-message>
     } @else if (offices(); as items) { @if (items.length === 0) {
-    <p class="occupancy__empty">{{ translate('attendance.occupancy.empty') }}</p>
+    <p>{{ translate('attendance.occupancy.empty') }}</p>
     } @else {
-    <label class="occupancy__field">
-      <span>{{ translate('attendance.occupancy.officeLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.occupancy.officeLabel')">
       <select #officeSelect (change)="chooseOffice(officeSelect.value)">
         <option value="">{{ translate('attendance.occupancy.officePlaceholder') }}</option>
         @for (office of items; track office.id) {
         <option [value]="office.id">{{ office.name }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
     @if (selectedOffice(); as office) {
-    <label class="occupancy__field">
-      <span>{{ translate('attendance.occupancy.roomLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.occupancy.roomLabel')">
       <select #roomSelect (change)="chooseRoom(roomSelect.value)">
         <option value="">{{ translate('attendance.occupancy.allRooms') }}</option>
         @for (room of office.rooms; track room.id) {
         <option [value]="room.id">{{ room.name }}</option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
-    <label class="occupancy__field">
-      <span>{{ translate('attendance.occupancy.rangeLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.occupancy.rangeLabel')">
       <select #presetSelect (change)="choosePreset(presetSelect.value)">
         @for (option of presets; track option) {
         <option [value]="option" [selected]="option === preset()">
@@ -41,12 +38,11 @@
         </option>
         }
       </select>
-    </label>
+    </roomy-form-field>
 
-    <label class="occupancy__field">
-      <span>{{ translate('attendance.occupancy.dateLabel') }}</span>
+    <roomy-form-field [label]="translate('attendance.occupancy.dateLabel')">
       <input type="date" [value]="effectiveAnchor()" (change)="changeAnchor(dateInput.value)" #dateInput />
-    </label>
+    </roomy-form-field>
 
     @if (days(); as result) {
     <ol class="occupancy__days">
@@ -91,7 +87,7 @@
     </ol>
     }
     } } } @else {
-    <p class="occupancy__loading">{{ translate('attendance.occupancy.loading') }}</p>
+    <p>{{ translate('attendance.occupancy.loading') }}</p>
     }
   </section>
 </ng-container>
