@@ -39,16 +39,12 @@ public sealed class AttendanceDay : EventSourcedAggregate
     {
         if (!BookingWindow.IsBookable(Date, today))
         {
-            return Error.Validation(
-                "not_bookable",
-                "Only working days within the next two weeks can be reserved.");
+            return Error.Validation("not_bookable", "Only working days within the next two weeks can be reserved.");
         }
 
         if (reservations.Exists(reservation => reservation.Employee == employee))
         {
-            return Error.Conflict(
-                "already_reserved_today",
-                "The employee already holds a reservation for this day.");
+            return Error.Conflict("already_reserved_today", "The employee already holds a reservation for this day.");
         }
 
         var placesTaken = reservations.Count(reservation => reservation.Room == room.Room);
@@ -90,9 +86,7 @@ public sealed class AttendanceDay : EventSourcedAggregate
 
         if (!MayCancel(existing, actor, actorIsAdmin))
         {
-            return Error.Forbidden(
-                "not_owner",
-                "Only the reservation's owner or an administrator may cancel it.");
+            return Error.Forbidden("not_owner", "Only the reservation's owner or an administrator may cancel it.");
         }
 
         Raise(new ReservationCancelled(
