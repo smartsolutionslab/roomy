@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -50,7 +51,10 @@ public static class BffEndpoints
     }
 
     private static string SafeReturnUrl(string? returnUrl) =>
-        !string.IsNullOrWhiteSpace(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative)
-            ? returnUrl
-            : "/";
+        IsSafeRelativeReturnUrl(returnUrl) ? returnUrl : "/";
+
+    // Only a non-empty, well-formed relative URL is a safe redirect target — an absolute URL would be an
+    // open-redirect vector, so anything else falls back to the app root.
+    private static bool IsSafeRelativeReturnUrl([NotNullWhen(true)] string? returnUrl) =>
+        !string.IsNullOrWhiteSpace(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative);
 }
