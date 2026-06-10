@@ -5,7 +5,7 @@
 **Created:** 2026-06-10
 **Updated:** 2026-06-10
 **Realizes:** product request for a modern Roomy visual identity built around orange, a
-custom logo/favicon, and a dark theme. Design-system decision recorded in **ADR-0045**
+custom logo/favicon, and a dark theme. Design-system decision recorded in **ADR-0047**
 (within the vanilla-CSS, WCAG 2.2 AA + Transloco, and frontend-boundary constraints of
 ADR-0019/0021/0024/0035).
 
@@ -99,7 +99,7 @@ purpose-built and comfortable to use in any lighting.
 
 ### Functional Requirements
 - **FR-001:** A single global token set MUST define the palette; recolouring or theming
-  happens there and reaches every view (ADR-0045). No colour literals in component CSS.
+  happens there and reaches every view (ADR-0047). No colour literals in component CSS.
 - **FR-002:** The accent MUST be modelled as two tokens — a brand/decorative tone and an
   AA-safe text-bearing tone — and text-on-accent MUST use the AA-safe tone (≥ 4.5:1).
 - **FR-003:** The app MUST ship a custom Roomy logo (header) and favicon/app icons
@@ -127,7 +127,7 @@ purpose-built and comfortable to use in any lighting.
   drawer/responsive pass is deferred) and marketing pages beyond the signed-out hero.
 - Restyling every feature page's internals (they inherit the new tokens; per-page card
   layouts can follow).
-- Adopting a CSS framework or component library (explicitly rejected — ADR-0019/0021/0045).
+- Adopting a CSS framework or component library (explicitly rejected — ADR-0019/0021/0047).
 - Per-context theme variations; animation beyond simple hover/transition.
 
 ## Review & Acceptance Checklist
