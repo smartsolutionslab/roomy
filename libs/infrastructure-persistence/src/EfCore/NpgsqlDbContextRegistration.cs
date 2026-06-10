@@ -26,18 +26,14 @@ public static class NpgsqlDbContextRegistration
     /// retried in the data layer.
     /// </remarks>
     /// <typeparam name="TContext">The per-service context deriving from <see cref="RoomyDbContext"/>.</typeparam>
-    public static IServiceCollection AddRoomyDbContext<TContext>(
-        this IServiceCollection services,
-        string connectionString)
+    public static IServiceCollection AddRoomyDbContext<TContext>(this IServiceCollection services, string connectionString)
         where TContext : RoomyDbContext
     {
         Ensure.That((IServiceCollection?)services).IsNotNull();
         Ensure.That(connectionString).IsNotNullOrWhiteSpace();
 
         services.AddDbContext<TContext>(options =>
-            options.UseNpgsql(
-                connectionString,
-                npgsql => npgsql.MigrationsAssembly(typeof(TContext).Assembly.FullName)));
+            options.UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(typeof(TContext).Assembly.FullName)));
 
         return services;
     }

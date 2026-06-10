@@ -14,13 +14,8 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 /// against this context's transaction. The earlier hand-rolled <c>OutboxMessage</c> table (#19) was
 /// retired when Wolverine took the outbox over (#20).
 /// </remarks>
-public abstract class RoomyDbContext : DbContext
+public abstract class RoomyDbContext(DbContextOptions options) : DbContext(options)
 {
-    protected RoomyDbContext(DbContextOptions options)
-        : base(options)
-    {
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

@@ -26,7 +26,5 @@ public interface IEventStore
     /// Reads a stream's events in version order, ready to be replayed to rebuild an aggregate.
     /// Returns an empty list for a stream that has no events.
     /// </summary>
-    Task<IReadOnlyList<EventEnvelope>> ReadStreamAsync(
-        StreamId streamId,
-        CancellationToken cancellationToken);
+    Task<IReadOnlyList<EventEnvelope>> ReadStreamAsync(StreamId streamId, CancellationToken cancellationToken);
 }

@@ -10,10 +10,7 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 // BFF's concern; this only validates the token and shapes claims. Shared by every context API host (ADR-0045).
 public static class KeycloakJwtBearerExtensions
 {
-    public static IServiceCollection AddKeycloakJwtBearer(
-        this IServiceCollection services,
-        Uri keycloakBaseAddress,
-        string realm)
+    public static IServiceCollection AddKeycloakJwtBearer(this IServiceCollection services, Uri keycloakBaseAddress, string realm)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

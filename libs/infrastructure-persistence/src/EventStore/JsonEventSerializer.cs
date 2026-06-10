@@ -8,16 +8,10 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 /// through an <see cref="IEventTypeRegistry"/> (ADR-0012). JSON keeps the events table queryable as
 /// Postgres <c>jsonb</c> and avoids a second serialization library.
 /// </summary>
-public sealed class JsonEventSerializer : IEventSerializer
+public sealed class JsonEventSerializer(IEventTypeRegistry typeRegistry, JsonSerializerOptions? serializerOptions = null)
+    : IEventSerializer
 {
-    private readonly IEventTypeRegistry typeRegistry;
-    private readonly JsonSerializerOptions serializerOptions;
-
-    public JsonEventSerializer(IEventTypeRegistry typeRegistry, JsonSerializerOptions? serializerOptions = null)
-    {
-        this.typeRegistry = typeRegistry;
-        this.serializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
-    }
+    private readonly JsonSerializerOptions serializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
     public SerializedEvent Serialize(object @event)
     {
@@ -34,7 +28,6 @@ public sealed class JsonEventSerializer : IEventSerializer
         var eventType = typeRegistry.Resolve(eventTypeName);
 
         return JsonSerializer.Deserialize(payload, eventType, serializerOptions)
-            ?? throw new EventDeserializationException(
-                $"Payload for event type '{eventTypeName}' deserialized to null.");
+            ?? throw new EventDeserializationException($"Payload for event type '{eventTypeName}' deserialized to null.");
     }
 }

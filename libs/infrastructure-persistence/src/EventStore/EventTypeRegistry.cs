@@ -13,9 +13,7 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
     private readonly IReadOnlyDictionary<Type, string> namesByType;
     private readonly IReadOnlyDictionary<string, Type> typesByName;
 
-    private EventTypeRegistry(
-        IReadOnlyDictionary<Type, string> namesByType,
-        IReadOnlyDictionary<string, Type> typesByName)
+    private EventTypeRegistry(IReadOnlyDictionary<Type, string> namesByType, IReadOnlyDictionary<string, Type> typesByName)
     {
         this.namesByType = namesByType;
         this.typesByName = typesByName;
@@ -29,8 +27,7 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
 
         return namesByType.TryGetValue(eventType, out var name)
             ? name
-            : throw new UnknownEventTypeException(
-                $"Event type '{eventType.FullName}' is not registered in the event-type registry.");
+            : throw new UnknownEventTypeException($"Event type '{eventType.FullName}' is not registered in the event-type registry.");
     }
 
     public Type Resolve(string eventTypeName)
@@ -39,8 +36,7 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
 
         return typesByName.TryGetValue(eventTypeName, out var type)
             ? type
-            : throw new UnknownEventTypeException(
-                $"Event type name '{eventTypeName}' is not registered in the event-type registry.");
+            : throw new UnknownEventTypeException($"Event type name '{eventTypeName}' is not registered in the event-type registry.");
     }
 
     public sealed class Builder
@@ -55,25 +51,18 @@ public sealed class EventTypeRegistry : IEventTypeRegistry
 
             var eventType = typeof(TEvent);
 
-            if (!namesByType.TryAdd(eventType, persistedName))
-            {
-                throw new ArgumentException(
-                    $"Event type '{eventType.FullName}' is already registered.", nameof(persistedName));
-            }
+            if (!namesByType.TryAdd(eventType, persistedName)) throw new ArgumentException($"Event type '{eventType.FullName}' is already registered.", nameof(persistedName));
 
             if (!typesByName.TryAdd(persistedName, eventType))
             {
                 namesByType.Remove(eventType);
-                throw new ArgumentException(
-                    $"Event type name '{persistedName}' is already registered.", nameof(persistedName));
+                throw new ArgumentException($"Event type name '{persistedName}' is already registered.", nameof(persistedName));
             }
 
             return this;
         }
 
         public EventTypeRegistry Build() =>
-            new(
-                new Dictionary<Type, string>(namesByType),
-                new Dictionary<string, Type>(typesByName, StringComparer.Ordinal));
+            new(new Dictionary<Type, string>(namesByType), new Dictionary<string, Type>(typesByName, StringComparer.Ordinal));
     }
 }

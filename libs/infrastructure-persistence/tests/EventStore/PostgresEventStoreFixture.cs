@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.TestSupport;
 
