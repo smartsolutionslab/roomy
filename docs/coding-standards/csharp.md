@@ -58,15 +58,16 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 
 ## Comments & documentation
 
-- Comments only when needed. A comment explains *why* something non-obvious is done; it
-  never restates *what* the code does. If a comment is needed to explain *what*, rename
-  instead.
+- **Default to no comment.** A comment is the rare exception, reserved for what the code
+  genuinely cannot carry itself: a platform/library workaround (cite the bug id, e.g.
+  `GH-2876`, a `SQLSTATE`), a security subtlety, a non-obvious algorithm, or a
+  "looks-wrong-but-intentional" note. If you need a comment to explain *what*, rename instead.
+- **Do not write** narrative/header comments, "what this does" summaries, or spec/FR/ADR
+  *reference* comments. Traceability belongs to the spec, the ADR, the commit message, and the
+  test name — not to code comments. Restating intent the names already carry is noise.
 - No commented-out code — that is what version control is for.
-- XML doc comments only on public, reusable API surface (e.g. `shared-kernel`); not on
-  internal domain types whose names already carry the meaning.
-- No ceremonial or boilerplate comments/XML docs that merely echo a type or member name.
-  Most code needs no comment at all; default to none and add one only when the *why* is
-  non-obvious. A wall of `<summary>` on self-explanatory members is noise, not documentation.
+- XML doc comments are not used as documentation ceremony; a `<summary>` is justified only by
+  the same "genuinely non-obvious" bar above, never to echo a type or member name.
 - `// TODO:` must reference a tracking issue.
 
 ## Domain modeling (DDD)
