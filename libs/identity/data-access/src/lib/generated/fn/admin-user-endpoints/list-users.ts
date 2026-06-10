@@ -7,14 +7,18 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { AdminUserResponse } from '../../models/admin-user-response';
+import { AdminUserPage } from '../../models/admin-user-page';
 
 export interface ListUsers$Params {
+  cursor?: string;
+  limit?: (number | string);
 }
 
-export function listUsers(http: HttpClient, rootUrl: string, params?: ListUsers$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<AdminUserResponse>>> {
+export function listUsers(http: HttpClient, rootUrl: string, params?: ListUsers$Params, context?: HttpContext): Observable<StrictHttpResponse<AdminUserPage>> {
   const rb = new RequestBuilder(rootUrl, listUsers.PATH, 'get');
   if (params) {
+    rb.query('cursor', params.cursor, {});
+    rb.query('limit', params.limit, {});
   }
 
   return http.request(
@@ -22,7 +26,7 @@ export function listUsers(http: HttpClient, rootUrl: string, params?: ListUsers$
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<AdminUserResponse>>;
+      return r as StrictHttpResponse<AdminUserPage>;
     })
   );
 }

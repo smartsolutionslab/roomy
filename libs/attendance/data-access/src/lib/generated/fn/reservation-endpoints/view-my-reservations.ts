@@ -7,14 +7,18 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { MyReservationResponse } from '../../models/my-reservation-response';
+import { MyReservationPage } from '../../models/my-reservation-page';
 
 export interface ViewMyReservations$Params {
+  cursor?: string;
+  limit?: (number | string);
 }
 
-export function viewMyReservations(http: HttpClient, rootUrl: string, params?: ViewMyReservations$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<MyReservationResponse>>> {
+export function viewMyReservations(http: HttpClient, rootUrl: string, params?: ViewMyReservations$Params, context?: HttpContext): Observable<StrictHttpResponse<MyReservationPage>> {
   const rb = new RequestBuilder(rootUrl, viewMyReservations.PATH, 'get');
   if (params) {
+    rb.query('cursor', params.cursor, {});
+    rb.query('limit', params.limit, {});
   }
 
   return http.request(
@@ -22,7 +26,7 @@ export function viewMyReservations(http: HttpClient, rootUrl: string, params?: V
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<MyReservationResponse>>;
+      return r as StrictHttpResponse<MyReservationPage>;
     })
   );
 }

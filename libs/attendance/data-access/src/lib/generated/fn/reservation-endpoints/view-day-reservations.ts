@@ -7,13 +7,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ReservationResponse } from '../../models/reservation-response';
+import { ReservationPage } from '../../models/reservation-page';
 
 export interface ViewDayReservations$Params {
   date: string;
 }
 
-export function viewDayReservations(http: HttpClient, rootUrl: string, params: ViewDayReservations$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ReservationResponse>>> {
+export function viewDayReservations(http: HttpClient, rootUrl: string, params: ViewDayReservations$Params, context?: HttpContext): Observable<StrictHttpResponse<ReservationPage>> {
   const rb = new RequestBuilder(rootUrl, viewDayReservations.PATH, 'get');
   if (params) {
     rb.query('date', params.date, {});
@@ -24,7 +24,7 @@ export function viewDayReservations(http: HttpClient, rootUrl: string, params: V
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<ReservationResponse>>;
+      return r as StrictHttpResponse<ReservationPage>;
     })
   );
 }
