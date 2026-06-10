@@ -20,6 +20,7 @@ import {
   RoomAvailability,
   RoomId,
   bookableDaysFrom,
+  errorCode,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
 import { Button, DaySelect, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
@@ -170,7 +171,7 @@ export class ReservePage {
   }
 
   private handleReserveError(error: HttpErrorResponse): void {
-    const code = (error.error as { code?: string } | null)?.code;
+    const code = errorCode(error);
     switch (code) {
       case 'room_full':
         this.errorKey.set('attendance.reserve.errors.roomFull');

@@ -14,7 +14,8 @@ import {
   AttendanceGateway,
   Employee,
   MyReservation,
-  isPastDay,
+  errorCode,
+  partitionReservationsByDay,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
 import { cursorList } from '@roomy/shared-data-access';
@@ -73,16 +74,11 @@ export class OnBehalfPage {
     return employee === null ? EMPTY : this.gateway.reservationsFor(employee.id, cursor);
   }, { autoLoad: false });
 
-  protected readonly upcoming = computed(() =>
-    (this.reservationsList.items() ?? [])
-      .filter((reservation) => !isPastDay(reservation.date, this.today()))
-      .sort((left, right) => left.date.localeCompare(right.date)),
+  private readonly schedule = computed(() =>
+    partitionReservationsByDay(this.reservationsList.items() ?? [], this.today()),
   );
-  protected readonly past = computed(() =>
-    (this.reservationsList.items() ?? [])
-      .filter((reservation) => isPastDay(reservation.date, this.today()))
-      .sort((left, right) => right.date.localeCompare(left.date)),
-  );
+  protected readonly upcoming = computed(() => this.schedule().upcoming);
+  protected readonly past = computed(() => this.schedule().past);
 
   protected chooseEmployee(employeeValue: string): void {
     this.selectedEmployeeId.set(employeeValue || null);
@@ -116,9 +112,8 @@ export class OnBehalfPage {
           this.result.set({ key: 'attendance.onBehalf.cancelled' });
         },
         error: (error: HttpErrorResponse) => {
-          const code = (error.error as { code?: string } | null)?.code;
           this.errorKey.set(
-            code === 'past_immutable'
+            errorCode(error) === 'past_immutable'
               ? 'attendance.onBehalf.errors.pastImmutable'
               : 'attendance.onBehalf.errors.generic',
           );

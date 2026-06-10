@@ -14,7 +14,8 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import {
   AttendanceGateway,
   MyReservation,
-  isPastDay,
+  errorCode,
+  partitionReservationsByDay,
   todayInBerlin,
 } from '@roomy/attendance-data-access';
 import { cursorList } from '@roomy/shared-data-access';
@@ -50,16 +51,11 @@ export class MyReservationsPage {
   protected readonly result = signal<ResultMessage | null>(null);
   protected readonly errorKey = signal<string | null>(null);
 
-  protected readonly upcoming = computed(() =>
-    (this.list.items() ?? [])
-      .filter((reservation) => !isPastDay(reservation.date, this.today()))
-      .sort((left, right) => left.date.localeCompare(right.date)),
+  private readonly schedule = computed(() =>
+    partitionReservationsByDay(this.list.items() ?? [], this.today()),
   );
-  protected readonly past = computed(() =>
-    (this.list.items() ?? [])
-      .filter((reservation) => isPastDay(reservation.date, this.today()))
-      .sort((left, right) => right.date.localeCompare(left.date)),
-  );
+  protected readonly upcoming = computed(() => this.schedule().upcoming);
+  protected readonly past = computed(() => this.schedule().past);
 
   protected cancel(reservation: MyReservation): void {
     this.result.set(null);
@@ -104,9 +100,8 @@ export class MyReservationsPage {
   }
 
   private handleCancelError(error: HttpErrorResponse): void {
-    const code = (error.error as { code?: string } | null)?.code;
     this.errorKey.set(
-      code === 'past_immutable'
+      errorCode(error) === 'past_immutable'
         ? 'attendance.mine.errors.pastImmutable'
         : 'attendance.mine.errors.generic',
     );
