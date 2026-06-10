@@ -2,10 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmartSolutionsLab.Roomy.DbMigrator;
 
-public sealed class DatabaseMigrator(
-    IServiceProvider services,
-    IEnumerable<MigrationTarget> targets,
-    ILogger<DatabaseMigrator> logger)
+public sealed class DatabaseMigrator(IServiceProvider services, IEnumerable<MigrationTarget> targets, ILogger<DatabaseMigrator> logger)
 {
     public async Task MigrateAsync(CancellationToken cancellationToken)
     {
