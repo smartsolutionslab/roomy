@@ -16,8 +16,7 @@ public sealed class CompanyRepository(OrganizationDbContext context) : ICompanyR
     {
         var company = await context.Companies.FirstOrDefaultAsync(cancellationToken);
 
-        if (company is null)
-            return Error.NotFound("company.not_seeded", "No company has been seeded yet.");
+        if (company is null) return Error.NotFound("company.not_seeded", "No company has been seeded yet.");
 
         return company;
     }

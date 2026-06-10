@@ -21,16 +21,10 @@ public sealed record WorkEmail : IValueObject
 
         var trimmed = value.Trim();
         var at = trimmed.IndexOf('@');
-        if (!HasSingleInteriorAt(trimmed, at))
-        {
-            return null;
-        }
+        if (!HasSingleInteriorAt(trimmed, at)) return null;
 
         var domain = trimmed[(at + 1)..];
-        if (!IsDottedDomain(domain))
-        {
-            return null;
-        }
+        if (!IsDottedDomain(domain)) return null;
 
         return new WorkEmail(trimmed.ToLowerInvariant());
 
