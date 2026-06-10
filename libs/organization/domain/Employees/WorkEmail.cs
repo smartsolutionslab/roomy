@@ -21,18 +21,26 @@ public sealed record WorkEmail : IValueObject
 
         var trimmed = value.Trim();
         var at = trimmed.IndexOf('@');
-        if (at <= 0 || at != trimmed.LastIndexOf('@') || at == trimmed.Length - 1)
+        if (!HasSingleInteriorAt(trimmed, at))
         {
             return null;
         }
 
         var domain = trimmed[(at + 1)..];
-        if (!domain.Contains('.') || domain.StartsWith('.') || domain.EndsWith('.'))
+        if (!IsDottedDomain(domain))
         {
             return null;
         }
 
         return new WorkEmail(trimmed.ToLowerInvariant());
+
+        // Exactly one '@', with a non-empty local part before it and at least one character after it.
+        static bool HasSingleInteriorAt(string candidate, int at) =>
+            at > 0 && at == candidate.LastIndexOf('@') && at != candidate.Length - 1;
+
+        // A dotted domain that neither starts nor ends with the dot.
+        static bool IsDottedDomain(string domain) =>
+            domain.Contains('.') && !domain.StartsWith('.') && !domain.EndsWith('.');
     }
 
     public override string ToString() => Value;
