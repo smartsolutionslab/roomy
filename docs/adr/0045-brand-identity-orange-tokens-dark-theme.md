@@ -1,4 +1,4 @@
-# 0045. Brand identity: burnt-orange two-accent token system, dark theme, and monogram logo
+# 0045. Brand identity: vivid-orange two-accent token system, sunset gradients, dark theme, sidebar shell, and monogram logo
 
 - **Status:** Accepted
 - **Date:** 2026-06-10
@@ -12,17 +12,20 @@ text-only branding in the header, the default Angular `favicon.ico`, and a thin 
 colours hard-coded in component CSS (`#b00020`, `#ccc`, `#f4f4f4`) rather than reading
 tokens, so a theme change could not reach them.
 
-We want a modern, recognizable Roomy identity built around **orange** as the primary
-colour, including a custom logo/favicon, and (a product decision taken with this work) a
-**dark theme**. The question is how to express that identity as a maintainable, accessible
-design system within our existing constraints — vanilla CSS (ADR-0019/0021), WCAG 2.2 AA
+We want a modern, recognizable Roomy identity built around **vivid orange** as the primary
+colour with **sunset (orange→amber→rose) gradients**, a custom logo/favicon, a **dark
+theme**, and a richer app layout — a **left sidebar** shell, a **hero landing** for
+signed-out visitors, and a **dashboard** of cards for signed-in users (product decisions
+taken with this work). The question is how to express that identity as a maintainable,
+accessible design system within our existing constraints — vanilla CSS (ADR-0019/0021), WCAG 2.2 AA
 and Transloco DE+EN (ADR-0024), and the frontend library boundaries (ADR-0035).
 
 ## Decision drivers
 
-- **Accessibility (ADR-0024).** WCAG 2.2 AA contrast is a hard gate. Burnt orange `#EA580C`
-  with white text is only ~3.5:1 — fine as a brand/decorative tone, but it fails AA for
-  text. The system must not let a single "accent" token be used where it breaks contrast.
+- **Accessibility (ADR-0024).** WCAG 2.2 AA contrast is a hard gate. Vivid orange `#F97316`
+  with white text is only ~2.9:1 — fine as a brand/decorative tone (logo, gradients, large
+  hero text ≥3:1), but it fails AA for normal text. The system must not let a single
+  "accent" token be used where it breaks contrast.
 - **Single source of truth.** Recolouring or theming must happen in one place and reach
   every view, including the feature libs — no colour literals stranded in component CSS.
 - **No new stack (ADR-0019/0021).** Stay on vanilla CSS custom properties; no Tailwind,
@@ -50,12 +53,13 @@ and Transloco DE+EN (ADR-0024), and the frontend library boundaries (ADR-0035).
 We chose **Option C**.
 
 1. **Two-accent token model** in `apps/web/src/styles.css`. `--roomy-color-accent`
-   (`#EA580C`) is the **brand/decorative** tone (logo, borders, gradient, large/icon use);
+   (`#F97316`) is the **brand/decorative** tone (logo, borders, gradient, large/icon use);
    `--roomy-color-accent-strong` (`#C2410C`, ~5:1 on white) is the **text-bearing** tone
    for buttons/links and the focus ring. Supporting `*-hover/-subtle/-muted/-on-accent`
    tokens complete the ramp, alongside a refreshed cool-zinc neutral palette and new
-   `radius`, `shadow`, `transition`, type-scale, and `gradient-accent` tokens. Existing
-   token *names* are preserved so already-merged component CSS keeps working.
+   `radius`, `shadow`, `transition`, type-scale, **sunset `gradient-accent`, `shadow-glow`,
+   and glass (translucent + blur)** tokens. Existing token *names* are preserved so
+   already-merged component CSS keeps working.
 2. **Dark theme as token overrides** under both `@media (prefers-color-scheme: dark)`
    (scoped to `:root:not([data-theme="light"])`) and `:root[data-theme="dark"]` (explicit
    choice wins). `html { color-scheme: light dark }` so native controls follow the theme.
@@ -71,6 +75,12 @@ We chose **Option C**.
 4. **Tokenize stranded literals.** The hard-coded colours in attendance feature CSS are
    replaced with `--roomy-color-danger` / `-border` / `-background-muted` so dark theme is
    correct everywhere.
+5. **Richer layout.** The shell branches on the session: signed-in users get a **left
+   sidebar** (brand, icon navigation, and a footer with the user, theme toggle, language
+   switcher, and sign-out) over a content area; signed-out visitors get a **glass top bar**
+   and a **gradient hero landing**. The signed-in home is a **dashboard** of navigation
+   cards. The sidebar/hero/dashboard live in the `context:web` app shell + `home` component
+   (the one frontend composition root, ADR-0035) and reuse the shared tokens.
 
 ## Consequences
 

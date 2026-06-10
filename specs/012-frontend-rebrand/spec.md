@@ -1,4 +1,4 @@
-# Feature Specification: Frontend rebrand — burnt-orange identity, logo, and dark theme
+# Feature Specification: Frontend rebrand — vivid-orange identity, logo, dark theme, sidebar shell
 
 **Feature Branch:** `feat/012-frontend-rebrand`
 **Status:** Draft
@@ -13,11 +13,14 @@ ADR-0019/0021/0024/0035).
 
 The web app had no product identity: a generic blue accent, text-only header branding, the
 default Angular favicon, a thin token set, and colours hard-coded in some feature CSS. This
-feature gives Roomy a recognizable look: a **burnt-orange** brand palette expressed as a
-centralized **two-accent token system** (a decorative tone plus an AA-safe text tone), a
-**custom monogram logo + favicon**, a refreshed neutral/elevation/type scale, and a
-**dark theme** that follows the OS preference and can be toggled. All visible strings stay
-localized (DE + EN) and the shell remains WCAG 2.2 AA.
+feature gives Roomy a recognizable, modern look: a **vivid-orange** brand palette with
+**sunset (orange→amber→rose) gradients**, expressed as a centralized **two-accent token
+system** (a decorative tone plus an AA-safe text tone); a **custom monogram logo + favicon**;
+a refreshed neutral/elevation/type scale plus **glow and glass** tokens; a **dark theme**
+that follows the OS preference and can be toggled; and a **richer layout** — a **left
+sidebar** for signed-in users, a **gradient hero landing** for signed-out visitors, and a
+**dashboard** of navigation cards on the signed-in home. All visible strings stay localized
+(DE + EN) and the shell remains WCAG 2.2 AA.
 
 ## User Scenarios & Testing
 
@@ -67,9 +70,20 @@ purpose-built and comfortable to use in any lighting.
      element keeps a hard-coded light-only colour.
 
 8. **Shell stays accessible**
-   - GIVEN the redesigned header
+   - GIVEN the redesigned shell
    - THEN it has no detectable accessibility violations (automated axe check) and the
      skip-link / keyboard navigation still work.
+
+9. **Hero landing for signed-out visitors**
+   - GIVEN a visitor with no session
+   - THEN the home page shows a gradient hero (brand mark, headline, subtitle) and a clear
+     Sign-in call to action, over a glass top bar — not a bare welcome line.
+
+10. **Sidebar + dashboard for signed-in users**
+   - GIVEN a signed-in user
+   - THEN navigation is a left sidebar (brand, icon links, and user/theme/language/sign-out
+     in its footer), and the home page is a dashboard of cards linking to the user's
+     available sections (admin-only cards only for administrators).
 
 ### Edge Cases
 - `localStorage` unavailable (private mode / SSR) → theme still resolves and applies; the
@@ -97,12 +111,19 @@ purpose-built and comfortable to use in any lighting.
   guarded for zoneless/SSR.
 - **FR-007:** The redesigned shell MUST keep the existing accessibility guarantees (axe:
   no violations; skip-link and keyboard nav intact).
+- **FR-008:** The shell MUST present a left sidebar for signed-in users and a glass top bar
+  + gradient hero landing for signed-out visitors; the signed-in home MUST be a dashboard of
+  navigation cards. Admin-only destinations MUST appear only for administrators (unchanged
+  authorization — ADR-0040 guards still gate the routes themselves).
 
 ### Key Entities (view models)
 - **ThemePreference** — `'light' | 'dark'`; the resolved/persisted appearance choice.
 
 ## Out of Scope (this feature / deferred)
-- Responsive breakpoints, mobile navigation, and marketing/landing pages.
+- Polished mobile navigation (the sidebar collapses at narrow widths, but a full mobile
+  drawer/responsive pass is deferred) and marketing pages beyond the signed-out hero.
+- Restyling every feature page's internals (they inherit the new tokens; per-page card
+  layouts can follow).
 - Adopting a CSS framework or component library (explicitly rejected — ADR-0019/0021/0045).
 - Per-context theme variations; animation beyond simple hover/transition.
 
