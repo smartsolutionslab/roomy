@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SmartSolutionsLab.Roomy.TestSupport</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.TestSupport</AssemblyName>
+  </PropertyGroup>
+
+  <!--
+    Shared test utilities (context-agnostic): the test auth scheme, a fixed clock, date helpers, and the
+    Aspire-Postgres fixture mechanics. Deliberately a library (no test runner) and IsPackable=false, so it is
+    never discovered or run as a test assembly. Its namespace avoids the .Domain/.Application/.Infrastructure
+    segments, so the architecture tests never select it (and it is not referenced by Roomy.ArchitectureTests).
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Aspire.Hosting.Testing" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="xunit.v3.extensibility.core" />
+  </ItemGroup>
+
+</Project>
