@@ -1,9 +1,5 @@
 using JasperFx;
 using JasperFx.CommandLine;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
@@ -17,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // The organization context owns its database (ADR-0014); Aspire injects the connection string by name.
-var connectionString = builder.Configuration.GetRequiredConnectionString("organization");
+var connectionString = builder.Configuration.GetOrganizationConnectionString();
 
 builder.Services.AddOrganizationPersistence(connectionString);
 
@@ -62,7 +58,7 @@ if (!emittingOpenApiDocument)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = connectionString,
-            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
+            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
         },
         applicationAssembly: typeof(OrganizationApiHost).Assembly,
         typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserRegisteredConsumer).Assembly);

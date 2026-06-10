@@ -1,7 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 using SmartSolutionsLab.Roomy.DevSeeder;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
@@ -15,13 +11,13 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-var identityConnectionString = builder.Configuration.GetRequiredConnectionString("identity");
+var identityConnectionString = builder.Configuration.GetIdentityConnectionString();
 builder.Services.AddIdentityPersistence(identityConnectionString);
 
-var organizationConnectionString = builder.Configuration.GetRequiredConnectionString("organization");
+var organizationConnectionString = builder.Configuration.GetOrganizationConnectionString();
 builder.Services.AddOrganizationPersistence(organizationConnectionString);
 
-var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
+var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 
 var keycloak = builder.Configuration.GetSection("Keycloak");
