@@ -41,32 +41,32 @@ libs; no gateway change; no backend write change (reserve `onBehalfOf` + admin c
   Regenerate the client (no spec drift).
 
 ## Phase 3: Reserve input (reuse the 007 flow)
-- [ ] T006 [US1] `ReservePage`: add `onBehalfOf = input<string | null>(null)`; `reserve()` passes it to
+- [x] T006 [US1] `ReservePage`: add `onBehalfOf = input<string | null>(null)`; `reserve()` passes it to
   the gateway (null ⇒ self-service, unchanged). Spec: when `onBehalfOf` is set, the reserve call carries
   it; default behaviour and existing specs stay green.
 
 ## Phase 4: On-behalf page (US1, US2)
-- [ ] T007 [US1/US2] RED: `on-behalf/on-behalf-page.spec.ts` — employee picker lists employees; before a
+- [x] T007 [US1/US2] RED: `on-behalf/on-behalf-page.spec.ts` — employee picker lists employees; before a
   pick, no reserve form/list (prompt); after a pick, the embedded reserve flow targets that employee
   (onBehalfOf), and the employee's reservations render with cancel on upcoming only; cancel removes the
   row + announces; empty directory + empty reservations states.
-- [ ] T008 [US1/US2] GREEN: `on-behalf/on-behalf-page.ts/.html/.css` — employee `<select>`
+- [x] T008 [US1/US2] GREEN: `on-behalf/on-behalf-page.ts/.html/.css` — employee `<select>`
   (`listEmployees`), `<roomy-reserve-page [onBehalfOf]>`, the employee's reservations (`reservationsFor`)
   with cancel (admin cancel authorised); `aria-live` results; `past_immutable` surfaced (FR-004).
 
 ## Phase 5: Wiring, localization, accessibility (US3)
-- [ ] T009 [US3] Add the `on-behalf` route (guarded by `authGuard` + `adminGuard`) to
+- [x] T009 [US3] Add the `on-behalf` route (guarded by `authGuard` + `adminGuard`) to
   `attendance.routes.ts`. Guard behaviour is covered by `shared-feature`; add a smoke test if useful.
-- [ ] T010 [US3] Add the admin-only `On behalf` nav entry to `apps/web/src/app/app.html` (inside the
+- [x] T010 [US3] Add the admin-only `On behalf` nav entry to `apps/web/src/app/app.html` (inside the
   `administrator` block).
-- [ ] T011 [US3] `attendance.onBehalf.*` i18n in `apps/web/public/i18n/{en,de}.json` + the feature test
+- [x] T011 [US3] `attendance.onBehalf.*` i18n in `apps/web/public/i18n/{en,de}.json` + the feature test
   transloco helper; assert DE/EN key parity.
-- [ ] T012 [US3] WCAG 2.2 AA pass: labelled picker, announced reserve/cancel, keyboard operability,
+- [x] T012 [US3] WCAG 2.2 AA pass: labelled picker, announced reserve/cancel, keyboard operability,
   visible focus.
 
 ## Verify (Definition of Done)
-- [ ] `dotnet build -warnaserror` + `dotnet test` (host + read model) + `dotnet format --verify-no-changes`.
-- [ ] `pnpm nx run-many -t test lint -p attendance-data-access attendance-feature web` + `nx build web`.
-- [ ] OpenAPI spec + generated-client drift gates green.
-- [ ] EN/DE i18n key parity holds.
-- [ ] Reconcile this tasks.md on merge.
+- [x] `dotnet build -warnaserror` + `dotnet test` (host + read model) + `dotnet format --verify-no-changes`.
+- [x] `pnpm nx run-many -t test lint -p attendance-data-access attendance-feature web` + `nx build web`.
+- [x] OpenAPI spec + generated-client drift gates green.
+- [x] EN/DE i18n key parity holds.
+- [x] Reconcile this tasks.md on merge.

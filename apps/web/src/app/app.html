@@ -14,6 +14,7 @@
       <a class="app__nav-link" routerLink="/attendance/occupancy">{{ translate('shell.occupancyLink') }}</a>
       <a class="app__nav-link" routerLink="/attendance/calendar">{{ translate('shell.calendarLink') }}</a>
       @if (user.roles.includes('administrator')) {
+      <a class="app__admin-link" routerLink="/attendance/on-behalf">{{ translate('shell.onBehalfLink') }}</a>
       <a class="app__admin-link" routerLink="/offices">{{ translate('shell.officesLink') }}</a>
       <a class="app__admin-link" routerLink="/admin/users">{{ translate('shell.adminLink') }}</a>
       }

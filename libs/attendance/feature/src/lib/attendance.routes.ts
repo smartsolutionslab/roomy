@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@roomy/shared-feature';
+import { adminGuard, authGuard } from '@roomy/shared-feature';
 
 // The attendance section is self-service for any signed-in employee (FR-009): authGuard only, never
 // adminGuard. Reserve is the default; my-reservations hosts cancel/change (AT-4/AT-5); occupancy and
@@ -26,6 +26,11 @@ export const attendanceRoutes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./occupancy/occupancy-calendar').then((module) => module.OccupancyCalendar),
+  },
+  {
+    path: 'on-behalf',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./on-behalf/on-behalf-page').then((module) => module.OnBehalfPage),
   },
   {
     path: '',
