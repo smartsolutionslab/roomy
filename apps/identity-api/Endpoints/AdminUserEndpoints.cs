@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
@@ -19,12 +18,12 @@ public static class AdminUserEndpoints
         endpoints.MapGet("/admin/users", ListAccountsAsync)
             .RequireAdministrator()
             .WithName("ListUsers")
-            .Produces<AdminUserPage>()
+            .Produces<Response.Page.AdminUser>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/admin/users/{userId:guid}", GetAccountAsync)
             .RequireAdministrator()
             .WithName("GetUser")
-            .Produces<AdminUserResponse>()
+            .Produces<Response.AdminUser>()
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         endpoints.MapPost("/admin/users/{userId:guid}:grant-administrator", GrantAdministratorAsync)
             .RequireAdministrator()
@@ -57,7 +56,7 @@ public static class AdminUserEndpoints
         var page = await users.GetPageAsync(request.Value, cancellationToken);
 
         return page.Match(
-            accounts => Results.Ok(new AdminUserPage(accounts.Items.Select(Project).ToList(), accounts.NextCursor)),
+            accounts => Results.Ok(new Response.Page.AdminUser(accounts.Items.Select(Project).ToList(), accounts.NextCursor)),
             error => error.ToBadRequest());
     }
 
@@ -82,7 +81,7 @@ public static class AdminUserEndpoints
         return result.Match(Results.NoContent, error => error.ToHttpResult());
     }
 
-    private static AdminUserResponse Project(User user) =>
+    private static Response.AdminUser Project(User user) =>
         new(
             user.Identifier.Value,
             user.Email.Value,
