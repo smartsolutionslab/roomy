@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
+namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 
 // One keyset-paginated page per list (ADR-0044): the items in their stable sort order plus the opaque
 // cursor that locates the next page — null when the list is exhausted. Concrete per-list records keep

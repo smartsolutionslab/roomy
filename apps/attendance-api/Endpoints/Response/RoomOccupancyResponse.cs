@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
+namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 
 internal sealed record RoomOccupancyResponse(
     Guid RoomId,

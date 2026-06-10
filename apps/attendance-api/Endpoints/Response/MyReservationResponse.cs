@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
+namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 
 internal sealed record MyReservationResponse(
     Guid ReservationId,
