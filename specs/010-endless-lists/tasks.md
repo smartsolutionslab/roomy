@@ -24,50 +24,50 @@ context; no write-model change.
 ---
 
 ## Phase 1: Shared primitives (US1)
-- [ ] T001 [US1] `Page<T>(IReadOnlyList<T> Items, string? NextCursor)` in
+- [x] T001 [US1] `Page<T>(IReadOnlyList<T> Items, string? NextCursor)` in
   `libs/shared-kernel/src/Pagination/`.
-- [ ] T002 [US1] `CursorCodec.Encode<TKey>/TryDecode<TKey>` (base64url JSON). Test:
+- [x] T002 [US1] `CursorCodec.Encode<TKey>/TryDecode<TKey>` (base64url JSON). Test:
   round-trip a sort-key record; `TryDecode` returns false on malformed input.
-- [ ] T003 [US1] `PageRequest` value object + `PageRequest.From(string? cursor, int? limit) →
+- [x] T003 [US1] `PageRequest` value object + `PageRequest.From(string? cursor, int? limit) →
   Result<PageRequest>` (default 50, cap 100, `>= 1`, decode cursor; `Error.Validation` otherwise).
   Test: default; cap rejected; `< 1` rejected; bad cursor rejected; valid carries decoded cursor.
 
 ## Phase 2: Identity `/admin/users` (US2)
-- [ ] T004 [US2] `IUserRepository.GetPageAsync(PageRequest, CancellationToken) → Task<Page<User>>`
+- [x] T004 [US2] `IUserRepository.GetPageAsync(PageRequest, CancellationToken) → Task<Page<User>>`
   keyset `(DisplayName, Identifier)`; implement in `UserRepository` (`limit + 1` probe). Replace the
   single `GetAllAsync` use; update the two test fakes.
-- [ ] T005 [US2] `AdminUserEndpoints.ListAccountsAsync`: bind `cursor`/`limit`, `PageRequest.From`
+- [x] T005 [US2] `AdminUserEndpoints.ListAccountsAsync`: bind `cursor`/`limit`, `PageRequest.From`
   (400 on invalid), return `AdminUserPage`; `.Produces<AdminUserPage>()`. Re-emit OpenAPI.
-- [ ] T006 [US2] Identity integration tests (real Postgres): first page + `nextCursor`; next page
+- [x] T006 [US2] Identity integration tests (real Postgres): first page + `nextCursor`; next page
   contiguity; end `nextCursor: null`; stability across an insert; 400 bad cursor/limit; 403 non-admin.
 
 ## Phase 3: Attendance (US2)
-- [ ] T007 [US2] `ViewMyReservations`/`ViewEmployees` carry a `PageRequest`; handlers return
+- [x] T007 [US2] `ViewMyReservations`/`ViewEmployees` carry a `PageRequest`; handlers return
   `Result<Page<…View>>`.
-- [ ] T008 [US2] `MyReservationsReadModel` keyset `(Date, ReservationId)`; `EmployeeCatalog` keyset
+- [x] T008 [US2] `MyReservationsReadModel` keyset `(Date, ReservationId)`; `EmployeeCatalog` keyset
   `(Name, EmployeeId)`; both return `Page<T>` with the `limit + 1` probe. Read-model integration
   tests (real Postgres): boundary + stability.
-- [ ] T009 [US2] `ReservationEndpoints`: `ViewMine`/`ViewEmployees`/`ViewForEmployee` bind
+- [x] T009 [US2] `ReservationEndpoints`: `ViewMine`/`ViewEmployees`/`ViewForEmployee` bind
   `cursor`/`limit` + validate + return `MyReservationPage`/`EmployeePage`; `ViewAsync` wraps in
   `ReservationPage(items, nextCursor: null)`. `.Produces<…Page>()`. Host tests + re-emit OpenAPI.
 
 ## Phase 4: Generated clients (US3)
-- [ ] T010 [US3] `nx run identity-data-access:generate-client` +
+- [x] T010 [US3] `nx run identity-data-access:generate-client` +
   `nx run attendance-data-access:generate-client`; commit regenerated trees; drift gate green.
 
 ## Phase 5: Web endless scroll (US4)
-- [ ] T011 [US4] Frontend `Page<T>` + `mapPage` in `@roomy/shared-data-access`.
-- [ ] T012 [US4] New `@roomy/shared-ui` (`type:ui`/`context:shared`): infinite-scroll list
+- [x] T011 [US4] Frontend `Page<T>` + `mapPage` in `@roomy/shared-data-access`.
+- [x] T012 [US4] New `@roomy/shared-ui` (`type:ui`/`context:shared`): infinite-scroll list
   (`IntersectionObserver` sentinel + "Load more" button, stop at `nextCursor` null), WCAG 2.2 AA.
   `@testing-library` spec: emits "load next" on intersection / button; hides at end.
-- [ ] T013 [US4] Facades take `cursor`/`limit`, return `Observable<Page<…>>`:
+- [x] T013 [US4] Facades take `cursor`/`limit`, return `Observable<Page<…>>`:
   `attendance-gateway` (`reservationsMine`/`listEmployees`/`reservationsFor`; `/reservations?date=`
   unwraps `.items`) + identity admin `listUsers`. Update `.spec.ts`.
-- [ ] T014 [US4] `my-reservations-page`, `on-behalf-page` (picker + employee list), `admin-users-page`
+- [x] T014 [US4] `my-reservations-page`, `on-behalf-page` (picker + employee list), `admin-users-page`
   accumulate pages via `@roomy/shared-ui`; Transloco "Load more"/"End of list" (DE + EN). Specs:
   append on intersection / "Load more"; stop at end.
 
 ## Phase 6: Verify
-- [ ] T015 Full gates: `dotnet build -warnaserror`, `dotnet test`, `dotnet format
+- [x] T015 Full gates: `dotnet build -warnaserror`, `dotnet test`, `dotnet format
   --verify-no-changes`, `pnpm nx affected -t lint test build`, both drift gates. Atomic Conventional
-  Commits; PR.
+  Commits; PR. **All green; `010-endless-lists` complete.**
