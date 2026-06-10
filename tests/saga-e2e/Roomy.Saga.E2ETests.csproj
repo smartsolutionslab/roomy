@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SmartSolutionsLab.Roomy.Saga.E2ETests</RootNamespace>
+    <AssemblyName>SmartSolutionsLab.Roomy.Saga.E2ETests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The full saga stack the testing builder boots: Postgres + RabbitMQ + Keycloak + the schema runner
+         + identity-api + organization-api, so the org<->identity provisioning saga runs over the real
+         transport and credential provider (ADR-0025). -->
+    <ProjectReference Include="../saga-e2e-apphost/Roomy.Saga.TestAppHost.csproj" />
+    <!-- The organization read side, to poll the Employee's provisioning state directly from its database. -->
+    <ProjectReference Include="../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Stands up the real stack through the same Aspire resource model the app host uses. Needs Docker —
+         available on the CI ubuntu-latest runner. -->
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="10.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
