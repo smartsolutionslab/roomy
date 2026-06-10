@@ -196,6 +196,11 @@
     "notAuthorized": {
       "title": "Nicht berechtigt",
       "message": "Sie haben keine Berechtigung, diese Seite anzuzeigen."
+    },
+    "list": {
+      "loadMore": "Mehr laden",
+      "loading": "Wird geladen…",
+      "endOfList": "Ende der Liste"
     }
   }
 }
