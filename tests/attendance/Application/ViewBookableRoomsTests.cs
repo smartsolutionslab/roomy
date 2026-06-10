@@ -1,3 +1,4 @@
+using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
@@ -21,33 +22,30 @@ public class ViewBookableRoomsTests
             RoomIdentifier.New(),
             "A1",
             RoomCapacity.From(8));
-        var handler = new ViewBookableRoomsHandler(new StubReadModel(company, [room]));
+        var readModel = Substitute.For<IBookableRoomsReadModel>();
+        IReadOnlyList<BookableRoomView> rooms = [room];
+        readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<CancellationToken>()).Returns(rooms);
+        var handler = new ViewBookableRoomsHandler(readModel);
 
         var result = await handler.HandleAsync(new ViewBookableRooms(company), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldHaveSingleItem().ShouldBe(room);
+        await readModel.Received(1).GetAsync(company, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task A_company_with_no_rooms_gets_an_empty_list()
     {
         var company = CompanyIdentifier.New();
-        var handler = new ViewBookableRoomsHandler(new StubReadModel(company, []));
+        var readModel = Substitute.For<IBookableRoomsReadModel>();
+        IReadOnlyList<BookableRoomView> rooms = [];
+        readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<CancellationToken>()).Returns(rooms);
+        var handler = new ViewBookableRoomsHandler(readModel);
 
         var result = await handler.HandleAsync(new ViewBookableRooms(company), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldBeEmpty();
-    }
-
-    private sealed class StubReadModel(CompanyIdentifier expected, IReadOnlyList<BookableRoomView> rooms)
-        : IBookableRoomsReadModel
-    {
-        public Task<IReadOnlyList<BookableRoomView>> GetAsync(CompanyIdentifier company, CancellationToken cancellationToken)
-        {
-            company.ShouldBe(expected);
-            return Task.FromResult(rooms);
-        }
     }
 }

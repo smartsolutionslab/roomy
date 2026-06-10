@@ -1,3 +1,4 @@
+using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
@@ -23,7 +24,11 @@ public class CancelReservationHandlerTests
     {
         var reservationId = ReservationIdentifier.New();
         var owner = EmployeeIdentifier.New();
-        var repository = new FakeRepository(reservationId, owner);
+        var repository = Substitute.For<IAttendanceDayRepository>();
+        repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
+            .Returns(_ => SeededDay(reservationId, owner));
+        repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success());
         var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
 
         var result = await handler.HandleAsync(
@@ -31,14 +36,16 @@ public class CancelReservationHandlerTests
             CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        repository.LoadCount.ShouldBe(1);
-        repository.SaveCount.ShouldBe(1);
+        await repository.Received(1).LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>());
+        await repository.Received(1).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task An_unknown_reservation_is_rejected_without_saving()
     {
-        var repository = new FakeRepository(seededReservation: null, seededOwner: default);
+        var repository = Substitute.For<IAttendanceDayRepository>();
+        repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
+            .Returns(_ => AttendanceDay.For(company, bookingDate));
         var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
 
         var result = await handler.HandleAsync(
@@ -47,7 +54,7 @@ public class CancelReservationHandlerTests
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("reservation_not_found");
-        repository.SaveCount.ShouldBe(0);
+        await repository.DidNotReceive().SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -55,8 +62,11 @@ public class CancelReservationHandlerTests
     {
         var reservationId = ReservationIdentifier.New();
         var owner = EmployeeIdentifier.New();
-        var repository = new FakeRepository(reservationId, owner);
-        repository.EnqueueSaveResult(Error.Conflict("concurrency_conflict", "The day changed concurrently."));
+        var repository = Substitute.For<IAttendanceDayRepository>();
+        repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
+            .Returns(_ => SeededDay(reservationId, owner));
+        repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
+            .Returns(ConcurrencyConflict(), Result.Success());
         var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
 
         var result = await handler.HandleAsync(
@@ -64,8 +74,8 @@ public class CancelReservationHandlerTests
             CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        repository.LoadCount.ShouldBe(2);
-        repository.SaveCount.ShouldBe(2);
+        await repository.Received(2).LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>());
+        await repository.Received(2).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -73,8 +83,11 @@ public class CancelReservationHandlerTests
     {
         var reservationId = ReservationIdentifier.New();
         var owner = EmployeeIdentifier.New();
-        var repository = new FakeRepository(reservationId, owner);
-        repository.AlwaysConflictOnSave();
+        var repository = Substitute.For<IAttendanceDayRepository>();
+        repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
+            .Returns(_ => SeededDay(reservationId, owner));
+        repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
+            .Returns(ConcurrencyConflict());
         var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
 
         var result = await handler.HandleAsync(
@@ -82,47 +95,19 @@ public class CancelReservationHandlerTests
             CancellationToken.None);
 
         result.Error.Code.ShouldBe("concurrency_retry_exhausted");
-        repository.SaveCount.ShouldBe(3);
+        await repository.Received(3).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
-    private sealed class FakeRepository(ReservationIdentifier? seededReservation, EmployeeIdentifier seededOwner)
-        : IAttendanceDayRepository
+    private static AttendanceDay SeededDay(ReservationIdentifier reservation, EmployeeIdentifier owner)
     {
-        private readonly Queue<Result> saveResults = new();
-        private bool alwaysConflict;
-
-        public int LoadCount { get; private set; }
-
-        public int SaveCount { get; private set; }
-
-        public void EnqueueSaveResult(Result result) => saveResults.Enqueue(result);
-
-        public void AlwaysConflictOnSave() => alwaysConflict = true;
-
-        public Task<AttendanceDay> LoadAsync(CompanyIdentifier company, BookingDate date, CancellationToken cancellationToken)
-        {
-            LoadCount++;
-            var day = AttendanceDay.For(company, date);
-            if (seededReservation is { } reservation)
-            {
-                day.LoadFromHistory(
-                [
-                    new ReservationPlaced(reservation.Value, company.Value, date.Value, seededOwner.Value, Guid.CreateVersion7(), Guid.CreateVersion7(), now),
-                ]);
-            }
-
-            return Task.FromResult(day);
-        }
-
-        public Task<Result> SaveAsync(AttendanceDay attendanceDay, CancellationToken cancellationToken)
-        {
-            SaveCount++;
-            if (alwaysConflict)
-            {
-                return Task.FromResult<Result>(Error.Conflict("concurrency_conflict", "The day changed concurrently."));
-            }
-
-            return Task.FromResult(saveResults.Count > 0 ? saveResults.Dequeue() : Result.Success());
-        }
+        var day = AttendanceDay.For(company, bookingDate);
+        day.LoadFromHistory(
+        [
+            new ReservationPlaced(reservation.Value, company.Value, bookingDate.Value, owner.Value, Guid.CreateVersion7(), Guid.CreateVersion7(), now),
+        ]);
+        return day;
     }
+
+    private static Result ConcurrencyConflict() =>
+        Error.Conflict("concurrency_conflict", "The day changed concurrently.");
 }

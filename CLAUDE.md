@@ -297,7 +297,10 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   code by the qualified short form; the stable OpenAPI schema id (`EmployeeResponse`, `EmployeePage`, …)
   is reconstructed from the namespace tail by `web-http`'s `EndpointSchemaIds`, so the wire contract and
   generated client are unchanged (ADR-0050).
-- **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`.
+- **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`. Unit-test
+  doubles use **NSubstitute** (`Substitute.For<T>()`, `.Returns(...)`, `.Received(...)`, `Arg.*`);
+  assertions stay in the Assert, never inside a double; integration/e2e run against the real stack and
+  do not mock (ADR-0052).
 - **No framework in `domain`/`application`** — owned abstractions only (ADR-0005).
 - **C#:** root namespace `SmartSolutionsLab.Roomy` · file-scoped namespaces · `nullable`
   on · warnings-as-errors · async all the way with `CancellationToken` · constructor

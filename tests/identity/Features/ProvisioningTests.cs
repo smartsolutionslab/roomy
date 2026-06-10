@@ -1,3 +1,4 @@
+using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Contracts.Identity;
@@ -5,14 +6,13 @@ using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Application.Commands;
 using SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
-using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Tests.Features;
 
 // Use-case tests for RegisterUser (US3 / IA-3), the identity step of the provisioning saga (ADR-0025).
-// Provisioning is exercised with in-memory doubles for the ports — the real Keycloak + Postgres +
-// broker round-trip is covered by the integration/e2e slices once the Aspire stack runs it.
+// Provisioning is exercised with substituted ports — the real Keycloak + Postgres + broker round-trip is
+// covered by the integration/e2e slices once the Aspire stack runs it.
 public sealed class ProvisioningTests
 {
     private static RegisterUser Command(Role role) =>
@@ -28,43 +28,48 @@ public sealed class ProvisioningTests
     public async Task Provisioning_an_employee_persists_an_active_account_and_publishes_user_registered()
     {
         var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
-        var users = new RecordingUserRepository();
-        var publisher = new RecordingPublisher();
+        var added = new List<User>();
+        var users = Substitute.For<IUserRepository>();
+        _ = users.AddAsync(Arg.Do<User>(added.Add), Arg.Any<CancellationToken>());
+        var published = new List<IIntegrationEvent>();
+        var publisher = Substitute.For<IIntegrationEventPublisher>();
+        _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
         var handler = new RegisterUserHandler(
-            users, StubIdentityProvider.Succeeds(subject), publisher, TimeProvider.System);
+            users, IdentityProviderSucceeding(subject), publisher, TimeProvider.System);
         var command = Command(Role.Employee);
 
         var result = await handler.HandleAsync(command, CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        var saved = users.Added.ShouldHaveSingleItem();
+        var saved = added.ShouldHaveSingleItem();
         saved.Identifier.ShouldBe(command.UserIdentifier);
         saved.Status.ShouldBe(UserStatus.Active);
         saved.KeycloakSubjectIdentifier.ShouldBe(subject);
 
-        var published = publisher.Published.ShouldHaveSingleItem().ShouldBeOfType<UserRegistered>();
-        published.UserId.ShouldBe(command.UserIdentifier.Value);
-        published.EmployeeId.ShouldBe(command.EmployeeId);
-        published.Email.ShouldBe("ada@example.com");
-        published.Role.ShouldBe(AccountRole.Employee);
-        published.KeycloakSubjectId.ShouldBe(subject.Value);
+        var registered = published.ShouldHaveSingleItem().ShouldBeOfType<UserRegistered>();
+        registered.UserId.ShouldBe(command.UserIdentifier.Value);
+        registered.EmployeeId.ShouldBe(command.EmployeeId);
+        registered.Email.ShouldBe("ada@example.com");
+        registered.Role.ShouldBe(AccountRole.Employee);
+        registered.KeycloakSubjectId.ShouldBe(subject.Value);
     }
 
     [Fact]
     public async Task Provisioning_an_administrator_publishes_the_administrator_role()
     {
-        var users = new RecordingUserRepository();
-        var publisher = new RecordingPublisher();
+        var published = new List<IIntegrationEvent>();
+        var publisher = Substitute.For<IIntegrationEventPublisher>();
+        _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
         var handler = new RegisterUserHandler(
-            users,
-            StubIdentityProvider.Succeeds(KeycloakSubjectIdentifier.From(Guid.NewGuid())),
+            Substitute.For<IUserRepository>(),
+            IdentityProviderSucceeding(KeycloakSubjectIdentifier.From(Guid.NewGuid())),
             publisher,
             TimeProvider.System);
 
         await handler.HandleAsync(Command(Role.Employee.GrantAdministrator()), CancellationToken.None);
 
-        var published = publisher.Published.ShouldHaveSingleItem().ShouldBeOfType<UserRegistered>();
-        published.Role.ShouldBe(AccountRole.Administrator);
+        var registered = published.ShouldHaveSingleItem().ShouldBeOfType<UserRegistered>();
+        registered.Role.ShouldBe(AccountRole.Administrator);
     }
 
     [Theory]
@@ -75,11 +80,13 @@ public sealed class ProvisioningTests
         string providerErrorCode,
         UserProvisioningFailureReason expectedReason)
     {
-        var users = new RecordingUserRepository();
-        var publisher = new RecordingPublisher();
+        var users = Substitute.For<IUserRepository>();
+        var published = new List<IIntegrationEvent>();
+        var publisher = Substitute.For<IIntegrationEventPublisher>();
+        _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
         var handler = new RegisterUserHandler(
             users,
-            StubIdentityProvider.Fails(new Error(providerErrorCode, "provisioning failed")),
+            IdentityProviderFailing(new Error(providerErrorCode, "provisioning failed")),
             publisher,
             TimeProvider.System);
         var command = Command(Role.Employee);
@@ -87,70 +94,29 @@ public sealed class ProvisioningTests
         var result = await handler.HandleAsync(command, CancellationToken.None);
 
         result.IsFailure.ShouldBeTrue();
-        users.Added.ShouldBeEmpty();
+        await users.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
 
-        var published = publisher.Published.ShouldHaveSingleItem().ShouldBeOfType<UserProvisioningFailed>();
-        published.UserId.ShouldBe(command.UserIdentifier.Value);
-        published.EmployeeId.ShouldBe(command.EmployeeId);
-        published.Reason.ShouldBe(expectedReason);
+        var failed = published.ShouldHaveSingleItem().ShouldBeOfType<UserProvisioningFailed>();
+        failed.UserId.ShouldBe(command.UserIdentifier.Value);
+        failed.EmployeeId.ShouldBe(command.EmployeeId);
+        failed.Reason.ShouldBe(expectedReason);
     }
 
-    private sealed class RecordingUserRepository : IUserRepository
+    private static IIdentityProviderPort IdentityProviderSucceeding(KeycloakSubjectIdentifier subject)
     {
-        public List<User> Added { get; } = [];
-
-        public Task AddAsync(User user, CancellationToken cancellationToken)
-        {
-            Added.Add(user);
-            return Task.CompletedTask;
-        }
-
-        public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
-            Task.FromResult(false);
-
-        public Task<Result<Page<User>>> GetPageAsync(
-            PageRequest request, CancellationToken cancellationToken) =>
-            Task.FromResult<Result<Page<User>>>(new Page<User>(Added, null));
-
-        public Task<Result<User>> GetByIdentifierAsync(
-            UserIdentifier identifier,
-            CancellationToken cancellationToken) =>
-            Task.FromResult<Result<User>>(Error.NotFound("user.not_found", "absent"));
-
-        public Task<Result<User>> GetByKeycloakSubjectAsync(
-            KeycloakSubjectIdentifier subject,
-            CancellationToken cancellationToken) =>
-            Task.FromResult<Result<User>>(Error.NotFound("user.not_found", "absent"));
+        var identityProvider = Substitute.For<IIdentityProviderPort>();
+        identityProvider.ProvisionUserAsync(
+                Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success(subject));
+        return identityProvider;
     }
 
-    private sealed class StubIdentityProvider(Result<KeycloakSubjectIdentifier> outcome) : IIdentityProviderPort
+    private static IIdentityProviderPort IdentityProviderFailing(Error error)
     {
-        public static StubIdentityProvider Succeeds(KeycloakSubjectIdentifier subject) => new(subject);
-
-        public static StubIdentityProvider Fails(Error error) => new(error);
-
-        public Task<Result<KeycloakSubjectIdentifier>> ProvisionUserAsync(
-            Email email,
-            DisplayName displayName,
-            string initialPassword,
-            Role role,
-            CancellationToken cancellationToken) =>
-            Task.FromResult(outcome);
-
-        public Task<Result> AssignAdministratorRoleAsync(
-            KeycloakSubjectIdentifier subject,
-            CancellationToken cancellationToken) =>
-            throw new NotSupportedException("Provisioning does not elevate an existing account.");
-    }
-
-    private sealed class RecordingPublisher : IIntegrationEventPublisher
-    {
-        public List<IIntegrationEvent> Published { get; } = [];
-
-        public Task PublishAsync(IIntegrationEvent integrationEvent, CancellationToken cancellationToken)
-        {
-            Published.Add(integrationEvent);
-            return Task.CompletedTask;
-        }
+        var identityProvider = Substitute.For<IIdentityProviderPort>();
+        identityProvider.ProvisionUserAsync(
+                Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Failure<KeycloakSubjectIdentifier>(error));
+        return identityProvider;
     }
 }
