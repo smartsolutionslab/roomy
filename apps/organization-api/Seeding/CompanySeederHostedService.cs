@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 namespace SmartSolutionsLab.Roomy.Organization.Api.Seeding;
 
 // Runs the company seeding once at startup. The seeder needs scoped services (the DbContext), so this
