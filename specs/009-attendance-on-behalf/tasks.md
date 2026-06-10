@@ -22,11 +22,11 @@ libs; no gateway change; no backend write change (reserve `onBehalfOf` + admin c
 ---
 
 ## Phase 1: Backend reads (admin-gated)
-- [ ] T001 [US1] `ViewEmployees` query + `EmployeeView` (employeeId, name) + `IEmployeeCatalog` port +
+- [x] T001 [US1] `ViewEmployees` query + `EmployeeView` (employeeId, name) + `IEmployeeCatalog` port +
   `ViewEmployeesHandler`; handler unit test over a faked catalog (returns rows; empty when none).
-- [ ] T002 [US1] `EmployeeCatalog` adapter over the `Employees` read model (employeeId + displayName),
+- [x] T002 [US1] `EmployeeCatalog` adapter over the `Employees` read model (employeeId + displayName),
   ordered by name; register in DI. Read-model integration test (real Postgres).
-- [ ] T003 [US1/US2] `GET /reservations/employees` (admin → `[{employeeId,name}]`, 403 for non-admin) and
+- [x] T003 [US1/US2] `GET /reservations/employees` (admin → `[{employeeId,name}]`, 403 for non-admin) and
   `GET /reservations/by-employee/{employeeId:guid}` (admin → `[MyReservationResponse]`, reusing
   `ViewMyReservations`); `.WithName/.Produces/.ProducesProblem`. Host tests: admin gets the list / an
   employee's reservations; a non-admin gets 403; no session → 401. Re-emit the OpenAPI spec.
