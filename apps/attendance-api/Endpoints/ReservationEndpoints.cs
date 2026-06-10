@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
@@ -36,20 +37,23 @@ public static class ReservationEndpoints
         endpoints.MapGet("/reservations", ViewAsync)
             .RequireAuthorization()
             .WithName("ViewDayReservations")
-            .Produces<IEnumerable<ReservationResponse>>();
+            .Produces<ReservationPage>();
         endpoints.MapGet("/reservations/mine", ViewMineAsync)
             .RequireAuthorization()
             .WithName("ViewMyReservations")
-            .Produces<IEnumerable<MyReservationResponse>>();
+            .Produces<MyReservationPage>()
+            .ProducesProblem(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/reservations/employees", ViewEmployeesAsync)
             .RequireAuthorization()
             .WithName("ViewEmployees")
-            .Produces<IEnumerable<EmployeeResponse>>()
+            .Produces<EmployeePage>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);
         endpoints.MapGet("/reservations/by-employee/{employeeId:guid}", ViewForEmployeeAsync)
             .RequireAuthorization()
             .WithName("ViewReservationsForEmployee")
-            .Produces<IEnumerable<MyReservationResponse>>()
+            .Produces<MyReservationPage>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);
         return endpoints;
     }
@@ -68,13 +72,18 @@ public static class ReservationEndpoints
 
         var result = await view.HandleAsync(query, cancellationToken);
 
+        // The company-day is bounded by room capacity and replayed from the aggregate in memory, so it
+        // is one page — it adopts the page envelope for contract uniformity with nextCursor always null
+        // (ADR-0042), never keyset-paginated.
         return result.Match(
-            reservations => Results.Ok(reservations.Select(reservation => new ReservationResponse(
-                reservation.Reservation.Value,
-                reservation.Office.Value,
-                reservation.Room.Value,
-                reservation.Date.Value,
-                reservation.Employee.Value))),
+            reservations => Results.Ok(new ReservationPage(
+                reservations.Select(reservation => new ReservationResponse(
+                    reservation.Reservation.Value,
+                    reservation.Office.Value,
+                    reservation.Room.Value,
+                    reservation.Date.Value,
+                    reservation.Employee.Value)).ToList(),
+                NextCursor: null)),
             error => error.ToHttpResult());
     }
 
@@ -82,14 +91,22 @@ public static class ReservationEndpoints
     // acting employee is resolved from the token; past reservations are returned as history and the client
     // offers cancellation only for future ones (the rule lives in the cancel endpoint).
     private static async Task<IResult> ViewMineAsync(
+        string? cursor,
+        int? limit,
         ClaimsPrincipal principal,
         IEmployeeDirectory employees,
-        IQueryHandler<ViewMyReservations, IReadOnlyList<MyReservationView>> view,
+        IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
         if (!TryGetSubject(principal, out var subject))
         {
             return Results.Unauthorized();
+        }
+
+        var pageRequest = PageRequest.From(cursor, limit);
+        if (pageRequest.IsFailure)
+        {
+            return BadRequest(pageRequest.Error);
         }
 
         var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
@@ -98,24 +115,19 @@ public static class ReservationEndpoints
             return actor.Error.ToHttpResult();
         }
 
-        var result = await view.HandleAsync(new ViewMyReservations(actor.Value), cancellationToken);
+        var result = await view.HandleAsync(
+            new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
 
-        return result.Match(
-            reservations => Results.Ok(reservations.Select(reservation => new MyReservationResponse(
-                reservation.Reservation.Value,
-                reservation.Office.Value,
-                reservation.OfficeName,
-                reservation.Room.Value,
-                reservation.RoomName,
-                reservation.Date.Value))),
-            error => error.ToHttpResult());
+        return result.Match(MyReservationPageResult, BadRequest);
     }
 
     // GET /reservations/employees — the directory an administrator picks from to act on behalf (009,
     // AT-6). Administrator-only on the server (FR-009), not merely UI-hidden.
     private static async Task<IResult> ViewEmployeesAsync(
+        string? cursor,
+        int? limit,
         ClaimsPrincipal principal,
-        IQueryHandler<ViewEmployees, IReadOnlyList<EmployeeView>> view,
+        IQueryHandler<ViewEmployees, Page<EmployeeView>> view,
         CancellationToken cancellationToken)
     {
         if (!principal.IsInRole(AdministratorRole))
@@ -123,19 +135,29 @@ public static class ReservationEndpoints
             return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
         }
 
-        var result = await view.HandleAsync(new ViewEmployees(), cancellationToken);
+        var pageRequest = PageRequest.From(cursor, limit);
+        if (pageRequest.IsFailure)
+        {
+            return BadRequest(pageRequest.Error);
+        }
+
+        var result = await view.HandleAsync(new ViewEmployees(pageRequest.Value), cancellationToken);
 
         return result.Match(
-            employees => Results.Ok(employees.Select(employee => new EmployeeResponse(employee.Employee.Value, employee.Name))),
-            error => error.ToHttpResult());
+            employees => Results.Ok(new EmployeePage(
+                employees.Items.Select(employee => new EmployeeResponse(employee.Employee.Value, employee.Name)).ToList(),
+                employees.NextCursor)),
+            BadRequest);
     }
 
     // GET /reservations/by-employee/{employeeId} — a chosen employee's reservations, for the administrator
     // on-behalf view (009). Administrator-only; reuses the "my reservations" query for the target employee.
     private static async Task<IResult> ViewForEmployeeAsync(
         Guid employeeId,
+        string? cursor,
+        int? limit,
         ClaimsPrincipal principal,
-        IQueryHandler<ViewMyReservations, IReadOnlyList<MyReservationView>> view,
+        IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
         if (!principal.IsInRole(AdministratorRole))
@@ -143,18 +165,33 @@ public static class ReservationEndpoints
             return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
         }
 
-        var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId)), cancellationToken);
+        var pageRequest = PageRequest.From(cursor, limit);
+        if (pageRequest.IsFailure)
+        {
+            return BadRequest(pageRequest.Error);
+        }
 
-        return result.Match(
-            reservations => Results.Ok(reservations.Select(reservation => new MyReservationResponse(
+        var result = await view.HandleAsync(
+            new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest.Value), cancellationToken);
+
+        return result.Match(MyReservationPageResult, BadRequest);
+    }
+
+    private static IResult MyReservationPageResult(Page<MyReservationView> page) =>
+        Results.Ok(new MyReservationPage(
+            page.Items.Select(reservation => new MyReservationResponse(
                 reservation.Reservation.Value,
                 reservation.Office.Value,
                 reservation.OfficeName,
                 reservation.Room.Value,
                 reservation.RoomName,
-                reservation.Date.Value))),
-            error => error.ToHttpResult());
-    }
+                reservation.Date.Value)).ToList(),
+            page.NextCursor));
+
+    // A bad limit or a malformed cursor is request validation, not a domain rule — a 400, distinct from
+    // the 422 the domain Validation errors map to via ToHttpResult (ADR-0042).
+    private static IResult BadRequest(Error error) =>
+        Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: StatusCodes.Status400BadRequest);
 
     // POST /reservations — reserve a place in a room for a day (FR-001/011). The acting employee is
     // resolved from the token; onBehalfOf is administrator-only. The Result maps to 201/409/422/404/403.
@@ -260,3 +297,12 @@ internal sealed record MyReservationResponse(
     Guid RoomId,
     string RoomName,
     DateOnly Date);
+
+// One keyset-paginated page per list (ADR-0042): the items in their stable sort order plus the opaque
+// cursor that locates the next page — null when the list is exhausted. Concrete per-list records keep
+// the emitted OpenAPI schema names stable for the drift gate (ADR-0036).
+internal sealed record ReservationPage(IReadOnlyList<ReservationResponse> Items, string? NextCursor);
+
+internal sealed record MyReservationPage(IReadOnlyList<MyReservationResponse> Items, string? NextCursor);
+
+internal sealed record EmployeePage(IReadOnlyList<EmployeeResponse> Items, string? NextCursor);

@@ -2,6 +2,8 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
+using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -23,31 +25,37 @@ public class ViewMyReservationsTests
             BookingDate.From(new DateOnly(2026, 6, 8)));
         var handler = new ViewMyReservationsHandler(new StubReadModel(employee, [reservation]));
 
-        var result = await handler.HandleAsync(new ViewMyReservations(employee), CancellationToken.None);
+        var result = await handler.HandleAsync(
+            new ViewMyReservations(employee, FirstPage), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldHaveSingleItem().ShouldBe(reservation);
+        result.Value.Items.ShouldHaveSingleItem().ShouldBe(reservation);
     }
 
     [Fact]
-    public async Task An_employee_with_no_reservations_gets_an_empty_list()
+    public async Task An_employee_with_no_reservations_gets_an_empty_page()
     {
         var employee = EmployeeIdentifier.New();
         var handler = new ViewMyReservationsHandler(new StubReadModel(employee, []));
 
-        var result = await handler.HandleAsync(new ViewMyReservations(employee), CancellationToken.None);
+        var result = await handler.HandleAsync(
+            new ViewMyReservations(employee, FirstPage), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldBeEmpty();
+        result.Value.Items.ShouldBeEmpty();
     }
+
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
 
     private sealed class StubReadModel(EmployeeIdentifier expected, IReadOnlyList<MyReservationView> reservations)
         : IMyReservationsReadModel
     {
-        public Task<IReadOnlyList<MyReservationView>> GetAsync(EmployeeIdentifier employee, CancellationToken cancellationToken)
+        public Task<Result<Page<MyReservationView>>> GetAsync(
+            EmployeeIdentifier employee, PageRequest request, CancellationToken cancellationToken)
         {
             employee.ShouldBe(expected);
-            return Task.FromResult(reservations);
+            return Task.FromResult<Result<Page<MyReservationView>>>(
+                new Page<MyReservationView>(reservations, null));
         }
     }
 }

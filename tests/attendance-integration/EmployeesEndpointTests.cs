@@ -72,11 +72,20 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
         await SeedAsync(seed =>
             seed.Employees.Add(new Employee { EmployeeId = employee, UserId = Guid.CreateVersion7(), DisplayName = "Ada" }));
 
-        var employees = await AdminClient().GetFromJsonAsync<EmployeeDto[]>(
+        var page = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
             "/reservations/employees", TestContext.Current.CancellationToken);
 
-        employees.ShouldNotBeNull();
-        employees.ShouldContain(candidate => candidate.EmployeeId == employee && candidate.Name == "Ada");
+        page.ShouldNotBeNull();
+        page.Items.ShouldContain(candidate => candidate.EmployeeId == employee && candidate.Name == "Ada");
+    }
+
+    [Fact]
+    public async Task The_employee_directory_rejects_a_bad_page_request_with_400()
+    {
+        var response = await AdminClient().GetAsync(
+            "/reservations/employees?limit=0", TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -110,11 +119,11 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
             });
         });
 
-        var reservations = await AdminClient().GetFromJsonAsync<MyReservationDto[]>(
+        var page = await AdminClient().GetFromJsonAsync<PageDto<MyReservationDto>>(
             "/reservations/by-employee/" + employee, TestContext.Current.CancellationToken);
 
-        reservations.ShouldNotBeNull();
-        var listed = reservations.ShouldHaveSingleItem();
+        page.ShouldNotBeNull();
+        var listed = page.Items.ShouldHaveSingleItem();
         listed.ReservationId.ShouldBe(reservation);
         listed.RoomName.ShouldBe("A1");
     }
@@ -146,4 +155,6 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     private sealed record EmployeeDto(Guid EmployeeId, string Name);
 
     private sealed record MyReservationDto(Guid ReservationId, Guid OfficeId, string OfficeName, Guid RoomId, string RoomName, DateOnly Date);
+
+    private sealed record PageDto<T>(T[] Items, string? NextCursor);
 }
