@@ -1,7 +1,7 @@
-# JS/TS workspace packages. The .NET projects under libs/<context>/{domain,application,
-# infrastructure} are governed by the .NET solution, not pnpm. This lists the Angular app
-# and feature libs (ADR-0016: @roomy/<context>-<type>).
+# JS/TS workspace packages. All frontend projects live under frontend/; the .NET projects
+# under libs/<context>/{domain,application,infrastructure} are governed by the .NET solution,
+# not pnpm. This lists the Angular app and feature libs (ADR-0016: @roomy/<context>-<type>).
 packages:
-  - 'apps/web'
-  - 'libs/*'
-  - 'libs/shared/*'
+  - 'frontend/apps/web'
+  - 'frontend/libs/*'
+  - 'frontend/libs/shared/*'

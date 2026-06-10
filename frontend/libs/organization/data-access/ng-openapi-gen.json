@@ -1,0 +1,6 @@
+{
+  "input": "apps/organization-api/Roomy.Organization.Api.json",
+  "output": "frontend/libs/organization/data-access/src/lib/generated",
+  "indexFile": true,
+  "ignoreUnusedModels": true
+}
