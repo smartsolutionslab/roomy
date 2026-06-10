@@ -28,6 +28,7 @@
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.6.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.6.0" />
 
     <!-- EF Core / PostgreSQL -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />

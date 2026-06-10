@@ -36,6 +36,13 @@
       the .NET 10 wave of YARP (a 2.4 preview) is not GA, so we pin the stable 2.x.
     -->
     <PackageReference Include="Yarp.ReverseProxy" />
+
+    <!--
+      Resolves YARP cluster destinations that use Aspire service-discovery names
+      (e.g. http://attendance-api) to the real host:port via the injected services__* config.
+      Without it YARP treats the name as a literal DNS host and every proxied API route 502s.
+    -->
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp" />
   </ItemGroup>
 
 </Project>
