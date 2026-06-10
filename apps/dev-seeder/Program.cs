@@ -15,16 +15,13 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-var identityConnectionString = builder.Configuration.GetConnectionString("identity")
-    ?? throw new InvalidOperationException("Missing connection string 'identity'.");
+var identityConnectionString = builder.Configuration.GetRequiredConnectionString("identity");
 builder.Services.AddIdentityPersistence(identityConnectionString);
 
-var organizationConnectionString = builder.Configuration.GetConnectionString("organization")
-    ?? throw new InvalidOperationException("Missing connection string 'organization'.");
+var organizationConnectionString = builder.Configuration.GetRequiredConnectionString("organization");
 builder.Services.AddOrganizationPersistence(organizationConnectionString);
 
-var attendanceConnectionString = builder.Configuration.GetConnectionString("attendance")
-    ?? throw new InvalidOperationException("Missing connection string 'attendance'.");
+var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 
 var keycloak = builder.Configuration.GetSection("Keycloak");
