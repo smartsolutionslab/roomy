@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
+namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 
 // The admin account projection returned by GET /admin/users and /admin/users/{id} (identity-api.md).
 // Like AccountResponse but with the account status the admin overview needs; role is the flattened

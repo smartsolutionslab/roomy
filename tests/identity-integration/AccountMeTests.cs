@@ -9,9 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
+using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.TestSupport;
-
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 
 // Boots the identity host in-process against the real test Postgres, with the external infra removed

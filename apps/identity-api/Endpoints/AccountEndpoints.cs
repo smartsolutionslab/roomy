@@ -1,7 +1,7 @@
 using System.Security.Claims;
+using SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.Web.Http;
-
 namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 
 // The account/role read surface (contract: identity-api.md). The service is internal — reached only
