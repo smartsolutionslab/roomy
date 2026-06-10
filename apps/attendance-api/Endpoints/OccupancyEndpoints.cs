@@ -1,5 +1,4 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
-using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
@@ -22,7 +21,7 @@ public static class OccupancyEndpoints
         endpoints.MapGet("/occupancy", ViewAsync)
             .RequireAuthorization()
             .WithName("ViewOccupancy")
-            .Produces<IEnumerable<OccupancyDayResponse>>()
+            .Produces<IEnumerable<Response.OccupancyDay>>()
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
         return endpoints;
@@ -74,23 +73,23 @@ public static class OccupancyEndpoints
             error => error.ToHttpResult());
     }
 
-    private static OccupancyDayResponse ToResponse(OccupancyView day) =>
+    private static Response.OccupancyDay ToResponse(OccupancyView day) =>
         new(
             day.Date.Value,
-            new OfficeOccupancyResponse(
+            new Response.OfficeOccupancy(
                 day.Office.Office.Value,
                 day.Office.Name,
                 day.Office.Occupied,
                 day.Office.Capacity,
                 day.Office.IsFull),
-            day.Rooms.Select(room => new RoomOccupancyResponse(
+            day.Rooms.Select(room => new Response.RoomOccupancy(
                 room.Room.Value,
                 room.Name,
                 room.Occupied,
                 room.Capacity,
                 room.IsFull,
                 room.Occupants?
-                    .Select(occupant => new OccupantResponse(occupant.Employee.Value, occupant.Name))
+                    .Select(occupant => new Response.Occupant(occupant.Employee.Value, occupant.Name))
                     .ToList())).ToList());
 }
 

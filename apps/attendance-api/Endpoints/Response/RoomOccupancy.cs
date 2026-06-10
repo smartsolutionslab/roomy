@@ -2,10 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints.Response;
 
-internal sealed record RoomOccupancyResponse(
+internal sealed record RoomOccupancy(
     Guid RoomId,
     string Name,
     int Occupied,
     int Capacity,
     bool IsFull,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<OccupantResponse>? Occupants);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<Occupant>? Occupants);
