@@ -138,7 +138,7 @@ export class OccupancyCalendar {
       });
 
     // The calendar marks every day the viewer holds a reservation, so it walks all pages of the
-    // keyset-paginated history (ADR-0042) — following nextCursor until the list is exhausted — rather
+    // keyset-paginated history (ADR-0044) — following nextCursor until the list is exhausted — rather
     // than only the first page (which, being date-ordered, need not include the displayed month).
     this.gateway
       .myReservations()

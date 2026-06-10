@@ -8,7 +8,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
 
 // The employee-catalog adapter against real PostgreSQL (009): it lists the local Employees read model
 // ordered by display name for the administrator on-behalf picker, keyset-paginated by
-// (display_name, employee_id) so duplicate names still page deterministically (ADR-0042).
+// (display_name, employee_id) so duplicate names still page deterministically (ADR-0044).
 public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
     : IClassFixture<PostgresEventStoreFixture>
 {

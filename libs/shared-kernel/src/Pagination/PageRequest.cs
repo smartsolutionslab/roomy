@@ -2,7 +2,7 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 
-// A validated request for one page of a keyset-paginated list (ADR-0042): an optional opaque cursor
+// A validated request for one page of a keyset-paginated list (ADR-0044): an optional opaque cursor
 // (absent = first page) and a limit defaulted to 50 and capped at 100. A limit outside [1, 100] is a
 // validation error here; a malformed cursor is a validation error at DecodeCursor, where the list's
 // sort-key type is known. The server never silently clamps — both surface as a 400.

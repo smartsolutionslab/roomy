@@ -11,7 +11,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees
 // The IEmployeeCatalog adapter (009): lists the employees from attendance's local Employees read model,
 // ordered by display name for the on-behalf picker — attendance's own read model, fed by EmployeeHired
 // (ADR-0014/0031), never a cross-context join. Keyset-paginated by (display_name, employee_id) so the
-// cursor is a stable total order even when names collide (ADR-0042). The keyset predicate is a
+// cursor is a stable total order even when names collide (ADR-0044). The keyset predicate is a
 // parameterized PostgreSQL row-value comparison (FromSql): Npgsql does not translate string.Compare,
 // but PostgreSQL compares the `(text, uuid)` tuple natively, so the page is one indexed scan.
 public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCatalog
@@ -54,5 +54,5 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
 }
 
 // The opaque cursor for the employee directory: the (name, id) of the last returned employee
-// (ADR-0042). The id breaks ties so duplicate display names still page deterministically.
+// (ADR-0044). The id breaks ties so duplicate display names still page deterministically.
 internal sealed record EmployeeCursor(string Name, Guid EmployeeId);

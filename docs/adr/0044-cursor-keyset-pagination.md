@@ -1,4 +1,4 @@
-# 0042. Cursor/keyset pagination for endless lists
+# 0044. Cursor/keyset pagination for endless lists
 
 - **Status:** Accepted
 - **Date:** 2026-06-10
@@ -21,7 +21,7 @@ The web app wants **endless (infinite-scroll) lists** — the user scrolls and t
 transparently loads the next chunk. That needs a server pagination contract. This decision fixes a
 **single, consistent convention** across services so each list view, generated client, and read
 model follows the same shape; the consuming endpoints and the web infinite-scroll land with it
-(`010-endless-lists`).
+(`011-endless-lists`).
 
 This is a cross-cutting structural change, so it is recorded here **before** the implementing code
 (golden rule 4).

@@ -1,10 +1,10 @@
-# Implementation Plan: Endless (infinite-scroll) lists via cursor pagination (010)
+# Implementation Plan: Endless (infinite-scroll) lists via cursor pagination (011)
 
-**Spec:** `specs/010-endless-lists/spec.md` · **Decision:** ADR-0042 · **Issue:** #133
+**Spec:** `specs/011-endless-lists/spec.md` · **Decision:** ADR-0044 · **Issue:** #133
 
 ## Approach
 
-One vertical slice realizing ADR-0042: shared primitives → per-endpoint keyset backend (+ real
+One vertical slice realizing ADR-0044: shared primitives → per-endpoint keyset backend (+ real
 Postgres tests) → re-emitted OpenAPI + regenerated clients → web infinite-scroll. Keyset, opaque
 cursor, `{ items, nextCursor }`, default limit 50 / max 100, 400 on bad input.
 
@@ -19,7 +19,7 @@ cursor, `{ items, nextCursor }`, default limit 50 / max 100, 400 on bad input.
 
 ## Key design points
 - Shared primitives in `shared-kernel` so the identity **domain** repository may return `Page<User>`
-  (`domain → util`; a `type:application` lib is forbidden to the domain — ADR-0042 option E).
+  (`domain → util`; a `type:application` lib is forbidden to the domain — ADR-0044 option E).
 - Keyset predicate written **inline** in each read model's LINQ (EF-translatable; no single-use
   abstraction). Fetch `limit + 1` rows to compute `nextCursor`.
 - HTTP boundary returns concrete `*Page` records (`AdminUserPage`, `MyReservationPage`,

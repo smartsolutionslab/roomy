@@ -86,7 +86,7 @@ export class AttendanceGateway {
   }
 
   // One keyset-paginated page of the signed-in employee's own reservations, past and upcoming (GET
-  // /reservations/mine, AT-4; ADR-0042). Absent cursor = the first page; the page carries the opaque
+  // /reservations/mine, AT-4; ADR-0044). Absent cursor = the first page; the page carries the opaque
   // nextCursor (null at the end) the caller passes back to load the next.
   myReservations(cursor?: string): Observable<Page<MyReservation>> {
     return viewMyReservations(this.http, this.config.rootUrl, { cursor }).pipe(
@@ -95,7 +95,7 @@ export class AttendanceGateway {
   }
 
   // One page of the administrator on-behalf directory (GET /reservations/employees, admin-only, 009;
-  // ADR-0042).
+  // ADR-0044).
   listEmployees(cursor?: string): Observable<Page<Employee>> {
     return viewEmployees(this.http, this.config.rootUrl, { cursor }).pipe(
       map((response) => mapPage(response.body, toEmployee)),
@@ -103,7 +103,7 @@ export class AttendanceGateway {
   }
 
   // One page of a chosen employee's reservations, for the administrator on-behalf view (GET
-  // /reservations/by-employee/{id}, admin-only, 009; ADR-0042).
+  // /reservations/by-employee/{id}, admin-only, 009; ADR-0044).
   reservationsFor(employee: EmployeeId, cursor?: string): Observable<Page<MyReservation>> {
     return viewReservationsForEmployee(this.http, this.config.rootUrl, {
       employeeId: employee,

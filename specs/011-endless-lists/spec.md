@@ -1,11 +1,11 @@
 # Feature Specification: Endless (infinite-scroll) lists via cursor pagination
 
-**Feature Branch:** `feat/010-endless-lists`
+**Feature Branch:** `feat/011-endless-lists`
 **Status:** Draft
 **Created:** 2026-06-10
 **Updated:** 2026-06-10
 **Realizes:** issue #133 (cursor/keyset pagination for the unbounded list endpoints + web
-infinite-scroll). Convention recorded in **ADR-0042**.
+infinite-scroll). Convention recorded in **ADR-0044**.
 
 ## Summary
 
@@ -15,7 +15,7 @@ its entire result set (no `limit`, cursor, or `Skip`/`Take` anywhere). This feat
 lists **endless**: the API paginates with an opaque **cursor** and a capped **limit**, returning a
 uniform `{ items, nextCursor }` envelope, and the web app loads the next chunk as the user scrolls.
 
-Per **ADR-0042** the contract is **keyset** (not offset): each list has a stable total sort order
+Per **ADR-0044** the contract is **keyset** (not offset): each list has a stable total sort order
 and a `WHERE (sortKey) > @cursor ORDER BY sortKey LIMIT @limit + 1` predicate pushed into SQL, so a
 row inserted between two fetches is never skipped or duplicated and the payload can never be
 unbounded. Shared primitives (`Page<T>`, `PageRequest`, `CursorCodec`) live in `shared-kernel`; the
@@ -32,7 +32,7 @@ tiebreaker is avoided where a unique column exists; C# `Guid` has no comparison 
 - `GET /reservations/by-employee/{employeeId}` (attendance) — sort `Date` (same invariant).
 
 Envelope only, `nextCursor` always `null` (bounded by daily room capacity; replays the
-`AttendanceDay` aggregate in memory, no SQL projection to keyset — ADR-0042):
+`AttendanceDay` aggregate in memory, no SQL projection to keyset — ADR-0044):
 - `GET /reservations?date=` (attendance).
 
 Out of scope (naturally small / no web consumer): `GET /occupancy`, `/rooms`, `/offices`, and the
@@ -103,7 +103,7 @@ a manual page control.
 ### Functional Requirements
 - **FR-001:** Each unbounded endpoint MUST accept an optional opaque `cursor` and an optional
   `limit`, return `{ items, nextCursor }`, and apply the keyset predicate in SQL — never
-  materialize-then-slice (ADR-0042).
+  materialize-then-slice (ADR-0044).
 - **FR-002:** `limit` MUST default to 50 and be capped at 100; a `limit` outside `[1, 100]` or a
   malformed `cursor` MUST be rejected with 400.
 - **FR-003:** Each list MUST use a stable, total sort order (per the table above) so the cursor is
@@ -131,7 +131,7 @@ a manual page control.
 - Switching `GET /reservations?date=` to the eventually-consistent projection.
 
 ## Review & Acceptance Checklist
-- [ ] No implementation details in the spec body beyond the ADR-0042 contract it realizes
+- [ ] No implementation details in the spec body beyond the ADR-0044 contract it realizes
 - [ ] Every functional requirement is testable
 - [ ] Each acceptance scenario maps to one or more requirements
 - [ ] Keyset (not offset); stability-across-insert asserted against real Postgres

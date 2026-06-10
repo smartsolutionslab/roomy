@@ -6,6 +6,6 @@ namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 public sealed record AdminUserResponse(
     Guid UserId, string Email, string DisplayName, string Role, string Status);
 
-// One keyset-paginated page of accounts (ADR-0042): the accounts in email order plus the opaque
+// One keyset-paginated page of accounts (ADR-0044): the accounts in email order plus the opaque
 // cursor that locates the next page — null when the list is exhausted.
 public sealed record AdminUserPage(IReadOnlyList<AdminUserResponse> Items, string? NextCursor);

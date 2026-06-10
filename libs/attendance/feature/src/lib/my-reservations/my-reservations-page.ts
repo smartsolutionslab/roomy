@@ -63,7 +63,7 @@ export class MyReservationsPage {
   }
 
   // Loads the next page (the first when no cursor yet) and appends it, so the history grows as the
-  // employee scrolls or activates "Load more" (ADR-0042); the upcoming/past split derives from the
+  // employee scrolls or activates "Load more" (ADR-0044); the upcoming/past split derives from the
   // accumulated set. nextCursor === null marks the end.
   protected loadMore(): void {
     if (this.loadingMore()) {

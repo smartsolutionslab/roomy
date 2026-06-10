@@ -235,7 +235,7 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         var page = await response.Content.ReadFromJsonAsync<PageDto<ReservationDto>>(TestContext.Current.CancellationToken);
         page!.Items.Length.ShouldBe(2);
         page.Items.All(reservation => reservation.Date == date).ShouldBeTrue();
-        // The day list is bounded by capacity — it adopts the page envelope with no further page (ADR-0042).
+        // The day list is bounded by capacity — it adopts the page envelope with no further page (ADR-0044).
         page.NextCursor.ShouldBeNull();
     }
 

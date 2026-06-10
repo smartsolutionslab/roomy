@@ -43,7 +43,7 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
         context.Users.AnyAsync(user => user.Email == email, cancellationToken);
 
-    // Keyset pagination over the accounts, ordered by email (ADR-0042). Email is the unique account
+    // Keyset pagination over the accounts, ordered by email (ADR-0044). Email is the unique account
     // key, so a single text column is a stable total order. The keyset predicate is parameterized SQL
     // (FromSql): Npgsql does not translate string.Compare, but PostgreSQL compares `text` natively with
     // `>`, so the page is one indexed scan. Fetching limit + 1 rows reveals whether a further page
@@ -82,6 +82,6 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
         await context.Users.AddAsync(user, cancellationToken);
 }
 
-// The opaque cursor for the accounts list: the email of the last returned account (ADR-0042). Email
+// The opaque cursor for the accounts list: the email of the last returned account (ADR-0044). Email
 // is unique, so it is a stable total order needing no tiebreaker.
 internal sealed record UserCursor(string Email);

@@ -1,10 +1,10 @@
 ---
-description: "Task list for Endless (infinite-scroll) lists via cursor pagination (010)"
+description: "Task list for Endless (infinite-scroll) lists via cursor pagination (011)"
 ---
 
 # Tasks: Endless (infinite-scroll) lists via cursor pagination
 
-**Input**: Design documents in `specs/010-endless-lists/` (plan.md, spec.md) and ADR-0042.
+**Input**: Design documents in `specs/011-endless-lists/` (plan.md, spec.md) and ADR-0044.
 
 **Tests**: REQUIRED (RED→GREEN). xUnit + Shouldly for shared primitives, host endpoints, and read
 models (real Postgres for keyset); `@testing-library/angular` on `vitest-analog` for the SPA.
@@ -70,4 +70,4 @@ context; no write-model change.
 ## Phase 6: Verify
 - [x] T015 Full gates: `dotnet build -warnaserror`, `dotnet test`, `dotnet format
   --verify-no-changes`, `pnpm nx affected -t lint test build`, both drift gates. Atomic Conventional
-  Commits; PR. **All green; `010-endless-lists` complete.**
+  Commits; PR. **All green; `011-endless-lists` complete.**

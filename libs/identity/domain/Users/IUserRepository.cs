@@ -18,7 +18,7 @@ public interface IUserRepository
 
     Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken);
 
-    // One keyset-paginated page of accounts ordered by email (ADR-0042) — email is the unique account
+    // One keyset-paginated page of accounts ordered by email (ADR-0044) — email is the unique account
     // key, so the cursor is a stable total order. A malformed cursor is a validation failure.
     Task<Result<Page<User>>> GetPageAsync(PageRequest request, CancellationToken cancellationToken);
 
