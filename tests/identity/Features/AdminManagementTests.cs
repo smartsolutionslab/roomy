@@ -2,6 +2,7 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Application.UseCases;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Tests.Features;
@@ -114,8 +115,9 @@ public sealed class AdminManagementTests
         public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
             Task.FromResult(false);
 
-        public Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken) =>
-            Task.FromResult<IReadOnlyList<User>>(users.Values.ToList());
+        public Task<Result<Page<User>>> GetPageAsync(
+            PageRequest request, CancellationToken cancellationToken) =>
+            Task.FromResult<Result<Page<User>>>(new Page<User>(users.Values.ToList(), null));
 
         public Task AddAsync(User user, CancellationToken cancellationToken)
         {

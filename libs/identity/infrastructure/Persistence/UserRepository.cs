@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
@@ -42,9 +43,45 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
         context.Users.AnyAsync(user => user.Email == email, cancellationToken);
 
-    public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken) =>
-        await context.Users.AsNoTracking().ToListAsync(cancellationToken);
+    // Keyset pagination over the accounts, ordered by email (ADR-0042). Email is the unique account
+    // key, so a single text column is a stable total order. The keyset predicate is parameterized SQL
+    // (FromSql): Npgsql does not translate string.Compare, but PostgreSQL compares `text` natively with
+    // `>`, so the page is one indexed scan. Fetching limit + 1 rows reveals whether a further page
+    // exists; EF materializes the User aggregate through its value converters as usual.
+    public async Task<Result<Page<User>>> GetPageAsync(
+        PageRequest request,
+        CancellationToken cancellationToken)
+    {
+        var decoded = request.DecodeCursor<UserCursor>();
+        if (decoded.IsFailure)
+        {
+            return decoded.Error;
+        }
+
+        var probeLimit = request.Limit + 1;
+        var rows = decoded.Value is { } after
+            ? await context.Users
+                .FromSql($@"SELECT * FROM ""users"" WHERE ""email"" > {after.Email} ORDER BY ""email"" LIMIT {probeLimit}")
+                .AsNoTracking()
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false)
+            : await context.Users
+                .FromSql($@"SELECT * FROM ""users"" ORDER BY ""email"" LIMIT {probeLimit}")
+                .AsNoTracking()
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+        var hasMore = rows.Count > request.Limit;
+        var items = hasMore ? rows.Take(request.Limit).ToList() : rows;
+        var nextCursor = hasMore ? CursorCodec.Encode(new UserCursor(items[^1].Email.Value)) : null;
+
+        return new Page<User>(items, nextCursor);
+    }
 
     public async Task AddAsync(User user, CancellationToken cancellationToken) =>
         await context.Users.AddAsync(user, cancellationToken);
 }
+
+// The opaque cursor for the accounts list: the email of the last returned account (ADR-0042). Email
+// is unique, so it is a stable total order needing no tiebreaker.
+internal sealed record UserCursor(string Email);

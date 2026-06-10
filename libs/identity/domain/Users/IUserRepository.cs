@@ -1,3 +1,4 @@
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;
@@ -17,7 +18,9 @@ public interface IUserRepository
 
     Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken);
+    // One keyset-paginated page of accounts ordered by email (ADR-0042) — email is the unique account
+    // key, so the cursor is a stable total order. A malformed cursor is a validation failure.
+    Task<Result<Page<User>>> GetPageAsync(PageRequest request, CancellationToken cancellationToken);
 
     Task AddAsync(User user, CancellationToken cancellationToken);
 }
