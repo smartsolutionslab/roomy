@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.IdentityModel.JsonWebTokens;
 
+using SmartSolutionsLab.Roomy.Gateway.Bff.Response;
 namespace SmartSolutionsLab.Roomy.Gateway.Bff;
 
 // Projects an authenticated ClaimsPrincipal into the token-free CurrentUser the SPA consumes.
