@@ -9,6 +9,10 @@ export type { CancelReservation$Params as CancelReservation$Params } from './fn/
 export { cancelReservation as cancelReservation } from './fn/reservation-endpoints/cancel-reservation';
 export type { ViewMyReservations$Params as ViewMyReservations$Params } from './fn/reservation-endpoints/view-my-reservations';
 export { viewMyReservations as viewMyReservations } from './fn/reservation-endpoints/view-my-reservations';
+export type { ViewEmployees$Params as ViewEmployees$Params } from './fn/reservation-endpoints/view-employees';
+export { viewEmployees as viewEmployees } from './fn/reservation-endpoints/view-employees';
+export type { ViewReservationsForEmployee$Params as ViewReservationsForEmployee$Params } from './fn/reservation-endpoints/view-reservations-for-employee';
+export { viewReservationsForEmployee as viewReservationsForEmployee } from './fn/reservation-endpoints/view-reservations-for-employee';
 export type { ViewOccupancy$Params as ViewOccupancy$Params } from './fn/occupancy-endpoints/view-occupancy';
 export { viewOccupancy as viewOccupancy } from './fn/occupancy-endpoints/view-occupancy';
 export type { ViewBookableRooms$Params as ViewBookableRooms$Params } from './fn/room-catalogue-endpoints/view-bookable-rooms';

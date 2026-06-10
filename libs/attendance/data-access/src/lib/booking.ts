@@ -18,6 +18,9 @@ export const roomId = (value: string): RoomId => value as RoomId;
 export type ReservationId = Brand<string, 'ReservationId'>;
 export const reservationId = (value: string): ReservationId => value as ReservationId;
 
+export type EmployeeId = Brand<string, 'EmployeeId'>;
+export const employeeId = (value: string): EmployeeId => value as EmployeeId;
+
 // A bookable room and its fixed capacity. The second step of the reserve picker (AT-1).
 export interface BookableRoom {
   readonly id: RoomId;

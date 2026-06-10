@@ -8,7 +8,10 @@ export type {
   RoomAvailability,
   RoomId,
 } from './lib/booking';
-export { officeId, reservationId, roomId } from './lib/booking';
+export { employeeId, officeId, reservationId, roomId } from './lib/booking';
+export type { EmployeeId } from './lib/booking';
+export type { Employee } from './lib/employee';
+export { toEmployee } from './lib/employee';
 export {
   BOOKING_WINDOW_DAYS,
   addDays,
