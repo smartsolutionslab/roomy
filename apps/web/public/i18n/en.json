@@ -196,6 +196,11 @@
     "notAuthorized": {
       "title": "Not authorized",
       "message": "You do not have permission to view this page."
+    },
+    "list": {
+      "loadMore": "Load more",
+      "loading": "Loading…",
+      "endOfList": "End of list"
     }
   }
 }

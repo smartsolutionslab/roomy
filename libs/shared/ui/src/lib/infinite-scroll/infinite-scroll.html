@@ -1,0 +1,19 @@
+<ng-container *transloco="let translate">
+  <ng-content />
+
+  <div class="infinite-scroll__footer">
+    @if (hasMore()) {
+      <div #sentinel class="infinite-scroll__sentinel" aria-hidden="true"></div>
+      <button
+        type="button"
+        class="infinite-scroll__more"
+        [disabled]="loading()"
+        (click)="requestMore()"
+      >
+        {{ loading() ? translate('shared.list.loading') : translate('shared.list.loadMore') }}
+      </button>
+    } @else {
+      <p class="infinite-scroll__end" role="status">{{ translate('shared.list.endOfList') }}</p>
+    }
+  </div>
+</ng-container>
