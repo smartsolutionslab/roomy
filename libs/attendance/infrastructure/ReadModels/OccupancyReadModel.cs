@@ -17,8 +17,7 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
     public async Task<Result<OccupancyData>> GetAsync(
         CompanyIdentifier company,
         OccupancyScope scope,
-        BookingDate from,
-        BookingDate to,
+        BookingDateRange range,
         CancellationToken cancellationToken)
     {
         var scopeResult = await ResolveScopeAsync(scope, cancellationToken).ConfigureAwait(false);
@@ -30,8 +29,8 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
         var (officeId, officeName, rooms) = scopeResult.Value;
         var roomIds = rooms.Select(room => room.RoomId).ToList();
         var companyId = company.Value;
-        var fromDate = from.Value;
-        var toDate = to.Value;
+        var fromDate = range.From.Value;
+        var toDate = range.To.Value;
 
         var occupantRows = await (
             from reservation in context.Reservations.AsNoTracking()

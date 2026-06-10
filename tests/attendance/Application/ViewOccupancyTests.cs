@@ -157,7 +157,7 @@ public class ViewOccupancyTests
     }
 
     private static ViewOccupancy NewQuery(DateOnly from, DateOnly to) =>
-        new(company, OccupancyScope.ForOffice(office), BookingDate.From(from), BookingDate.From(to));
+        new(company, OccupancyScope.ForOffice(office), BookingDateRange.Between(from, to));
 
     private static RoomOccupancy Room(IReadOnlyList<OccupancyView> days, DateOnly date) =>
         days.Single(day => day.Date.Value == date).Rooms.Single();
@@ -179,8 +179,7 @@ public class ViewOccupancyTests
         public Task<Result<OccupancyData>> GetAsync(
             CompanyIdentifier company,
             OccupancyScope scope,
-            BookingDate from,
-            BookingDate to,
+            BookingDateRange range,
             CancellationToken cancellationToken) => Task.FromResult(result);
     }
 }
