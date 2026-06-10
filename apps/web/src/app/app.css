@@ -22,28 +22,7 @@
   outline-offset: var(--roomy-focus-outline-offset);
 }
 
-/* ---------- Signed-in: orange sidebar + glass app bar + content ---------- */
-
-.shell {
-  display: grid;
-  grid-template-columns: 264px 1fr;
-  min-block-size: 100vh;
-}
-
-.sidebar {
-  position: sticky;
-  inset-block-start: 0;
-  align-self: start;
-  block-size: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: var(--roomy-space-md);
-  padding: var(--roomy-space-lg) var(--roomy-space-md);
-  background: var(--roomy-gradient-sidebar);
-  color: #ffffff;
-  box-shadow: var(--roomy-shadow-lg);
-  overflow-y: auto;
-}
+/* ---------- Signed-in: content projected into <roomy-app-layout> ---------- */
 
 .sidebar__brand {
   display: inline-flex;
@@ -115,39 +94,10 @@
   flex: none;
 }
 
-.shell__body {
+.topbar-controls {
   display: flex;
-  flex-direction: column;
-  min-block-size: 100vh;
-  background:
-    radial-gradient(36rem 22rem at 100% -4%, rgba(249, 115, 22, 0.1), transparent 60%),
-    radial-gradient(30rem 20rem at -6% 8%, rgba(244, 63, 94, 0.07), transparent 60%),
-    transparent;
-}
-
-.appbar {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: 10;
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--roomy-space-sm);
   align-items: center;
-  justify-content: flex-end;
-  padding: var(--roomy-space-sm) var(--roomy-space-lg);
-  border-block-end: 1px solid var(--roomy-glass-border);
-  background: var(--roomy-glass-bg);
-  backdrop-filter: var(--roomy-blur);
-  -webkit-backdrop-filter: var(--roomy-blur);
-}
-
-.shell__main {
-  flex: 1;
-  padding: var(--roomy-space-xl) var(--roomy-space-lg);
-}
-
-.shell__main:focus-visible {
-  outline: none;
 }
 
 /* ---------- Signed-out: glass public topbar + hero ---------- */
@@ -247,15 +197,6 @@
 }
 
 @media (max-width: 640px) {
-  .shell {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: static;
-    block-size: auto;
-  }
-
   .topbar__tagline {
     display: none;
   }

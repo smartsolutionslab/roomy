@@ -82,9 +82,13 @@ We chose **Option C**.
    — beside a content area whose **glass top app bar** (right-aligned) holds the current
    user, theme toggle, language switcher, and sign-out. Signed-out visitors get a **glass top
    bar** and a **gradient hero landing**. The signed-in home is a **dashboard** of glass
-   navigation cards over a faintly tinted background. The sidebar/app-bar/hero/dashboard live
-   in the `context:web` app shell + `home` component (the one frontend composition root,
-   ADR-0035) and reuse the shared tokens.
+   navigation cards over a faintly tinted background. The authenticated shell's structure is a
+   reusable **`AppLayout` slot component** in `@roomy/shared-ui` (brand / nav / top / footer /
+   default-main projection slots); the app projects the brand, navigation, top-bar controls
+   (theme toggle, language switcher, and an **account avatar menu** that shows the signed-in
+   user's name and **role** — Administrator vs Employee), footer, and routed content into it.
+   These live in the `context:web` app shell + `home` component (the one frontend composition
+   root, ADR-0035) and reuse the shared tokens.
 
 ## Consequences
 

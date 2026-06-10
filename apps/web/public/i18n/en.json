@@ -224,7 +224,8 @@
     },
     "account": {
       "menu": "Account menu",
-      "signedIn": "Signed in",
+      "roleAdmin": "Administrator",
+      "roleEmployee": "Employee",
       "signOut": "Sign out"
     }
   }

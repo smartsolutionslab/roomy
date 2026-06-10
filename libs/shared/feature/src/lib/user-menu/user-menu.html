@@ -17,7 +17,9 @@
       <roomy-avatar [name]="user.name" size="md" />
       <span class="user-menu__detail">
         <span class="user-menu__name">{{ user.name }}</span>
-        <span class="user-menu__caption">{{ translate('shared.account.signedIn') }}</span>
+        <span class="user-menu__role" [class.user-menu__role--admin]="isAdmin()">
+          {{ translate(isAdmin() ? 'shared.account.roleAdmin' : 'shared.account.roleEmployee') }}
+        </span>
       </span>
     </div>
     <form class="user-menu__signout" method="post" action="/bff/logout">

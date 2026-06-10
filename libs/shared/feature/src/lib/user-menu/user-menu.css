@@ -58,9 +58,22 @@
   font-weight: var(--roomy-font-weight-semibold);
 }
 
-.user-menu__caption {
+.user-menu__role {
+  align-self: flex-start;
+  margin-block-start: 3px;
+  padding: 1px var(--roomy-space-sm);
+  border-radius: var(--roomy-radius-full);
+  background: var(--roomy-color-background-muted);
   color: var(--roomy-color-text-muted);
-  font-size: var(--roomy-font-size-sm);
+  font-size: 0.6875rem;
+  font-weight: var(--roomy-font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.user-menu__role--admin {
+  background: var(--roomy-color-accent-muted);
+  color: var(--roomy-color-accent-strong);
 }
 
 .user-menu__signout {

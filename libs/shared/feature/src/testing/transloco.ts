@@ -16,7 +16,8 @@ const english = {
     },
     account: {
       menu: 'Account menu',
-      signedIn: 'Signed in',
+      roleAdmin: 'Administrator',
+      roleEmployee: 'Employee',
       signOut: 'Sign out',
     },
   },
@@ -34,7 +35,8 @@ const german = {
     },
     account: {
       menu: 'Kontomenü',
-      signedIn: 'Angemeldet',
+      roleAdmin: 'Administrator',
+      roleEmployee: 'Mitarbeiter',
       signOut: 'Abmelden',
     },
   },
