@@ -87,7 +87,7 @@ public static class OfficeEndpoints
 
         var created = await offices.GetByIdentifierAsync(result.Value, cancellationToken);
         return created.Match(
-            office => Results.Created($"/offices/{office.Identifier.Value}", Project(office)),
+            office => Results.Created($"/offices/{office.Identifier.Value}", office.ToResponse()),
             error => error.ToHttpResult());
     }
 
@@ -97,7 +97,7 @@ public static class OfficeEndpoints
         CancellationToken cancellationToken)
     {
         var all = await offices.GetAllAsync(cancellationToken);
-        return Results.Ok(all.Select(Project));
+        return Results.Ok(all.Select(office => office.ToResponse()));
     }
 
     // GET /offices/{officeId} — a single office, or 404 if none has that identifier.
@@ -107,7 +107,7 @@ public static class OfficeEndpoints
         CancellationToken cancellationToken)
     {
         var office = await offices.GetByIdentifierAsync(OfficeIdentifier.From(officeId), cancellationToken);
-        return office.Match(found => Results.Ok(Project(found)), error => error.ToHttpResult());
+        return office.Match(found => Results.Ok(found.ToResponse()), error => error.ToHttpResult());
     }
 
     // PATCH /offices/{officeId}/name — renames the office. 400 blank, 404 unknown, 409 name taken.
@@ -119,10 +119,7 @@ public static class OfficeEndpoints
         CancellationToken cancellationToken)
     {
         var name = OfficeName.TryParse(request.Name);
-        if (name is null)
-        {
-            return Results.BadRequest("An office name must not be blank.");
-        }
+        if (name is null) return Results.BadRequest("An office name must not be blank.");
 
         var identifier = OfficeIdentifier.From(officeId);
         var result = await renameOffice.HandleAsync(new RenameOffice(identifier, name), cancellationToken);
@@ -138,14 +135,12 @@ public static class OfficeEndpoints
         CancellationToken cancellationToken)
     {
         var location = Location.TryParse(request.Location);
-        if (location is null)
-        {
-            return Results.BadRequest("An office location must not be blank.");
-        }
+        if (location is null) return Results.BadRequest("An office location must not be blank.");
 
         var identifier = OfficeIdentifier.From(officeId);
         var result = await changeLocation.HandleAsync(
-            new ChangeOfficeLocation(identifier, location), cancellationToken);
+            new ChangeOfficeLocation(identifier, location),
+            cancellationToken);
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
@@ -160,25 +155,18 @@ public static class OfficeEndpoints
     {
         var name = RoomName.TryParse(request.Name);
         var capacity = Capacity.TryParse(request.Capacity);
-        if (name is null || capacity is null)
-        {
-            return Results.BadRequest("A room requires a non-empty name and a capacity of at least 1.");
-        }
+        if (name is null || capacity is null) return Results.BadRequest("A room requires a non-empty name and a capacity of at least 1.");
 
         var identifier = OfficeIdentifier.From(officeId);
         var result = await addRoom.HandleAsync(
-            new AddRoomToOffice(identifier, name, capacity.Value), cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToHttpResult();
-        }
+            new AddRoomToOffice(identifier, name, capacity.Value),
+            cancellationToken);
+        if (result.IsFailure) return result.Error.ToHttpResult();
 
         var office = await offices.GetByIdentifierAsync(identifier, cancellationToken);
         return office.Match(
             found => found.Rooms.FirstOrDefault(room => room.Identifier == result.Value) is { } room
-                ? Results.Created(
-                    $"/offices/{officeId}/rooms/{room.Identifier.Value}",
-                    new Response.Room(room.Identifier.Value, room.Name.Value, room.Capacity))
+                ? Results.Created($"/offices/{officeId}/rooms/{room.Identifier.Value}", room.ToResponse())
                 : Results.NotFound(),
             _ => Results.NotFound());
     }
@@ -194,14 +182,12 @@ public static class OfficeEndpoints
         CancellationToken cancellationToken)
     {
         var name = RoomName.TryParse(request.Name);
-        if (name is null)
-        {
-            return Results.BadRequest("A room name must not be blank.");
-        }
+        if (name is null) return Results.BadRequest("A room name must not be blank.");
 
         var identifier = OfficeIdentifier.From(officeId);
         var result = await renameRoom.HandleAsync(
-            new RenameRoom(identifier, RoomIdentifier.From(roomId), name), cancellationToken);
+            new RenameRoom(identifier, RoomIdentifier.From(roomId), name),
+            cancellationToken);
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
@@ -212,22 +198,9 @@ public static class OfficeEndpoints
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        if (result.IsFailure)
-        {
-            return result.Error.ToHttpResult();
-        }
+        if (result.IsFailure) return result.Error.ToHttpResult();
 
         var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
-        return office.Match(found => Results.Ok(Project(found)), error => error.ToHttpResult());
+        return office.Match(found => Results.Ok(found.ToResponse()), error => error.ToHttpResult());
     }
-
-    private static Response.Office Project(Office office) =>
-        new(
-            office.Identifier.Value,
-            office.Name.Value,
-            office.Location.Value,
-            office.Capacity,
-            office.Rooms
-                .Select(room => new Response.Room(room.Identifier.Value, room.Name.Value, room.Capacity))
-                .ToList());
 }

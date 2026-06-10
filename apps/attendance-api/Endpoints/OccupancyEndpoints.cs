@@ -60,27 +60,8 @@ public static class OccupancyEndpoints
         var result = await view.HandleAsync(query, cancellationToken);
 
         return result.Match(
-            days => Results.Ok(days.Select(ToResponse)),
+            days => Results.Ok(days.Select(day => day.ToResponse())),
             error => error.ToHttpResult());
     }
-
-    private static Response.OccupancyDay ToResponse(OccupancyView day) =>
-        new(
-            day.Date.Value,
-            new Response.OfficeOccupancy(
-                day.Office.Office.Value,
-                day.Office.Name,
-                day.Office.Occupied,
-                day.Office.Capacity,
-                day.Office.IsFull),
-            day.Rooms.Select(room => new Response.RoomOccupancy(
-                room.Room.Value,
-                room.Name,
-                room.Occupied,
-                room.Capacity,
-                room.IsFull,
-                room.Occupants?
-                    .Select(occupant => new Response.Occupant(occupant.Employee.Value, occupant.Name))
-                    .ToList())).ToList());
 }
 

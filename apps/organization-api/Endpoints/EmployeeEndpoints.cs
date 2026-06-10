@@ -39,20 +39,15 @@ public static class EmployeeEndpoints
             || string.IsNullOrWhiteSpace(request.InitialPassword)
             || !Enum.TryParse<EmployeeRole>(request.Role, ignoreCase: true, out var role))
         {
-            return Results.BadRequest(
-                "A hire requires a display name, a valid work email, a role (Employee or Administrator), and an initial password.");
+            return Results.BadRequest("A hire requires a display name, a valid work email, a role (Employee or Administrator), and an initial password.");
         }
 
         var result = await hireEmployee.HandleAsync(
-            new HireEmployee(name, email, role, request.InitialPassword), cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToHttpResult();
-        }
+            new HireEmployee(name, email, role, request.InitialPassword),
+            cancellationToken);
+        if (result.IsFailure) return result.Error.ToHttpResult();
 
         var hired = result.Value;
-        return Results.Accepted(
-            $"/employees/{hired.Employee.Value}",
-            new Response.HiredEmployee(hired.Employee.Value, hired.User.Value, ProvisioningState.Provisioning.ToString()));
+        return Results.Accepted($"/employees/{hired.Employee.Value}", hired.ToResponse());
     }
 }
