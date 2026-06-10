@@ -17,18 +17,15 @@ builder.AddServiceDefaults();
 // Each context contributes its database here (database-per-service, ADR-0014): register its persistence
 // so the DbContext resolves, then add it as a migration target. `organization` and `attendance` follow
 // the same two lines as they land. Aspire injects each connection string by the database resource name.
-var identityConnectionString = builder.Configuration.GetConnectionString("identity")
-    ?? throw new InvalidOperationException("Missing connection string 'identity'.");
+var identityConnectionString = builder.Configuration.GetRequiredConnectionString("identity");
 builder.Services.AddIdentityPersistence(identityConnectionString);
 builder.Services.AddMigrationTarget<IdentityDbContext>();
 
-var organizationConnectionString = builder.Configuration.GetConnectionString("organization")
-    ?? throw new InvalidOperationException("Missing connection string 'organization'.");
+var organizationConnectionString = builder.Configuration.GetRequiredConnectionString("organization");
 builder.Services.AddOrganizationPersistence(organizationConnectionString);
 builder.Services.AddMigrationTarget<OrganizationDbContext>();
 
-var attendanceConnectionString = builder.Configuration.GetConnectionString("attendance")
-    ?? throw new InvalidOperationException("Missing connection string 'attendance'.");
+var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 builder.Services.AddMigrationTarget<AttendanceDbContext>();
 

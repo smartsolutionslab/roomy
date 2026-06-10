@@ -19,8 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // The identity context owns its database (ADR-0014); Aspire injects the connection string by name.
-var identityConnectionString = builder.Configuration.GetConnectionString("identity")
-    ?? throw new InvalidOperationException("Missing connection string 'identity'.");
+var identityConnectionString = builder.Configuration.GetRequiredConnectionString("identity");
 
 builder.Services.AddIdentityPersistence(identityConnectionString);
 
@@ -77,8 +76,7 @@ if (!emittingOpenApiDocument)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = identityConnectionString,
-            ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-                ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
         },
         applicationAssembly: typeof(IdentityApiHost).Assembly,
         typeof(EmployeeHiredConsumer).Assembly);

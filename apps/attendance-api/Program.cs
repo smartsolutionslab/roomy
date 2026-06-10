@@ -21,8 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // The attendance context owns its database (ADR-0014); Aspire injects the connection string by name.
-var attendanceConnectionString = builder.Configuration.GetConnectionString("attendance")
-    ?? throw new InvalidOperationException("Missing connection string 'attendance'.");
+var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
 
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 builder.Services.AddAttendanceUseCases();
@@ -81,8 +80,7 @@ if (!emittingOpenApiDocument && messagingEnabled)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = attendanceConnectionString,
-            ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-                ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
         },
         applicationAssembly: typeof(AttendanceApiHost).Assembly,
         typeof(RoomAddedConsumer).Assembly);

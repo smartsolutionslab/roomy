@@ -17,8 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // The organization context owns its database (ADR-0014); Aspire injects the connection string by name.
-var connectionString = builder.Configuration.GetConnectionString("organization")
-    ?? throw new InvalidOperationException("Missing connection string 'organization'.");
+var connectionString = builder.Configuration.GetRequiredConnectionString("organization");
 
 builder.Services.AddOrganizationPersistence(connectionString);
 
@@ -63,8 +62,7 @@ if (!emittingOpenApiDocument)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = connectionString,
-            ConnectionString = builder.Configuration.GetConnectionString("rabbitmq")
-                ?? throw new InvalidOperationException("Missing connection string 'rabbitmq'."),
+            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
         },
         applicationAssembly: typeof(OrganizationApiHost).Assembly,
         typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserRegisteredConsumer).Assembly);
