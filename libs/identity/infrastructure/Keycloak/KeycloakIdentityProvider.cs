@@ -30,10 +30,7 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
         var token = await AcquireAdminTokenAsync(cancellationToken);
 
         var creation = await CreateUserAsync(token, email, displayName, initialPassword, cancellationToken);
-        if (creation.IsFailure)
-        {
-            return creation.Error;
-        }
+        if (creation.IsFailure) return creation.Error;
 
         var subject = creation.Value;
 
@@ -47,23 +44,15 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
         return subject;
     }
 
-    public async Task<Result> AssignAdministratorRoleAsync(
-        KeycloakSubjectIdentifier subject,
-        CancellationToken cancellationToken)
+    public async Task<Result> AssignAdministratorRoleAsync(KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
     {
         var token = await AcquireAdminTokenAsync(cancellationToken);
 
         var representation = await FetchRealmRoleAsync(token, "administrator", cancellationToken);
-        if (representation.IsFailure)
-        {
-            return representation.Error;
-        }
+        if (representation.IsFailure) return representation.Error;
 
-        using var request = AdminRequest(
-            HttpMethod.Post,
-            $"admin/realms/{options.Realm}/users/{subject.Value}/role-mappings/realm",
-            token,
-            new JsonArray(representation.Value));
+        var requestUrl = $"admin/realms/{options.Realm}/users/{subject.Value}/role-mappings/realm";
+        using var request = AdminRequest(HttpMethod.Post, requestUrl, token, new JsonArray(representation.Value));
         using var response = await httpClient.SendAsync(request, cancellationToken);
 
         return response.IsSuccessStatusCode ? Result.Success() : ProviderError(response);
@@ -71,9 +60,8 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
 
     private async Task<string> AcquireAdminTokenAsync(CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"realms/{options.AdminRealm}/protocol/openid-connect/token")
+        var requestUrl = $"realms/{options.AdminRealm}/protocol/openid-connect/token";
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -88,8 +76,7 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
         response.EnsureSuccessStatusCode();
 
         var payload = await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken);
-        return payload?["access_token"]?.GetValue<string>()
-            ?? throw new InvalidOperationException("Keycloak returned no admin access token.");
+        return payload?["access_token"]?.GetValue<string>() ?? throw new InvalidOperationException("Keycloak returned no admin access token.");
     }
 
     private async Task<Result<KeycloakSubjectIdentifier>> CreateUserAsync(
@@ -120,30 +107,18 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
 
         if (response.StatusCode == HttpStatusCode.Created)
         {
-            var location = response.Headers.Location
-                ?? throw new InvalidOperationException("Keycloak create-user returned no Location header.");
+            var location = response.Headers.Location ?? throw new InvalidOperationException("Keycloak create-user returned no Location header.");
             var subjectId = Guid.Parse(location.Segments[^1].Trim('/'));
             return KeycloakSubjectIdentifier.From(subjectId);
         }
 
-        if (response.StatusCode == HttpStatusCode.Conflict)
-        {
-            return Error.Conflict("email_taken", "An account already exists for this email.");
-        }
-
-        if (response.StatusCode == HttpStatusCode.BadRequest)
-        {
-            return Error.Validation("password_rejected", "The initial password does not satisfy the policy.");
-        }
+        if (response.StatusCode == HttpStatusCode.Conflict) return Error.Conflict("email_taken", "An account already exists for this email.");
+        if (response.StatusCode == HttpStatusCode.BadRequest) return Error.Validation("password_rejected", "The initial password does not satisfy the policy.");
 
         return ProviderError(response);
     }
 
-    private async Task<Result> AssignRealmRolesAsync(
-        string token,
-        KeycloakSubjectIdentifier subject,
-        Role role,
-        CancellationToken cancellationToken)
+    private async Task<Result> AssignRealmRolesAsync(string token, KeycloakSubjectIdentifier subject, Role role, CancellationToken cancellationToken)
     {
         var roleNames = role.IsAdministrator
             ? new[] { "employee", "administrator" }
@@ -153,74 +128,46 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
         foreach (var roleName in roleNames)
         {
             var representation = await FetchRealmRoleAsync(token, roleName, cancellationToken);
-            if (representation.IsFailure)
-            {
-                return representation.Error;
-            }
+            if (representation.IsFailure) return representation.Error;
 
             representations.Add(representation.Value);
         }
 
-        using var request = AdminRequest(
-            HttpMethod.Post,
-            $"admin/realms/{options.Realm}/users/{subject.Value}/role-mappings/realm",
-            token,
-            representations);
+        var requestUrl = $"admin/realms/{options.Realm}/users/{subject.Value}/role-mappings/realm";
+        using var request = AdminRequest(HttpMethod.Post, requestUrl, token, representations);
         using var response = await httpClient.SendAsync(request, cancellationToken);
 
         return response.IsSuccessStatusCode ? Result.Success() : ProviderError(response);
     }
 
-    private async Task<Result<JsonNode>> FetchRealmRoleAsync(
-        string token,
-        string roleName,
-        CancellationToken cancellationToken)
+    private async Task<Result<JsonNode>> FetchRealmRoleAsync(string token, string roleName, CancellationToken cancellationToken)
     {
-        using var request = AdminRequest(
-            HttpMethod.Get,
-            $"admin/realms/{options.Realm}/roles/{roleName}",
-            token,
-            content: null);
+        var requestUrl = $"admin/realms/{options.Realm}/roles/{roleName}";
+        using var request = AdminRequest(HttpMethod.Get, requestUrl, token, content: null);
         using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            return ProviderError(response);
-        }
+        if (!response.IsSuccessStatusCode) return ProviderError(response);
 
         var role = await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken);
         var identifier = role?["id"]?.GetValue<string>();
         var name = role?["name"]?.GetValue<string>();
-        if (identifier is null || name is null)
-        {
-            return new Error("provider_error", "Keycloak returned an incomplete role representation.");
-        }
+        if (identifier is null || name is null) return new Error("provider_error", "Keycloak returned an incomplete role representation.");
 
         return new JsonObject { ["id"] = identifier, ["name"] = name };
     }
 
-    private async Task RemovePartialUserAsync(
-        string token,
-        KeycloakSubjectIdentifier subject,
-        CancellationToken cancellationToken)
+    private async Task RemovePartialUserAsync(string token, KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
     {
         // Best-effort compensation: the user was created but its roles were not, so roll it back to
         // keep provisioning idempotent on retry. A failure here is deliberately not surfaced — the
         // original assignment error is the outcome the caller acts on.
-        using var request = AdminRequest(
-            HttpMethod.Delete,
-            $"admin/realms/{options.Realm}/users/{subject.Value}",
-            token,
-            content: null);
+        var requestUrl = $"admin/realms/{options.Realm}/users/{subject.Value}";
+        using var request = AdminRequest(HttpMethod.Delete, requestUrl, token, content: null);
         using var response = await httpClient.SendAsync(request, cancellationToken);
         _ = response;
     }
 
-    private static HttpRequestMessage AdminRequest(
-        HttpMethod method,
-        string requestUri,
-        string token,
-        JsonNode? content)
+    private static HttpRequestMessage AdminRequest(HttpMethod method, string requestUri, string token, JsonNode? content)
     {
         var request = new HttpRequestMessage(method, requestUri);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

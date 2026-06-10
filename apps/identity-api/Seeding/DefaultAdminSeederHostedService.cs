@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 namespace SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 
 // Runs the DefaultAdmin seeding once at startup. The seeder needs scoped services (the DbContext), so

@@ -19,9 +19,7 @@ namespace SmartSolutionsLab.Roomy.Identity.Infrastructure;
 public static class IdentityInfrastructureServiceCollectionExtensions
 {
     // Registers the identity database (its own Postgres, ADR-0014) and the User repository over it.
-    public static IServiceCollection AddIdentityPersistence(
-        this IServiceCollection services,
-        string connectionString)
+    public static IServiceCollection AddIdentityPersistence(this IServiceCollection services, string connectionString)
     {
         Ensure.That(connectionString).IsNotNullOrWhiteSpace();
 
@@ -35,17 +33,13 @@ public static class IdentityInfrastructureServiceCollectionExtensions
     // Registers the Keycloak admin adapter behind the identity-provider port (ADR-0013). The adapter
     // is a typed HttpClient so it gets pooled handlers and the shared resilience defaults; the admin
     // options carry the realm and credentials resolved from configuration at the composition root.
-    public static IServiceCollection AddKeycloakIdentityProvider(
-        this IServiceCollection services,
-        Uri baseAddress,
-        KeycloakAdminOptions options)
+    public static IServiceCollection AddKeycloakIdentityProvider(this IServiceCollection services, Uri baseAddress, KeycloakAdminOptions options)
     {
         Ensure.That((Uri?)baseAddress).IsNotNull();
         Ensure.That((KeycloakAdminOptions?)options).IsNotNull();
 
         services.AddSingleton(options);
-        services.AddHttpClient<IIdentityProviderPort, KeycloakIdentityProvider>(
-            httpClient => httpClient.BaseAddress = baseAddress);
+        services.AddHttpClient<IIdentityProviderPort, KeycloakIdentityProvider>(httpClient => httpClient.BaseAddress = baseAddress);
 
         return services;
     }

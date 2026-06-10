@@ -50,10 +50,7 @@ public sealed class User : Aggregate
     // Provisioning account can be activated.
     public void Activate(KeycloakSubjectIdentifier keycloakSubjectIdentifier)
     {
-        if (Status != UserStatus.Provisioning)
-        {
-            throw new InvalidOperationException("Only a provisioning user can be activated.");
-        }
+        if (Status != UserStatus.Provisioning) throw new InvalidOperationException("Only a provisioning user can be activated.");
 
         KeycloakSubjectIdentifier = keycloakSubjectIdentifier;
         Status = UserStatus.Active;
