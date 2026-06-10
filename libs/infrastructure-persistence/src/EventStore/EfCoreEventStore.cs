@@ -129,8 +129,8 @@ public sealed class EfCoreEventStore : IEventStore
         // Npgsql surfaces a 23505 unique_violation as the inner PostgresException. Matched by the
         // provider-agnostic SQLSTATE rather than a typed reference so this assembly need not bind to
         // Npgsql exception types; the unique (stream_id, version) index is what was violated. This
-        // true-race branch is exercised by the PostgreSQL Testcontainers test (#67), not the SQLite
-        // unit tests (which hit the in-code version check and cannot emit SQLSTATE 23505).
+        // true-race branch is exercised by EventStoreConcurrencyRaceTests against a real Postgres (#67) —
+        // the sequential in-code version check cannot emit SQLSTATE 23505.
         for (var inner = exception.InnerException; inner is not null; inner = inner.InnerException)
         {
             var sqlState = inner.GetType().GetProperty("SqlState")?.GetValue(inner) as string;

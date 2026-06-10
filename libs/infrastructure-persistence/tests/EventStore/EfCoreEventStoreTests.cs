@@ -3,7 +3,13 @@ using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Persistence.Tests.EventStore;
 
-public sealed class EfCoreEventStoreTests
+// Exercises append/replay, the in-code expected-version check, and metadata round-trips against the real
+// PostgreSQL provider (ADR-0012) — the same engine production uses, including its unique
+// (stream_id, version) index. Each test uses a fresh random stream id, so they share the one database
+// without interfering. The DB-level unique-violation (23505) race is covered by
+// EventStoreConcurrencyRaceTests (#67).
+public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
+    : IClassFixture<PostgresEventStoreFixture>
 {
     private static readonly IEventSerializer serializer = new JsonEventSerializer(
         EventTypeRegistry.Create()
@@ -14,7 +20,6 @@ public sealed class EfCoreEventStoreTests
     [Fact]
     public async Task Append_then_read_replays_events_in_version_order()
     {
-        using var fixture = new SqliteEventStoreFixture();
         var streamId = StreamId.From(Guid.NewGuid());
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
         var released = new DeskReleased(booked.DeskId, "ada");
@@ -42,7 +47,6 @@ public sealed class EfCoreEventStoreTests
     [Fact]
     public async Task Reading_an_unknown_stream_returns_empty()
     {
-        using var fixture = new SqliteEventStoreFixture();
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
 
@@ -54,7 +58,6 @@ public sealed class EfCoreEventStoreTests
     [Fact]
     public async Task Appending_no_events_is_a_no_op()
     {
-        using var fixture = new SqliteEventStoreFixture();
         var streamId = StreamId.From(Guid.NewGuid());
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
@@ -67,7 +70,6 @@ public sealed class EfCoreEventStoreTests
     [Fact]
     public async Task Append_with_a_stale_expected_version_is_rejected()
     {
-        using var fixture = new SqliteEventStoreFixture();
         var streamId = StreamId.From(Guid.NewGuid());
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
 
@@ -96,7 +98,6 @@ public sealed class EfCoreEventStoreTests
     [Fact]
     public async Task A_second_writer_on_the_same_expected_version_loses_and_one_append_survives()
     {
-        using var fixture = new SqliteEventStoreFixture();
         var streamId = StreamId.From(Guid.NewGuid());
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
 
@@ -108,9 +109,9 @@ public sealed class EfCoreEventStoreTests
         await firstStore.AppendAsync(
             streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None);
 
-        // Sequential here: the second writer re-reads version 1, so the in-code version check
-        // rejects it. The true concurrent race (both reading 0, the DB unique index rejecting the
-        // loser via SQLSTATE 23505) is covered by the Postgres integration test (#67).
+        // Sequential here: the second writer re-reads version 1, so the in-code version check rejects it.
+        // The true concurrent race (both reading 0, the DB unique index rejecting the loser via SQLSTATE
+        // 23505) is covered by EventStoreConcurrencyRaceTests (#67).
         await Should.ThrowAsync<EventStoreConcurrencyException>(() =>
             secondStore.AppendAsync(
                 streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None));
@@ -123,7 +124,6 @@ public sealed class EfCoreEventStoreTests
     [Fact]
     public async Task Append_preserves_event_metadata()
     {
-        using var fixture = new SqliteEventStoreFixture();
         var streamId = StreamId.From(Guid.NewGuid());
         var metadata = new EventMetadata(Guid.NewGuid(), Guid.NewGuid(), "ada");
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));

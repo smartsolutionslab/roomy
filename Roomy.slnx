@@ -117,6 +117,9 @@
   <Folder Name="/tests/saga-e2e-apphost/">
     <Project Path="tests/saga-e2e-apphost/Roomy.Saga.TestAppHost.csproj" />
   </Folder>
+  <Folder Name="/tests/eventstore-integration-apphost/">
+    <Project Path="tests/eventstore-integration-apphost/Roomy.EventStore.TestAppHost.csproj" />
+  </Folder>
   <Folder Name="/tests/identity-integration/">
     <Project Path="tests/identity-integration/Roomy.Identity.IntegrationTests.csproj" />
   </Folder>
