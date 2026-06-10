@@ -6,6 +6,13 @@
   gap: var(--roomy-space-md);
 }
 
+/* Square the design-system button down to an icon-only chevron control. */
+.calendar__nav-button {
+  padding: var(--roomy-space-sm);
+  font-size: var(--roomy-font-size-lg);
+  line-height: 1;
+}
+
 .calendar__grid {
   width: 100%;
   border-collapse: collapse;

@@ -27,11 +27,23 @@
     </roomy-form-field>
 
     <div class="calendar__nav">
-      <button type="button" (click)="previousMonth()" [attr.aria-label]="translate('attendance.calendar.previousMonth')">
+      <button
+        roomyButton
+        type="button"
+        class="calendar__nav-button"
+        (click)="previousMonth()"
+        [attr.aria-label]="translate('attendance.calendar.previousMonth')"
+      >
         ‹
       </button>
       <h2 class="calendar__month">{{ monthLabel() }}</h2>
-      <button type="button" (click)="nextMonth()" [attr.aria-label]="translate('attendance.calendar.nextMonth')">
+      <button
+        roomyButton
+        type="button"
+        class="calendar__nav-button"
+        (click)="nextMonth()"
+        [attr.aria-label]="translate('attendance.calendar.nextMonth')"
+      >
         ›
       </button>
     </div>
