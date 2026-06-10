@@ -4,8 +4,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // Local development infrastructure (issue #17). The app host provisions the backing
 // services every context needs, so the full stack comes up with one command
-// (`dotnet run --project apps/apphost`). No application/context services exist yet —
-// they are wired in later issues (#18-#23) and will reference these resources by name.
+// (`dotnet run --project apps/apphost`).
 //
 // Credentials are Aspire parameters, never hard-coded secrets: passwords default to a
 // generated value persisted to user secrets (stable across runs), usernames to a stable
@@ -13,16 +12,9 @@ var builder = DistributedApplication.CreateBuilder(args);
 // secrets (e.g. `Parameters:postgres-password`). See https://aka.ms/aspire/parameters.
 
 // --- PostgreSQL (ADR-0011, ADR-0012) -----------------------------------------------
-// A single Postgres server for local dev. Contexts are database-per-service
-// (ADR-0014), so each future context API adds its OWN database off this server rather
-// than sharing one — e.g. once the identity API exists:
-//
-//     var identityDb = postgres.AddDatabase("identity");
-//     builder.AddProject<Projects.Roomy_Identity_Api>("identity-api")
-//            .WithReference(identityDb).WaitFor(identityDb);
-//
-// `organization` and `attendance` follow the same pattern. A persistent volume and a
-// stable container name keep dev data across restarts.
+// A single Postgres server for local dev. Contexts are database-per-service (ADR-0014),
+// so each context API adds its OWN database off this server rather than sharing one. A
+// persistent volume and a stable container name keep dev data across restarts.
 var postgresUser = builder.AddParameter("postgres-username", "postgres", publishValueAsDefault: true);
 var postgresPassword = builder.AddParameter(
     "postgres-password", GeneratedSecret(), secret: true, persist: true);

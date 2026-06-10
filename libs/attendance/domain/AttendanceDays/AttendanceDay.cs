@@ -100,7 +100,6 @@ public sealed class AttendanceDay : EventSourcedAggregate
         return Result.Success();
     }
 
-    // The reservation's owner or any administrator may cancel it; no one else.
     private static bool MayCancel(Reservation reservation, EmployeeIdentifier actor, bool actorIsAdmin) =>
         actorIsAdmin || reservation.Employee == actor;
 

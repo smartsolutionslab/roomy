@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // The attendance context owns its database (ADR-0014); Aspire injects the connection string by name.
-var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
+var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
 
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 builder.Services.AddAttendanceUseCases();
@@ -76,7 +76,7 @@ if (!emittingOpenApiDocument && messagingEnabled)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = attendanceConnectionString,
-            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
+            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
         },
         applicationAssembly: typeof(AttendanceApiHost).Assembly,
         typeof(RoomAddedConsumer).Assembly);
@@ -86,8 +86,7 @@ if (!emittingOpenApiDocument && messagingEnabled)
 var attendance = builder.Configuration.GetSection(AttendanceApiOptions.SectionName);
 builder.Services.AddSingleton(new AttendanceApiOptions
 {
-    CompanyId = Guid.Parse(attendance["CompanyId"]
-        ?? throw new InvalidOperationException("Missing configuration 'Attendance:CompanyId'.")),
+    CompanyId = Guid.Parse(attendance["CompanyId"] ?? throw new InvalidOperationException("Missing configuration 'Attendance:CompanyId'."))
 });
 
 // The attendance API is internal — reached only through the BFF, which forwards the Keycloak access

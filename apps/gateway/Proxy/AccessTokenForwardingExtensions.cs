@@ -24,8 +24,7 @@ public static class AccessTokenForwardingExtensions
     {
         builder.AddTransforms(context =>
         {
-            if (!ForwardsAccessToken(context.Route))
-                return;
+            if (!ForwardsAccessToken(context.Route)) return;
 
             context.AddRequestTransform(async transform =>
             {
@@ -33,13 +32,10 @@ public static class AccessTokenForwardingExtensions
                     .GetTokenAsync(AccessTokenName)
                     .ConfigureAwait(false);
 
-                if (string.IsNullOrEmpty(accessToken))
-                    return;
+                if (string.IsNullOrEmpty(accessToken)) return;
 
                 transform.ProxyRequest.Headers.Remove(HeaderNames.Authorization);
-                transform.ProxyRequest.Headers.TryAddWithoutValidation(
-                    HeaderNames.Authorization,
-                    $"Bearer {accessToken}");
+                transform.ProxyRequest.Headers.TryAddWithoutValidation(HeaderNames.Authorization, $"Bearer {accessToken}");
             });
         });
 

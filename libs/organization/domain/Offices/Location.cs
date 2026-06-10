@@ -2,7 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// An office's location: required and trimmed. Equality is by value.
 public sealed record Location : IValueObject
 {
     public string Value { get; }

@@ -6,7 +6,6 @@ namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 // hard-coded. Defaults match the dev realm import (research R1/R2/R5).
 public sealed class KeycloakAdminOptions
 {
-    // The realm accounts are provisioned into.
     public string Realm { get; init; } = "roomy";
 
     // The realm whose token endpoint issues the admin access token (Keycloak's own master realm).

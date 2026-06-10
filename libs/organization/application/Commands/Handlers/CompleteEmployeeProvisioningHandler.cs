@@ -4,9 +4,8 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
-// Completes provisioning on the identity ack (ADR-0025): load the employee, transition it Active, and
-// commit. The transition is idempotent (a re-delivered UserRegistered is a no-op), so at-least-once
-// delivery is safe (FR-008).
+// Completes provisioning on the identity ack (ADR-0025). The transition is idempotent (a re-delivered
+// UserRegistered is a no-op), so at-least-once delivery is safe (FR-008).
 public sealed class CompleteEmployeeProvisioningHandler(IEmployeeRepository employees, IUnitOfWork unitOfWork)
     : ICommandHandler<CompleteEmployeeProvisioning>
 {
