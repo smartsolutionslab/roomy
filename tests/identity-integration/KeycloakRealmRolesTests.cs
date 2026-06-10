@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Shouldly;
-using SmartSolutionsLab.Roomy.Identity.Api.Authentication;
+using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 
 namespace SmartSolutionsLab.Roomy.Identity.IntegrationTests;
 

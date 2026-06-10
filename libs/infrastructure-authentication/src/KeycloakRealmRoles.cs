@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace SmartSolutionsLab.Roomy.Organization.Api.Authentication;
+namespace SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 
-// Keycloak carries realm roles in a nested `realm_access.roles` array, which the JWT handler surfaces as
-// a single JSON-valued claim rather than individual role claims. The admin-only routes gate on
+// Keycloak carries realm roles in a nested `realm_access.roles` array, which the JWT handler surfaces as a
+// single JSON-valued claim rather than individual role claims. The admin authorization policy gates on
 // RequireRole, so the host flattens those roles to ClaimTypes.Role claims on the BFF-forwarded token
-// (ADR-0013). Mirrored from identity-api rather than shared, to keep this slice surgical (research.md D5).
+// (ADR-0013). Login and session remain the BFF's concern; this only shapes claims for authorization.
 public static class KeycloakRealmRoles
 {
     private const string RealmAccessClaim = "realm_access";

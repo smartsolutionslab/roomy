@@ -1,3 +1,4 @@
+using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Application;
 
 namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
