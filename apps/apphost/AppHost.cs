@@ -64,6 +64,14 @@ var keycloakUser = builder.AddParameter("keycloak-username", "admin", publishVal
 var keycloakPassword = builder.AddParameter(
     "keycloak-password", GeneratedSecret(), secret: true, persist: true);
 
+// Two dev gotchas:
+//  - Resources reach Keycloak via its "http" endpoint (keycloak.GetEndpoint("http")), which Aspire routes
+//    through its service-discovery proxy to the container. The container publishes only https (8443) to the
+//    host, but inter-resource traffic uses the proxy — so GetEndpoint("http") is correct and works (verified:
+//    DefaultAdmin provisioning + the saga e2e). Don't "fix" it to the https host port.
+//  - WithRealmImport seeds the realm only into an *empty* data volume. Because the volume is persistent,
+//    editing the realm file does NOT re-import on the next run — recreate it: `docker volume rm
+//    roomy-keycloak-data` (loses dev users/data; the realm re-imports fresh).
 var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, adminPassword: keycloakPassword)
     .WithDataVolume("roomy-keycloak-data")
     .WithContainerName("roomy-keycloak")
