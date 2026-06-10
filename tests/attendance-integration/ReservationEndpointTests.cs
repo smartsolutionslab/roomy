@@ -232,20 +232,23 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
             .GetAsync(ViewUrl(date), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var reservations = await response.Content.ReadFromJsonAsync<ReservationDto[]>(TestContext.Current.CancellationToken);
-        reservations!.Length.ShouldBe(2);
-        reservations.All(reservation => reservation.Date == date).ShouldBeTrue();
+        var page = await response.Content.ReadFromJsonAsync<PageDto<ReservationDto>>(TestContext.Current.CancellationToken);
+        page!.Items.Length.ShouldBe(2);
+        page.Items.All(reservation => reservation.Date == date).ShouldBeTrue();
+        // The day list is bounded by capacity — it adopts the page envelope with no further page (ADR-0042).
+        page.NextCursor.ShouldBeNull();
     }
 
     [Fact]
-    public async Task Viewing_an_empty_day_returns_an_empty_array()
+    public async Task Viewing_an_empty_day_returns_an_empty_page()
     {
         var response = await ClientForSubject(Guid.NewGuid())
             .GetAsync(ViewUrl(monday.AddDays(12)), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var reservations = await response.Content.ReadFromJsonAsync<ReservationDto[]>(TestContext.Current.CancellationToken);
-        reservations!.ShouldBeEmpty();
+        var page = await response.Content.ReadFromJsonAsync<PageDto<ReservationDto>>(TestContext.Current.CancellationToken);
+        page!.Items.ShouldBeEmpty();
+        page.NextCursor.ShouldBeNull();
     }
 
     [Fact]
@@ -261,9 +264,9 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         var response = await ClientForSubject(subject).GetAsync("/reservations/mine", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var mine = await response.Content.ReadFromJsonAsync<MyReservationDto[]>(TestContext.Current.CancellationToken);
-        mine!.Length.ShouldBe(2);
-        mine.All(reservation => reservation.Date == monday.AddDays(7) || reservation.Date == monday.AddDays(8)).ShouldBeTrue();
+        var mine = await response.Content.ReadFromJsonAsync<PageDto<MyReservationDto>>(TestContext.Current.CancellationToken);
+        mine!.Items.Length.ShouldBe(2);
+        mine.Items.All(reservation => reservation.Date == monday.AddDays(7) || reservation.Date == monday.AddDays(8)).ShouldBeTrue();
     }
 
     [Fact]
@@ -276,8 +279,8 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
         var response = await ClientForSubject(subject).GetAsync("/reservations/mine", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var mine = await response.Content.ReadFromJsonAsync<MyReservationDto[]>(TestContext.Current.CancellationToken);
-        mine!.ShouldBeEmpty();
+        var mine = await response.Content.ReadFromJsonAsync<PageDto<MyReservationDto>>(TestContext.Current.CancellationToken);
+        mine!.Items.ShouldBeEmpty();
     }
 
     public void Dispose() => app.Dispose();
@@ -329,6 +332,8 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
     private sealed record ReservationDto(Guid ReservationId, Guid OfficeId, Guid RoomId, DateOnly Date, Guid EmployeeId);
 
     private sealed record MyReservationDto(Guid ReservationId, Guid OfficeId, string OfficeName, Guid RoomId, string RoomName, DateOnly Date);
+
+    private sealed record PageDto<T>(T[] Items, string? NextCursor);
 
     private sealed record ErrorDto(string Code, string Message);
 

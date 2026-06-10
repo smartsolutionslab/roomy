@@ -4,6 +4,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Offices;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Reservations.Reservation;
 
 namespace SmartSolutionsLab.Roomy.Attendance.IntegrationTests;
@@ -32,14 +33,50 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
             seed.Reservations.Add(Reservation(company, employee, officeId, roomId, past));
         });
 
-        var reservations = await new MyReservationsReadModel(fixture.CreateDbContext())
-            .GetAsync(EmployeeIdentifier.From(employee), TestContext.Current.CancellationToken);
+        var page = await new MyReservationsReadModel(fixture.CreateDbContext())
+            .GetAsync(EmployeeIdentifier.From(employee), FirstPage, TestContext.Current.CancellationToken);
 
+        var reservations = page.Value.Items;
         reservations.Count.ShouldBe(2);
         reservations[0].Date.Value.ShouldBe(past);
         reservations[1].Date.Value.ShouldBe(future);
         reservations[0].OfficeName.ShouldBe("Munich");
         reservations[0].RoomName.ShouldBe("A1");
+        page.Value.NextCursor.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task It_keyset_paginates_by_day_with_a_cursor_to_the_next_page()
+    {
+        var company = Guid.CreateVersion7();
+        var officeId = Guid.CreateVersion7();
+        var roomId = Guid.CreateVersion7();
+        var employee = Guid.CreateVersion7();
+        var days = new[] { new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 2), new DateOnly(2026, 6, 3) };
+
+        await SeedAsync(seed =>
+        {
+            seed.Offices.Add(new Office { OfficeId = officeId, CompanyId = company, Name = "Munich" });
+            seed.Rooms.Add(new Room { RoomId = roomId, OfficeId = officeId, CompanyId = company, Capacity = 8, Name = "A1" });
+            foreach (var day in days)
+            {
+                seed.Reservations.Add(Reservation(company, employee, officeId, roomId, day));
+            }
+        });
+
+        var readModel = new MyReservationsReadModel(fixture.CreateDbContext());
+        var first = await readModel.GetAsync(
+            EmployeeIdentifier.From(employee), Page(limit: 2), TestContext.Current.CancellationToken);
+
+        first.Value.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[0], days[1]]);
+        first.Value.NextCursor.ShouldNotBeNull();
+
+        var second = await readModel.GetAsync(
+            EmployeeIdentifier.From(employee), Page(limit: 2, cursor: first.Value.NextCursor),
+            TestContext.Current.CancellationToken);
+
+        second.Value.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[2]]);
+        second.Value.NextCursor.ShouldBeNull();
     }
 
     [Fact]
@@ -60,20 +97,26 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
             seed.Reservations.Add(Reservation(company, other, officeId, roomId, date));
         });
 
-        var reservations = await new MyReservationsReadModel(fixture.CreateDbContext())
-            .GetAsync(EmployeeIdentifier.From(mine), TestContext.Current.CancellationToken);
+        var page = await new MyReservationsReadModel(fixture.CreateDbContext())
+            .GetAsync(EmployeeIdentifier.From(mine), FirstPage, TestContext.Current.CancellationToken);
 
-        reservations.ShouldHaveSingleItem().Reservation.Value.ShouldNotBe(Guid.Empty);
+        page.Value.Items.ShouldHaveSingleItem().Reservation.Value.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
-    public async Task An_employee_with_no_reservations_gets_an_empty_list()
+    public async Task An_employee_with_no_reservations_gets_an_empty_page()
     {
-        var reservations = await new MyReservationsReadModel(fixture.CreateDbContext())
-            .GetAsync(EmployeeIdentifier.New(), TestContext.Current.CancellationToken);
+        var page = await new MyReservationsReadModel(fixture.CreateDbContext())
+            .GetAsync(EmployeeIdentifier.New(), FirstPage, TestContext.Current.CancellationToken);
 
-        reservations.ShouldBeEmpty();
+        page.Value.Items.ShouldBeEmpty();
+        page.Value.NextCursor.ShouldBeNull();
     }
+
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
+
+    private static PageRequest Page(int limit, string? cursor = null) =>
+        PageRequest.From(cursor, limit).Value;
 
     private async Task SeedAsync(Action<AttendanceDbContext> seed)
     {

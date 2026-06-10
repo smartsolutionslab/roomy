@@ -8,6 +8,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 
@@ -54,9 +55,9 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
         services.AddScoped<ICommandHandler<CancelReservation>, CancelReservationHandler>();
         services.AddScoped<IQueryHandler<ViewDayReservations, IReadOnlyList<ReservationView>>, ViewDayReservationsHandler>();
         services.AddScoped<IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>>, ViewOccupancyHandler>();
-        services.AddScoped<IQueryHandler<ViewMyReservations, IReadOnlyList<MyReservationView>>, ViewMyReservationsHandler>();
+        services.AddScoped<IQueryHandler<ViewMyReservations, Page<MyReservationView>>, ViewMyReservationsHandler>();
         services.AddScoped<IQueryHandler<ViewBookableRooms, IReadOnlyList<BookableRoomView>>, ViewBookableRoomsHandler>();
-        services.AddScoped<IQueryHandler<ViewEmployees, IReadOnlyList<EmployeeView>>, ViewEmployeesHandler>();
+        services.AddScoped<IQueryHandler<ViewEmployees, Page<EmployeeView>>, ViewEmployeesHandler>();
 
         return services;
     }

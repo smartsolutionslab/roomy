@@ -2,6 +2,8 @@ using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.UseCases;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
+using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -16,26 +18,28 @@ public class ViewEmployeesTests
         var employee = new EmployeeView(EmployeeIdentifier.New(), "Ada");
         var handler = new ViewEmployeesHandler(new StubCatalog([employee]));
 
-        var result = await handler.HandleAsync(new ViewEmployees(), CancellationToken.None);
+        var result = await handler.HandleAsync(new ViewEmployees(FirstPage), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldHaveSingleItem().ShouldBe(employee);
+        result.Value.Items.ShouldHaveSingleItem().ShouldBe(employee);
     }
 
     [Fact]
-    public async Task No_employees_yields_an_empty_list()
+    public async Task No_employees_yields_an_empty_page()
     {
         var handler = new ViewEmployeesHandler(new StubCatalog([]));
 
-        var result = await handler.HandleAsync(new ViewEmployees(), CancellationToken.None);
+        var result = await handler.HandleAsync(new ViewEmployees(FirstPage), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldBeEmpty();
+        result.Value.Items.ShouldBeEmpty();
     }
+
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
 
     private sealed class StubCatalog(IReadOnlyList<EmployeeView> employees) : IEmployeeCatalog
     {
-        public Task<IReadOnlyList<EmployeeView>> GetAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(employees);
+        public Task<Result<Page<EmployeeView>>> GetAsync(PageRequest request, CancellationToken cancellationToken) =>
+            Task.FromResult<Result<Page<EmployeeView>>>(new Page<EmployeeView>(employees, null));
     }
 }
