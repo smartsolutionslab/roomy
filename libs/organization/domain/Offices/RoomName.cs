@@ -2,8 +2,7 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 
-// A room's name: required and trimmed. Equality is by value; uniqueness within the office is enforced
-// by the Office aggregate (and a unique index).
+// Uniqueness within the office is enforced by the Office aggregate (and a unique index).
 public sealed record RoomName : IValueObject
 {
     public string Value { get; }

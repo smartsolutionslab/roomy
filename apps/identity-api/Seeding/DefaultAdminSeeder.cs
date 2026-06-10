@@ -17,20 +17,18 @@ public sealed class DefaultAdminSeeder(
     public async Task<Result> SeedAsync(CancellationToken cancellationToken)
     {
         var email = Email.From(options.Email);
-        if (await users.ExistsByEmailAsync(email, cancellationToken))
-        {
-            return Result.Success();
-        }
+        if (await users.ExistsByEmailAsync(email, cancellationToken)) return Result.Success();
 
         var displayName = DisplayName.From(options.DisplayName);
         var administrator = Role.Employee.GrantAdministrator();
 
         var provisioning = await identityProvider.ProvisionUserAsync(
-            email, displayName, options.InitialPassword, administrator, cancellationToken);
-        if (provisioning.IsFailure)
-        {
-            return provisioning.Error;
-        }
+            email,
+            displayName,
+            options.InitialPassword,
+            administrator,
+            cancellationToken);
+        if (provisioning.IsFailure) return provisioning.Error;
 
         var admin = User.Register(email, displayName, administrator);
         admin.Activate(provisioning.Value);

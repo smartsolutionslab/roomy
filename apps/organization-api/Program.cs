@@ -73,8 +73,7 @@ if (!emittingOpenApiDocument)
     var company = builder.Configuration.GetSection(CompanyOptions.SectionName);
     builder.Services.AddSingleton(new CompanyOptions
     {
-        Name = company["Name"]
-            ?? throw new InvalidOperationException("Missing configuration 'Company:Name'."),
+        Name = company["Name"] ?? throw new InvalidOperationException("Missing configuration 'Company:Name'."),
     });
     builder.Services.AddScoped<CompanySeeder>();
     builder.Services.AddHostedService<CompanySeederHostedService>();

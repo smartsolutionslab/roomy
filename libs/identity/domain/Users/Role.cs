@@ -8,9 +8,8 @@ public readonly record struct Role : IValueObject
 {
     public bool IsAdministrator { get; private init; }
 
-    // The base role every account carries.
     public static Role Employee => new() { IsAdministrator = false };
 
-    // Elevate to administrator. Idempotent — granting an already-administrator role is a no-op.
+    // Idempotent — granting an already-administrator role is a no-op.
     public Role GrantAdministrator() => this with { IsAdministrator = true };
 }

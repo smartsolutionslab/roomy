@@ -2,7 +2,6 @@ using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 
-// The company's name: required and trimmed. Equality is by value.
 public sealed record CompanyName : IValueObject
 {
     public string Value { get; }

@@ -6,7 +6,7 @@ namespace SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 /// (constitution Principle III).
 /// </summary>
 /// <remarks>
-/// The transport (Wolverine over RabbitMQ by default) is an infrastructure concern introduced
-/// later (#20); the application layer depends only on this owned contract (ADR-0005).
+/// The transport (Wolverine over RabbitMQ by default) is an infrastructure concern; the
+/// application layer depends only on this owned contract (ADR-0005).
 /// </remarks>
 public interface IIntegrationEvent;
