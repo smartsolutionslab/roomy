@@ -68,12 +68,9 @@ if (!emittingOpenApiDocument)
 var defaultAdmin = builder.Configuration.GetSection(DefaultAdminOptions.SectionName);
 builder.Services.AddSingleton(new DefaultAdminOptions
 {
-    Email = defaultAdmin["Email"]
-        ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:Email'."),
-    DisplayName = defaultAdmin["DisplayName"]
-        ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:DisplayName'."),
-    InitialPassword = defaultAdmin["InitialPassword"]
-        ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
+    Email = defaultAdmin["Email"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:Email'."),
+    DisplayName = defaultAdmin["DisplayName"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:DisplayName'."),
+    InitialPassword = defaultAdmin["InitialPassword"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
 });
 builder.Services.AddScoped<DefaultAdminSeeder>();
 

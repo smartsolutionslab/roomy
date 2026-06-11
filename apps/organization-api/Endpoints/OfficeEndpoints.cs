@@ -66,16 +66,10 @@ public static class OfficeEndpoints
     {
         var name = OfficeName.TryParse(request.Name);
         var location = Location.TryParse(request.Location);
-        if (name is null || location is null)
-        {
-            return Results.BadRequest("An office requires a non-empty name and location.");
-        }
+        if (name is null || location is null) return Results.BadRequest("An office requires a non-empty name and location.");
 
         var result = await createOffice.HandleAsync(new CreateOffice(name, location), cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToHttpResult();
-        }
+        if (result.IsFailure) return result.Error.ToHttpResult();
 
         var created = await offices.GetByIdentifierAsync(result.Value, cancellationToken);
         return created.Match(
@@ -83,18 +77,13 @@ public static class OfficeEndpoints
             error => error.ToHttpResult());
     }
 
-    private static async Task<IResult> ListOfficesAsync(
-        IOfficeRepository offices,
-        CancellationToken cancellationToken)
+    private static async Task<IResult> ListOfficesAsync(IOfficeRepository offices, CancellationToken cancellationToken)
     {
         var all = await offices.GetAllAsync(cancellationToken);
         return Results.Ok(all.Select(office => office.ToResponse()));
     }
 
-    private static async Task<IResult> GetOfficeAsync(
-        Guid officeId,
-        IOfficeRepository offices,
-        CancellationToken cancellationToken)
+    private static async Task<IResult> GetOfficeAsync(Guid officeId, IOfficeRepository offices, CancellationToken cancellationToken)
     {
         var office = await offices.GetByIdentifierAsync(OfficeIdentifier.From(officeId), cancellationToken);
         return office.Match(found => Results.Ok(found.ToResponse()), error => error.ToHttpResult());
@@ -126,9 +115,7 @@ public static class OfficeEndpoints
         if (location is null) return Results.BadRequest("An office location must not be blank.");
 
         var identifier = OfficeIdentifier.From(officeId);
-        var result = await changeLocation.HandleAsync(
-            new ChangeOfficeLocation(identifier, location),
-            cancellationToken);
+        var result = await changeLocation.HandleAsync(new ChangeOfficeLocation(identifier, location), cancellationToken);
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
