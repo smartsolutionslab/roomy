@@ -5,6 +5,19 @@
   display: contents;
 }
 
+/* The trigger buttons (rename/relocate/add room) are direct flex children of the surrounding card,
+   so they stretch full-width by default; pin them to the trailing edge instead. */
+:host > button {
+  align-self: flex-end;
+}
+
+/* Save/Cancel pair, grouped at the trailing edge of the edit form. */
+.offices__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--roomy-space-sm);
+}
+
 .offices__rooms {
   list-style: none;
   margin: 0;
