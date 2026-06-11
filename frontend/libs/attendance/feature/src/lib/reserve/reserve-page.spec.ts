@@ -95,7 +95,7 @@ describe('ReservePage', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
 
     expect(await screen.findByText('Full')).toBeTruthy();
-    expect(screen.getByText('4 of 5 places left')).toBeTruthy();
+    expect(screen.getByText('4 of 5 free')).toBeTruthy();
     expect((screen.getByRole('button', { name: /A1/ }) as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByRole('button', { name: /B1/ }) as HTMLButtonElement).disabled).toBe(false);
   });
@@ -106,14 +106,14 @@ describe('ReservePage', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
     // No day chosen yet → availability unknown → no bars, only the capacity figure.
-    expect(container.querySelectorAll('.reserve__room-bar').length).toBe(0);
+    expect(container.querySelectorAll('roomy-usage-bar').length).toBe(0);
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
-    await screen.findByText('8 of 8 places left');
+    await screen.findByText('8 of 8 free');
 
-    expect(container.querySelectorAll('.reserve__room-bar').length).toBe(2);
+    expect(container.querySelectorAll('roomy-usage-bar').length).toBe(2);
     expect(
-      (container.querySelector('.reserve__room-bar-fill') as HTMLElement).getAttribute('style'),
+      (container.querySelector('.usage-bar__fill') as HTMLElement).getAttribute('style'),
     ).toContain('inline-size');
   });
 

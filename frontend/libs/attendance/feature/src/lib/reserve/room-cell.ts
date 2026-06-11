@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { BookableRoom, RoomAvailability } from '@roomy/attendance-api';
+import { UsageBar } from '@roomy/shared-ui';
 
 @Component({
   selector: 'roomy-room-cell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective],
+  imports: [TranslocoDirective, UsageBar],
   templateUrl: './room-cell.html',
   styleUrl: './room-cell.css',
 })
@@ -20,12 +21,5 @@ export class RoomCell {
   protected readonly remaining = computed(() => {
     const availability = this.availability();
     return availability ? availability.capacity - availability.occupied : this.room().capacity;
-  });
-
-  // How full the room is, 0–100, for the availability bar. Unknown availability (no day chosen yet) reads
-  // as empty.
-  protected readonly occupiedPercent = computed(() => {
-    const availability = this.availability();
-    return availability ? Math.round((availability.occupied / availability.capacity) * 100) : 0;
   });
 }

@@ -13,3 +13,4 @@ export { Icon, type IconName } from './lib/icon/icon';
 export { DaySelect, type DayOption } from './lib/day-select/day-select';
 export { Select, type SelectOption } from './lib/select/select';
 export { TileGroup } from './lib/tile-group/tile-group';
+export { UsageBar } from './lib/usage-bar/usage-bar';

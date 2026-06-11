@@ -152,7 +152,7 @@
       "dayPlaceholder": "Select a day",
       "roomsHeading": "Rooms",
       "capacityLabel": "{{capacity}} places",
-      "placesLeft": "{{remaining}} of {{capacity}} places left",
+      "free": "{{remaining}} of {{capacity}} free",
       "full": "Full",
       "confirm": "Reserve",
       "reserved": "Reserved {{room}} for {{date}}.",
