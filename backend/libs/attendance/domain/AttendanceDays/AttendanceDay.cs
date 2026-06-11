@@ -64,7 +64,7 @@ public sealed class AttendanceDay : EventSourcedAggregate
         BookingDate today,
         DateTimeOffset occurredAt)
     {
-        var existing = reservations.Find(held => held.Id == reservation);
+        var existing = reservations.Find(held => held.Identifier == reservation);
         if (existing is null)
         {
             return Error.NotFound("reservation_not_found", "No such reservation for this day.");
@@ -81,7 +81,7 @@ public sealed class AttendanceDay : EventSourcedAggregate
         }
 
         Raise(new ReservationCancelled(
-            existing.Id.Value,
+            existing.Identifier.Value,
             Company.Value,
             Date.Value,
             existing.Employee.Value,
@@ -107,7 +107,7 @@ public sealed class AttendanceDay : EventSourcedAggregate
                 break;
 
             case ReservationCancelled cancelled:
-                reservations.RemoveAll(held => held.Id == ReservationIdentifier.From(cancelled.ReservationId));
+                reservations.RemoveAll(held => held.Identifier == ReservationIdentifier.From(cancelled.ReservationId));
                 break;
         }
     }
