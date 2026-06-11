@@ -23,7 +23,7 @@ import {
   errorCode,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { Button, DaySelect, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
+import { Button, DaySelect, Message, Page, TileGroup, type SelectOption } from '@roomy/shared-ui';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
 
@@ -35,7 +35,7 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-reserve-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, Message, Button, DaySelect, Select],
+  imports: [TranslocoDirective, Page, Message, Button, DaySelect, TileGroup],
   templateUrl: './reserve-page.html',
   styleUrl: './reserve-page.css',
 })
@@ -161,7 +161,10 @@ export class ReservePage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.result.set({ key: 'attendance.reserve.reserved', params: { room: roomName, date: day } });
+          this.result.set({
+            key: 'attendance.reserve.reserved',
+            params: { room: roomName, date: day },
+          });
           this.selectedRoomId.set(null);
           this.loadAvailability();
           this.reserved.emit();
