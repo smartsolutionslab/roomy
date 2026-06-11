@@ -30,6 +30,12 @@
   margin-inline-start: auto;
 }
 
+/* Match the height of the icon-sized theme toggle and language switcher beside it. */
+.topbar__sign-in {
+  block-size: 2.25rem;
+  padding-block: 0;
+}
+
 @media (max-width: 640px) {
   .topbar__tagline {
     display: none;
