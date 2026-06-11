@@ -20,6 +20,8 @@ public static class MessagingServiceCollectionExtensions
         Assembly? applicationAssembly = null,
         params Assembly[] handlerAssemblies)
     {
+        Ensure.That((IHostApplicationBuilder?)builder).IsNotNull();
+        Ensure.That((MessagingOptions?)options).IsNotNull();
         var postgresConnectionString = Ensure.That(options.PostgresConnectionString).IsNotNullOrWhiteSpace().Value;
 
         builder.UseWolverine(wolverine =>
