@@ -48,7 +48,9 @@ describe('AttendanceGateway', () => {
   it('reads an office occupancy for one day as room availability', () => {
     let received: RoomAvailability[] | undefined;
 
-    gateway.occupancyForOffice(officeId('o1'), '2026-06-08').subscribe((rooms) => (received = rooms));
+    gateway
+      .occupancyForOffice(officeId('o1'), '2026-06-08')
+      .subscribe((rooms) => (received = rooms));
 
     const request = httpController.expectOne((req) => req.url === '/occupancy');
     expect(request.request.method).toBe('GET');
@@ -59,7 +61,9 @@ describe('AttendanceGateway', () => {
       {
         date: '2026-06-08',
         office: { officeId: 'o1', name: 'Munich', occupied: 8, capacity: 8, isFull: true },
-        rooms: [{ roomId: 'r1', name: 'A1', occupied: 8, capacity: 8, isFull: true, occupants: null }],
+        rooms: [
+          { roomId: 'r1', name: 'A1', occupied: 8, capacity: 8, isFull: true, occupants: null },
+        ],
       },
     ]);
 
@@ -69,9 +73,7 @@ describe('AttendanceGateway', () => {
   it('reserves a place and maps the new reservation id back', () => {
     let received: string | undefined;
 
-    gateway
-      .reserve(officeId('o1'), roomId('r1'), '2026-06-08')
-      .subscribe((id) => (received = id));
+    gateway.reserve(officeId('o1'), roomId('r1'), '2026-06-08').subscribe((id) => (received = id));
 
     const request = httpController.expectOne((req) => req.url === '/reservations');
     expect(request.request.method).toBe('POST');

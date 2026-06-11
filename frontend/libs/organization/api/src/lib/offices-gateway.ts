@@ -53,9 +53,10 @@ export class OfficesGateway {
   // The API returns the created room (201); the page appends it and recomputes the office's derived
   // capacity from its rooms (FR-004/FR-008).
   addRoom(office: OfficeId, name: string, capacity: number): Observable<Room> {
-    return addRoom(this.http, this.config.rootUrl, { officeId: office, body: { name, capacity } }).pipe(
-      map((response) => toRoom(response.body)),
-    );
+    return addRoom(this.http, this.config.rootUrl, {
+      officeId: office,
+      body: { name, capacity },
+    }).pipe(map((response) => toRoom(response.body)));
   }
 
   renameRoom(office: OfficeId, room: RoomId, name: string): Observable<Office> {

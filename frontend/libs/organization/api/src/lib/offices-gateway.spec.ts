@@ -109,7 +109,9 @@ describe('OfficesGateway', () => {
       .renameRoom(officeId(berlin.id), roomId(berlin.rooms[0].id), 'Sky Lounge')
       .subscribe((office) => (received = office));
 
-    const request = httpController.expectOne(`/offices/${berlin.id}/rooms/${berlin.rooms[0].id}/name`);
+    const request = httpController.expectOne(
+      `/offices/${berlin.id}/rooms/${berlin.rooms[0].id}/name`,
+    );
     expect(request.request.method).toBe('PATCH');
     expect(request.request.body).toEqual({ name: 'Sky Lounge' });
     request.flush({

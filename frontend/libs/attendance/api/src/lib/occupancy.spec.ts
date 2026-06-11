@@ -28,7 +28,13 @@ describe('toOccupancyDays', () => {
     const [day] = toOccupancyDays([today]);
 
     expect(day.date).toBe('2026-06-08');
-    expect(day.office).toEqual({ officeId: 'o1', name: 'Munich', occupied: 3, capacity: 13, isFull: false });
+    expect(day.office).toEqual({
+      officeId: 'o1',
+      name: 'Munich',
+      occupied: 3,
+      capacity: 13,
+      isFull: false,
+    });
     expect(day.rooms[0]).toMatchObject({ roomId: 'r1', occupied: 8, capacity: 8, isFull: true });
   });
 
@@ -50,7 +56,9 @@ describe('toOccupancyDays', () => {
       {
         date: '2026-06-08',
         office: { officeId: 'o1', name: 'Munich', occupied: '3', capacity: '13', isFull: false },
-        rooms: [{ roomId: 'r1', name: 'A1', occupied: '8', capacity: '8', isFull: true, occupants: null }],
+        rooms: [
+          { roomId: 'r1', name: 'A1', occupied: '8', capacity: '8', isFull: true, occupants: null },
+        ],
       },
     ]);
 

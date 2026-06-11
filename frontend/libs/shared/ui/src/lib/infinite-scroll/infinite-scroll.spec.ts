@@ -8,7 +8,11 @@ import { InfiniteScroll } from './infinite-scroll';
 
 @Component({
   imports: [InfiniteScroll],
-  template: `<roomy-infinite-scroll [hasMore]="hasMore" [loading]="loading" (loadMore)="loads = loads + 1">
+  template: `<roomy-infinite-scroll
+    [hasMore]="hasMore"
+    [loading]="loading"
+    (loadMore)="loads = loads + 1"
+  >
     <p>projected item</p>
   </roomy-infinite-scroll>`,
 })
@@ -70,7 +74,8 @@ describe('InfiniteScroll', () => {
       }
     }
     const original = globalThis.IntersectionObserver;
-    globalThis.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
+    globalThis.IntersectionObserver =
+      MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
     try {
       const { fixture } = await renderHost({ hasMore: true });
@@ -78,7 +83,10 @@ describe('InfiniteScroll', () => {
         throw new Error('the component did not register an IntersectionObserver');
       }
 
-      capturedCallback([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+      capturedCallback(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      );
 
       expect(fixture.componentInstance.loads).toBe(1);
     } finally {

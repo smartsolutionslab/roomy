@@ -37,7 +37,9 @@ describe('AttendanceGateway.occupancy', () => {
       {
         date: '2026-06-08',
         office: { officeId: 'o1', name: 'Munich', occupied: 3, capacity: 13, isFull: false },
-        rooms: [{ roomId: 'r1', name: 'A1', occupied: 3, capacity: 8, isFull: false, occupants: null }],
+        rooms: [
+          { roomId: 'r1', name: 'A1', occupied: 3, capacity: 8, isFull: false, occupants: null },
+        ],
       },
     ]);
 

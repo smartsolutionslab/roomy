@@ -60,7 +60,10 @@ export function toOccupancyDays(days: readonly OccupancyDayResponse[]): Occupanc
       occupants:
         room.occupants == null
           ? undefined
-          : room.occupants.map((occupant) => ({ employeeId: occupant.employeeId, name: occupant.name })),
+          : room.occupants.map((occupant) => ({
+              employeeId: occupant.employeeId,
+              name: occupant.name,
+            })),
     })),
   }));
 }

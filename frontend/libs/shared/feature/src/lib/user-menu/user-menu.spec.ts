@@ -7,12 +7,17 @@ import { importSharedTestTransloco } from '../../testing/transloco';
 
 import { UserMenu } from './user-menu';
 
-async function renderMenu(user: CurrentUser | null = { name: 'Ada Lovelace', roles: ['employee'] }) {
+async function renderMenu(
+  user: CurrentUser | null = { name: 'Ada Lovelace', roles: ['employee'] },
+) {
   return render(UserMenu, {
     imports: [importSharedTestTransloco()],
     providers: [
       provideZonelessChangeDetection(),
-      { provide: SessionService, useValue: { currentUser: signal(user) } as unknown as SessionService },
+      {
+        provide: SessionService,
+        useValue: { currentUser: signal(user) } as unknown as SessionService,
+      },
     ],
   });
 }
