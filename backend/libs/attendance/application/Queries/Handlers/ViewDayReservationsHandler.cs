@@ -15,7 +15,7 @@ public sealed class ViewDayReservationsHandler(IAttendanceDayRepository attendan
 
         var reservations = attendanceDay.Reservations
             .Select(reservation => new ReservationView(
-                reservation.Id,
+                reservation.Identifier,
                 reservation.Office,
                 reservation.Room,
                 attendanceDay.Date,

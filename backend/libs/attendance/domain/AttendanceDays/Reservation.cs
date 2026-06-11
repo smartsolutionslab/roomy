@@ -5,18 +5,18 @@ namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 public sealed class Reservation : IEntity
 {
     internal Reservation(
-        ReservationIdentifier id,
+        ReservationIdentifier identifier,
         EmployeeIdentifier employee,
         OfficeIdentifier office,
         RoomIdentifier room)
     {
-        Id = id;
+        Identifier = identifier;
         Employee = employee;
         Office = office;
         Room = room;
     }
 
-    public ReservationIdentifier Id { get; }
+    public ReservationIdentifier Identifier { get; }
 
     public EmployeeIdentifier Employee { get; }
 
