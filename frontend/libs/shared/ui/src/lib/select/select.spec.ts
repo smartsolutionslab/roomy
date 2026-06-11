@@ -1,4 +1,5 @@
 import { Component, provideZonelessChangeDetection } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 
@@ -55,5 +56,57 @@ describe('Select', () => {
     await userEvent.selectOptions(screen.getByLabelText('Office'), 'Pick an office');
 
     expect(fixture.componentInstance.chosen).toBe('');
+  });
+});
+
+@Component({
+  imports: [Select, ReactiveFormsModule],
+  template: `<roomy-select
+    [label]="'Office'"
+    [placeholder]="'Pick an office'"
+    [options]="options"
+    [formControl]="control"
+  />`,
+})
+class FormHostComponent {
+  readonly control = new FormControl('', { nonNullable: true });
+  options: SelectOption[] = [
+    { value: 'office-1', label: 'London' },
+    { value: 'office-2', label: 'Berlin' },
+  ];
+}
+
+function renderFormHost() {
+  return render(FormHostComponent, {
+    providers: [provideZonelessChangeDetection()],
+  });
+}
+
+describe('Select as a form control', () => {
+  it('reflects the form control value in the rendered selection', async () => {
+    const { fixture } = await renderFormHost();
+
+    fixture.componentInstance.control.setValue('office-2');
+    fixture.detectChanges();
+
+    expect((screen.getByLabelText('Office') as HTMLSelectElement).value).toBe('office-2');
+  });
+
+  it('writes the chosen option into the form control', async () => {
+    const { fixture } = await renderFormHost();
+
+    await userEvent.selectOptions(screen.getByLabelText('Office'), 'office-1');
+
+    expect(fixture.componentInstance.control.value).toBe('office-1');
+  });
+
+  it('returns to the placeholder when the control is reset', async () => {
+    const { fixture } = await renderFormHost();
+
+    await userEvent.selectOptions(screen.getByLabelText('Office'), 'office-1');
+    fixture.componentInstance.control.reset();
+    fixture.detectChanges();
+
+    expect((screen.getByLabelText('Office') as HTMLSelectElement).value).toBe('');
   });
 });

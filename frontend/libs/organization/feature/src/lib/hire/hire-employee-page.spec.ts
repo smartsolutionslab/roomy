@@ -68,6 +68,7 @@ describe('HireEmployeePage', () => {
 
     expect((screen.getByLabelText('Display name') as HTMLInputElement).value).toBe('');
     expect((screen.getByLabelText('Initial password') as HTMLInputElement).value).toBe('');
+    expect((screen.getByLabelText('Role') as HTMLSelectElement).value).toBe('');
   });
 
   it('sends the administrator role when chosen', async () => {

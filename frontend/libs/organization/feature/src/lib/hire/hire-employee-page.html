@@ -29,7 +29,7 @@
           { value: 'Employee', label: translate('organization.hire.roleEmployee') },
           { value: 'Administrator', label: translate('organization.hire.roleAdministrator') }
         ]"
-        (selected)="selectRole($event)"
+        formControlName="role"
       />
       @if (attempted() && hireForm.controls.role.invalid) {
       <roomy-message variant="error"
