@@ -77,3 +77,4 @@ ADRs are written **before** the implementing code, not after.
 | [0057](0057-backend-folder-layout.md) | Nest all backend (.NET) projects under backend/ | Accepted |
 | [0058](0058-roomy-user-id-token-claim.md) | Carry the Roomy UserIdentifier as a token claim; resolve the current user from it | Accepted |
 | [0059](0059-defaultadmin-bootstrap-organization-led.md) | DefaultAdmin bootstrap is organization-led | Accepted |
+| [0060](0060-feature-local-presentational-components.md) | Feature-local presentational components; the page stays the single smart orchestrator | Accepted |
