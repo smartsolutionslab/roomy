@@ -7,21 +7,9 @@
     } @else if (offices(); as items) { @if (items.length === 0) {
     <p>{{ translate('attendance.occupancy.empty') }}</p>
     } @else {
-    <roomy-select
-      [label]="translate('attendance.occupancy.officeLabel')"
-      [placeholder]="translate('attendance.occupancy.officePlaceholder')"
-      [options]="officeOptions()"
-      (selected)="chooseOffice($event)"
-    />
+    <roomy-office-room-picker [offices]="items" (scopeChange)="onScope($event)" />
 
-    @if (selectedOffice()) {
-    <roomy-select
-      [label]="translate('attendance.occupancy.roomLabel')"
-      [placeholder]="translate('attendance.occupancy.allRooms')"
-      [options]="roomOptions()"
-      (selected)="chooseRoom($event)"
-    />
-
+    @if (scope()) {
     <div class="calendar__nav">
       <button
         roomyButton
@@ -64,12 +52,10 @@
             @if (isSameMonth(date)) {
             <span class="calendar__daynum">{{ date.slice(8) }}</span>
             @if (figureFor(date); as day) {
-            <span class="calendar__figure">{{
-              translate('attendance.calendar.occupied', {
-                occupied: day.office.occupied,
-                capacity: day.office.capacity
-              })
-            }}</span>
+            <span class="calendar__figure"
+              >{{ translate('attendance.calendar.occupied', { occupied: day.office.occupied,
+              capacity: day.office.capacity }) }}</span
+            >
             } @if (isMine(date)) {
             <span class="calendar__mine" aria-hidden="true">★</span>
             <span class="roomy-visually-hidden">{{ translate('attendance.calendar.mine') }}</span>
@@ -80,8 +66,7 @@
         }
       </tbody>
     </table>
-    }
-    } } @else {
+    } } } @else {
     <p>{{ translate('attendance.occupancy.loading') }}</p>
     }
   </section>
