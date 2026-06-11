@@ -4,12 +4,7 @@ import { Page, mapPage } from '@roomy/shared-data-access';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import {
-  reservationId,
-  toBookableOffices,
-  toMyReservation,
-  toRoomAvailability,
-} from './booking';
+import { reservationId, toBookableOffices, toMyReservation, toRoomAvailability } from './booking';
 import type {
   BookableOffice,
   EmployeeId,
@@ -54,9 +49,11 @@ export class AttendanceGateway {
   // Each room's availability in an office for one day, to show remaining places and grey out a full room
   // before submitting (AT-3, FR-002).
   occupancyForOffice(office: OfficeId, day: string): Observable<RoomAvailability[]> {
-    return viewOccupancy(this.http, this.config.rootUrl, { officeId: office, from: day, to: day }).pipe(
-      map((response) => toRoomAvailability(response.body)),
-    );
+    return viewOccupancy(this.http, this.config.rootUrl, {
+      officeId: office,
+      from: day,
+      to: day,
+    }).pipe(map((response) => toRoomAvailability(response.body)));
   }
 
   // Occupancy for an office or room over a date range (GET /occupancy), as full day figures — the office
@@ -79,7 +76,12 @@ export class AttendanceGateway {
   // already_reserved_today, not_bookable, unknown_room, concurrency_retry_exhausted) surface as the
   // HttpErrorResponse the page maps to a localized message (FR-004). `onBehalfOf` is administrator-only
   // (009 AT-6); omitted ⇒ the caller reserves for themselves.
-  reserve(office: OfficeId, room: RoomId, date: string, onBehalfOf?: EmployeeId): Observable<ReservationId> {
+  reserve(
+    office: OfficeId,
+    room: RoomId,
+    date: string,
+    onBehalfOf?: EmployeeId,
+  ): Observable<ReservationId> {
     return reserve(this.http, this.config.rootUrl, {
       body: { officeId: office, roomId: room, date, onBehalfOf },
     }).pipe(map((response) => reservationId(response.body.reservationId)));
@@ -95,11 +97,14 @@ export class AttendanceGateway {
   }
 
   // One page of the administrator on-behalf directory (GET /reservations/employees, admin-only, 009;
-  // ADR-0044).
-  listEmployees(cursor?: string): Observable<Page<Employee>> {
-    return viewEmployees(this.http, this.config.rootUrl, { cursor }).pipe(
-      map((response) => mapPage(response.body, toEmployee)),
-    );
+  // ADR-0044). A non-blank `query` ranks the directory by name similarity (012, ADR-0047); a blank query
+  // sends no `q`, returning the full keyset-ordered directory unchanged (009/011 behaviour, FR-003).
+  listEmployees(query = '', cursor?: string): Observable<Page<Employee>> {
+    const trimmed = query.trim();
+    return viewEmployees(this.http, this.config.rootUrl, {
+      q: trimmed || undefined,
+      cursor,
+    }).pipe(map((response) => mapPage(response.body, toEmployee)));
   }
 
   // One page of a chosen employee's reservations, for the administrator on-behalf view (GET

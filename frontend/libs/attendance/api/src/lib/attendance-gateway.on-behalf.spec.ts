@@ -36,10 +36,26 @@ describe('AttendanceGateway on-behalf', () => {
   });
 
   it('forwards the cursor when paging the directory', () => {
-    gateway.listEmployees('cursor-token').subscribe();
+    gateway.listEmployees('', 'cursor-token').subscribe();
 
     const request = httpController.expectOne((req) => req.url === '/reservations/employees');
     expect(request.request.params.get('cursor')).toBe('cursor-token');
+    request.flush({ items: [], nextCursor: null });
+  });
+
+  it('searches the directory by name, passing q ranked by similarity (012)', () => {
+    gateway.listEmployees('han').subscribe();
+
+    const request = httpController.expectOne((req) => req.url === '/reservations/employees');
+    expect(request.request.params.get('q')).toBe('han');
+    request.flush({ items: [], nextCursor: null });
+  });
+
+  it('omits q for a blank query, returning the full directory unchanged (FR-003)', () => {
+    gateway.listEmployees('   ').subscribe();
+
+    const request = httpController.expectOne((req) => req.url === '/reservations/employees');
+    expect(request.request.params.has('q')).toBe(false);
     request.flush({ items: [], nextCursor: null });
   });
 
@@ -76,9 +92,7 @@ describe('AttendanceGateway on-behalf', () => {
   });
 
   it('reserves on behalf of an employee, sending onBehalfOf in the body', () => {
-    gateway
-      .reserve(officeId('o1'), roomId('r1'), '2026-06-10', employeeId('e1'))
-      .subscribe();
+    gateway.reserve(officeId('o1'), roomId('r1'), '2026-06-10', employeeId('e1')).subscribe();
 
     const request = httpController.expectOne((req) => req.url === '/reservations');
     expect(request.request.method).toBe('POST');
@@ -88,6 +102,12 @@ describe('AttendanceGateway on-behalf', () => {
       date: '2026-06-10',
       onBehalfOf: 'e1',
     });
-    request.flush({ reservationId: 'res1', officeId: 'o1', roomId: 'r1', date: '2026-06-10', employeeId: 'e1' });
+    request.flush({
+      reservationId: 'res1',
+      officeId: 'o1',
+      roomId: 'r1',
+      date: '2026-06-10',
+      employeeId: 'e1',
+    });
   });
 });
