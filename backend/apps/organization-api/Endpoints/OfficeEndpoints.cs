@@ -55,9 +55,6 @@ public static class OfficeEndpoints
         return endpoints;
     }
 
-    private static RouteHandlerBuilder RequireAdministrator(this RouteHandlerBuilder builder) =>
-        builder.RequireAuthorization(policy => policy.RequireRole(RoomyRoles.Administrator));
-
     private static async Task<IResult> CreateOfficeAsync(
         Request.CreateOffice request,
         ICommandHandler<CreateOffice, OfficeIdentifier> createOffice,
