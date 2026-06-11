@@ -12,7 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
 import {
   AttendanceGateway,
-  BookableOffice,
   OccupancyDay,
   RangePreset,
   errorCode,
@@ -20,6 +19,8 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-api';
 import { FormField, Message, Page } from '@roomy/shared-ui';
+
+import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
 import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
 
@@ -42,8 +43,9 @@ export class OccupancyPage {
 
   readonly today = input<string>(todayInBerlin());
 
-  protected readonly offices = signal<BookableOffice[] | null>(null);
-  protected readonly loadFailed = signal(false);
+  private readonly catalogue = bookableOfficesCatalogue();
+  protected readonly offices = this.catalogue.offices;
+  protected readonly loadFailed = this.catalogue.loadFailed;
 
   protected readonly scope = signal<OccupancyScope | null>(null);
   protected readonly preset = signal<RangePreset>('day');
@@ -55,23 +57,6 @@ export class OccupancyPage {
 
   protected readonly presets: readonly RangePreset[] = ['day', 'week', 'month'];
   protected readonly effectiveAnchor = computed(() => this.anchor() ?? this.today());
-
-  constructor() {
-    this.loadCatalogue();
-  }
-
-  private loadCatalogue(): void {
-    this.gateway
-      .listBookableOffices()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (offices) => this.offices.set(offices),
-        error: () => {
-          this.loadFailed.set(true);
-          this.offices.set([]);
-        },
-      });
-  }
 
   protected onScope(scope: OccupancyScope | null): void {
     this.scope.set(scope);
@@ -109,7 +94,7 @@ export class OccupancyPage {
           const code = errorCode(error);
           if (code === 'unknown_office' || code === 'unknown_room') {
             this.errorKey.set('attendance.occupancy.unknownScope');
-            this.loadCatalogue();
+            this.catalogue.reload();
           } else {
             this.errorKey.set('attendance.occupancy.loadError');
           }

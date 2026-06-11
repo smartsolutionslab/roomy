@@ -11,7 +11,6 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import {
   AttendanceGateway,
-  BookableOffice,
   MyReservation,
   OccupancyDay,
   addMonths,
@@ -22,6 +21,8 @@ import {
 } from '@roomy/attendance-api';
 import { Button, Heat, Message, Page } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
+
+import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
 import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
 
@@ -43,8 +44,9 @@ export class OccupancyCalendar {
 
   readonly today = input<string>(todayInBerlin());
 
-  protected readonly offices = signal<BookableOffice[] | null>(null);
-  protected readonly loadFailed = signal(false);
+  private readonly catalogue = bookableOfficesCatalogue();
+  protected readonly offices = this.catalogue.offices;
+  protected readonly loadFailed = this.catalogue.loadFailed;
   protected readonly scope = signal<OccupancyScope | null>(null);
   protected readonly anchorMonth = signal<string | null>(null);
   protected readonly occupancyByDate = signal<Map<string, OccupancyDay>>(new Map());
@@ -68,23 +70,6 @@ export class OccupancyCalendar {
       asUtcDate(this.month()),
     ),
   );
-
-  constructor() {
-    this.loadCatalogue();
-  }
-
-  private loadCatalogue(): void {
-    this.gateway
-      .listBookableOffices()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (offices) => this.offices.set(offices),
-        error: () => {
-          this.loadFailed.set(true);
-          this.offices.set([]);
-        },
-      });
-  }
 
   protected onScope(scope: OccupancyScope | null): void {
     this.scope.set(scope);
