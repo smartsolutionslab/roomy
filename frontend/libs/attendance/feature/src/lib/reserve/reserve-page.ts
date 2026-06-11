@@ -26,6 +26,8 @@ import {
 import { type ResultMessage } from '@roomy/shared-data-access';
 import { Button, DaySelect, Message, Page, TileGroup, type SelectOption } from '@roomy/shared-ui';
 
+import { RoomCell } from './room-cell';
+
 // The reserve flow (AT-1/AT-2): pick an office, then a day, then a room with a remaining place, then
 // confirm. The catalogue and the per-day availability come from the attendance context only; the day
 // chooser offers only bookable days (FR-003), so a past/weekend/out-of-window day cannot be picked, and
@@ -34,7 +36,7 @@ import { Button, DaySelect, Message, Page, TileGroup, type SelectOption } from '
 @Component({
   selector: 'roomy-reserve-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, Message, Button, DaySelect, TileGroup],
+  imports: [TranslocoDirective, Page, Message, Button, DaySelect, TileGroup, RoomCell],
   templateUrl: './reserve-page.html',
   styleUrl: './reserve-page.css',
 })
@@ -101,9 +103,6 @@ export class ReservePage {
   }
 
   protected chooseRoom(room: BookableRoom): void {
-    if (this.isFull(room)) {
-      return;
-    }
     this.selectedRoomId.set(room.id);
   }
 
@@ -127,22 +126,6 @@ export class ReservePage {
 
   protected availabilityFor(room: BookableRoom): RoomAvailability | undefined {
     return this.availability()?.get(room.id);
-  }
-
-  protected isFull(room: BookableRoom): boolean {
-    return this.availabilityFor(room)?.isFull ?? false;
-  }
-
-  protected remaining(room: BookableRoom): number {
-    const availability = this.availabilityFor(room);
-    return availability ? availability.capacity - availability.occupied : room.capacity;
-  }
-
-  // How full the room is, 0–100, for the availability bar. Unknown availability (no day chosen yet) reads
-  // as empty.
-  protected occupiedPercent(room: BookableRoom): number {
-    const availability = this.availabilityFor(room);
-    return availability ? Math.round((availability.occupied / availability.capacity) * 100) : 0;
   }
 
   protected canReserve(): boolean {

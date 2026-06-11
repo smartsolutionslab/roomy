@@ -1,0 +1,30 @@
+<ng-container *transloco="let translate">
+  <button
+    type="button"
+    class="roomy-tile reserve__room"
+    [disabled]="isFull()"
+    [attr.aria-pressed]="selected()"
+    (click)="chosen.emit()"
+  >
+    <span class="reserve__room-row">
+      <span class="reserve__room-name">{{ room().name }}</span>
+      @if (availability(); as availability) { @if (availability.isFull) {
+      <span class="reserve__room-figure">{{ translate('attendance.reserve.full') }}</span>
+      } @else {
+      <span class="reserve__room-figure"
+        >{{ translate('attendance.reserve.placesLeft', { remaining: remaining(), capacity:
+        room().capacity }) }}</span
+      >
+      } } @else {
+      <span class="reserve__room-figure"
+        >{{ translate('attendance.reserve.capacityLabel', { capacity: room().capacity }) }}</span
+      >
+      }
+    </span>
+    @if (availability()) {
+    <span class="reserve__room-bar" aria-hidden="true">
+      <span class="reserve__room-bar-fill" [style.inline-size.%]="occupiedPercent()"></span>
+    </span>
+    }
+  </button>
+</ng-container>
