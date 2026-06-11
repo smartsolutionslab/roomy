@@ -116,7 +116,7 @@ apps/web/src/app/
 └─ app.routes.ts             # lazy-load @roomy/identity-feature routes
 
 apps/web/public/i18n/{en,de}.json        # add `account.*` and `admin.*` namespaces (FR-006)
-apps/gateway/appsettings.json            # add the `/admin/{**}` YARP route (backend enablement)
+backend/apps/gateway/appsettings.json            # add the `/admin/{**}` YARP route (backend enablement)
 ```
 
 ## Complexity Tracking

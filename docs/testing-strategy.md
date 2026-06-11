@@ -68,7 +68,7 @@ tests run against the real Aspire-composed stack and do **not** mock.
 
 - **.NET** — the floor is a build-failing Coverlet MSBuild threshold (`Threshold=85`,
   `ThresholdType=line,branch`). A domain/application test project opts in by importing
-  `tests/coverage/CoverageGate.props` and setting `CoverageInclude` to its
+  `backend/tests/coverage/CoverageGate.props` and setting `CoverageInclude` to its
   assembly-under-test; from then on `dotnet test` fails below the floor. CI collects and
   reports coverage for **all** test projects via `coverlet.runsettings` (same policy
   exclusions); only the gated projects block the merge. Shared-kernel primitives,

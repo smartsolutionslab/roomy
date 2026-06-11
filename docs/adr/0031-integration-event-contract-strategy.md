@@ -43,14 +43,14 @@ under the producer's context namespace.
 ## Decision
 
 **Option A — per-context published language.** Each publishing context owns a `contracts`
-library under its own folder (`libs/<context>/contracts`). A consumer takes a project
+library under its own folder (`backend/libs/<context>/contracts`). A consumer takes a project
 reference on the *producer's* contracts library only — never on the producer's domain,
 application, or infrastructure.
 
 To satisfy `CrossContextIsolationConventionTests`, the contract types live under a
 **context-neutral namespace and assembly**, `SmartSolutionsLab.Roomy.Contracts.<OwningContext>`,
 rather than under `SmartSolutionsLab.Roomy.<OwningContext>`. The folder still expresses
-ownership (`libs/organization/contracts`), and the namespace's trailing segment still names
+ownership (`backend/libs/organization/contracts`), and the namespace's trailing segment still names
 the owner (`...Contracts.Organization`), but because the type does **not** reside under
 `SmartSolutionsLab.Roomy.Organization`, the isolation rule neither treats it as an
 organization-internal type nor forbids identity from referencing it. This is correct by
@@ -66,9 +66,9 @@ deprecation window.
 
 For this first flow:
 
-- `libs/organization/contracts` → `SmartSolutionsLab.Roomy.Contracts.Organization`:
+- `backend/libs/organization/contracts` → `SmartSolutionsLab.Roomy.Contracts.Organization`:
   `EmployeeHired`.
-- `libs/identity/contracts` → `SmartSolutionsLab.Roomy.Contracts.Identity`:
+- `backend/libs/identity/contracts` → `SmartSolutionsLab.Roomy.Contracts.Identity`:
   `UserRegistered`, `UserProvisioningFailed`.
 
 Mapping a consumed wire event onto an internal command happens at the infrastructure edge

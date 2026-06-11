@@ -58,5 +58,5 @@ Forbidden→403, NotFound→404). No domain detail leaks beyond `code` + a human
 
 ## Gateway route
 
-Add an `/attendance/{**}` (or `/reservations/{**}`) route to `apps/gateway/appsettings.json`:
+Add an `/attendance/{**}` (or `/reservations/{**}`) route to `backend/apps/gateway/appsettings.json`:
 cluster `attendance`, `AuthorizationPolicy: default` — mirroring the `identity-account` route.

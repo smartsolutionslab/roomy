@@ -35,7 +35,7 @@ before the component/guard exists.
   URLs. Spec: each client calls the expected URL and maps the response (HttpTestingController).
 - [x] T002 [P] Extend `SessionService` (D-FE3) with a readiness signal so guards can await the first
   session resolution; `load()` flips it once `/bff/user` resolves (success or 401). Spec covers both.
-- [x] T003 Add the gateway `/admin/{**}` YARP route in `apps/gateway/appsettings.json` (mirror
+- [x] T003 Add the gateway `/admin/{**}` YARP route in `backend/apps/gateway/appsettings.json` (mirror
   `identity-account`: cluster `identity`, `AuthorizationPolicy: default`). Backend enablement for US3/US4.
 
 ---

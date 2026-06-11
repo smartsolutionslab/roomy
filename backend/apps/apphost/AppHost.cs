@@ -40,7 +40,7 @@ var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, admi
 builder.AddExecutable(
         "web",
         OperatingSystem.IsWindows() ? "pnpm.cmd" : "pnpm",
-        "../..",
+        "../../..",
         "nx", "serve", "web", "--port", "4200", "--host", "127.0.0.1")
     .WithHttpEndpoint(port: 4200, targetPort: 4200, isProxied: false)
     .WithExplicitStart();

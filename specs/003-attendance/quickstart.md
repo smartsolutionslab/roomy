@@ -7,7 +7,7 @@ this is the run/validate guide. Tests are written **before** implementation (con
 
 - 002 (organization Office/Room) merged, **emitting `OfficeOpened` + `RoomAdded`** (PR #113 +
   the publish addition) — see the dependency note in `plan.md`.
-- Local stack via Aspire: `dotnet run --project apps/apphost` (Postgres, RabbitMQ, Keycloak,
+- Local stack via Aspire: `dotnet run --project backend/apps/apphost` (Postgres, RabbitMQ, Keycloak,
   gateway, identity-api, **attendance-api**, db-migrator).
 - The attendance schema (events table + `Rooms`/`Employees` read models) applied by the
   db-migrator before `attendance-api` starts (ADR-0033, `WaitForCompletion`).
@@ -41,7 +41,7 @@ Assert the `contracts/attendance-api.md` surface: status-code + `code` mapping f
 outcome, admin `onBehalfOf` authorization, owner-only cancel, and the `GET /reservations`
 replay.
 
-### 4. Architecture tests (`tests/architecture`)
+### 4. Architecture tests (`backend/tests/architecture`)
 After adding the three attendance projects as `ProjectReference`s to
 `Roomy.ArchitectureTests` (CLAUDE.md — otherwise the rules pass vacuously): the dependency rule
 and "no framework in domain/application" hold for `Roomy.Attendance.*`.

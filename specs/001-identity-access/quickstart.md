@@ -15,7 +15,7 @@ implementation — concrete steps land in `tasks.md`.
 
 ```
 # from repo root
-dotnet run --project apps/identity-api            # or via the Aspire app host once it exists
+dotnet run --project backend/apps/identity-api            # or via the Aspire app host once it exists
 ```
 
 ## Scenarios (map to acceptance criteria)

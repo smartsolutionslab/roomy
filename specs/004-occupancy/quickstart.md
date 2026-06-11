@@ -10,7 +10,7 @@ story (US6 lists, US9 my-reservations, US7 calendar).
   the `Rooms`/`Employees` read models with their `RoomAdded`/`EmployeeHired` consumers.
 - Organization (002) emitting the **existing** `OfficeOpened` + `EmployeeHired` (DisplayName) — no
   producer change is needed; 004 consumes more of the published language (research R6).
-- Local stack via Aspire: `dotnet run --project apps/apphost` (Postgres, RabbitMQ, Keycloak, gateway,
+- Local stack via Aspire: `dotnet run --project backend/apps/apphost` (Postgres, RabbitMQ, Keycloak, gateway,
   identity-api, organization-api, **attendance-api**, db-migrator).
 - The 004 migration (`Reservations`, `Offices`, `Employees.DisplayName`) applied by the db-migrator
   before `attendance-api` starts (ADR-0033, `WaitForCompletion`).
@@ -59,7 +59,7 @@ Assert the `contracts/attendance-api.md` surface:
 - `GET /reservations/mine` returns the caller's reservations; `unknown_employee` ⇒ 404.
 - Any authenticated user may view any office/room (FR-005); only `GET` exists (read-only, FR-006).
 
-### 5. Architecture tests (`tests/architecture`)
+### 5. Architecture tests (`backend/tests/architecture`)
 The attendance projects are already referenced (003). Confirm the read side respects the dependency
 rule: query handlers/ports in `application` reference no EF/Wolverine type; the projection and read
 models live in `infrastructure`; `domain` is untouched.

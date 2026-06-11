@@ -40,7 +40,7 @@ gateway/BFF, orchestrated by .NET Aspire. Consequences that follow and are now b
 
 This brings the Wolverine + message-broker need forward relative to ADR-0005's "as late
 as possible" (which assumed a monolith): the messaging backbone is required as soon as the
-first cross-service flow exists. The repo layout (`apps/<context>-api`, `apps/gateway`)
+first cross-service flow exists. The repo layout (`backend/apps/<context>-api`, `backend/apps/gateway`)
 already reflects this topology.
 
 ## Consequences

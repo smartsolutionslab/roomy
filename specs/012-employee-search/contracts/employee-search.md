@@ -54,8 +54,8 @@ A new read-only employee directory in the organization context (the host today e
 After implementing, re-emit specs and regenerate clients; CI asserts no diff:
 
 ```
-apps/attendance-api/Roomy.Attendance.Api.json
-apps/organization-api/Roomy.Organization.Api.json
+backend/apps/attendance-api/Roomy.Attendance.Api.json
+backend/apps/organization-api/Roomy.Organization.Api.json
 pnpm nx run attendance-data-access:generate-client
 pnpm nx run organization-data-access:generate-client
 ```

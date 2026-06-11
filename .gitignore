@@ -15,8 +15,8 @@ TestResults/
 [Tt]est[Rr]esults/
 coverage/
 # Keep the reusable coverage-gate sources: `coverage/` above is meant for output dirs,
-# but it also matches the tests/coverage/ props directory, which is tracked.
-!tests/coverage/
+# but it also matches the backend/tests/coverage/ props directory, which is tracked.
+!backend/tests/coverage/
 *.coverage
 *.coveragexml
 *.cobertura.xml

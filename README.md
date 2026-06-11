@@ -94,13 +94,14 @@ roomy/
 │  ├─ coding-standards/ # C# and TypeScript rules
 │  └─ project-setup-issues.md
 ├─ specs/               # Spec Kit specs, plans, tasks per feature
-├─ apps/                # service hosts and the Aspire app host
-├─ libs/                # shared-kernel, shared utilities, service defaults, context libs
-└─ tests/
-   └─ architecture/     # NetArchTest rules enforcing the dependency rule
+└─ backend/             # ALL .NET projects live here (ADR-0057)
+   ├─ apps/             # service hosts and the Aspire app host
+   ├─ libs/             # shared-kernel, shared utilities, service defaults, context libs
+   └─ tests/
+      └─ architecture/  # NetArchTest rules enforcing the dependency rule
 ```
 
-Only the scaffolding currently exists under `apps/` and `libs/` (the Aspire app host,
+Only the scaffolding currently exists under `backend/apps/` and `backend/libs/` (the Aspire app host,
 service defaults, and shared primitives); context services and the Angular app arrive in
 later slices.
 

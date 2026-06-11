@@ -14,7 +14,7 @@ reader cannot tell a write from a read, a message from its handler, or a request
 without opening each file and checking the marker interface.
 
 The CQRS split is already explicit in the type system — `ICommand`/`ICommandHandler` vs
-`IQuery`/`IQueryHandler` (`libs/application-contracts/Messaging`) — but the folder structure throws that
+`IQuery`/`IQueryHandler` (`backend/libs/application-contracts/Messaging`) — but the folder structure throws that
 information away. The repo's folder=namespace convention (ADR-0049/0050) means the structure should carry
 it.
 

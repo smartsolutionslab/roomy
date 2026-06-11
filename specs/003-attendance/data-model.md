@@ -148,7 +148,7 @@ Actor→employee resolution for authorization (research R3).
 ## Cross-context dependencies (by ID + integration events only)
 
 - **Consumes** organization's published language: `OfficeOpened`, `RoomAdded` (NEW),
-  `EmployeeHired` (existing) — `libs/organization/contracts`, mapped to internal commands at
+  `EmployeeHired` (existing) — `backend/libs/organization/contracts`, mapped to internal commands at
   the infrastructure edge (ADR-0031).
 - **Publishes** nothing in this slice — reservation events stay internal to the attendance
   context; the occupancy projection (004) folds the same stream locally.

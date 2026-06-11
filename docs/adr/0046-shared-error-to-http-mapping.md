@@ -23,7 +23,7 @@ and one was an outright bug (a client validation error surfaced as a 500).
 
 ## Decision
 
-Introduce **`libs/web-http`** (`SmartSolutionsLab.Roomy.Web.Http`) holding the single mapping, extracted from
+Introduce **`backend/libs/web-http`** (`SmartSolutionsLab.Roomy.Web.Http`) holding the single mapping, extracted from
 attendance's (the correct one):
 
 - `Error.ToHttpResult()` — the kind→status table above, body always `ErrorResponse(code, message)`.

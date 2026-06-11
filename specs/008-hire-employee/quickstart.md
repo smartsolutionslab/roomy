@@ -9,7 +9,7 @@ run/validate guide. Tests are written **before** implementation (constitution I)
   `UserRegistered`/`UserProvisioningFailed` contracts — the dormant half this feature activates.
 - Organization (002) on `main`: `Company`/`Office`/`Room`, the `Aggregate` domain-event base (ADR-0032),
   and the `OrganizationUnitOfWork` outbox drain (ADR-0037).
-- Local stack via Aspire: `dotnet run --project apps/apphost` (Postgres, RabbitMQ, Keycloak, gateway,
+- Local stack via Aspire: `dotnet run --project backend/apps/apphost` (Postgres, RabbitMQ, Keycloak, gateway,
   identity-api, organization-api, attendance-api, db-migrator).
 - The 008 migration (`Employees` table) applied by the db-migrator before organization-api starts
   (ADR-0033, `WaitForCompletion`).
@@ -56,7 +56,7 @@ Assert `contracts/organization-api.md`:
 - Missing/invalid field ⇒ **422 `invalid_hire`**; non-administrator ⇒ **403**; no session ⇒ **401**.
 
 ### 5. Architecture & codegen
-- `tests/architecture`: organization layers stay within the dependency rule; the foreign contracts are
+- `backend/tests/architecture`: organization layers stay within the dependency rule; the foreign contracts are
   referenced only at the infrastructure edge (consumers), never in `application`.
 - `organization-api` Wolverine **codegen-verify** is green with the two new consumer handlers; the
   **OpenAPI drift gate** is green with `POST /employees`.

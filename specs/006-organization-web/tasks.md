@@ -32,9 +32,9 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 - [x] T001 Stand up the OpenAPI spec emit on `organization-api`, mirroring identity: add
   `Microsoft.AspNetCore.OpenApi` + `Microsoft.Extensions.ApiDescription.Server` package refs and the
   `OpenApiDocumentsDirectory` / `OpenApiGenerateDocumentsOnBuild=false` props to
-  `apps/organization-api/Roomy.Organization.Api.csproj`; add `AddOpenApi()` + `MapOpenApi()` and the
+  `backend/apps/organization-api/Roomy.Organization.Api.csproj`; add `AddOpenApi()` + `MapOpenApi()` and the
   `OpenApi:EmitDocument` skip-guards (skip messaging + company seeder during emit) to `Program.cs`;
-  commit the emitted `apps/organization-api/Roomy.Organization.Api.json`. Verify: a clean build with
+  commit the emitted `backend/apps/organization-api/Roomy.Organization.Api.json`. Verify: a clean build with
   `-p:OpenApiGenerateDocumentsOnBuild=true` re-emits an identical spec.
 - [x] T002 Add the CI drift gates to `.github/workflows/ci.yml`: a "Verify the OpenAPI spec is
   current" step for `organization-api` (build with emit, `git diff --exit-code` the `.json`) and the
@@ -47,7 +47,7 @@ description: "Task list for Organization Web — Office & Room Admin UI (006)"
 
 - [x] T003 Generate the lib `libs/organization/data-access` (`type:data-access`,
   `context:organization`) with `--unitTestRunner=vitest-analog`; add `ng-openapi-gen.json` (input
-  `apps/organization-api/Roomy.Organization.Api.json`, output `src/lib/generated`) and the
+  `backend/apps/organization-api/Roomy.Organization.Api.json`, output `src/lib/generated`) and the
   `generate-client` target (mirror identity's `project.json`); run it and commit `generated/`.
 - [x] T004 [US1] `office.ts` — `Office`/`Room` view models, `OfficeId`/`RoomId` branded ids, and
   `toOffice` mapping the generated DTO at the boundary (ADR-0020). Spec: `office.spec.ts` maps a DTO

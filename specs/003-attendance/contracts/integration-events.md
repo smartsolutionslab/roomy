@@ -44,9 +44,9 @@ enforce the invariant.
 
 > **Producer-side note (organization / 002).** `OfficeOpened` and `RoomAdded` are organization's
 > *published language* and must be **emitted by the organization context** when an office/room is
-> created (`libs/organization/contracts` + a publish in organization's create handlers). 002's
+> created (`backend/libs/organization/contracts` + a publish in organization's create handlers). 002's
 > Office/Room domain is in PR **#113** (not yet on `main`) — see the dependency note in `plan.md`.
-> Consumers reference only `libs/organization/contracts` (ADR-0031).
+> Consumers reference only `backend/libs/organization/contracts` (ADR-0031).
 
 ## Published
 

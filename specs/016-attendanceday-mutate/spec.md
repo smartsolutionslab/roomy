@@ -99,15 +99,15 @@ command handler expresses only *what* to apply and never owns concurrency or att
 - **NFR-003:** All existing quality gates stay green.
 
 ## Test-first plan (Red → Green)
-- Unit (`tests/attendance-infrastructure`, fake delegates): `OptimisticWrite` — success-saves-once;
+- Unit (`backend/tests/attendance-infrastructure`, fake delegates): `OptimisticWrite` — success-saves-once;
   decide-failure-no-save; conflict-then-success reloads+re-decides; exhaustion returns
   `concurrency_retry_exhausted` after `MaxAttempts`; the non-generic overload mirrors these.
-- Unit (`tests/attendance`, substitute `IAttendanceDayRepository`): handlers now assert wiring — the
+- Unit (`backend/tests/attendance`, substitute `IAttendanceDayRepository`): handlers now assert wiring — the
   handler hands a working decision to `MutateAsync` (verified by invoking the captured closure), and
   `ReservePlace` short-circuits on the on-behalf guard / `unknown_room` without calling `MutateAsync`.
   The old retry/exhaustion/loser-on-reload handler tests are removed (their coverage moves to
   `OptimisticWrite`).
-- Integration (`tests/attendance-integration`): keep the existing repository concurrency tests; add
+- Integration (`backend/tests/attendance-integration`): keep the existing repository concurrency tests; add
   one `MutateAsync` two-writer conflict-then-retry-succeeds against real Postgres.
 
 ## Out of scope

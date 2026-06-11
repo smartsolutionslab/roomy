@@ -30,7 +30,7 @@ OpenAPI-generated client (ADR-0036). See [research.md](./research.md), [data-mod
 
 **Language/Version**: C# / .NET 10 (backend read side) + TypeScript / Angular 22 (frontend views)
 **Primary Dependencies**: EF Core (Npgsql) on PostgreSQL for the read models in attendance's own
-`AttendanceDbContext`; the owned event store (`libs/infrastructure-persistence/EventStore`) for the
+`AttendanceDbContext`; the owned event store (`backend/libs/infrastructure-persistence/EventStore`) for the
 inline projection seam (ADR-0012/0038); the owned `IQueryHandler`/`Result`/`Ensure` abstractions (no
 MediatR, no framework in core); Wolverine inbox for the `OfficeOpened` consumer (ADR-0005/0031);
 Angular standalone signal components + NgRx SignalStore facade + `ng-openapi-gen` client (ADR-0016/0019/0036);
@@ -43,7 +43,7 @@ sibling Aspire test host); WebApplicationFactory (API/contract); NetArchTest (ar
 already referenced from 003); `vitest-analog` + `@testing-library/angular` (frontend libs),
 `@angular/build:unit-test` (app); Playwright e2e deferred to the suite in ADR-0022
 **Target Platform**: Linux server (containerised) composed by Aspire; the SPA served via the YARP BFF
-**Project Type**: Backend read side (`apps/attendance-api`, `libs/attendance/*`) + frontend feature
+**Project Type**: Backend read side (`backend/apps/attendance-api`, `backend/libs/attendance/*`) + frontend feature
 slice (`libs/attendance/{data-access,ui,feature}`, routed in `apps/web`)
 **Performance Goals**: v1 single-tenant, small per-company-day volume (ADR-0026) — correctness and
 read-your-writes consistency (FR-010) first; occupancy figures by indexed `GROUP BY`, no throughput
@@ -67,7 +67,7 @@ calendar, my-reservations) across 3 new Angular libs; 9 acceptance scenarios + 2
 |---|---|---|
 | I. Spec-Driven & Test-First | ✅ | Every scenario (1–9) + edges becomes a failing test first (quickstart §1–5); Red→Green→Refactor. Projection tested at unit + integration before wiring; queries before endpoints; FE components before pages. |
 | II. Clean Architecture & DDD | ✅ | Read models & projection are **infrastructure**; query use cases & ports are **application** (own `IQueryHandler`); `domain` untouched (read side carries no invariants, ADR-0026/0038). Attendance projects already in `Roomy.ArchitectureTests` (003) so rules stay enforced. FE layers `feature→ui→data-access` (ADR-0035). |
-| III. Context Isolation — IDs & Events | ✅ | No cross-service join: office name via `OfficeOpened`, capacity via `Rooms` (already), name via `EmployeeHired`. Wire event → read-model row at the infra edge; attendance consumes only `libs/organization/contracts`. No new published contracts. |
+| III. Context Isolation — IDs & Events | ✅ | No cross-service join: office name via `OfficeOpened`, capacity via `Rooms` (already), name via `EmployeeHired`. Wire event → read-model row at the infra edge; attendance consumes only `backend/libs/organization/contracts`. No new published contracts. |
 | IV. No Framework in Core | ✅ | Query handlers use owned `IQueryHandler`/`Result`/`TimeProvider`-at-edge only; the inline projector and EF read models are wired at the composition root; `domain`/`application` reference no EF/Wolverine type. |
 | V. Decisions Recorded (ADR-before-code) | ✅ | **ADR-0038** (occupancy read side: inline synchronous projection into materialised read models, consistency + retry-safety) authored **before** the projection code. Reuses ADR-0012/0026/0031/0035/0036 otherwise. |
 | VI. Green Before Done — No Suppressions | ✅ | Full gate suite in quickstart §DoD (dotnet + nx affected lint/test/build, format, OpenAPI drift gate); no analyzer/test suppression. |
@@ -94,7 +94,7 @@ specs/004-occupancy/
 ### Source Code (repository root)
 
 ```text
-libs/
+backend/libs/
   attendance/
     application/                          # Roomy.Attendance.Application (type:application, context:attendance)
       UseCases/
@@ -129,14 +129,14 @@ libs/
       occupancy-figure/ full-badge/ calendar-cell/ …            # presentational signal components
     feature/                              # NEW Roomy.Attendance.Feature (type:feature)
       occupancy-list/ occupancy-calendar/ my-reservations/      # routed pages (lazy)
-apps/
+backend/apps/
   attendance-api/                         # Roomy.Attendance.Api (type:app)
     Endpoints/OccupancyEndpoints.cs       # NEW — GET /occupancy
     Endpoints/ReservationEndpoints.cs     # EXTEND — GET /reservations/mine
     Program.cs                            # map new endpoints; register OfficeOpened consumer
   gateway/appsettings.json                # ensure /occupancy + /reservations route to the attendance cluster
   web/                                    # register attendance routes (occupancy, calendar, my-reservations)
-tests/
+backend/tests/
   attendance/                             # domain N/A; projection + query unit, integration, API/contract
   attendance-integration/                 # projection-in-transaction, reserve-after-conflict, rebuild (real Postgres)
 ```

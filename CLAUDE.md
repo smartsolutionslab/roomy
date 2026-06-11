@@ -97,30 +97,31 @@ roomy/
 │  ├─ adr/                        # architecture decision records
 │  └─ architecture.md             # living high-level overview  (FILL IN)
 ├─ specs/                         # Spec Kit specs, plans, tasks
-├─ apps/                         # .NET hosts only
-│  ├─ gateway/                    # YARP gateway / BFF
-│  └─ <context>-api/              # one host per bounded context
-├─ libs/                         # .NET libraries only
-│  ├─ <context>/
-│  │  ├─ domain/                  # entities, aggregates, value objects, domain events  (no infra deps)
-│  │  ├─ application/             # use cases, handlers, ports
-│  │  ├─ infrastructure/          # persistence, messaging, external adapters
-│  │  └─ contracts/              # this context's published integration events  (ADR-0031)
-│  └─ shared-kernel/              # only truly shared, stable primitives
-├─ frontend/                     # ALL Angular/Nx projects live here (ADR-0016/0035)
-│  ├─ apps/
-│  │  └─ web/                     # Angular app (the single SPA)
-│  └─ libs/
-│     ├─ <context>/
-│     │  ├─ feature/              # routed feature areas / smart components  (type:feature)
-│     │  └─ api/                  # typed OpenAPI client + gateway facade    (type:api)
-│     └─ shared/
-│        ├─ feature/              # cross-cutting smart components (auth guards, theme toggle)  (type:feature)
-│        ├─ data-access/          # shared client-side data utils: session, theme, pagination  (type:data-access)
-│        ├─ ui/                   # presentational design-system components  (type:ui)
-│        └─ util/                 # shared TS utilities (@roomy/util)         (type:util)
-└─ tests/
-   └─ architecture/              # NetArchTest rules enforcing the dependency rule
+├─ backend/                       # ALL .NET projects live here (ADR-0057)
+│  ├─ apps/                       # .NET hosts only
+│  │  ├─ gateway/                 # YARP gateway / BFF
+│  │  └─ <context>-api/           # one host per bounded context
+│  ├─ libs/                       # .NET libraries only
+│  │  ├─ <context>/
+│  │  │  ├─ domain/               # entities, aggregates, value objects, domain events  (no infra deps)
+│  │  │  ├─ application/          # use cases, handlers, ports
+│  │  │  ├─ infrastructure/       # persistence, messaging, external adapters
+│  │  │  └─ contracts/            # this context's published integration events  (ADR-0031)
+│  │  └─ shared-kernel/           # only truly shared, stable primitives
+│  └─ tests/                      # architecture + unit/integration test projects
+│     └─ architecture/            # NetArchTest rules enforcing the dependency rule
+└─ frontend/                      # ALL Angular/Nx projects live here (ADR-0016/0035)
+   ├─ apps/
+   │  └─ web/                     # Angular app (the single SPA)
+   └─ libs/
+      ├─ <context>/
+      │  ├─ feature/              # routed feature areas / smart components  (type:feature)
+      │  └─ api/                  # typed OpenAPI client + gateway facade    (type:api)
+      └─ shared/
+         ├─ feature/              # cross-cutting smart components (auth guards, theme toggle)  (type:feature)
+         ├─ data-access/          # shared client-side data utils: session, theme, pagination  (type:data-access)
+         ├─ ui/                   # presentational design-system components  (type:ui)
+         └─ util/                 # shared TS utilities (@roomy/util)         (type:util)
 ```
 
 **Bounded contexts (confirmed).** The model has **three** contexts — three independently
@@ -134,7 +135,7 @@ occupancy below).
 | `organization` — Organization | Supporting (master data, admin-managed) | `Company` (seeded root), `Office` (name, location), `Room` (name, capacity), `Employee` (refs `CompanyId`, refs `UserId`) | `002-office-management` |
 | `attendance` — Attendance | **Core** | `AttendanceDay` aggregate (identity = `CompanyId` + `Date`; consistency boundary for no-overbooking and one-reservation-per-employee-per-day), `Reservation` entity, **`Occupancy` read model** (per-room + office rollup) | `003-attendance`, `004-occupancy` |
 
-Hosts are `apps/identity-api`, `apps/organization-api`, `apps/attendance-api`; frontend
+Hosts are `backend/apps/identity-api`, `backend/apps/organization-api`, `backend/apps/attendance-api`; frontend
 feature libs live at `frontend/libs/<context>/<type>` and follow `@roomy/<context>-<type>`
 (ADR-0016).
 
@@ -154,14 +155,14 @@ feature libs live at `frontend/libs/<context>/<type>` and follow `@roomy/<contex
 
 - **Dependency rule (Clean Architecture):** `domain` depends on nothing; `application`
   depends only on `domain`; `infrastructure` depends inward; hosts/`apps` wire it all
-  together. Enforced by `tests/architecture`.
+  together. Enforced by `backend/tests/architecture`.
 - **DDD invariants:** behaviour lives in aggregates; value objects over primitives (no
   primitive obsession); aggregates are consistency boundaries; domain events for
   intra-context reactions.
 - **Cross-context communication is by ID and integration events only.** Never
   reference another context's aggregate type directly. Cross-context flows go through
   Wolverine integration events with the transactional outbox/inbox. Each context owns the
-  events it **publishes** in a `libs/<context>/contracts` library (its *published
+  events it **publishes** in a `backend/libs/<context>/contracts` library (its *published
   language*); consumers reference the producer's contracts library only. Contracts live
   under the neutral `SmartSolutionsLab.Roomy.Contracts.<OwningContext>` namespace
   (`context:shared`) and carry IDs/primitives, never domain value objects (ADR-0031). The
@@ -206,14 +207,14 @@ lint failures (ADR-0002/0003). The .NET side mirrors this with architecture test
 
 > ESLint here is scoped to the boundary rule only; the full lint/format ruleset is #10.
 
-**Architecture tests (`tests/architecture`).** The .NET counterpart enforces the same
+**Architecture tests (`backend/tests/architecture`).** The .NET counterpart enforces the same
 dependency rule (plus "no MediatR" / no-framework-in-core) via NetArchTest. Its
 convention-based rules inspect every *loaded* `SmartSolutionsLab.Roomy.*` assembly, and an
 assembly is only loaded if `Roomy.ArchitectureTests` references it. **When you create a
 context, you MUST add its `domain`/`application`/`infrastructure` projects as
 `ProjectReference`s to `Roomy.ArchitectureTests`** — otherwise its layers are never
 inspected and the rules pass *vacuously* (green but enforcing nothing). Adding the
-reference is part of creating a context. See `tests/architecture/README.md`.
+reference is part of creating a context. See `backend/tests/architecture/README.md`.
 
 ---
 

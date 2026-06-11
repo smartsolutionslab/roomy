@@ -36,8 +36,8 @@ event-sourced); the identity and attendance read models are untouched
 + RabbitMQ via the sibling Aspire test host (the saga round-trip), WebApplicationFactory (API/contract),
 NetArchTest (architecture)
 **Target Platform**: Linux server (containerised), composed locally by Aspire
-**Project Type**: Backend bounded-context feature — `libs/organization/{domain,application,infrastructure}`
-+ `apps/organization-api`; consumes `libs/identity/contracts`; publishes via `libs/organization/contracts`
+**Project Type**: Backend bounded-context feature — `backend/libs/organization/{domain,application,infrastructure}`
++ `backend/apps/organization-api`; consumes `backend/libs/identity/contracts`; publishes via `backend/libs/organization/contracts`
 **Performance Goals**: v1 single-tenant, low hire volume — correctness and the no-half-account guarantee
 first; provisioning convergence in seconds under normal operation (SC-002)
 **Constraints**: eventual consistency (no distributed transaction, ADR-0014); cross-context only by ID +
@@ -56,7 +56,7 @@ prioritized stories; the identity half is already implemented
 |---|---|---|
 | I. Spec-Driven & Test-First | ✅ | Every scenario (US1–US3) + edges becomes a failing test first (quickstart §1–4); aggregate state machine, drain, and compensation are red→green. |
 | II. Clean Architecture & DDD | ✅ | `Employee` is an aggregate root (consistency boundary) with behaviour (`Hire`/`CompleteProvisioning`/`FailProvisioning`) and value objects; `domain`→`application`→`infrastructure`→`app`. Mirrors `Office`. |
-| III. Context Isolation — IDs & Events | ✅ | Organization publishes `EmployeeHired`; consumes identity's `UserRegistered`/`UserProvisioningFailed` from `libs/identity/contracts` (`context:shared`), each mapped to an **internal command at the infra edge** so `application` never sees a foreign contract (ADR-0031). 1:1 link by `UserId`/`EmployeeId`; no cross-DB access. |
+| III. Context Isolation — IDs & Events | ✅ | Organization publishes `EmployeeHired`; consumes identity's `UserRegistered`/`UserProvisioningFailed` from `backend/libs/identity/contracts` (`context:shared`), each mapped to an **internal command at the infra edge** so `application` never sees a foreign contract (ADR-0031). 1:1 link by `UserId`/`EmployeeId`; no cross-DB access. |
 | IV. No Framework in Core | ✅ | Domain/application use owned abstractions only; Wolverine inbox/outbox + EF wired at the composition root; the domain→integration map and command-mapping consumers live in `infrastructure`. |
 | V. Decisions Recorded (ADR-before-code) | ✅ | **ADR-0025 (Accepted)** already decides the organization-led saga, eventual consistency, and compensation; this feature **realizes its follow-ups** (define the contracts — done — and the compensating action — here). No new ADR. Reuses ADR-0031/0032/0037. |
 | VI. Green Before Done — No Suppressions | ✅ | Full gate suite incl. organization OpenAPI drift gate + Wolverine codegen-verify (organization gains a consumer); no suppressions. |
@@ -81,7 +81,7 @@ specs/008-hire-employee/
 ### Source Code (repository root)
 
 ```text
-libs/
+backend/libs/
   organization/
     domain/Employees/                     # NEW aggregate (Roomy.Organization.Domain, type:domain)
       Employee.cs                          # aggregate root: Hire / CompleteProvisioning / FailProvisioning
@@ -107,14 +107,14 @@ libs/
       OrganizationInfrastructureServiceCollectionExtensions.cs  # EXTEND — register repo + 3 handlers
   organization/contracts/EmployeeHired.cs  # EXISTS (organization's published language) — unchanged
   identity/contracts/                      # EXISTS — UserRegistered/UserProvisioningFailed consumed here
-apps/
+backend/apps/
   organization-api/
     Endpoints/EmployeeEndpoints.cs         # NEW — POST /employees (admin-only)
     Program.cs                             # EXTEND — scan the consumer assembly (inbox) alongside publish
     Internal/Generated/WolverineHandlers/  # regenerated — 2 new consumer handlers
     Roomy.Organization.Api.json            # re-emitted OpenAPI (POST /employees)
   gateway/appsettings.json                 # NEW /employees route → organization cluster
-tests/
+backend/tests/
   organization/                            # Employee domain + application (state machine, compensation)
   organization-integration/                # saga round-trip + consumers + endpoint (real Postgres/RabbitMQ)
   architecture/                            # confirm organization layers stay within the dependency rule

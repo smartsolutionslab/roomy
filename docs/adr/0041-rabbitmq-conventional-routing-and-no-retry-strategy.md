@@ -12,7 +12,7 @@ and events (ADR-0014). Until now every test exercised this **without a broker** 
 directly (`Handle(...)`), or the Wolverine runtime was dropped in the in-process host tests, or the
 outbox drain was verified against a capturing fake (`OrganizationUnitOfWorkTests`). The first genuine
 **cross-service round-trip over a real RabbitMQ + Keycloak + both hosts** (the `008` hire-employee
-provisioning saga, exercised by `tests/saga-e2e`) revealed that the backbone **did not actually deliver
+provisioning saga, exercised by `backend/tests/saga-e2e`) revealed that the backbone **did not actually deliver
 any integration event between services**. Two independent defects were masking each other:
 
 1. **No routing.** The RabbitMQ transport was configured `UseRabbitMq(...).AutoProvision()` with **no
@@ -82,7 +82,7 @@ messages.
   `codegen verify`.
 
 **Follow-ups**
-- The cross-service round-trip is now covered by `tests/saga-e2e` (real RabbitMQ + Keycloak + both hosts),
+- The cross-service round-trip is now covered by `backend/tests/saga-e2e` (real RabbitMQ + Keycloak + both hosts),
   closing the verification gap of issue #68.
 - Consider a lighter Testcontainers-only messaging round-trip (no Keycloak) for faster feedback, if the
   full-stack e2e proves slow in CI.
