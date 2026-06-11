@@ -96,17 +96,39 @@ jobs:
           git diff --exit-code -- apps/organization-api/Roomy.Organization.Api.json
           git diff --exit-code -- apps/attendance-api/Roomy.Attendance.Api.json
 
-      # Regenerate the Wolverine handler code (--no-build, reusing the build above) and fail
-      # if it differs from what is committed, so a handler or Wolverine-config change without
-      # re-running `codegen write` cannot reach production (where there is no runtime compiler).
+      # Regenerate the Wolverine handler code (--no-build, reusing the build above) so a handler or
+      # Wolverine-config change that was not re-generated cannot reach production (no runtime compiler).
+      # Wolverine emits the independent local-variable declarations of EF-transactional handlers in an
+      # environment-dependent order (ADR-0056) — proven to differ between this runner and a dev machine
+      # on the same SDK/OS — so we compare ORDER-INSENSITIVELY: a new/uncommitted generated file, or a
+      # modified file that still differs after sorting its lines, is real drift and fails; pure
+      # statement reordering of semantically-identical code passes.
       - name: Verify Wolverine codegen is current
         run: |
+          set -euo pipefail
           dotnet run --project apps/identity-api --configuration Release --no-build -- codegen write
-          git diff --exit-code -- apps/identity-api/Internal/Generated
           dotnet run --project apps/organization-api --configuration Release --no-build -- codegen write
-          git diff --exit-code -- apps/organization-api/Internal/Generated
           dotnet run --project apps/attendance-api --configuration Release --no-build -- codegen write
-          git diff --exit-code -- apps/attendance-api/Internal/Generated
+
+          generated="apps/identity-api/Internal/Generated apps/organization-api/Internal/Generated apps/attendance-api/Internal/Generated"
+          drift=0
+
+          new_files=$(git ls-files --others --exclude-standard -- $generated)
+          if [ -n "$new_files" ]; then
+            echo "::error::Wolverine codegen drift — a handler changed but its generated file was not committed:"
+            echo "$new_files"
+            drift=1
+          fi
+
+          for file in $(git diff --name-only -- $generated); do
+            if ! diff -q <(git show "HEAD:$file" | sort) <(sort "$file") >/dev/null; then
+              echo "::error::Wolverine codegen drift (semantic change) in $file — run 'dotnet run --project <host> --configuration Release -- codegen write' and commit."
+              diff <(git show "HEAD:$file" | sort) <(sort "$file") || true
+              drift=1
+            fi
+          done
+
+          exit $drift
         env:
           ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
           ConnectionStrings__organization: "Host=localhost;Database=organization;Username=ci;Password=ci"
