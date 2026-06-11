@@ -36,14 +36,14 @@ describe('Home dashboard', () => {
 
     expect(screen.getByRole('link', { name: /Im Namen/ })).toBeTruthy();
     expect(screen.getByRole('link', { name: /Büros/ })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /Verwaltung/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /Konten/ })).toBeTruthy();
   });
 
   it('does not offer the administrator destinations to a non-administrator', async () => {
     await renderHome({ name: 'Grace Hopper', roles: ['employee'] });
 
     expect(screen.queryByRole('link', { name: /Büros/ })).toBeNull();
-    expect(screen.queryByRole('link', { name: /Verwaltung/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Konten/ })).toBeNull();
   });
 
   it('shows the sign-in hero, and no destination cards, when signed out', async () => {
