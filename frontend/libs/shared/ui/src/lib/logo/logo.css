@@ -1,6 +1,6 @@
 .roomy-logo {
   display: inline-flex;
-  gap: var(--roomy-space-sm);
+  gap: var(--roomy-space-xs);
   align-items: center;
 }
 
