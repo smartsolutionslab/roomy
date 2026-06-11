@@ -95,11 +95,10 @@ _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithEnvironment("Seed__CompanyId", "0199a0b0-0000-7000-8000-000000000001")
     .WithEnvironment("Seed__EmployeePassword", "ObexLabs.2025");
 
-var apiDocs = builder.AddScalarApiReference()
+_ = builder.AddScalarApiReference()
     .WithApiReference(identityApi)
     .WithApiReference(organizationApi)
     .WithApiReference(attendanceApi);
-_ = apiDocs;
 
 foreach (var api in new[] { identityApi, organizationApi, attendanceApi })
 {
