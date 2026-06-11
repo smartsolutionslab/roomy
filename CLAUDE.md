@@ -312,6 +312,10 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   The port (`Today: BookingDate`, `Now: DateTimeOffset`) is implemented once in attendance infrastructure
   over `TimeProvider` + a configured zone (`Attendance:TimeZone`, default `Europe/Berlin`, resolved at the
   composition root); `TimeProvider` stays the raw instant source for event timestamps (ADR-0054).
+- **Mutate an event-sourced aggregate via the repository's `MutateAsync`** — the optimistic-concurrency
+  loop (reload-decide-save, retry on conflict, bounded attempts, the `concurrency_*` codes) is a
+  persistence concern owned by the repository; a handler passes only the decision and never hand-rolls
+  the retry loop or owns `MaxAttempts` (ADR-0055).
 - **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`. Unit-test
   doubles use **NSubstitute** (`Substitute.For<T>()`, `.Returns(...)`, `.Received(...)`, `Arg.*`);
   assertions stay in the Assert, never inside a double; integration/e2e run against the real stack and
