@@ -39,7 +39,8 @@ describe('OfficeRoomPicker', () => {
 
     expect(await screen.findByRole('button', { name: 'Munich' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Berlin' })).toBeTruthy();
-    expect(screen.queryByLabelText('Room')).toBeNull();
+    // No room control until an office is chosen.
+    expect(screen.queryByRole('button', { name: 'All rooms' })).toBeNull();
   });
 
   it('emits an office scope and reveals the room select when an office tile is chosen', async () => {
@@ -47,7 +48,8 @@ describe('OfficeRoomPicker', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
 
-    expect(screen.getByLabelText('Room')).toBeTruthy();
+    // The room control (led by "All rooms") appears once an office is chosen.
+    expect(screen.getByRole('button', { name: 'All rooms' })).toBeTruthy();
     expect(scopes.at(-1)).toEqual({ officeId: 'o1' });
   });
 
@@ -55,9 +57,9 @@ describe('OfficeRoomPicker', () => {
     const { scopes } = await renderPicker();
 
     await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
-    expect(screen.getByRole('option', { name: 'A1' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'A1' })).toBeTruthy();
 
-    await userEvent.selectOptions(screen.getByLabelText('Room'), 'r2');
+    await userEvent.click(screen.getByRole('button', { name: 'B1' }));
 
     expect(scopes.at(-1)).toEqual({ roomId: 'r2' });
   });
@@ -66,13 +68,13 @@ describe('OfficeRoomPicker', () => {
     const { scopes } = await renderPicker();
 
     await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
-    await userEvent.selectOptions(screen.getByLabelText('Room'), 'r2');
+    await userEvent.click(screen.getByRole('button', { name: 'B1' }));
     await userEvent.click(screen.getByRole('button', { name: 'Berlin' }));
 
     expect(scopes.at(-1)).toEqual({ officeId: 'o2' });
     // Only the newly chosen office's rooms are offered.
-    expect(screen.getByRole('option', { name: 'C1' })).toBeTruthy();
-    expect(screen.queryByRole('option', { name: 'A1' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'C1' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'A1' })).toBeNull();
   });
 
   it('marks the chosen office tile as pressed', async () => {

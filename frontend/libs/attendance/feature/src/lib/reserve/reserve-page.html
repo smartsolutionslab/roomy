@@ -15,6 +15,7 @@
     } @else {
     <roomy-tile-group
       [label]="translate('attendance.reserve.officeLabel')"
+      [placeholder]="translate('attendance.reserve.officePlaceholder')"
       [options]="officeOptions()"
       [value]="selectedOfficeId()"
       (selected)="chooseOffice($event)"
