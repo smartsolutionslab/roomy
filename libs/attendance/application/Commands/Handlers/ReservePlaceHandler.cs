@@ -14,7 +14,11 @@ public sealed class ReservePlaceHandler(IAttendanceDayRepository attendanceDays,
 
     public async Task<Result<ReservationIdentifier>> HandleAsync(ReservePlace command, CancellationToken cancellationToken)
     {
-        var (company, employee, office, roomIdentifier, bookingDate) = command;
+        var (company, employee, actor, office, roomIdentifier, bookingDate, actorIsAdmin) = command;
+
+        if (employee != actor && !actorIsAdmin)
+            return Error.Forbidden("not_authorized", "Only an administrator may reserve on behalf of another employee.");
+
         var capacity = await rooms.FindCapacityAsync(roomIdentifier, cancellationToken);
         if (capacity.IsFailure) return capacity.Error;
 

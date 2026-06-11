@@ -6,6 +6,8 @@ namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 public sealed record ReservePlace(
     CompanyIdentifier Company,
     EmployeeIdentifier Employee,
+    EmployeeIdentifier Actor,
     OfficeIdentifier Office,
     RoomIdentifier Room,
-    BookingDate Date) : ICommand<ReservationIdentifier>;
+    BookingDate Date,
+    bool ActorIsAdmin) : ICommand<ReservationIdentifier>;
