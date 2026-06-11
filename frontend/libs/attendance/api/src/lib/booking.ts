@@ -6,9 +6,7 @@ import type {
   OccupancyDayResponse,
 } from './generated';
 
-// Branded identifiers so a bare string cannot be passed where an office/room/reservation identifier is
-// expected. Backend DTOs are trusted (ADR-0020) and the contract types these as uuids, so the value is
-// not re-validated here — the helpers only mint the brand at the data-access boundary.
+// Backend uuids are trusted, so these mint the brand without re-validating.
 export type OfficeId = Brand<string, 'OfficeId'>;
 export const officeId = (value: string): OfficeId => value as OfficeId;
 
@@ -21,22 +19,18 @@ export const reservationId = (value: string): ReservationId => value as Reservat
 export type EmployeeId = Brand<string, 'EmployeeId'>;
 export const employeeId = (value: string): EmployeeId => value as EmployeeId;
 
-// A bookable room and its fixed capacity. The second step of the reserve picker (AT-1).
 export interface BookableRoom {
   readonly id: RoomId;
   readonly name: string;
   readonly capacity: number;
 }
 
-// An office and its bookable rooms — the first step of the reserve picker (AT-1).
 export interface BookableOffice {
   readonly id: OfficeId;
   readonly name: string;
   readonly rooms: readonly BookableRoom[];
 }
 
-// A room's availability on the chosen day, used to show remaining places and grey out a full room before
-// submitting (AT-3, FR-002). Derived from the occupancy read side for a single day.
 export interface RoomAvailability {
   readonly roomId: RoomId;
   readonly occupied: number;
@@ -44,9 +38,7 @@ export interface RoomAvailability {
   readonly isFull: boolean;
 }
 
-// One of the signed-in employee's own reservations (AT-4). `date` is the Europe/Berlin calendar day
-// (ISO yyyy-MM-dd); whether it is upcoming (cancellable) or past is decided against "today" by the
-// bookable-day helpers, so this view model stays clock-free.
+// date is the ISO calendar day (yyyy-MM-dd); past-vs-upcoming is decided elsewhere against "today".
 export interface MyReservation {
   readonly id: ReservationId;
   readonly officeId: OfficeId;
@@ -56,10 +48,7 @@ export interface MyReservation {
   readonly date: string;
 }
 
-// Groups the flat /rooms catalogue into offices at the data-access boundary (ADR-0020). Every row carries
-// its office, so offices are built in first-seen order and rooms appended in order. Capacity is coerced
-// from the contract's `number | string` (OpenAPI integer widening) to a number — the one narrowing the
-// contract cannot express.
+// Capacity is coerced from the contract's number | string (OpenAPI integer widening) — a narrowing the types can't express.
 export function toBookableOffices(rooms: readonly BookableRoomResponse[]): BookableOffice[] {
   const offices = new Map<string, { id: OfficeId; name: string; rooms: BookableRoom[] }>();
   for (const room of rooms) {
@@ -77,8 +66,6 @@ export function toBookableOffices(rooms: readonly BookableRoomResponse[]): Booka
   return [...offices.values()];
 }
 
-// Maps a single occupancy day's rooms to their availability for the room step. An empty list (the day
-// is not in the response) yields no availability.
 export function toRoomAvailability(days: readonly OccupancyDayResponse[]): RoomAvailability[] {
   const day = days[0];
   if (day === undefined) {

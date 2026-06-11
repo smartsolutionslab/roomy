@@ -1,8 +1,7 @@
 import { addDays } from './bookable-day';
 
-// Range maths for the occupancy views, kept clock-free and pure: callers pass an ISO yyyy-MM-dd anchor.
-// Day/week/month presets keep every request within the backend's 31-day bound (008 FR-006); the calendar
-// renders a month as a Monday-aligned grid of whole weeks.
+// Pure, clock-free range maths: callers pass an ISO yyyy-MM-dd anchor. The presets stay within the
+// backend's 31-day bound.
 
 export type RangePreset = 'day' | 'week' | 'month';
 
@@ -51,8 +50,7 @@ export function rangeFor(preset: RangePreset, anchor: string): DateRange {
   }
 }
 
-// The Monday-aligned grid of whole weeks that covers the anchor's month: leading days from the previous
-// month and trailing days from the next fill the first/last weeks. Each inner array is 7 ISO dates.
+// Monday-aligned grid of whole weeks covering the anchor's month; each inner array is 7 ISO dates.
 export function monthGrid(anchor: string): string[][] {
   const monthFrom = firstOfMonth(anchor);
   const monthTo = lastOfMonth(anchor);
@@ -72,8 +70,6 @@ export function monthGrid(anchor: string): string[][] {
   return weeks;
 }
 
-// Whether a date falls inside the anchor's month (in-month cells render their figure; the leading/
-// trailing grid cells are shown muted).
 export function isSameMonth(date: string, anchor: string): boolean {
   return parts(date).year === parts(anchor).year && parts(date).month === parts(anchor).month;
 }

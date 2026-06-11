@@ -29,25 +29,17 @@ import {
 import { toOccupancyDays } from './occupancy';
 import type { OccupancyDay } from './occupancy';
 
-// Reads and mutates attendance through the gateway (`/rooms`, `/reservations**`, `/occupancy`) using the
-// generated client (ADR-0036), mapping the trusted DTOs to branded view models at this boundary
-// (ADR-0020). The generated client defaults to a relative root URL, so calls stay same-origin (ADR-0030)
-// and the BFF forwards the token — the SPA never sees one (ADR-0013). Every endpoint is self-service;
-// the acting employee is resolved server-side from the session (no onBehalfOf here — AT-6 is deferred).
 @Injectable({ providedIn: 'root' })
 export class AttendanceGateway {
   private readonly http = inject(HttpClient);
   private readonly config = inject(ApiConfiguration);
 
-  // The bookable catalogue (GET /rooms), grouped into offices for the picker's first step (AT-1).
   listBookableOffices(): Observable<BookableOffice[]> {
     return viewBookableRooms(this.http, this.config.rootUrl).pipe(
       map((response) => toBookableOffices(response.body)),
     );
   }
 
-  // Each room's availability in an office for one day, to show remaining places and grey out a full room
-  // before submitting (AT-3, FR-002).
   occupancyForOffice(office: OfficeId, day: string): Observable<RoomAvailability[]> {
     return viewOccupancy(this.http, this.config.rootUrl, {
       officeId: office,
@@ -56,9 +48,7 @@ export class AttendanceGateway {
     }).pipe(map((response) => toRoomAvailability(response.body)));
   }
 
-  // Occupancy for an office or room over a date range (GET /occupancy), as full day figures — the office
-  // rollup, per-room occupied/capacity, and (today/tomorrow only) occupants (008 OC-1/2/4/6). Exactly one
-  // of officeId/roomId is set; the caller keeps the range within the backend's 31-day bound.
+  // Set exactly one of officeId / roomId.
   occupancy(
     scope: { officeId?: OfficeId; roomId?: RoomId },
     from: string,
@@ -72,10 +62,6 @@ export class AttendanceGateway {
     }).pipe(map((response) => toOccupancyDays(response.body)));
   }
 
-  // Reserve a place (POST /reservations). Resolves to the new reservation id; rejections (room_full,
-  // already_reserved_today, not_bookable, unknown_room, concurrency_retry_exhausted) surface as the
-  // HttpErrorResponse the page maps to a localized message (FR-004). `onBehalfOf` is administrator-only
-  // (009 AT-6); omitted ⇒ the caller reserves for themselves.
   reserve(
     office: OfficeId,
     room: RoomId,
@@ -87,18 +73,13 @@ export class AttendanceGateway {
     }).pipe(map((response) => reservationId(response.body.reservationId)));
   }
 
-  // One keyset-paginated page of the signed-in employee's own reservations, past and upcoming (GET
-  // /reservations/mine, AT-4; ADR-0044). Absent cursor = the first page; the page carries the opaque
-  // nextCursor (null at the end) the caller passes back to load the next.
   myReservations(cursor?: string): Observable<Page<MyReservation>> {
     return viewMyReservations(this.http, this.config.rootUrl, { cursor }).pipe(
       map((response) => mapPage(response.body, toMyReservation)),
     );
   }
 
-  // One page of the administrator on-behalf directory (GET /reservations/employees, admin-only, 009;
-  // ADR-0044). A non-blank `query` ranks the directory by name similarity (012, ADR-0047); a blank query
-  // sends no `q`, returning the full keyset-ordered directory unchanged (009/011 behaviour, FR-003).
+  // A blank query sends no `q`, returning the full directory rather than a similarity ranking.
   listEmployees(query = '', cursor?: string): Observable<Page<Employee>> {
     const trimmed = query.trim();
     return viewEmployees(this.http, this.config.rootUrl, {
@@ -107,8 +88,6 @@ export class AttendanceGateway {
     }).pipe(map((response) => mapPage(response.body, toEmployee)));
   }
 
-  // One page of a chosen employee's reservations, for the administrator on-behalf view (GET
-  // /reservations/by-employee/{id}, admin-only, 009; ADR-0044).
   reservationsFor(employee: EmployeeId, cursor?: string): Observable<Page<MyReservation>> {
     return viewReservationsForEmployee(this.http, this.config.rootUrl, {
       employeeId: employee,
@@ -116,8 +95,7 @@ export class AttendanceGateway {
     }).pipe(map((response) => mapPage(response.body, toMyReservation)));
   }
 
-  // Cancel a reservation (DELETE /reservations/{id}?date=). The date locates the company-day stream; a
-  // past day is rejected server-side as past_immutable (FR-007).
+  // The date locates the company-day event stream the reservation lives in.
   cancel(reservation: ReservationId, date: string): Observable<void> {
     return cancelReservation(this.http, this.config.rootUrl, {
       reservationId: reservation,

@@ -1,7 +1,6 @@
-// The bookable-day rules (FR-003), kept clock-free: every function takes the dates it needs as ISO
-// yyyy-MM-dd strings so it is pure and testable. A day is bookable only if it is a working day (Mon–Fri)
-// within today through today + 14 calendar days (inclusive) — the same rule the server enforces (003
-// FR-002). The page supplies "today" from `todayInBerlin`, so the only timezone-aware step is isolated.
+// Pure, clock-free day rules: every function takes ISO yyyy-MM-dd dates so it stays testable; the one
+// timezone-aware step is isolated in todayInBerlin. A day is bookable if it is a working day within
+// today .. today + BOOKING_WINDOW_DAYS (inclusive) — the same rule the server enforces.
 
 export const BOOKING_WINDOW_DAYS = 14;
 
@@ -54,7 +53,6 @@ export function isBookable(date: string, today: string): boolean {
   return offset >= 0 && offset <= BOOKING_WINDOW_DAYS && isWorkingDay(date);
 }
 
-// The selectable days for the day chooser: every working day in the window, today first (FR-003).
 export function bookableDaysFrom(today: string): string[] {
   const days: string[] = [];
   for (let offset = 0; offset <= BOOKING_WINDOW_DAYS; offset++) {
