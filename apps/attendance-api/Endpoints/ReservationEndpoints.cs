@@ -12,8 +12,6 @@ namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 
 public static class ReservationEndpoints
 {
-    private const string AdministratorRole = "administrator";
-
     public static IEndpointRouteBuilder MapReservationEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/reservations", ReserveAsync)
@@ -80,12 +78,13 @@ public static class ReservationEndpoints
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
-        if (!TryGetSubject(principal, out var subject)) return Results.Unauthorized();
+        var subject = principal.Subject();
+        if (subject.IsFailure) return Results.Unauthorized();
 
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
 
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject.Value), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
@@ -101,7 +100,7 @@ public static class ReservationEndpoints
         IQueryHandler<ViewEmployees, Page<EmployeeView>> view,
         CancellationToken cancellationToken)
     {
-        if (!principal.IsInRole(AdministratorRole)) return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
+        if (!principal.IsAdministrator()) return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
 
         var searchTerm = SearchTerm.From(q);
         if (searchTerm.IsFailure) return BadRequest(searchTerm.Error);
@@ -122,7 +121,7 @@ public static class ReservationEndpoints
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
-        if (!principal.IsInRole(AdministratorRole)) return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
+        if (!principal.IsAdministrator()) return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
 
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
@@ -143,26 +142,24 @@ public static class ReservationEndpoints
         ICommandHandler<ReservePlace, ReservationIdentifier> reserve,
         CancellationToken cancellationToken)
     {
-        if (!TryGetSubject(principal, out var subject)) return Results.Unauthorized();
+        var subject = principal.Subject();
+        if (subject.IsFailure) return Results.Unauthorized();
 
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject.Value), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var employee = request.OnBehalfOf is { } onBehalfOf
             ? EmployeeIdentifier.From(onBehalfOf)
             : actor.Value;
 
-        if (!MayReserveFor(employee, actor.Value, principal))
-        {
-            return Error.Forbidden("not_authorized", "Only an administrator may reserve on behalf of another employee.").ToHttpResult();
-        }
-
         var command = new ReservePlace(
             CompanyIdentifier.From(options.CompanyId),
             employee,
+            actor.Value,
             OfficeIdentifier.From(request.OfficeId),
             RoomIdentifier.From(request.RoomId),
-            BookingDate.From(request.Date));
+            BookingDate.From(request.Date),
+            principal.IsAdministrator());
 
         var result = await reserve.HandleAsync(command, cancellationToken);
 
@@ -178,9 +175,6 @@ public static class ReservationEndpoints
             error => error.ToHttpResult());
     }
 
-    private static bool MayReserveFor(EmployeeIdentifier employee, EmployeeIdentifier actor, ClaimsPrincipal principal) =>
-        employee == actor || principal.IsInRole(AdministratorRole);
-
     private static async Task<IResult> CancelAsync(
         Guid reservationId,
         DateOnly date,
@@ -190,9 +184,10 @@ public static class ReservationEndpoints
         ICommandHandler<CancelReservation> cancel,
         CancellationToken cancellationToken)
     {
-        if (!TryGetSubject(principal, out var subject)) return Results.Unauthorized();
+        var subject = principal.Subject();
+        if (subject.IsFailure) return Results.Unauthorized();
 
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject), cancellationToken);
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(subject.Value), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var command = new CancelReservation(
@@ -200,17 +195,10 @@ public static class ReservationEndpoints
             ReservationIdentifier.From(reservationId),
             BookingDate.From(date),
             actor.Value,
-            ActorIsAdmin: principal.IsInRole(AdministratorRole));
+            ActorIsAdmin: principal.IsAdministrator());
 
         var result = await cancel.HandleAsync(command, cancellationToken);
 
         return result.Match(Results.NoContent, error => error.ToHttpResult());
-    }
-
-    private static bool TryGetSubject(ClaimsPrincipal principal, out Guid subject)
-    {
-        var subjectClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? principal.FindFirstValue("sub");
-        return Guid.TryParse(subjectClaim, out subject);
     }
 }

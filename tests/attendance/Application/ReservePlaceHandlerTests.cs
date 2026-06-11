@@ -116,8 +116,43 @@ public class ReservePlaceHandlerTests
         await repository.Received(3).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
     }
 
-    private static ReservePlace NewCommand() =>
-        new(company, EmployeeIdentifier.New(), OfficeIdentifier.New(), RoomIdentifier.New(), bookingDate);
+    [Fact]
+    public async Task A_non_administrator_reserving_for_another_employee_is_forbidden_without_touching_the_aggregate()
+    {
+        var repository = Substitute.For<IAttendanceDayRepository>();
+        var onBehalf = NewCommand() with { Employee = EmployeeIdentifier.New(), ActorIsAdmin = false };
+        var handler = NewHandler(repository, capacity: 8);
+
+        var result = await handler.HandleAsync(onBehalf, CancellationToken.None);
+
+        result.Error.Code.ShouldBe("not_authorized");
+        result.Error.Type.ShouldBe(ErrorType.Forbidden);
+        await repository.DidNotReceive().LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>());
+        await repository.DidNotReceive().SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task An_administrator_may_reserve_for_another_employee()
+    {
+        var repository = Substitute.For<IAttendanceDayRepository>();
+        repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
+            .Returns(_ => AttendanceDay.For(company, bookingDate));
+        repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success());
+        var onBehalf = NewCommand() with { Employee = EmployeeIdentifier.New(), ActorIsAdmin = true };
+        var handler = NewHandler(repository, capacity: 8);
+
+        var result = await handler.HandleAsync(onBehalf, CancellationToken.None);
+
+        result.IsSuccess.ShouldBeTrue();
+        await repository.Received(1).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
+    }
+
+    private static ReservePlace NewCommand()
+    {
+        var employee = EmployeeIdentifier.New();
+        return new(company, employee, employee, OfficeIdentifier.New(), RoomIdentifier.New(), bookingDate, ActorIsAdmin: false);
+    }
 
     private static ReservePlaceHandler NewHandler(IAttendanceDayRepository repository, int capacity) =>
         new(repository, RoomDirectoryWith(capacity), new FixedTimeProvider(now));
