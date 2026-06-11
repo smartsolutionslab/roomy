@@ -31,11 +31,6 @@ export class HireEmployeePage {
   protected readonly invalid = signal(false);
   protected readonly failed = signal(false);
 
-  // roomy-select is uncontrolled (emits the chosen value), so the reactive control is set on selection.
-  protected selectRole(value: string): void {
-    this.hireForm.controls.role.setValue(value);
-  }
-
   protected hire(): void {
     this.attempted.set(true);
     if (this.hireForm.invalid) {

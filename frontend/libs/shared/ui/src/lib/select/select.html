@@ -1,5 +1,11 @@
 <roomy-form-field [label]="label()">
-  <select #control (change)="selected.emit(control.value)">
+  <select
+    #control
+    [value]="value()"
+    [disabled]="disabled()"
+    (change)="choose(control.value)"
+    (blur)="markTouched()"
+  >
     <option value="">{{ placeholder() }}</option>
     @for (option of options(); track option.value) {
     <option [value]="option.value">{{ option.label }}</option>
