@@ -53,6 +53,11 @@
               >{{ translate('attendance.calendar.occupied', { occupied: day.office.occupied,
               capacity: day.office.capacity }) }}</span
             >
+            <roomy-usage-bar
+              class="calendar__meter"
+              [occupied]="day.office.occupied"
+              [capacity]="day.office.capacity"
+            />
             } @if (isMine(date)) {
             <span class="calendar__mine" aria-hidden="true">★</span>
             <span class="roomy-visually-hidden">{{ translate('attendance.calendar.mine') }}</span>
