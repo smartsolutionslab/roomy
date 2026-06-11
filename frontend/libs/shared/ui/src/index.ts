@@ -10,6 +10,6 @@ export { FormField } from './lib/form-field/form-field';
 export { Message } from './lib/message/message';
 export { FieldError } from './lib/field-error/field-error';
 export { Icon, type IconName } from './lib/icon/icon';
-export { DaySelect } from './lib/day-select/day-select';
+export { DaySelect, type DayOption } from './lib/day-select/day-select';
 export { Select, type SelectOption } from './lib/select/select';
 export { TileGroup } from './lib/tile-group/tile-group';

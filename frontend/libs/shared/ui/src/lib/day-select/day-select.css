@@ -1,0 +1,51 @@
+/* Stacked label + day tiles. The tiles use the shared .roomy-tile look (design-system.css); this file
+   owns the group layout, the two-line (weekday over date) tile content, and the smartphone fallback. On
+   small screens the tiles give way to a native dropdown of the same days. */
+.day-select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+}
+
+.day-select__label {
+  font-weight: var(--roomy-font-weight-medium);
+}
+
+.day-select__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--roomy-space-sm);
+}
+
+.day-select__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  line-height: 1.2;
+}
+
+.day-select__weekday {
+  font-weight: var(--roomy-font-weight-medium);
+}
+
+/* Dimmed relative to the tile's own text colour so it adapts to the selected (on-accent) state. */
+.day-select__date {
+  font-size: var(--roomy-font-size-sm);
+  opacity: 0.75;
+}
+
+/* The dropdown fallback is hidden on wide screens; the tiles take over. */
+.day-select__fallback {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .day-select__tiles {
+    display: none;
+  }
+
+  .day-select__fallback {
+    display: block;
+  }
+}
