@@ -38,7 +38,11 @@ describe('EmployeesGateway', () => {
       initialPassword: 'first-password',
     });
     request.flush(
-      { employeeId: '0199a0b0-0000-7000-8000-000000000001', userId: '0199a0b0-0000-7000-8000-000000000002', state: 'Provisioning' },
+      {
+        employeeId: '0199a0b0-0000-7000-8000-000000000001',
+        userId: '0199a0b0-0000-7000-8000-000000000002',
+        state: 'Provisioning',
+      },
       { status: 202, statusText: 'Accepted' },
     );
   });
@@ -56,7 +60,11 @@ describe('EmployeesGateway', () => {
       .subscribe((hired) => (received = hired));
 
     httpController.expectOne('/employees').flush(
-      { employeeId: '0199a0b0-0000-7000-8000-0000000000aa', userId: '0199a0b0-0000-7000-8000-0000000000bb', state: 'Provisioning' },
+      {
+        employeeId: '0199a0b0-0000-7000-8000-0000000000aa',
+        userId: '0199a0b0-0000-7000-8000-0000000000bb',
+        state: 'Provisioning',
+      },
       { status: 202, statusText: 'Accepted' },
     );
 
@@ -80,7 +88,11 @@ describe('EmployeesGateway', () => {
     const request = httpController.expectOne('/employees');
     expect(request.request.body.role).toBe('Administrator');
     request.flush(
-      { employeeId: '0199a0b0-0000-7000-8000-0000000000aa', userId: '0199a0b0-0000-7000-8000-0000000000bb', state: 'Provisioning' },
+      {
+        employeeId: '0199a0b0-0000-7000-8000-0000000000aa',
+        userId: '0199a0b0-0000-7000-8000-0000000000bb',
+        state: 'Provisioning',
+      },
       { status: 202, statusText: 'Accepted' },
     );
   });
