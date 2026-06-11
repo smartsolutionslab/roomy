@@ -2,7 +2,6 @@ using JasperFx;
 using JasperFx.CommandLine;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
-using SmartSolutionsLab.Roomy.Identity.Api.Seeding;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
@@ -44,8 +43,8 @@ builder.Services.AddIdentityUseCases();
 // HostFactoryResolver-based tool obtain the built service provider instead of the JasperFx dispatcher
 // disposing it first; it is scoped to the emit so the Wolverine `codegen write` step and normal
 // startup are unaffected. The document is built from endpoint metadata alone, so during an emit the
-// messaging runtime and the DefaultAdmin seeder — the two startups that open a broker/database
-// connection — are skipped, letting the spec emit with no Postgres or RabbitMQ.
+// messaging runtime — the startup that opens a broker/database connection — is skipped, letting the
+// spec emit with no Postgres or RabbitMQ.
 var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
 if (emittingOpenApiDocument)
 {
@@ -63,20 +62,6 @@ if (!emittingOpenApiDocument)
         },
         applicationAssembly: typeof(IdentityApiHost).Assembly,
         typeof(EmployeeHiredConsumer).Assembly);
-}
-
-var defaultAdmin = builder.Configuration.GetSection(DefaultAdminOptions.SectionName);
-builder.Services.AddSingleton(new DefaultAdminOptions
-{
-    Email = defaultAdmin["Email"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:Email'."),
-    DisplayName = defaultAdmin["DisplayName"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:DisplayName'."),
-    InitialPassword = defaultAdmin["InitialPassword"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
-});
-builder.Services.AddScoped<DefaultAdminSeeder>();
-
-if (!emittingOpenApiDocument)
-{
-    builder.Services.AddHostedService<DefaultAdminSeederHostedService>();
 }
 
 var app = builder.Build();

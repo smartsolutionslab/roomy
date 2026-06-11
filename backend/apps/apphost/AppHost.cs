@@ -58,10 +58,7 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
-    .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
-    .WithEnvironment("DefaultAdmin__Email", "admin@roomy.local")
-    .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
-    .WithEnvironment("DefaultAdmin__InitialPassword", "DevAdmin.23456");
+    .WithEnvironment("Keycloak__AdminPassword", keycloakPassword);
 
 var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organization-api")
     .WithHttpEndpoint()
@@ -70,7 +67,10 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
     .WithReference(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
-    .WithEnvironment("Company__Name", "Roomy");
+    .WithEnvironment("Company__Name", "Roomy")
+    .WithEnvironment("DefaultAdmin__Email", "admin@roomy.local")
+    .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
+    .WithEnvironment("DefaultAdmin__InitialPassword", "DevAdmin.23456");
 
 var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
     .WithHttpEndpoint()

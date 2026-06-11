@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Identity.Api.Seeding;
+namespace SmartSolutionsLab.Roomy.Organization.Api.Seeding;
 
 public sealed class DefaultAdminSeederHostedService(IServiceProvider services) : IHostedService
 {
@@ -6,9 +6,7 @@ public sealed class DefaultAdminSeederHostedService(IServiceProvider services) :
     {
         await using var scope = services.CreateAsyncScope();
         var seeder = scope.ServiceProvider.GetRequiredService<DefaultAdminSeeder>();
-
-        var result = await seeder.SeedAsync(cancellationToken);
-        if (result.IsFailure) throw new InvalidOperationException($"DefaultAdmin seeding failed: {result.Error.Code} — {result.Error.Message}");
+        await seeder.SeedAsync(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

@@ -7,4 +7,6 @@ public interface IEmployeeRepository
     Task AddAsync(Employee employee, CancellationToken cancellationToken);
 
     Task<Result<Employee>> GetByIdentifierAsync(EmployeeIdentifier identifier, CancellationToken cancellationToken);
+
+    Task<bool> ExistsByWorkEmailAsync(WorkEmail email, CancellationToken cancellationToken);
 }

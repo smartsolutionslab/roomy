@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Identity.Api.Seeding;
+namespace SmartSolutionsLab.Roomy.Organization.Api.Seeding;
 
 public sealed class DefaultAdminOptions
 {
