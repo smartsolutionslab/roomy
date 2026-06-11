@@ -19,10 +19,10 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-api';
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
-import { Combobox, InfiniteScroll, Message, Page, type SelectOption } from '@roomy/shared-ui';
+import { Combobox, Message, Page, type SelectOption } from '@roomy/shared-ui';
 import { EMPTY, Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
-import { ReservationItem } from '../reservation-item/reservation-item';
+import { ReservationHistory } from '../reservation-history/reservation-history';
 import { ReservePage } from '../reserve/reserve-page';
 
 // The administrator on-behalf page (009, AT-6): pick an employee, then reserve for them (the embedded
@@ -32,17 +32,8 @@ import { ReservePage } from '../reserve/reserve-page';
 @Component({
   selector: 'roomy-on-behalf-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    TranslocoDirective,
-    ReservePage,
-    ReservationItem,
-    InfiniteScroll,
-    Page,
-    Message,
-    Combobox,
-  ],
+  imports: [TranslocoDirective, ReservePage, ReservationHistory, Page, Message, Combobox],
   templateUrl: './on-behalf-page.html',
-  styleUrl: './on-behalf-page.css',
 })
 export class OnBehalfPage {
   private readonly gateway = inject(AttendanceGateway);

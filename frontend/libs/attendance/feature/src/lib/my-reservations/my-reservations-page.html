@@ -16,46 +16,17 @@
       {{ translate('attendance.mine.reserveLink') }}
     </button>
     } @else {
-    <roomy-infinite-scroll
+    <roomy-reservation-history
+      [upcoming]="upcoming()"
+      [past]="past()"
+      [namespace]="'attendance.mine'"
+      [showChange]="true"
       [hasMore]="list.hasMore()"
       [loading]="list.loading()"
       (loadMore)="list.loadMore()"
-    >
-      <section class="mine__group">
-        <h2>{{ translate('attendance.mine.upcomingHeading') }}</h2>
-        <ul class="roomy-list">
-          @for (reservation of upcoming(); track reservation.id) {
-          <li class="roomy-list-item">
-            <roomy-reservation-item
-              [reservation]="reservation"
-              [namespace]="'attendance.mine'"
-              [showActions]="true"
-              [showChange]="true"
-              (cancelRequested)="cancel(reservation)"
-              (changeRequested)="change(reservation)"
-            />
-          </li>
-          }
-        </ul>
-      </section>
-
-      @if (past().length > 0) {
-      <section class="mine__group">
-        <h2>{{ translate('attendance.mine.pastHeading') }}</h2>
-        <ul class="roomy-list">
-          @for (reservation of past(); track reservation.id) {
-          <li class="roomy-list-item mine__item--past">
-            <roomy-reservation-item
-              [reservation]="reservation"
-              [namespace]="'attendance.mine'"
-              [showActions]="false"
-            />
-          </li>
-          }
-        </ul>
-      </section>
-      }
-    </roomy-infinite-scroll>
+      (cancelRequested)="cancel($event)"
+      (changeRequested)="change($event)"
+    />
     } } @else {
     <p>{{ translate('attendance.mine.loading') }}</p>
     }

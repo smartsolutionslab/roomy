@@ -30,39 +30,16 @@
       @if (reservationsList.items(); as rows) { @if (rows.length === 0) {
       <p>{{ translate('attendance.onBehalf.noReservations') }}</p>
       } @else {
-      <roomy-infinite-scroll
+      <roomy-reservation-history
+        [upcoming]="upcoming()"
+        [past]="past()"
+        [namespace]="'attendance.onBehalf'"
+        [headingLevel]="3"
         [hasMore]="reservationsList.hasMore()"
         [loading]="reservationsList.loading()"
         (loadMore)="reservationsList.loadMore()"
-      >
-        <h3>{{ translate('attendance.onBehalf.upcomingHeading') }}</h3>
-        <ul class="roomy-list">
-          @for (reservation of upcoming(); track reservation.id) {
-          <li class="roomy-list-item">
-            <roomy-reservation-item
-              [reservation]="reservation"
-              [namespace]="'attendance.onBehalf'"
-              [showActions]="true"
-              (cancelRequested)="cancel(reservation)"
-            />
-          </li>
-          }
-        </ul>
-        @if (past().length > 0) {
-        <h3>{{ translate('attendance.onBehalf.pastHeading') }}</h3>
-        <ul class="roomy-list">
-          @for (reservation of past(); track reservation.id) {
-          <li class="roomy-list-item on-behalf__item--past">
-            <roomy-reservation-item
-              [reservation]="reservation"
-              [namespace]="'attendance.onBehalf'"
-              [showActions]="false"
-            />
-          </li>
-          }
-        </ul>
-        }
-      </roomy-infinite-scroll>
+        (cancelRequested)="cancel($event)"
+      />
       } } @else {
       <p>{{ translate('attendance.onBehalf.loading') }}</p>
       }
