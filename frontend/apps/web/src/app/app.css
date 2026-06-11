@@ -64,15 +64,31 @@
   transform: rotate(-45deg);
 }
 
-/* The admin sub-items sit indented under the disclosure. */
+/* The admin sub-items sit indented under the disclosure, behind a connecting rule, as lighter and
+   smaller links so they read as one level down. They collapse with the disclosure — `.subnav[hidden]`
+   must win over `.subnav`'s own `display`, or the [hidden] attribute is ignored and the group never closes. */
 .subnav {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  margin-block-start: 2px;
+  margin-inline-start: 1.15rem;
+  padding-inline-start: var(--roomy-space-sm);
+  border-inline-start: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.subnav[hidden] {
+  display: none;
 }
 
 .navlink--sub {
-  padding-inline-start: calc(1.25rem + var(--roomy-space-md));
+  padding-block: var(--roomy-space-xs);
+  font-size: var(--roomy-font-size-sm);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.navlink--sub .navlink__icon {
+  --roomy-icon-size: 1rem;
 }
 
 .navlink {
