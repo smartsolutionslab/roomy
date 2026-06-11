@@ -165,6 +165,12 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   which receives the decision as a command field (`ActorIsAdmin`), not in the endpoint. The edge turns
   claims into the primitives a command/query already accepts; handlers never see `ClaimsPrincipal`
   (ADR-0053).
+- **The company-local "today" comes from `IBusinessClock`.** Never derive a timezone in a handler or
+  endpoint (no `TimeZoneInfo.FindSystemTimeZoneById(...)`, no `ConvertTime(...).DateTime` at a call
+  site). The `IBusinessClock` port (`Today: BookingDate`, `Now: DateTimeOffset`) is implemented once in
+  attendance infrastructure over `TimeProvider` and a configured zone (`Attendance:TimeZone`, default
+  `Europe/Berlin`, resolved at the composition root); callers ask for `Today`/`Now`. `TimeProvider`
+  stays the raw instant source for event timestamps (ADR-0054).
 
 ## Dependencies (Clean Architecture) ⚙ via architecture tests
 
