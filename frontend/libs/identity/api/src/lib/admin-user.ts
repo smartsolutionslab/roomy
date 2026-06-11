@@ -6,8 +6,6 @@ import type { UserId } from './user-id';
 
 export type AccountStatus = 'provisioning' | 'active';
 
-// The admin account overview projection: like Account, plus the provisioning status the administrator
-// surface needs (identity-api.md).
 export interface AdminUser {
   readonly userId: UserId;
   readonly email: string;
@@ -16,8 +14,7 @@ export interface AdminUser {
   readonly status: AccountStatus;
 }
 
-// Maps the trusted generated DTO to the branded domain type at the data-access boundary (ADR-0020),
-// narrowing the contract's plain-string `role`/`status` to the enums it cannot express.
+// role/status are narrowed from the contract's plain strings to the enums it can't express.
 export function toAdminUser(response: AdminUserResponse): AdminUser {
   return {
     userId: userId(response.userId),
