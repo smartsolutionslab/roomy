@@ -27,9 +27,9 @@ import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 import { OccupancyShell } from './occupancy-shell';
 import { OccupancyScope } from './office-room-picker';
 
-// The occupancy calendar (OC-3, FR-004): a month grid where each in-month day shows its occupancy figure
-// (the office rollup for the chosen scope) and the days the viewer holds a reservation are highlighted
-// with a non-colour cue. Figures come from one month-range `occupancy` call; the highlight from
+// The occupancy calendar: a month grid where each in-month day shows its occupancy figure (the office
+// rollup for the chosen scope) and the days the viewer holds a reservation are highlighted with a
+// non-colour cue. Figures come from one month-range `occupancy` call; the highlight from
 // `myReservations`. Month and weekday names are localised via Intl in the active language.
 @Component({
   selector: 'roomy-occupancy-calendar',
@@ -126,8 +126,8 @@ export class OccupancyCalendar {
       });
 
     // The calendar marks every day the viewer holds a reservation, so it walks all pages of the
-    // keyset-paginated history (ADR-0044) — following nextCursor until the list is exhausted — rather
-    // than only the first page (which, being date-ordered, need not include the displayed month).
+    // keyset-paginated history — following nextCursor until the list is exhausted — rather than only
+    // the first page (which, being date-ordered, need not include the displayed month).
     this.gateway
       .myReservations()
       .pipe(

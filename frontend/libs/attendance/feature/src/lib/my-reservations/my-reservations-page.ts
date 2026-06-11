@@ -23,10 +23,9 @@ import { Button, Message, Page } from '@roomy/shared-ui';
 
 import { ReservationHistory } from '../reservation-history/reservation-history';
 
-// The signed-in employee's own reservations (AT-4): past and upcoming, with cancel offered only on
-// upcoming rows (FR-006/FR-007) and "change" performed as cancel + re-reserve — a navigation into the
-// reserve flow, never a combined edit (AT-5, FR-008). `today` is an input defaulting to the
-// Europe/Berlin calendar day, so the upcoming/past split is deterministic under test.
+// The signed-in employee's own reservations: cancel is offered only on upcoming rows, and "change" is
+// cancel + re-reserve (a navigation into the reserve flow), never a combined edit. `today` is an input
+// defaulting to the Europe/Berlin calendar day, so the upcoming/past split is deterministic under test.
 @Component({
   selector: 'roomy-my-reservations-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,8 +40,8 @@ export class MyReservationsPage {
 
   readonly today = input<string>(todayInBerlin());
 
-  // The endless reservation history (ADR-0044/0049): the helper owns the cursor accumulation; the
-  // upcoming/past split derives from its accumulated items.
+  // The endless reservation history: the helper owns the cursor accumulation; the upcoming/past split
+  // derives from its accumulated items.
   protected readonly list = cursorList<MyReservation>((cursor) =>
     this.gateway.myReservations(cursor),
   );
@@ -72,8 +71,8 @@ export class MyReservationsPage {
       });
   }
 
-  // Change = cancel + re-reserve (AT-5): cancel the existing reservation, then go to the reserve flow to
-  // book the new room/office/day. There is no single combined edit step.
+  // Change = cancel + re-reserve: cancel the existing reservation, then go to the reserve flow to book
+  // the new room/office/day. There is no single combined edit step.
   protected change(reservation: MyReservation): void {
     this.result.set(null);
     this.errorKey.set(null);

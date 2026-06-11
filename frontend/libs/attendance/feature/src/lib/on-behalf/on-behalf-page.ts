@@ -25,10 +25,10 @@ import { EMPTY, Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { ReservationHistory } from '../reservation-history/reservation-history';
 import { ReservePage } from '../reserve/reserve-page';
 
-// The administrator on-behalf page (009, AT-6): pick an employee, then reserve for them (the embedded
-// 007 reserve flow with `onBehalfOf` set) and view/cancel their reservations. Admin-gated by the route
-// (adminGuard); the server also enforces admin on the directory/by-employee reads and on-behalf reserve.
-// `today` is an input defaulting to the Europe/Berlin day so the upcoming/past split is deterministic.
+// The administrator on-behalf page: pick an employee, then reserve for them (the embedded reserve flow
+// with `onBehalfOf` set) and view/cancel their reservations. Admin-gated by the route; the server also
+// enforces admin on the directory/by-employee reads and on-behalf reserve. `today` is an input
+// defaulting to the Europe/Berlin day so the upcoming/past split is deterministic.
 @Component({
   selector: 'roomy-on-behalf-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,12 +41,12 @@ export class OnBehalfPage {
 
   readonly today = input<string>(todayInBerlin());
 
-  // The debounced name search over the on-behalf directory (012, FR-009). Blank means "no filter".
+  // The debounced name search over the on-behalf directory. Blank means "no filter".
   private readonly searchInput = new Subject<string>();
   protected readonly query = signal('');
 
-  // The endless employee directory (ADR-0044/0049) feeding the picker. The fetch reads the current
-  // search query, so reset() re-runs it ranked by name similarity whenever the query changes.
+  // The endless employee directory feeding the picker. The fetch reads the current search query, so
+  // reset() re-runs it ranked by name similarity whenever the query changes.
   protected readonly employeesList = cursorList<Employee>((cursor) =>
     this.gateway.listEmployees(this.query(), cursor),
   );
@@ -67,9 +67,9 @@ export class OnBehalfPage {
     })),
   );
 
-  // The chosen employee's reservations (ADR-0044/0049): deferred until a pick, then reloaded from the
-  // first page whenever the selection changes (chooseEmployee) or a booking is made (onReserved). The
-  // fetch reads the current selection, so reset() re-runs it for the newly picked employee.
+  // The chosen employee's reservations: deferred until a pick, then reloaded from the first page
+  // whenever the selection changes (chooseEmployee) or a booking is made (onReserved). The fetch reads
+  // the current selection, so reset() re-runs it for the newly picked employee.
   protected readonly reservationsList = cursorList<MyReservation>(
     (cursor) => {
       // Only ever driven (reset/loadMore) while an employee is selected — chooseEmployee clears the list
