@@ -26,6 +26,8 @@ import {
 import { type ResultMessage } from '@roomy/shared-data-access';
 import { Button, DaySelect, Message, Page, TileGroup, type SelectOption } from '@roomy/shared-ui';
 
+import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
+
 import { RoomCell } from './room-cell';
 
 // The reserve flow (AT-1/AT-2): pick an office, then a day, then a room with a remaining place, then
@@ -52,8 +54,9 @@ export class ReservePage {
   // self-service route.
   readonly reserved = output<void>();
 
-  protected readonly offices = signal<BookableOffice[] | null>(null);
-  protected readonly loadFailed = signal(false);
+  private readonly catalogue = bookableOfficesCatalogue();
+  protected readonly offices = this.catalogue.offices;
+  protected readonly loadFailed = this.catalogue.loadFailed;
 
   protected readonly selectedOfficeId = signal<string | null>(null);
   protected readonly selectedDay = signal<string | null>(null);
@@ -70,23 +73,6 @@ export class ReservePage {
   protected readonly officeOptions = computed<SelectOption[]>(() =>
     (this.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
   );
-
-  constructor() {
-    this.loadCatalogue();
-  }
-
-  private loadCatalogue(): void {
-    this.gateway
-      .listBookableOffices()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (offices) => this.offices.set(offices),
-        error: () => {
-          this.loadFailed.set(true);
-          this.offices.set([]);
-        },
-      });
-  }
 
   protected chooseOffice(officeId: string): void {
     this.selectedOfficeId.set(officeId || null);
@@ -177,7 +163,7 @@ export class ReservePage {
         break;
       case 'unknown_room':
         this.errorKey.set('attendance.reserve.errors.unknownRoom');
-        this.loadCatalogue();
+        this.catalogue.reload();
         break;
       case 'concurrency_retry_exhausted':
         this.errorKey.set('attendance.reserve.errors.retry');
