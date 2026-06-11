@@ -30,4 +30,10 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The realm import is the contract the BFF's realm-role flattening depends on; copy it so the
+         regression test can assert it maps realm roles into the ID token + UserInfo. -->
+    <Content Include="../keycloak/roomy-realm.json" Link="keycloak/roomy-realm.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
