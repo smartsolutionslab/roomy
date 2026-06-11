@@ -40,3 +40,8 @@
   display: block;
   font-variant-numeric: tabular-nums;
 }
+
+/* A slim usage bar under the figure, reinforcing the cell's heat tint with a quantitative cue. */
+.calendar__meter {
+  margin-block-start: 0.25rem;
+}

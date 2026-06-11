@@ -20,3 +20,14 @@
   gap: 0.75rem;
   align-items: baseline;
 }
+
+/* The usage bar sits on its own line under the figure, kept compact rather than spanning the page. */
+.occupancy__rollup-meter,
+.occupancy__room-meter {
+  max-inline-size: 16rem;
+  margin-block-start: var(--roomy-space-xs);
+}
+
+.occupancy__room-meter {
+  flex-basis: 100%;
+}

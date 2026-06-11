@@ -36,6 +36,11 @@
           {{ translate('attendance.occupancy.officeOccupied', { occupied: day.office.occupied,
           capacity: day.office.capacity }) }}
         </p>
+        <roomy-usage-bar
+          class="occupancy__rollup-meter"
+          [occupied]="day.office.occupied"
+          [capacity]="day.office.capacity"
+        />
         <ul class="occupancy__rooms">
           @for (room of day.rooms; track room.roomId) {
           <li class="occupancy__room">
@@ -46,7 +51,13 @@
             </span>
             @if (room.isFull) {
             <span class="occupancy__room-full">{{ translate('attendance.occupancy.full') }}</span>
-            } @if (room.occupants && room.occupants.length > 0) {
+            }
+            <roomy-usage-bar
+              class="occupancy__room-meter"
+              [occupied]="room.occupied"
+              [capacity]="room.capacity"
+            />
+            @if (room.occupants && room.occupants.length > 0) {
             <span class="occupancy__booked-heading"
               >{{ translate('attendance.occupancy.bookedHeading') }}</span
             >

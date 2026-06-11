@@ -18,7 +18,7 @@ import {
   rangeFor,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { FormField } from '@roomy/shared-ui';
+import { FormField, UsageBar } from '@roomy/shared-ui';
 
 import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
@@ -34,7 +34,7 @@ import { OccupancyScope } from './office-room-picker';
 @Component({
   selector: 'roomy-occupancy-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, FormField, OccupancyShell],
+  imports: [TranslocoDirective, FormField, OccupancyShell, UsageBar],
   templateUrl: './occupancy-page.html',
   styleUrl: './occupancy-page.css',
 })

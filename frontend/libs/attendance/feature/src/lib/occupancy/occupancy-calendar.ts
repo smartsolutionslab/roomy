@@ -19,7 +19,7 @@ import {
   rangeFor,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { Button, Heat } from '@roomy/shared-ui';
+import { Button, Heat, UsageBar } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
 
 import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
@@ -34,7 +34,7 @@ import { OccupancyScope } from './office-room-picker';
 @Component({
   selector: 'roomy-occupancy-calendar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Button, OccupancyShell, Heat],
+  imports: [TranslocoDirective, Button, OccupancyShell, Heat, UsageBar],
   templateUrl: './occupancy-calendar.html',
   styleUrl: './occupancy-calendar.css',
 })
