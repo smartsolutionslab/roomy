@@ -22,6 +22,7 @@
   <button
     roomyButton
     type="button"
+    class="offices__room-rename"
     [attr.aria-label]="translate('organization.rooms.renameRoom', { name: room().name })"
     (click)="rename.emit()"
   >
