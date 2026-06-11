@@ -93,6 +93,24 @@ describe('App shell', () => {
     expect(screen.getByRole('link', { name: 'Verwaltung' })).toBeTruthy();
   });
 
+  it('collapses and expands the administration group of sub-items', async () => {
+    await renderShell({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
+
+    const toggle = screen.getByRole('button', { name: 'Verwaltung' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('link', { name: 'Büros' })).toBeTruthy();
+
+    await userEvent.click(toggle);
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByRole('link', { name: 'Büros' })).toBeNull();
+
+    await userEvent.click(toggle);
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('link', { name: 'Büros' })).toBeTruthy();
+  });
+
   it('does not offer the administrator-only links to a non-administrator', async () => {
     await renderShell({ name: 'Grace Hopper', roles: ['employee'] });
 

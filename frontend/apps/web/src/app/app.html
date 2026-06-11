@@ -19,13 +19,26 @@
         <span>{{ translate(item.labelKey) }}</span>
       </a>
       } @if (adminNav().length) {
-      <span class="sidebar__section">{{ translate('shell.adminLink') }}</span>
-      @for (item of adminNav(); track item.path) {
-      <a class="navlink" [routerLink]="item.path" routerLinkActive="navlink--active">
-        <roomy-icon class="navlink__icon" [name]="item.icon" />
-        <span>{{ translate(item.labelKey) }}</span>
-      </a>
-      } }
+      <button
+        type="button"
+        class="navlink navgroup"
+        [attr.aria-expanded]="adminExpanded()"
+        aria-controls="admin-subnav"
+        (click)="toggleAdmin()"
+      >
+        <roomy-icon class="navlink__icon" name="admin" />
+        <span>{{ translate('shell.adminLink') }}</span>
+        <span class="navgroup__caret" aria-hidden="true"></span>
+      </button>
+      <div id="admin-subnav" class="subnav" [hidden]="!adminExpanded()">
+        @for (item of adminNav(); track item.path) {
+        <a class="navlink navlink--sub" [routerLink]="item.path" routerLinkActive="navlink--active">
+          <roomy-icon class="navlink__icon" [name]="item.icon" />
+          <span>{{ translate(item.labelKey) }}</span>
+        </a>
+        }
+      </div>
+      }
     </nav>
 
     <div roomy-top class="topbar-controls">
