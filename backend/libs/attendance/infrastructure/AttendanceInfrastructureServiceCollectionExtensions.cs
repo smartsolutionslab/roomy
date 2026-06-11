@@ -3,11 +3,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
+using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
@@ -35,6 +39,13 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
         services.AddScoped<IAttendanceDayRepository, AttendanceDayRepository>();
 
         services.AddScoped<ReservationsReadModelRebuilder>();
+
+        services.AddScoped<IRoomDirectory, RoomDirectory>();
+        services.AddScoped<IEmployeeDirectory, EmployeeDirectory>();
+        services.AddScoped<IOccupancyReadModel, OccupancyReadModel>();
+        services.AddScoped<IMyReservationsReadModel, MyReservationsReadModel>();
+        services.AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>();
+        services.AddScoped<IEmployeeCatalog, EmployeeCatalog>();
 
         return services;
     }

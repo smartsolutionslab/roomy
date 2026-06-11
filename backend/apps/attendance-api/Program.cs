@@ -5,9 +5,6 @@ using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
-using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
-using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
-using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Web.Http;
@@ -16,16 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-var attendanceConnectionString = builder.Configuration.GetRequiredConnectionString("attendance");
+var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
 
 builder.Services.AddAttendancePersistence(attendanceConnectionString)
     .AddAttendanceUseCases()
-    .AddScoped<IRoomDirectory, RoomDirectory>()
-    .AddScoped<IEmployeeDirectory, EmployeeDirectory>()
-    .AddScoped<IOccupancyReadModel, OccupancyReadModel>()
-    .AddScoped<IMyReservationsReadModel, MyReservationsReadModel>()
-    .AddScoped<IBookableRoomsReadModel, BookableRoomsReadModel>()
-    .AddScoped<IEmployeeCatalog, EmployeeCatalog>()
     .AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
 
@@ -43,7 +34,7 @@ if (!emittingOpenApiDocument && messagingEnabled)
         {
             Transport = MessagingTransport.RabbitMq,
             PostgresConnectionString = attendanceConnectionString,
-            ConnectionString = builder.Configuration.GetRequiredConnectionString("rabbitmq"),
+            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
         },
         applicationAssembly: typeof(AttendanceApiHost).Assembly,
         typeof(RoomAddedConsumer).Assembly);
