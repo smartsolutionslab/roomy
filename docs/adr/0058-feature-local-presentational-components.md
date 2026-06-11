@@ -1,6 +1,6 @@
 # 0058. Feature-local presentational components, with the page as the single smart orchestrator
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-06-11
 - **Deciders:** Heiko Weiß
 
