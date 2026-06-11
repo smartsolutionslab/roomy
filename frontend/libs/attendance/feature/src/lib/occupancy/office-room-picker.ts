@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { BookableOffice, OfficeId, RoomId, roomId } from '@roomy/attendance-api';
-import { Select, type SelectOption, TileGroup } from '@roomy/shared-ui';
+import { type SelectOption, TileGroup } from '@roomy/shared-ui';
 
 // The occupancy scope chosen in the picker: a whole office, or a single room within it.
 export type OccupancyScope = { readonly officeId: OfficeId } | { readonly roomId: RoomId };
@@ -15,7 +15,7 @@ export type OccupancyScope = { readonly officeId: OfficeId } | { readonly roomId
 @Component({
   selector: 'roomy-office-room-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Select, TileGroup],
+  imports: [TranslocoDirective, TileGroup],
   templateUrl: './office-room-picker.html',
 })
 export class OfficeRoomPicker {
@@ -34,6 +34,12 @@ export class OfficeRoomPicker {
   protected readonly roomOptions = computed<SelectOption[]>(() =>
     (this.selectedOffice()?.rooms ?? []).map((room) => ({ value: room.id, label: room.name })),
   );
+
+  // The room tiles lead with an "all rooms" entry (value '' = the whole-office scope); its label is
+  // translated in the template and passed in, so this stays free of the i18n service.
+  protected roomChoices(allRoomsLabel: string): SelectOption[] {
+    return [{ value: '', label: allRoomsLabel }, ...this.roomOptions()];
+  }
 
   protected chooseOffice(officeValue: string): void {
     this.selectedOfficeId.set(officeValue || null);
