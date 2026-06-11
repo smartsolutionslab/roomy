@@ -20,7 +20,10 @@ codegen is current*. The generated body of an EF-transactional handler (e.g. org
 - the inline Wolverine outbox (`new DbContextOutbox(...)` → `WolverineIntegrationEventOutbox`), and
 - a **service-located** `OrganizationDbContext` (a `serviceScope` frame) —
 
-and Wolverine emits them in an order that **varies by environment**. This was proven, not assumed:
+and Wolverine emits them in an order that **varies by environment**. It also formats some generated
+members differently per environment — e.g. a host's `GeneratedHandlerRegistry` emits its
+`new System.Type[] { … }` array on one line on the CI runner and as a multi-line block on a dev
+machine. Both kinds of difference are purely cosmetic. This was proven, not assumed:
 
 - It is **not** OS: a clean Linux container reproduced the committed order, not CI's.
 - It is **not** the SDK: CI installs SDK **10.0.301**; the container used the **same 10.0.301**, and
@@ -45,34 +48,37 @@ effect on behaviour, and the committed bytes cannot be reliably reproduced by th
 
 ## Decision
 
-Change the CI *Verify Wolverine codegen* step from a byte-exact `git diff --exit-code` to an
-**order-insensitive** comparison. After `codegen write`:
+Change the CI *Verify Wolverine codegen* step from a byte-exact `git diff --exit-code` to a
+**semantic** comparison that is insensitive to statement order and whitespace/line-break formatting.
+After `codegen write`:
 
 - A **new or orphaned** generated file fails the gate. A handler's filename carries a signature hash
   (`UserRegisteredHandler1226547712.cs`); a changed signature/dependency set yields a *different*
   filename, so a forgotten regeneration surfaces as an untracked (or vanished) file — real drift.
-- A **modified** generated file is compared **after sorting its lines**: if the committed and freshly
-  generated versions match once sorted, the only difference is statement order and the gate passes;
-  if they differ when sorted (a line added, removed, or changed), the gate fails — real drift.
+- A **modified** generated file is compared after **normalization** — strip `//` comments, drop all
+  whitespace, split on statement (`;`) boundaries, sort. If the committed and freshly generated
+  versions match once normalized, they differ only by declaration order and/or formatting and the gate
+  passes; if they differ when normalized (a statement added, removed, or changed), the gate fails.
 
-Pure reordering of the independent variable declarations within one handler body therefore passes,
-while any change to *which* code is generated fails. The committed files keep whatever valid ordering
-they have; contributors no longer need to regenerate on a particular machine.
+Reordering the independent variable declarations within a handler body, and multi-line-vs-single-line
+formatting of a generated array, therefore pass; any change to *which* code is generated fails. The
+committed files keep whatever valid order/formatting they have; contributors no longer need to
+regenerate on a particular machine.
 
 ## Consequences
 
 **Positive**
-- `main` is green without rewriting the generated files: the committed order and CI's regenerated order
-  differ only by statement order, which now normalizes equal.
+- `main` is green without rewriting the generated files: the committed and CI-regenerated output differ
+  only by statement order and array formatting, which now normalize equal.
 - The gate still fails if someone changes a handler and forgets to commit the regenerated code (new
-  filename hash → untracked file, or changed body lines → sorted-diff mismatch).
+  filename hash → untracked file, or changed statements → normalized mismatch).
 - Removes a recurring, machine-dependent CI failure that no amount of "regenerate and commit" fixed.
 
 **Negative / trade-offs**
 - The gate no longer guarantees the committed output is *byte-identical* to a fresh generation — only
-  that it is semantically current. The whole-file line sort is a pragmatic normalizer; a change that
-  both reorders and (coincidentally) leaves the sorted multiset identical would pass, which for
-  generated handler bodies is not a realistic failure mode.
+  that it is semantically current. The normalization (strip comments, drop whitespace, split on `;`,
+  sort) is a pragmatic approximation; a change that left the sorted statement multiset identical would
+  pass, which for generated handler bodies is not a realistic failure mode.
 - This is a property of Wolverine/JasperFx code generation (non-deterministic ordering of independent
   frames); if a future Wolverine version emits a stable order, the byte-exact gate could be restored.
 

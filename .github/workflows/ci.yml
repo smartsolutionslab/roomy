@@ -98,11 +98,12 @@ jobs:
 
       # Regenerate the Wolverine handler code (--no-build, reusing the build above) so a handler or
       # Wolverine-config change that was not re-generated cannot reach production (no runtime compiler).
-      # Wolverine emits the independent local-variable declarations of EF-transactional handlers in an
-      # environment-dependent order (ADR-0056) — proven to differ between this runner and a dev machine
-      # on the same SDK/OS — so we compare ORDER-INSENSITIVELY: a new/uncommitted generated file, or a
-      # modified file that still differs after sorting its lines, is real drift and fails; pure
-      # statement reordering of semantically-identical code passes.
+      # Wolverine emits the generated handlers with environment-dependent statement order AND
+      # whitespace/line-break formatting (ADR-0056) — proven to differ between this runner and a dev
+      # machine on the same SDK/OS — so we compare SEMANTICALLY: a new/uncommitted generated file, or a
+      # modified file that still differs after normalization, is real drift and fails; reordering and
+      # reformatting of semantically-identical code passes. normalize() strips comments, drops all
+      # whitespace, then splits on statements and sorts.
       - name: Verify Wolverine codegen is current
         run: |
           set -euo pipefail
@@ -112,6 +113,7 @@ jobs:
 
           generated="apps/identity-api/Internal/Generated apps/organization-api/Internal/Generated apps/attendance-api/Internal/Generated"
           drift=0
+          normalize() { sed 's,//.*,,' | tr -d '[:space:]' | tr ';' '\n' | sort; }
 
           new_files=$(git ls-files --others --exclude-standard -- $generated)
           if [ -n "$new_files" ]; then
@@ -121,9 +123,9 @@ jobs:
           fi
 
           for file in $(git diff --name-only -- $generated); do
-            if ! diff -q <(git show "HEAD:$file" | sort) <(sort "$file") >/dev/null; then
+            if ! diff -q <(git show "HEAD:$file" | normalize) <(normalize < "$file") >/dev/null; then
               echo "::error::Wolverine codegen drift (semantic change) in $file — run 'dotnet run --project <host> --configuration Release -- codegen write' and commit."
-              diff <(git show "HEAD:$file" | sort) <(sort "$file") || true
+              diff <(git show "HEAD:$file" | normalize) <(normalize < "$file") || true
               drift=1
             fi
           done
