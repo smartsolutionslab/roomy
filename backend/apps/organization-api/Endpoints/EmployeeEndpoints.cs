@@ -9,7 +9,7 @@ public static class EmployeeEndpoints
     public static IEndpointRouteBuilder MapEmployeeEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/employees", HireEmployeeAsync)
-            .RequireAuthorization(policy => policy.RequireRole(RoomyRoles.Administrator))
+            .RequireAdministrator()
             .WithName("HireEmployee")
             .Produces<Response.HiredEmployee>(StatusCodes.Status202Accepted)
             .ProducesProblem(StatusCodes.Status400BadRequest);

@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -97,7 +96,7 @@ public static class BffAuthenticationExtensions
     }
 
     private static string BuildAuthority(KeycloakOidcOptions keycloak) =>
-        string.Create(CultureInfo.InvariantCulture, $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}");
+        $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}";
 
     // Keycloak nests realm roles inside the realm_access JSON claim. Promote each to a flat
     // role claim so authorization policies and the whoami endpoint can read them directly.
