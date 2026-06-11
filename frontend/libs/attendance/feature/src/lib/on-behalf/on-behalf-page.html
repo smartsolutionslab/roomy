@@ -10,36 +10,19 @@
     } @if (employeesList.failed()) {
     <roomy-message variant="error">{{ translate('attendance.onBehalf.loadError') }}</roomy-message>
     } @else if (employeesList.items(); as items) {
-    <roomy-form-field [label]="translate('attendance.onBehalf.searchLabel')">
-      <input
-        type="search"
-        [formControl]="searchControl"
-        [placeholder]="translate('attendance.onBehalf.searchPlaceholder')"
-      />
-    </roomy-form-field>
-
-    <roomy-message>
-      @if (query()) { @if (items.length === 0) { {{ translate('attendance.onBehalf.noMatches') }} }
-      @else { {{ translate('attendance.onBehalf.matchCount', { count: items.length }) }} } }
-    </roomy-message>
+    <roomy-combobox
+      [label]="translate('attendance.onBehalf.employeeLabel')"
+      [placeholder]="translate('attendance.onBehalf.searchPlaceholder')"
+      [options]="employeeOptions()"
+      [loading]="employeesList.loading()"
+      [noResultsText]="translate('attendance.onBehalf.noMatches')"
+      (searchChange)="onSearch($event)"
+      (selected)="chooseEmployee($event)"
+    />
 
     @if (items.length === 0) { @if (!query()) {
     <p>{{ translate('attendance.onBehalf.emptyEmployees') }}</p>
-    } } @else {
-    <roomy-infinite-scroll
-      [hasMore]="employeesList.hasMore()"
-      [loading]="employeesList.loading()"
-      (loadMore)="employeesList.loadMore()"
-    >
-      <roomy-select
-        [label]="translate('attendance.onBehalf.employeeLabel')"
-        [placeholder]="translate('attendance.onBehalf.employeePlaceholder')"
-        [options]="employeeOptions()"
-        (selected)="chooseEmployee($event)"
-      />
-    </roomy-infinite-scroll>
-
-    @if (selectedEmployee(); as employee) {
+    } } @else if (selectedEmployee(); as employee) {
     <roomy-reserve-page [onBehalfOf]="employee.id" [today]="today()" (reserved)="onReserved()" />
 
     <section class="on-behalf__reservations">
@@ -86,7 +69,7 @@
     </section>
     } @else {
     <p>{{ translate('attendance.onBehalf.prompt') }}</p>
-    } } } @else {
+    } } @else {
     <p>{{ translate('attendance.onBehalf.loading') }}</p>
     }
   </section>
