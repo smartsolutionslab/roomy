@@ -73,3 +73,4 @@ ADRs are written **before** the implementing code, not after.
 | [0049](0049-endpoint-dto-request-response-subfolders.md) | API-host endpoint DTOs live in Request/ and Response/ subfolders | Accepted |
 | [0050](0050-endpoint-dto-short-names-reconstructed-schema-ids.md) | Endpoint DTOs drop the folder-redundant suffix; the OpenAPI schema id is reconstructed | Accepted |
 | [0051](0051-application-commands-queries-handlers-folders.md) | Application use cases split into Commands/ and Queries/ with a Handlers/ subfolder | Accepted |
+| [0056](0056-router-config-driven-navigation.md) | Navigation derived from the router config, with role inferred from the route guard | Accepted |

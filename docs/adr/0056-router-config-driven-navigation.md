@@ -1,4 +1,4 @@
-# 0050. Navigation derived from the router config, with role inferred from the route guard
+# 0056. Navigation derived from the router config, with role inferred from the route guard
 
 - **Status:** Accepted
 - **Date:** 2026-06-11

@@ -5,7 +5,7 @@ import { IconName } from '@roomy/shared-ui';
 
 import { adminGuard } from '../auth/admin.guard';
 
-// Presentation metadata a route opts into to appear in the navigation (ADR-0050). It carries no role —
+// Presentation metadata a route opts into to appear in the navigation (ADR-0056). It carries no role —
 // a route's access rule stays in its `canActivate` guard, which the builder reads instead. Attach it as
 // `data: { nav: { ... } satisfies NavMeta }` on the route.
 export interface NavMeta {
@@ -26,7 +26,7 @@ export interface NavItem {
   readonly requiresAdmin: boolean;
 }
 
-// Builds the signed-in navigation from the router configuration (ADR-0050): the single source of truth is
+// Builds the signed-in navigation from the router configuration (ADR-0056): the single source of truth is
 // the routes themselves. Every route that declares `data.nav` becomes an entry; its visibility follows the
 // guard it already carries (a route guarded by `adminGuard` is administrator-only), so a link can never
 // diverge from who the route actually admits. The lists are role-filtered against the BFF session.
