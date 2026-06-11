@@ -5,12 +5,10 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 
-public sealed class ReservePlaceHandler(IAttendanceDayRepository attendanceDays, IRoomDirectory rooms, TimeProvider timeProvider)
+public sealed class ReservePlaceHandler(IAttendanceDayRepository attendanceDays, IRoomDirectory rooms, IBusinessClock clock)
     : ICommandHandler<ReservePlace, ReservationIdentifier>
 {
     private const int MaxAttempts = 3;
-
-    private static readonly TimeZoneInfo berlinZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
 
     public async Task<Result<ReservationIdentifier>> HandleAsync(ReservePlace command, CancellationToken cancellationToken)
     {
@@ -22,8 +20,8 @@ public sealed class ReservePlaceHandler(IAttendanceDayRepository attendanceDays,
         var capacity = await rooms.FindCapacityAsync(roomIdentifier, cancellationToken);
         if (capacity.IsFailure) return capacity.Error;
 
-        var occurredAt = timeProvider.GetUtcNow();
-        var today = BookingDate.From(DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(occurredAt, berlinZone).DateTime));
+        var occurredAt = clock.Now;
+        var today = clock.Today;
         var room = RoomReference.From(office, roomIdentifier);
 
         for (var attempt = 1; attempt <= MaxAttempts; attempt++)

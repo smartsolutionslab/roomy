@@ -39,7 +39,7 @@ public class ReservePlaceHandlerTests
     public async Task An_unknown_room_is_rejected_without_touching_the_aggregate()
     {
         var repository = Substitute.For<IAttendanceDayRepository>();
-        var handler = new ReservePlaceHandler(repository, RoomDirectoryWith(capacity: null), new FixedTimeProvider(now));
+        var handler = new ReservePlaceHandler(repository, RoomDirectoryWith(capacity: null), ClockAt(now, bookingDate));
 
         var result = await handler.HandleAsync(NewCommand(), CancellationToken.None);
 
@@ -155,7 +155,15 @@ public class ReservePlaceHandlerTests
     }
 
     private static ReservePlaceHandler NewHandler(IAttendanceDayRepository repository, int capacity) =>
-        new(repository, RoomDirectoryWith(capacity), new FixedTimeProvider(now));
+        new(repository, RoomDirectoryWith(capacity), ClockAt(now, bookingDate));
+
+    private static IBusinessClock ClockAt(DateTimeOffset instant, BookingDate today)
+    {
+        var clock = Substitute.For<IBusinessClock>();
+        clock.Now.Returns(instant);
+        clock.Today.Returns(today);
+        return clock;
+    }
 
     private static IRoomDirectory RoomDirectoryWith(int? capacity)
     {

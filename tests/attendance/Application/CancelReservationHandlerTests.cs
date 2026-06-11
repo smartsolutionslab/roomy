@@ -2,6 +2,7 @@ using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
+using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.TestSupport;
@@ -25,7 +26,7 @@ public class CancelReservationHandlerTests
             .Returns(_ => SeededDay(reservationId, owner));
         repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success());
-        var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
+        var handler = new CancelReservationHandler(repository, ClockAt(now, bookingDate));
 
         var result = await handler.HandleAsync(
             new CancelReservation(company, reservationId, bookingDate, owner, ActorIsAdmin: false),
@@ -42,7 +43,7 @@ public class CancelReservationHandlerTests
         var repository = Substitute.For<IAttendanceDayRepository>();
         repository.LoadAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<BookingDate>(), Arg.Any<CancellationToken>())
             .Returns(_ => AttendanceDay.For(company, bookingDate));
-        var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
+        var handler = new CancelReservationHandler(repository, ClockAt(now, bookingDate));
 
         var result = await handler.HandleAsync(
             new CancelReservation(company, ReservationIdentifier.New(), bookingDate, EmployeeIdentifier.New(), ActorIsAdmin: false),
@@ -63,7 +64,7 @@ public class CancelReservationHandlerTests
             .Returns(_ => SeededDay(reservationId, owner));
         repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
             .Returns(ConcurrencyConflict(), Result.Success());
-        var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
+        var handler = new CancelReservationHandler(repository, ClockAt(now, bookingDate));
 
         var result = await handler.HandleAsync(
             new CancelReservation(company, reservationId, bookingDate, owner, ActorIsAdmin: false),
@@ -84,7 +85,7 @@ public class CancelReservationHandlerTests
             .Returns(_ => SeededDay(reservationId, owner));
         repository.SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>())
             .Returns(ConcurrencyConflict());
-        var handler = new CancelReservationHandler(repository, new FixedTimeProvider(now));
+        var handler = new CancelReservationHandler(repository, ClockAt(now, bookingDate));
 
         var result = await handler.HandleAsync(
             new CancelReservation(company, reservationId, bookingDate, owner, ActorIsAdmin: false),
@@ -92,6 +93,14 @@ public class CancelReservationHandlerTests
 
         result.Error.Code.ShouldBe("concurrency_retry_exhausted");
         await repository.Received(3).SaveAsync(Arg.Any<AttendanceDay>(), Arg.Any<CancellationToken>());
+    }
+
+    private static IBusinessClock ClockAt(DateTimeOffset instant, BookingDate today)
+    {
+        var clock = Substitute.For<IBusinessClock>();
+        clock.Now.Returns(instant);
+        clock.Today.Returns(today);
+        return clock;
     }
 
     private static AttendanceDay SeededDay(ReservationIdentifier reservation, EmployeeIdentifier owner)
