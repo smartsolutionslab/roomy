@@ -5,11 +5,9 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 
-public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProvider timeProvider)
+public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, IBusinessClock clock)
     : IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>>
 {
-    private static readonly TimeZoneInfo berlinZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
-
     public async Task<Result<IReadOnlyList<OccupancyView>>> HandleAsync(ViewOccupancy query, CancellationToken cancellationToken)
     {
         var (company, scope, range) = query;
@@ -17,7 +15,7 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, TimeProv
 
         if (data.IsFailure) return data.Error;
 
-        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(timeProvider.GetUtcNow(), berlinZone).DateTime);
+        var today = clock.Today.Value;
         var tomorrow = today.AddDays(1);
 
         var views = new List<OccupancyView>();

@@ -1,4 +1,5 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
@@ -8,8 +9,6 @@ namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 public static class OccupancyEndpoints
 {
     private const int MaxRangeDays = 31;
-
-    private static readonly TimeZoneInfo berlinZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
 
     public static IEndpointRouteBuilder MapOccupancyEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -28,13 +27,13 @@ public static class OccupancyEndpoints
         DateOnly? from,
         DateOnly? to,
         AttendanceApiOptions options,
-        TimeProvider timeProvider,
+        IBusinessClock clock,
         IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>> view,
         CancellationToken cancellationToken)
     {
         if (officeId is null == roomId is null) return Error.Validation("unknown_scope", "Provide exactly one of officeId or roomId.").ToHttpResult();
 
-        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(timeProvider.GetUtcNow(), berlinZone).DateTime);
+        var today = clock.Today.Value;
         var rangeFrom = from ?? today;
         var rangeTo = to ?? rangeFrom;
 

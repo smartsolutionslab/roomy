@@ -5,7 +5,6 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
-using SmartSolutionsLab.Roomy.TestSupport;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -136,7 +135,7 @@ public class ViewOccupancyTests
         var readModel = Substitute.For<IOccupancyReadModel>();
         readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<OccupancyScope>(), Arg.Any<BookingDateRange>(), Arg.Any<CancellationToken>())
             .Returns(Result.Failure<OccupancyData>(Error.NotFound("unknown_office", "no such office")));
-        var handler = new ViewOccupancyHandler(readModel, new FixedTimeProvider(now));
+        var handler = new ViewOccupancyHandler(readModel, ClockAt(now, BookingDate.From(today)));
 
         var result = await handler.HandleAsync(NewQuery(today, today), CancellationToken.None);
 
@@ -149,10 +148,18 @@ public class ViewOccupancyTests
         var readModel = Substitute.For<IOccupancyReadModel>();
         readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<OccupancyScope>(), Arg.Any<BookingDateRange>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success(data));
-        var handler = new ViewOccupancyHandler(readModel, new FixedTimeProvider(now));
+        var handler = new ViewOccupancyHandler(readModel, ClockAt(now, BookingDate.From(today)));
         var result = await handler.HandleAsync(NewQuery(from, to), CancellationToken.None);
         result.IsSuccess.ShouldBeTrue();
         return result.Value;
+    }
+
+    private static IBusinessClock ClockAt(DateTimeOffset instant, BookingDate today)
+    {
+        var clock = Substitute.For<IBusinessClock>();
+        clock.Now.Returns(instant);
+        clock.Today.Returns(today);
+        return clock;
     }
 
     private static ViewOccupancy NewQuery(DateOnly from, DateOnly to) =>

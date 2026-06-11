@@ -1,20 +1,19 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 
-public sealed class CancelReservationHandler(IAttendanceDayRepository attendanceDays, TimeProvider timeProvider)
+public sealed class CancelReservationHandler(IAttendanceDayRepository attendanceDays, IBusinessClock clock)
     : ICommandHandler<CancelReservation>
 {
     private const int MaxAttempts = 3;
 
-    private static readonly TimeZoneInfo berlinZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
-
     public async Task<Result> HandleAsync(CancelReservation command, CancellationToken cancellationToken)
     {
-        var occurredAt = timeProvider.GetUtcNow();
-        var today = BookingDate.From(DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(occurredAt, berlinZone).DateTime));
+        var occurredAt = clock.Now;
+        var today = clock.Today;
 
         var (company, reservation, bookingDate, actor, actorIsAdmin) = command;
         for (var attempt = 1; attempt <= MaxAttempts; attempt++)
