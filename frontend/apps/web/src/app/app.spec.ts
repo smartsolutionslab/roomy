@@ -85,12 +85,13 @@ describe('App shell', () => {
     expect(screen.getByRole('link', { name: 'Kalender' })).toBeTruthy();
   });
 
-  it('offers the administration section to administrators', async () => {
+  it('offers the administration group and its sub-items to administrators', async () => {
     await renderShell({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
 
+    expect(screen.getByRole('button', { name: 'Verwaltung' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Im Namen' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Büros' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Verwaltung' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Konten' })).toBeTruthy();
   });
 
   it('collapses and expands the administration group of sub-items', async () => {
@@ -114,7 +115,8 @@ describe('App shell', () => {
   it('does not offer the administrator-only links to a non-administrator', async () => {
     await renderShell({ name: 'Grace Hopper', roles: ['employee'] });
 
-    expect(screen.queryByRole('link', { name: 'Verwaltung' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Verwaltung' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Konten' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Im Namen' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Büros' })).toBeNull();
   });

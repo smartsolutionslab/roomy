@@ -10,6 +10,7 @@
     "signOut": "Sign out",
     "signedInAs": "Signed in as {{name}}",
     "adminLink": "Administration",
+    "usersLink": "Accounts",
     "officesLink": "Offices",
     "reserveLink": "Reserve a place",
     "myReservationsLink": "My reservations",

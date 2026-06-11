@@ -13,7 +13,7 @@ export const identityRoutes: Routes = [
     canActivate: [authGuard, adminGuard],
     data: {
       nav: {
-        labelKey: 'shell.adminLink',
+        labelKey: 'shell.usersLink',
         icon: 'admin',
         order: 70,
         descKey: 'home.cards.admin',
