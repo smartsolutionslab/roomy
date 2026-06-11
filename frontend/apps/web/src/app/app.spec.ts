@@ -98,17 +98,21 @@ describe('App shell', () => {
     await renderShell({ name: 'Ada Lovelace', roles: ['employee', 'administrator'] });
 
     const toggle = screen.getByRole('button', { name: 'Verwaltung' });
+    const subnav = document.getElementById('admin-subnav');
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(subnav?.hasAttribute('inert')).toBe(false);
     expect(screen.getByRole('link', { name: 'Büros' })).toBeTruthy();
 
     await userEvent.click(toggle);
 
+    // Collapsed: the disclosure reports it and the sub-items are inert (out of the tab order / a11y tree).
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(screen.queryByRole('link', { name: 'Büros' })).toBeNull();
+    expect(subnav?.hasAttribute('inert')).toBe(true);
 
     await userEvent.click(toggle);
 
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(subnav?.hasAttribute('inert')).toBe(false);
     expect(screen.getByRole('link', { name: 'Büros' })).toBeTruthy();
   });
 
