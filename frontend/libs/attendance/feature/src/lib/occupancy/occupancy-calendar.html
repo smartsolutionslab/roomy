@@ -48,6 +48,7 @@
             class="calendar__cell"
             [class.calendar__cell--outside]="!isSameMonth(date)"
             [class.calendar__cell--mine]="isMine(date)"
+            [roomyHeat]="occupancyRatio(date)"
           >
             @if (isSameMonth(date)) {
             <span class="calendar__daynum">{{ date.slice(8) }}</span>
