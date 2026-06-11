@@ -30,13 +30,24 @@
         <span>{{ translate('shell.adminLink') }}</span>
         <span class="navgroup__caret" aria-hidden="true"></span>
       </button>
-      <div id="admin-subnav" class="subnav" [hidden]="!adminExpanded()">
-        @for (item of adminNav(); track item.path) {
-        <a class="navlink navlink--sub" [routerLink]="item.path" routerLinkActive="navlink--active">
-          <roomy-icon class="navlink__icon" [name]="item.icon" />
-          <span>{{ translate(item.labelKey) }}</span>
-        </a>
-        }
+      <div
+        id="admin-subnav"
+        class="subnav-wrap"
+        [class.subnav-wrap--collapsed]="!adminExpanded()"
+        [attr.inert]="adminExpanded() ? null : ''"
+      >
+        <div class="subnav">
+          @for (item of adminNav(); track item.path) {
+          <a
+            class="navlink navlink--sub"
+            [routerLink]="item.path"
+            routerLinkActive="navlink--active"
+          >
+            <roomy-icon class="navlink__icon" [name]="item.icon" />
+            <span>{{ translate(item.labelKey) }}</span>
+          </a>
+          }
+        </div>
       </div>
       }
     </nav>

@@ -64,21 +64,29 @@
   transform: rotate(-45deg);
 }
 
-/* The admin sub-items sit indented under the disclosure, behind a connecting rule, as lighter and
-   smaller links so they read as one level down. They collapse with the disclosure — `.subnav[hidden]`
-   must win over `.subnav`'s own `display`, or the [hidden] attribute is ignored and the group never closes. */
+/* The sub-items collapse with a height transition (grid-template-rows 1fr↔0fr). `inert` (set in the
+   template when collapsed) takes them out of the tab order and the a11y tree while they animate away. */
+.subnav-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--roomy-transition);
+}
+
+.subnav-wrap--collapsed {
+  grid-template-rows: 0fr;
+}
+
+/* The admin sub-items sit indented behind a connecting rule, as lighter and smaller links so they read
+   as one level down. overflow + min-block-size:0 let the row clip them to zero height when collapsed. */
 .subnav {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-block-start: 2px;
+  min-block-size: 0;
+  overflow: hidden;
   margin-inline-start: 1.15rem;
   padding-inline-start: var(--roomy-space-sm);
   border-inline-start: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.subnav[hidden] {
-  display: none;
 }
 
 .navlink--sub {
