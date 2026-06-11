@@ -31,6 +31,10 @@ var keycloakUser = builder.AddParameter("keycloak-username", "admin", publishVal
 var keycloakPassword = builder.AddParameter(
     "keycloak-password", GeneratedSecret(), secret: true, persist: true);
 
+// Shared password for the seeded demo accounts (DefaultAdmin + seeded employees). A fixed, well-known
+// default so local sign-in is predictable; override per environment via the `demo-password` parameter.
+var demoPassword = builder.AddParameter("demo-password", "Test1234!", secret: true);
+
 var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, adminPassword: keycloakPassword)
     .WithDataVolume("roomy-keycloak-data")
     .WithContainerName("roomy-keycloak")
@@ -70,7 +74,7 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
     .WithEnvironment("Company__Name", "Roomy")
     .WithEnvironment("DefaultAdmin__Email", "admin@roomy.local")
     .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
-    .WithEnvironment("DefaultAdmin__InitialPassword", "DevAdmin.23456");
+    .WithEnvironment("DefaultAdmin__InitialPassword", demoPassword);
 
 var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
     .WithHttpEndpoint()
@@ -93,7 +97,7 @@ _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
     .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
     .WithEnvironment("Seed__CompanyId", "0199a0b0-0000-7000-8000-000000000001")
-    .WithEnvironment("Seed__EmployeePassword", "ObexLabs.2025");
+    .WithEnvironment("Seed__EmployeePassword", demoPassword);
 
 _ = builder.AddScalarApiReference()
     .WithApiReference(identityApi)
