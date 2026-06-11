@@ -1,11 +1,13 @@
-/* A full-width selectable room tile (the shared .roomy-tile look) with an availability bar; a full room
-   is disabled (greyed) by .roomy-tile. The host fills the list row so the tile spans its width. */
+/* A selectable room tile (the shared .roomy-tile look) with an availability bar; a full room is disabled
+   (greyed) by .roomy-tile. The host fills its grid cell so every tile in a row is the same size. */
 :host {
   display: block;
+  block-size: 100%;
 }
 
 .reserve__room {
   inline-size: 100%;
+  block-size: 100%;
 }
 
 .reserve__room-row {
