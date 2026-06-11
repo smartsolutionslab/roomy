@@ -202,11 +202,16 @@ html {
 body {
   margin: 0;
   background-color: var(--roomy-color-background);
-  background-image: var(--roomy-shell-image, none),
+  background-image:
+    var(--roomy-shell-image, none),
     radial-gradient(circle at center, var(--roomy-texture-dot) 1px, transparent 1.6px);
   background-repeat: no-repeat, repeat;
-  background-position: top center, top left;
-  background-size: 100% auto, 22px 22px;
+  background-position:
+    top center,
+    top left;
+  background-size:
+    100% auto,
+    22px 22px;
   background-attachment: fixed, scroll;
   color: var(--roomy-color-text);
   font-family: var(--roomy-font-family);
@@ -297,6 +302,42 @@ body {
   background: var(--roomy-gradient-accent);
   box-shadow: var(--roomy-shadow-glow);
   transform: translateY(-1px);
+}
+
+/* Tile — a selectable option button shared by the office TileGroup and the reserve room picker. Same
+   look as the button; the chosen tile (aria-pressed) is filled with the accent, an unselectable tile
+   (:disabled) is greyed. Inner layout is left to the consumer. */
+.roomy-tile {
+  display: block;
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  background: var(--roomy-color-surface);
+  color: var(--roomy-color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    color var(--roomy-transition),
+    border-color var(--roomy-transition),
+    background var(--roomy-transition);
+}
+
+.roomy-tile:hover:not(:disabled) {
+  border-color: var(--roomy-color-accent);
+}
+
+.roomy-tile[aria-pressed='true'] {
+  /* accent-strong (not accent) so white text on the fill clears WCAG 2.2 AA, matching .roomy-button--accent. */
+  border-color: transparent;
+  background: var(--roomy-color-accent-strong);
+  color: var(--roomy-color-on-accent);
+  font-weight: var(--roomy-font-weight-medium);
+}
+
+.roomy-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 /* Card — roomyCard directive applies .roomy-card (+ --interactive for link/button cards). */

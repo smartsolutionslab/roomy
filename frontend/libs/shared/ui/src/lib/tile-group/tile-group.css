@@ -1,6 +1,6 @@
-/* Stacked label + tiles. On smartphones the tiles give way to a native dropdown of the same options
-   (the fallback). The focus ring comes from the global normalized :focus-visible (design-system.css);
-   the active tile is filled with the primary accent. */
+/* Stacked label + tiles. The tiles themselves use the shared .roomy-tile look (design-system.css); this
+   file only owns the group layout and the smartphone fallback. On small screens the tiles give way to a
+   native dropdown of the same options. */
 .tile-group {
   display: flex;
   flex-direction: column;
@@ -21,31 +21,6 @@
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: stretch;
-}
-
-.tile {
-  padding: var(--roomy-space-sm) var(--roomy-space-md);
-  border: 1px solid var(--roomy-color-border);
-  border-radius: var(--roomy-radius-md);
-  background: var(--roomy-color-surface);
-  color: var(--roomy-color-text);
-  text-align: start;
-  cursor: pointer;
-  transition:
-    border-color var(--roomy-transition),
-    background var(--roomy-transition),
-    color var(--roomy-transition);
-}
-
-.tile:hover {
-  border-color: var(--roomy-color-accent);
-}
-
-.tile[aria-pressed='true'] {
-  border-color: var(--roomy-color-accent);
-  background: var(--roomy-color-accent);
-  color: var(--roomy-color-on-accent);
-  font-weight: var(--roomy-font-weight-medium);
 }
 
 /* The dropdown fallback is hidden on wide screens; the tiles take over. */
