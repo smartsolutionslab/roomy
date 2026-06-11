@@ -4,10 +4,9 @@ import { catchError, of } from 'rxjs';
 
 import { CurrentUser } from './current-user';
 
-// Reads the current session from the BFF (`GET /bff/user`) using a relative URL, so the call
-// stays same-origin through the gateway (ADR-0030). A 401 means there is no session and is
-// surfaced as `null`; the SPA never receives or handles a token (ADR-0013). `loaded` flips true
-// once the first response settles (success or 401) so route guards can wait for a decided session.
+// Reads the current session from the BFF (`GET /bff/user`) over a relative, same-origin URL. A 401
+// means no session and is surfaced as `null`; the SPA never receives or handles a token. `loaded`
+// flips true once the first response settles (success or 401) so route guards can wait for a decided session.
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private readonly httpClient = inject(HttpClient);

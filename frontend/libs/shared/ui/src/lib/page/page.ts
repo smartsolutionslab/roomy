@@ -2,8 +2,7 @@ import { Directive, input } from '@angular/core';
 
 // The standard feature-page container: a vertical stack with consistent gap and an optional
 // max-width (`form` ~ a single form, `content` ~ reading width, `wide` ~ tables/calendars). Replaces
-// the per-page `.x { display:flex; flex-direction:column; gap; max-width }` blocks. Global styling
-// (ADR-0048).
+// the per-page `.x { display:flex; flex-direction:column; gap; max-width }` blocks. Global styling.
 @Directive({
   selector: '[roomyPage]',
   host: {

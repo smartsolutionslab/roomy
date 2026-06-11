@@ -8,8 +8,8 @@ export type RoomyLogoVariant = 'brand' | 'sunset';
 // inline SVG so it stays crisp at any size and the wordmark inherits the current text colour (theme
 // aware in light/dark). The mark doubles as the leading R, so the visible wordmark reads "oomy"; a
 // visually-hidden R keeps the full "Roomy" name for assistive tech. "Roomy" is a product logotype, not
-// UI copy, so it is not translated (it is the same string in every locale — see shell.appName,
-// ADR-0024). With `showWordmark` off the mark still carries an accessible "Roomy" name via a
+// UI copy, so it is not translated (the same string in every locale). With `showWordmark` off the mark
+// still carries an accessible "Roomy" name via a
 // visually-hidden label. Size, corner radius and shadow are overridable via the
 // --roomy-logo-size/-radius/-shadow custom properties (the hero scales it up).
 @Component({

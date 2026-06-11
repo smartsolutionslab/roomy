@@ -5,11 +5,11 @@ import { Observable, Subscription } from 'rxjs';
 import { Page } from './page';
 
 // Fetches one keyset page; `cursor` is undefined for the first page and the opaque nextCursor of the
-// previous page thereafter (ADR-0044).
+// previous page thereafter.
 export type PageFetch<T> = (cursor: string | undefined) => Observable<Page<T>>;
 
-// The reusable cursor-paging state container (ADR-0049): owns accumulation, the cursor, and the
-// loading/failed flags so a paged page declares only its fetch. Pair it with `roomy-infinite-scroll`.
+// Reusable cursor-paging state container: owns accumulation, the cursor, and the loading/failed flags
+// so a paged page declares only its fetch. Pair it with `roomy-infinite-scroll`.
 export interface CursorList<T> {
   // Accumulated items; null until the first page resolves, so views can show a loading placeholder.
   readonly items: Signal<T[] | null>;
