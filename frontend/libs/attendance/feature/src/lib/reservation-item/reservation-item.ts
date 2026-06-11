@@ -12,7 +12,9 @@ import { Button } from '@roomy/shared-ui';
 })
 export class ReservationItem {
   readonly reservation = input.required<MyReservation>();
+  readonly namespace = input.required<string>();
   readonly showActions = input(false);
+  readonly showChange = input(false);
   readonly cancelRequested = output();
   readonly changeRequested = output();
 }

@@ -7,17 +7,18 @@
     roomyButton
     type="button"
     [attr.aria-label]="
-      translate('attendance.mine.cancelReservation', {
+      translate(namespace() + '.cancelReservation', {
         room: reservation().roomName,
         date: reservation().date
       })
     "
     (click)="cancelRequested.emit()"
   >
-    {{ translate('attendance.mine.cancel') }}
+    {{ translate(namespace() + '.cancel') }}
   </button>
+  @if (showChange()) {
   <button roomyButton type="button" (click)="changeRequested.emit()">
-    {{ translate('attendance.mine.change') }}
+    {{ translate(namespace() + '.change') }}
   </button>
-  }
+  } }
 </ng-container>

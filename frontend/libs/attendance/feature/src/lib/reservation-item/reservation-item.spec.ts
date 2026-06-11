@@ -22,7 +22,9 @@ const reservation: MyReservation = {
     <li class="roomy-list-item">
       <roomy-reservation-item
         [reservation]="reservation"
+        [namespace]="namespace"
         [showActions]="showActions"
+        [showChange]="showChange"
         (cancelRequested)="cancelled = cancelled + 1"
         (changeRequested)="changed = changed + 1"
       />
@@ -31,7 +33,9 @@ const reservation: MyReservation = {
 })
 class HostComponent {
   reservation: MyReservation = reservation;
+  namespace = 'attendance.mine';
   showActions = true;
+  showChange = true;
   cancelled = 0;
   changed = 0;
 }
@@ -46,21 +50,38 @@ function renderHost(properties: Partial<HostComponent> = {}) {
 
 describe('ReservationItem', () => {
   it('renders the office, room and date', async () => {
-    await renderHost();
+    await renderHost({ showActions: false });
 
     expect(screen.getByText('Munich')).toBeTruthy();
     expect(screen.getByText('A1')).toBeTruthy();
     expect(screen.getByText('2026-06-10')).toBeTruthy();
   });
 
-  it('offers cancel and change actions when actionable, emitting on click', async () => {
-    const { fixture } = await renderHost({ showActions: true });
+  it('offers cancel and change when both are enabled, emitting on click', async () => {
+    const { fixture } = await renderHost({ showActions: true, showChange: true });
 
     await userEvent.click(screen.getByRole('button', { name: /Cancel the reservation for A1/ }));
     await userEvent.click(screen.getByRole('button', { name: 'Change' }));
 
     expect(fixture.componentInstance.cancelled).toBe(1);
     expect(fixture.componentInstance.changed).toBe(1);
+  });
+
+  it('offers cancel without change when change is disabled', async () => {
+    await renderHost({
+      namespace: 'attendance.onBehalf',
+      showActions: true,
+      showChange: false,
+    });
+
+    expect(screen.getByRole('button', { name: /Cancel the reservation for A1/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Change' })).toBeNull();
+  });
+
+  it('uses the given namespace for its action labels', async () => {
+    await renderHost({ namespace: 'attendance.onBehalf', showActions: true });
+
+    expect(screen.getByRole('button', { name: /Cancel the reservation for A1/ })).toBeTruthy();
   });
 
   it('shows no actions when not actionable', async () => {

@@ -21,7 +21,6 @@ import {
 } from '@roomy/attendance-api';
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import {
-  Button,
   FormField,
   InfiniteScroll,
   Message,
@@ -31,6 +30,7 @@ import {
 } from '@roomy/shared-ui';
 import { EMPTY, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
+import { ReservationItem } from '../reservation-item/reservation-item';
 import { ReservePage } from '../reserve/reserve-page';
 
 // The administrator on-behalf page (009, AT-6): pick an employee, then reserve for them (the embedded
@@ -44,10 +44,10 @@ import { ReservePage } from '../reserve/reserve-page';
     TranslocoDirective,
     ReactiveFormsModule,
     ReservePage,
+    ReservationItem,
     InfiniteScroll,
     Page,
     Message,
-    Button,
     Select,
     FormField,
   ],

@@ -56,22 +56,12 @@
         <ul class="roomy-list">
           @for (reservation of upcoming(); track reservation.id) {
           <li class="roomy-list-item">
-            <span>{{ reservation.officeName }}</span>
-            <span>{{ reservation.roomName }}</span>
-            <span>{{ reservation.date }}</span>
-            <button
-              roomyButton
-              type="button"
-              [attr.aria-label]="
-              translate('attendance.onBehalf.cancelReservation', {
-                room: reservation.roomName,
-                date: reservation.date
-              })
-            "
-              (click)="cancel(reservation)"
-            >
-              {{ translate('attendance.onBehalf.cancel') }}
-            </button>
+            <roomy-reservation-item
+              [reservation]="reservation"
+              [namespace]="'attendance.onBehalf'"
+              [showActions]="true"
+              (cancelRequested)="cancel(reservation)"
+            />
           </li>
           }
         </ul>
@@ -80,9 +70,11 @@
         <ul class="roomy-list">
           @for (reservation of past(); track reservation.id) {
           <li class="roomy-list-item on-behalf__item--past">
-            <span>{{ reservation.officeName }}</span>
-            <span>{{ reservation.roomName }}</span>
-            <span>{{ reservation.date }}</span>
+            <roomy-reservation-item
+              [reservation]="reservation"
+              [namespace]="'attendance.onBehalf'"
+              [showActions]="false"
+            />
           </li>
           }
         </ul>

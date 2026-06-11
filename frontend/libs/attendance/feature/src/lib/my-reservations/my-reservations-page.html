@@ -28,7 +28,9 @@
           <li class="roomy-list-item">
             <roomy-reservation-item
               [reservation]="reservation"
+              [namespace]="'attendance.mine'"
               [showActions]="true"
+              [showChange]="true"
               (cancelRequested)="cancel(reservation)"
               (changeRequested)="change(reservation)"
             />
@@ -43,7 +45,11 @@
         <ul class="roomy-list">
           @for (reservation of past(); track reservation.id) {
           <li class="roomy-list-item mine__item--past">
-            <roomy-reservation-item [reservation]="reservation" [showActions]="false" />
+            <roomy-reservation-item
+              [reservation]="reservation"
+              [namespace]="'attendance.mine'"
+              [showActions]="false"
+            />
           </li>
           }
         </ul>
