@@ -36,12 +36,33 @@ public class CurrentUserTests
     }
 
     [Fact]
-    public void Subject_is_unauthorized_when_the_subject_claim_is_not_a_guid()
+    public void UserId_reads_the_roomy_user_id_claim()
     {
-        var subject = PrincipalWith(new Claim("sub", "not-a-guid")).Subject();
+        var id = Guid.CreateVersion7();
 
-        subject.IsFailure.ShouldBeTrue();
-        subject.Error.Type.ShouldBe(ErrorType.Unauthorized);
+        var userId = PrincipalWith(new Claim(RoomyClaims.UserId, id.ToString())).UserId();
+
+        userId.IsSuccess.ShouldBeTrue();
+        userId.Value.ShouldBe(id);
+    }
+
+    [Fact]
+    public void UserId_ignores_the_keycloak_sub_claim()
+    {
+        // The Keycloak sub is a different identifier from the Roomy UserIdentifier (ADR-0058).
+        var userId = PrincipalWith(new Claim("sub", Guid.CreateVersion7().ToString())).UserId();
+
+        userId.IsFailure.ShouldBeTrue();
+        userId.Error.Type.ShouldBe(ErrorType.Unauthorized);
+    }
+
+    [Fact]
+    public void UserId_is_unauthorized_when_the_claim_is_not_a_guid()
+    {
+        var userId = PrincipalWith(new Claim(RoomyClaims.UserId, "not-a-guid")).UserId();
+
+        userId.IsFailure.ShouldBeTrue();
+        userId.Error.Type.ShouldBe(ErrorType.Unauthorized);
     }
 
     [Fact]

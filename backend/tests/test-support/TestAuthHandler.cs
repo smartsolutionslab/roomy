@@ -23,7 +23,14 @@ public sealed class TestAuthHandler(
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, subject.ToString()) };
+        // The real token carries both the Keycloak sub and the Roomy UserIdentifier (roomy_user_id,
+        // ADR-0058). Set both to the test subject so endpoints resolve the caller whether they read
+        // Subject() (identity, by Keycloak subject) or UserId() (attendance, by Roomy UserId).
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, subject.ToString()),
+            new("roomy_user_id", subject.ToString()),
+        };
         if (Request.Headers.TryGetValue(RolesHeader, out var roles) && !string.IsNullOrEmpty(roles))
         {
             var separators = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;

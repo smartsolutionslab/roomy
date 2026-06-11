@@ -13,6 +13,7 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
     : IIdentityProviderPort
 {
     public async Task<Result<KeycloakSubjectIdentifier>> ProvisionUserAsync(
+        UserIdentifier userIdentifier,
         Email email,
         DisplayName displayName,
         string initialPassword,
@@ -21,7 +22,7 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
     {
         var token = await AcquireAdminTokenAsync(cancellationToken);
 
-        var creation = await CreateUserAsync(token, email, displayName, initialPassword, cancellationToken);
+        var creation = await CreateUserAsync(token, userIdentifier, email, displayName, initialPassword, cancellationToken);
         if (creation.IsFailure) return creation.Error;
 
         var subject = creation.Value;
@@ -73,6 +74,7 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
 
     private async Task<Result<KeycloakSubjectIdentifier>> CreateUserAsync(
         string token,
+        UserIdentifier userIdentifier,
         Email email,
         DisplayName displayName,
         string initialPassword,
@@ -80,6 +82,10 @@ public sealed class KeycloakIdentityProvider(HttpClient httpClient, KeycloakAdmi
     {
         var body = new JsonObject
         {
+            // The token's roomy_user_id claim is mapped from this attribute so the API resolves the caller
+            // by the Roomy UserIdentifier. Keycloak mints its own sub and ignores a forced id on create,
+            // so the identifier has to travel as an attribute (ADR-0058).
+            ["attributes"] = new JsonObject { ["roomy_user_id"] = new JsonArray(userIdentifier.Value.ToString()) },
             ["username"] = email.Value,
             ["email"] = email.Value,
             ["firstName"] = displayName.Value,

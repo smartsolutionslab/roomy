@@ -18,8 +18,10 @@ public sealed class DefaultAdminSeeder(
 
         var displayName = DisplayName.From(options.DisplayName);
         var administrator = Role.Employee.GrantAdministrator();
+        var userIdentifier = UserIdentifier.New();
 
         var provisioning = await identityProvider.ProvisionUserAsync(
+            userIdentifier,
             email,
             displayName,
             options.InitialPassword,
@@ -27,7 +29,7 @@ public sealed class DefaultAdminSeeder(
             cancellationToken);
         if (provisioning.IsFailure) return provisioning.Error;
 
-        var admin = User.Register(email, displayName, administrator);
+        var admin = User.Register(userIdentifier, email, displayName, administrator);
         admin.Activate(provisioning.Value);
 
         await users.AddAsync(admin, cancellationToken);

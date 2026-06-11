@@ -13,6 +13,7 @@ public sealed class RegisterUserHandler(IUserRepository users, IIdentityProvider
         var (userIdentifier, employeeId, email, displayName, role, initialPassword) = command;
 
         var provisioning = await identityProvider.ProvisionUserAsync(
+            userIdentifier,
             email,
             displayName,
             initialPassword,

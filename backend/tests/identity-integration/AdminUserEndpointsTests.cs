@@ -295,6 +295,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         public List<KeycloakSubjectIdentifier> AssignedSubjects { get; } = [];
 
         public Task<Result<KeycloakSubjectIdentifier>> ProvisionUserAsync(
+            UserIdentifier userIdentifier,
             Email email,
             DisplayName displayName,
             string initialPassword, Role role,
