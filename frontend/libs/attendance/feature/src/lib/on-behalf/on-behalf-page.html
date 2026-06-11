@@ -3,30 +3,40 @@
     <h1>{{ translate('attendance.onBehalf.title') }}</h1>
 
     <roomy-message>
-      @if (result(); as message) {
-      {{ translate(message.key, message.params) }}
-      }
+      @if (result(); as message) { {{ translate(message.key, message.params) }} }
     </roomy-message>
     @if (errorKey(); as key) {
     <roomy-message variant="error">{{ translate(key) }}</roomy-message>
-    }
-
-    @if (employeesList.failed()) {
+    } @if (employeesList.failed()) {
     <roomy-message variant="error">{{ translate('attendance.onBehalf.loadError') }}</roomy-message>
-    } @else if (employeesList.items(); as items) { @if (items.length === 0) {
+    } @else if (employeesList.items(); as items) {
+    <roomy-form-field [label]="translate('attendance.onBehalf.searchLabel')">
+      <input
+        type="search"
+        [formControl]="searchControl"
+        [placeholder]="translate('attendance.onBehalf.searchPlaceholder')"
+      />
+    </roomy-form-field>
+
+    <roomy-message>
+      @if (query()) { @if (items.length === 0) { {{ translate('attendance.onBehalf.noMatches') }} }
+      @else { {{ translate('attendance.onBehalf.matchCount', { count: items.length }) }} } }
+    </roomy-message>
+
+    @if (items.length === 0) { @if (!query()) {
     <p>{{ translate('attendance.onBehalf.emptyEmployees') }}</p>
-    } @else {
+    } } @else {
     <roomy-infinite-scroll
       [hasMore]="employeesList.hasMore()"
       [loading]="employeesList.loading()"
       (loadMore)="employeesList.loadMore()"
     >
-    <roomy-select
-      [label]="translate('attendance.onBehalf.employeeLabel')"
-      [placeholder]="translate('attendance.onBehalf.employeePlaceholder')"
-      [options]="employeeOptions()"
-      (selected)="chooseEmployee($event)"
-    />
+      <roomy-select
+        [label]="translate('attendance.onBehalf.employeeLabel')"
+        [placeholder]="translate('attendance.onBehalf.employeePlaceholder')"
+        [options]="employeeOptions()"
+        (selected)="chooseEmployee($event)"
+      />
     </roomy-infinite-scroll>
 
     @if (selectedEmployee(); as employee) {
@@ -42,41 +52,41 @@
         [loading]="reservationsList.loading()"
         (loadMore)="reservationsList.loadMore()"
       >
-      <h3>{{ translate('attendance.onBehalf.upcomingHeading') }}</h3>
-      <ul class="roomy-list">
-        @for (reservation of upcoming(); track reservation.id) {
-        <li class="roomy-list-item">
-          <span>{{ reservation.officeName }}</span>
-          <span>{{ reservation.roomName }}</span>
-          <span>{{ reservation.date }}</span>
-          <button
-            roomyButton
-            type="button"
-            [attr.aria-label]="
+        <h3>{{ translate('attendance.onBehalf.upcomingHeading') }}</h3>
+        <ul class="roomy-list">
+          @for (reservation of upcoming(); track reservation.id) {
+          <li class="roomy-list-item">
+            <span>{{ reservation.officeName }}</span>
+            <span>{{ reservation.roomName }}</span>
+            <span>{{ reservation.date }}</span>
+            <button
+              roomyButton
+              type="button"
+              [attr.aria-label]="
               translate('attendance.onBehalf.cancelReservation', {
                 room: reservation.roomName,
                 date: reservation.date
               })
             "
-            (click)="cancel(reservation)"
-          >
-            {{ translate('attendance.onBehalf.cancel') }}
-          </button>
-        </li>
+              (click)="cancel(reservation)"
+            >
+              {{ translate('attendance.onBehalf.cancel') }}
+            </button>
+          </li>
+          }
+        </ul>
+        @if (past().length > 0) {
+        <h3>{{ translate('attendance.onBehalf.pastHeading') }}</h3>
+        <ul class="roomy-list">
+          @for (reservation of past(); track reservation.id) {
+          <li class="roomy-list-item on-behalf__item--past">
+            <span>{{ reservation.officeName }}</span>
+            <span>{{ reservation.roomName }}</span>
+            <span>{{ reservation.date }}</span>
+          </li>
+          }
+        </ul>
         }
-      </ul>
-      @if (past().length > 0) {
-      <h3>{{ translate('attendance.onBehalf.pastHeading') }}</h3>
-      <ul class="roomy-list">
-        @for (reservation of past(); track reservation.id) {
-        <li class="roomy-list-item on-behalf__item--past">
-          <span>{{ reservation.officeName }}</span>
-          <span>{{ reservation.roomName }}</span>
-          <span>{{ reservation.date }}</span>
-        </li>
-        }
-      </ul>
-      }
       </roomy-infinite-scroll>
       } } @else {
       <p>{{ translate('attendance.onBehalf.loading') }}</p>
@@ -84,8 +94,7 @@
     </section>
     } @else {
     <p>{{ translate('attendance.onBehalf.prompt') }}</p>
-    }
-    } } @else {
+    } } } @else {
     <p>{{ translate('attendance.onBehalf.loading') }}</p>
     }
   </section>

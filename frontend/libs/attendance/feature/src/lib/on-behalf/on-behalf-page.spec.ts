@@ -20,6 +20,7 @@ import { importAttendanceTestTransloco } from '../../testing/transloco';
 import { OnBehalfPage } from './on-behalf-page';
 
 const ada: Employee = { id: employeeId('e1'), name: 'Ada' };
+const hannah: Employee = { id: employeeId('e2'), name: 'Hannah' };
 
 const munich: BookableOffice = {
   id: officeId('o1'),
@@ -45,7 +46,7 @@ function page<T>(items: T[], nextCursor: string | null = null): Page<T> {
 }
 
 interface Stub {
-  employees?: (cursor?: string) => Observable<Page<Employee>>;
+  employees?: (query?: string, cursor?: string) => Observable<Page<Employee>>;
   reservationsFor?: (employee: string, cursor?: string) => Observable<Page<MyReservation>>;
   cancel?: (reservation: string, date: string) => Observable<void>;
   reserve?: (...args: unknown[]) => Observable<unknown>;
@@ -158,5 +159,59 @@ describe('OnBehalfPage', () => {
     await user.click(screen.getByRole('button', { name: 'Load more' }));
 
     expect(await screen.findByText('C1')).toBeTruthy();
+  });
+
+  it('offers a labelled search box for the employee directory', async () => {
+    await renderPage();
+
+    const search = await screen.findByLabelText('Search employees');
+    expect(search.getAttribute('type')).toBe('search');
+  });
+
+  it('narrows the directory by name, passing the query to the gateway', async () => {
+    const user = userEvent.setup();
+    const queries: string[] = [];
+    await renderPage({
+      employees: (query) => {
+        queries.push(query ?? '');
+        return of(page(query ? [hannah] : [ada]));
+      },
+    });
+
+    expect(await screen.findByRole('option', { name: 'Ada' })).toBeTruthy();
+    await user.type(await screen.findByLabelText('Search employees'), 'han');
+
+    // reset() replaces the list, so once Hannah is present the unmatched Ada is gone.
+    expect(await screen.findByRole('option', { name: 'Hannah' })).toBeTruthy();
+    expect(screen.queryByRole('option', { name: 'Ada' })).toBeNull();
+    expect(queries).toContain('han');
+  });
+
+  it('restores the full directory when the search is cleared', async () => {
+    const user = userEvent.setup();
+    await renderPage({
+      employees: (query) => of(page(query ? [hannah] : [ada])),
+    });
+
+    const search = await screen.findByLabelText('Search employees');
+    await user.type(search, 'han');
+    expect(await screen.findByRole('option', { name: 'Hannah' })).toBeTruthy();
+
+    await user.clear(search);
+
+    expect(await screen.findByRole('option', { name: 'Ada' })).toBeTruthy();
+  });
+
+  it('shows a no-match message and keeps the search box when nothing matches', async () => {
+    const user = userEvent.setup();
+    await renderPage({
+      employees: (query) => of(page(query ? [] : [ada])),
+    });
+
+    await user.type(await screen.findByLabelText('Search employees'), 'zzz');
+
+    expect(await screen.findByText('No employees match your search.')).toBeTruthy();
+    // The search box stays so the query can be refined or cleared.
+    expect(screen.getByLabelText('Search employees')).toBeTruthy();
   });
 });

@@ -84,6 +84,10 @@ const english = {
     },
     onBehalf: {
       title: 'Reserve on behalf',
+      searchLabel: 'Search employees',
+      searchPlaceholder: 'Type a name',
+      noMatches: 'No employees match your search.',
+      matchCount: '{{count}} matching employees',
       employeeLabel: 'Employee',
       employeePlaceholder: 'Select an employee',
       loading: 'Loading…',
@@ -184,6 +188,10 @@ const german = {
     },
     onBehalf: {
       title: 'Im Namen reservieren',
+      searchLabel: 'Mitarbeiter suchen',
+      searchPlaceholder: 'Namen eingeben',
+      noMatches: 'Keine Mitarbeiter entsprechen Ihrer Suche.',
+      matchCount: '{{count}} passende Mitarbeiter',
       employeeLabel: 'Mitarbeiter',
       employeePlaceholder: 'Mitarbeiter auswählen',
       loading: 'Wird geladen…',

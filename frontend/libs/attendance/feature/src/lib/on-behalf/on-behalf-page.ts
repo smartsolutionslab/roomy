@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import {
   AttendanceGateway,
@@ -19,8 +20,16 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-api';
 import { cursorList } from '@roomy/shared-data-access';
-import { Button, InfiniteScroll, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
-import { EMPTY } from 'rxjs';
+import {
+  Button,
+  FormField,
+  InfiniteScroll,
+  Message,
+  Page,
+  Select,
+  type SelectOption,
+} from '@roomy/shared-ui';
+import { EMPTY, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { ReservePage } from '../reserve/reserve-page';
 
@@ -33,7 +42,17 @@ type ResultMessage = { key: string; params?: Record<string, unknown> };
 @Component({
   selector: 'roomy-on-behalf-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReservePage, InfiniteScroll, Page, Message, Button, Select],
+  imports: [
+    TranslocoDirective,
+    ReactiveFormsModule,
+    ReservePage,
+    InfiniteScroll,
+    Page,
+    Message,
+    Button,
+    Select,
+    FormField,
+  ],
   templateUrl: './on-behalf-page.html',
   styleUrl: './on-behalf-page.css',
 })
@@ -43,9 +62,14 @@ export class OnBehalfPage {
 
   readonly today = input<string>(todayInBerlin());
 
-  // The endless employee directory (ADR-0044/0049) feeding the picker.
+  // The debounced name search over the on-behalf directory (012, FR-009). Blank means "no filter".
+  protected readonly searchControl = new FormControl('', { nonNullable: true });
+  protected readonly query = signal('');
+
+  // The endless employee directory (ADR-0044/0049) feeding the picker. The fetch reads the current
+  // search query, so reset() re-runs it ranked by name similarity whenever the query changes.
   protected readonly employeesList = cursorList<Employee>((cursor) =>
-    this.gateway.listEmployees(cursor),
+    this.gateway.listEmployees(this.query(), cursor),
   );
 
   protected readonly selectedEmployeeId = signal<string | null>(null);
@@ -67,18 +91,43 @@ export class OnBehalfPage {
   // The chosen employee's reservations (ADR-0044/0049): deferred until a pick, then reloaded from the
   // first page whenever the selection changes (chooseEmployee) or a booking is made (onReserved). The
   // fetch reads the current selection, so reset() re-runs it for the newly picked employee.
-  protected readonly reservationsList = cursorList<MyReservation>((cursor) => {
-    // Only ever driven (reset/loadMore) while an employee is selected — chooseEmployee clears the list
-    // instead of loading when the selection is empty — so the null branch is unreachable.
-    const employee = this.selectedEmployee();
-    return employee === null ? EMPTY : this.gateway.reservationsFor(employee.id, cursor);
-  }, { autoLoad: false });
+  protected readonly reservationsList = cursorList<MyReservation>(
+    (cursor) => {
+      // Only ever driven (reset/loadMore) while an employee is selected — chooseEmployee clears the list
+      // instead of loading when the selection is empty — so the null branch is unreachable.
+      const employee = this.selectedEmployee();
+      return employee === null ? EMPTY : this.gateway.reservationsFor(employee.id, cursor);
+    },
+    { autoLoad: false },
+  );
 
   private readonly schedule = computed(() =>
     partitionReservationsByDay(this.reservationsList.items() ?? [], this.today()),
   );
   protected readonly upcoming = computed(() => this.schedule().upcoming);
   protected readonly past = computed(() => this.schedule().past);
+
+  constructor() {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(250),
+        map((value) => value.trim()),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((query) => this.applySearch(query));
+  }
+
+  // A new query reloads the directory from the first page (ranked by similarity) and drops any pick the
+  // narrowed results may no longer contain, so the page never shows a reserve flow for a hidden employee.
+  private applySearch(query: string): void {
+    this.query.set(query);
+    this.selectedEmployeeId.set(null);
+    this.reservationsList.clear();
+    this.result.set(null);
+    this.errorKey.set(null);
+    this.employeesList.reset();
+  }
 
   protected chooseEmployee(employeeValue: string): void {
     this.selectedEmployeeId.set(employeeValue || null);

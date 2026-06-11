@@ -211,6 +211,10 @@
     },
     "onBehalf": {
       "title": "Reserve on behalf",
+      "searchLabel": "Search employees",
+      "searchPlaceholder": "Type a name",
+      "noMatches": "No employees match your search.",
+      "matchCount": "{{count}} matching employees",
       "employeeLabel": "Employee",
       "employeePlaceholder": "Select an employee",
       "loading": "Loading…",
