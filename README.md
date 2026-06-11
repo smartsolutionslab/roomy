@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo.svg" alt="Roomy" width="280" />
+  <img src="docs/assets/logo.svg" alt="Roomy" width="218" />
 </p>
 
 <p align="center">
@@ -360,6 +360,15 @@ product.
 The result is a codebase where *why* (ADR), *what* (spec + test), and *how* (commit) are all
 traceable — exactly so AI-generated code stays reviewable and correct.
 
+> **A candid note on the process.** I leaned heavily on AI for this project and used it as
+> the primary implementer. I deliberately tried **spec-driven development** end to end — writing
+> the spec and acceptance criteria first, then letting the agent implement against them. In
+> practice it was far from hands-off: I adjusted a great deal along the way — tightening specs,
+> correcting course, reshaping the design — and a lot of the polish came from **prompting
+> targeted refactorings** rather than accepting the first output. The honest takeaway is that
+> spec-first + AI gets you a strong, consistent baseline quickly, but the quality bar is still
+> set by the human steering it: deciding what to keep, what to rework, and what to throw away.
+
 ---
 
 ## 7. Where to go next
@@ -590,6 +599,16 @@ wie das Produkt.
 
 Das Ergebnis ist eine Codebasis, in der *Warum* (ADR), *Was* (Spec + Test) und *Wie* (Commit)
 durchgängig nachvollziehbar sind — genau damit KI-generierter Code prüfbar und korrekt bleibt.
+
+> **Ein offenes Wort zum Vorgehen.** Ich habe für dieses Projekt stark auf KI gesetzt und sie
+> als primäre Implementierung genutzt. Bewusst habe ich **Spec-Driven Development** durchgängig
+> ausprobiert — erst Spec und Akzeptanzkriterien, dann den Agenten dagegen implementieren
+> lassen. In der Praxis war das keineswegs „hands-off“: Ich habe unterwegs **viel angepasst** —
+> Specs geschärft, Kurs korrigiert, das Design umgeformt — und einen großen Teil des Feinschliffs
+> durch **gezieltes Prompten von Refactorings** erreicht, statt die erste Ausgabe zu übernehmen. Das
+> ehrliche Fazit: Spec-first + KI liefert schnell eine starke, konsistente Basis, aber die
+> Qualitätslatte legt weiterhin der Mensch fest, der steuert — was bleibt, was überarbeitet und
+> was verworfen wird.
 
 ---
 
