@@ -23,9 +23,8 @@ import {
   errorCode,
   todayInBerlin,
 } from '@roomy/attendance-api';
+import { type ResultMessage } from '@roomy/shared-data-access';
 import { Button, DaySelect, Message, Page, TileGroup, type SelectOption } from '@roomy/shared-ui';
-
-type ResultMessage = { key: string; params?: Record<string, unknown> };
 
 // The reserve flow (AT-1/AT-2): pick an office, then a day, then a room with a remaining place, then
 // confirm. The catalogue and the per-day availability come from the attendance context only; the day
