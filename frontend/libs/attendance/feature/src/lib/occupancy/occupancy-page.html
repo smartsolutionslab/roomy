@@ -7,25 +7,27 @@
     (scopeChange)="onScope($event)"
   >
     @if (scope()) {
-    <roomy-form-field [label]="translate('attendance.occupancy.rangeLabel')">
-      <select #presetSelect (change)="choosePreset(presetSelect.value)">
-        @for (option of presets; track option) {
-        <option [value]="option" [selected]="option === preset()">
-          {{ translate('attendance.occupancy.preset' + (option.charAt(0).toUpperCase() +
-          option.slice(1))) }}
-        </option>
-        }
-      </select>
-    </roomy-form-field>
+    <div class="occupancy__controls">
+      <roomy-form-field [label]="translate('attendance.occupancy.rangeLabel')">
+        <select #presetSelect (change)="choosePreset(presetSelect.value)">
+          @for (option of presets; track option) {
+          <option [value]="option" [selected]="option === preset()">
+            {{ translate('attendance.occupancy.preset' + (option.charAt(0).toUpperCase() +
+            option.slice(1))) }}
+          </option>
+          }
+        </select>
+      </roomy-form-field>
 
-    <roomy-form-field [label]="translate('attendance.occupancy.dateLabel')">
-      <input
-        type="date"
-        [value]="effectiveAnchor()"
-        (change)="changeAnchor(dateInput.value)"
-        #dateInput
-      />
-    </roomy-form-field>
+      <roomy-form-field [label]="translate('attendance.occupancy.dateLabel')">
+        <input
+          type="date"
+          [value]="effectiveAnchor()"
+          (change)="changeAnchor(dateInput.value)"
+          #dateInput
+        />
+      </roomy-form-field>
+    </div>
 
     @if (days(); as result) {
     <ol class="occupancy__days">

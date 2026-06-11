@@ -9,7 +9,6 @@
 
   @if (selectedOffice()) {
   <roomy-tile-group
-    orientation="vertical"
     [label]="translate('attendance.occupancy.roomLabel')"
     [options]="roomChoices(translate('attendance.occupancy.allRooms'))"
     [value]="selectedRoomId()"
