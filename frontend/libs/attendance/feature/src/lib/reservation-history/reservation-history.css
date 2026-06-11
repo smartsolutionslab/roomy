@@ -1,0 +1,4 @@
+/* Past reservations are dimmed; the list, list items, and headings come from the shared design system. */
+.reservation-history__past {
+  opacity: 0.7;
+}

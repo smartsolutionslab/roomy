@@ -19,9 +19,9 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-api';
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
-import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
+import { Button, Message, Page } from '@roomy/shared-ui';
 
-import { ReservationItem } from '../reservation-item/reservation-item';
+import { ReservationHistory } from '../reservation-history/reservation-history';
 
 // The signed-in employee's own reservations (AT-4): past and upcoming, with cancel offered only on
 // upcoming rows (FR-006/FR-007) and "change" performed as cancel + re-reserve — a navigation into the
@@ -30,9 +30,8 @@ import { ReservationItem } from '../reservation-item/reservation-item';
 @Component({
   selector: 'roomy-my-reservations-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, InfiniteScroll, Page, Message, Button, ReservationItem],
+  imports: [TranslocoDirective, Page, Message, Button, ReservationHistory],
   templateUrl: './my-reservations-page.html',
-  styleUrl: './my-reservations-page.css',
 })
 export class MyReservationsPage {
   private readonly gateway = inject(AttendanceGateway);

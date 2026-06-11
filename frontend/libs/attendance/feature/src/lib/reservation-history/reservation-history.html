@@ -1,0 +1,46 @@
+<ng-container *transloco="let translate">
+  <roomy-infinite-scroll [hasMore]="hasMore()" [loading]="loading()" (loadMore)="loadMore.emit()">
+    <section class="reservation-history__group">
+      @if (headingLevel() === 3) {
+      <h3>{{ translate(namespace() + '.upcomingHeading') }}</h3>
+      } @else {
+      <h2>{{ translate(namespace() + '.upcomingHeading') }}</h2>
+      }
+      <ul class="roomy-list">
+        @for (reservation of upcoming(); track reservation.id) {
+        <li class="roomy-list-item">
+          <roomy-reservation-item
+            [reservation]="reservation"
+            [namespace]="namespace()"
+            [showActions]="true"
+            [showChange]="showChange()"
+            (cancelRequested)="cancelRequested.emit(reservation)"
+            (changeRequested)="changeRequested.emit(reservation)"
+          />
+        </li>
+        }
+      </ul>
+    </section>
+
+    @if (past().length > 0) {
+    <section class="reservation-history__group">
+      @if (headingLevel() === 3) {
+      <h3>{{ translate(namespace() + '.pastHeading') }}</h3>
+      } @else {
+      <h2>{{ translate(namespace() + '.pastHeading') }}</h2>
+      }
+      <ul class="roomy-list">
+        @for (reservation of past(); track reservation.id) {
+        <li class="roomy-list-item reservation-history__past">
+          <roomy-reservation-item
+            [reservation]="reservation"
+            [namespace]="namespace()"
+            [showActions]="false"
+          />
+        </li>
+        }
+      </ul>
+    </section>
+    }
+  </roomy-infinite-scroll>
+</ng-container>
