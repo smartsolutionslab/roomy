@@ -193,6 +193,12 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
   null. A `Get…` that is expected to hit returns `Result<T>`; never a bare `T?`. The same
   applies to application services and ports (they already return `Result`/`Result<T>`).
 - Never leak `IQueryable` out of `infrastructure`.
+- **Mutate an event-sourced aggregate through the repository, not a hand-rolled loop.** Optimistic
+  concurrency (reload-decide-save, retry on conflict, give up after a bounded number of attempts) is a
+  persistence concern: the repository exposes a `MutateAsync(id, decide, ct)` that applies the
+  decision and persists it atomically, retrying transparently. An application handler passes only the
+  decision — it never owns the retry loop, the attempt count, or the `concurrency_*` error codes
+  (ADR-0055).
 
 ## Testing
 
