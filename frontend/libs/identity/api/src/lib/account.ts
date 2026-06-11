@@ -4,7 +4,6 @@ import type { UserId } from './user-id';
 
 export type AccountRole = 'employee' | 'administrator';
 
-// The signed-in account projection (IA-2/IA-5), with the role the app authorizes on.
 export interface Account {
   readonly userId: UserId;
   readonly email: string;
@@ -12,9 +11,7 @@ export interface Account {
   readonly role: AccountRole;
 }
 
-// Maps the trusted generated DTO to the branded domain type at the data-access boundary (ADR-0020).
-// The contract types `role` as a plain string, so it is narrowed here — the one place the enum the
-// contract cannot express is enforced.
+// role is narrowed from the contract's plain string to the enum it can't express.
 export function toAccount(response: AccountResponse): Account {
   return {
     userId: userId(response.userId),
