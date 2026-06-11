@@ -1,4 +1,4 @@
-# 0058. Feature-local presentational components, with the page as the single smart orchestrator
+# 0059. Feature-local presentational components, with the page as the single smart orchestrator
 
 - **Status:** Accepted
 - **Date:** 2026-06-11

@@ -8,7 +8,7 @@
 (`002-office-management` / `006-organization-web`). No functional requirement changes; no new
 endpoint, contract, translation key, or icon. It splits the single 235-line `OfficesPage` smart
 component into the page plus focused presentational children, establishing the pattern recorded in
-**ADR-0058**.
+**ADR-0059**.
 
 ## Summary
 
@@ -20,12 +20,12 @@ large per-office template fragment that is repeated with `@for` (~110 of its ~16
 *one* office).
 
 This feature extracts the presentational pieces into co-located child components while the page stays the
-**single smart orchestrator** (ADR-0058, option D). The page keeps the gateway, all HTTP calls, the form
+**single smart orchestrator** (ADR-0059, option D). The page keeps the gateway, all HTTP calls, the form
 groups, the `activeEditor`, and the `result`/conflict/failed/not-found feedback signals; the children are
 `standalone`, `OnPush`, signal `input()`/`output()` only, inject nothing, and do no I/O. Because the forms
 and `activeEditor` remain on the page and are passed down, the single-editor-at-a-time behaviour is
 preserved exactly. The extracted children are private to the page (not exported from the lib barrel); none
-is promoted to a `ui` library, because none is reused beyond this page (ADR-0058 promotion rule).
+is promoted to a `ui` library, because none is reused beyond this page (ADR-0059 promotion rule).
 
 This is a pure structural refactor: the rendered output, the strings (DE + EN via Transloco, ADR-0024),
 the accessibility, and every observable behaviour are identical to today. The 17 existing `OfficesPage`
@@ -122,7 +122,7 @@ now satisfied through the extracted components.
 - **FR-8** All user-facing text MUST continue to come from Transloco; no string may be hardcoded; no new or
   renamed translation keys; DE + EN render exactly as today (ADR-0024).
 - **FR-9** No Nx module boundary or context boundary may be crossed; the children are co-located in
-  `organization/feature` and no new library or tag is introduced (ADR-0058). No backend, gateway, contract,
+  `organization/feature` and no new library or tag is introduced (ADR-0059). No backend, gateway, contract,
   OpenAPI, or generated-client change.
 - **FR-10** Each new child component MUST have its own unit test, written before its implementation, that
   renders it from stub inputs and asserts it emits the right intent on interaction (Shouldly-equivalent
@@ -168,4 +168,4 @@ Component contracts (presentational; the page wires them):
       first closes).
 - [ ] Rendered output, strings (DE + EN), `aria-label`s, and layout match the pre-refactor page exactly.
 - [ ] No new Nx library/tag; no boundary crossed; no backend/gateway/contract/client change.
-- [ ] ADR-0058 recorded; all quality gates green; no suppressions or skipped tests.
+- [ ] ADR-0059 recorded; all quality gates green; no suppressions or skipped tests.
