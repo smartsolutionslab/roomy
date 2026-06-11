@@ -1,0 +1,17 @@
+<ng-container *transloco="let translate">
+  <roomy-select
+    [label]="translate('attendance.occupancy.officeLabel')"
+    [placeholder]="translate('attendance.occupancy.officePlaceholder')"
+    [options]="officeOptions()"
+    (selected)="chooseOffice($event)"
+  />
+
+  @if (selectedOffice()) {
+  <roomy-select
+    [label]="translate('attendance.occupancy.roomLabel')"
+    [placeholder]="translate('attendance.occupancy.allRooms')"
+    [options]="roomOptions()"
+    (selected)="chooseRoom($event)"
+  />
+  }
+</ng-container>
