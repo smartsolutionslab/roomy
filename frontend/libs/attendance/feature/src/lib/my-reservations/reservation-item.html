@@ -1,0 +1,23 @@
+<ng-container *transloco="let translate">
+  <span>{{ reservation().officeName }}</span>
+  <span>{{ reservation().roomName }}</span>
+  <span>{{ reservation().date }}</span>
+  @if (showActions()) {
+  <button
+    roomyButton
+    type="button"
+    [attr.aria-label]="
+      translate('attendance.mine.cancelReservation', {
+        room: reservation().roomName,
+        date: reservation().date
+      })
+    "
+    (click)="cancelRequested.emit()"
+  >
+    {{ translate('attendance.mine.cancel') }}
+  </button>
+  <button roomyButton type="button" (click)="changeRequested.emit()">
+    {{ translate('attendance.mine.change') }}
+  </button>
+  }
+</ng-container>

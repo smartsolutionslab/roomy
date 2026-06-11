@@ -21,6 +21,8 @@ import {
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 
+import { ReservationItem } from './reservation-item';
+
 // The signed-in employee's own reservations (AT-4): past and upcoming, with cancel offered only on
 // upcoming rows (FR-006/FR-007) and "change" performed as cancel + re-reserve — a navigation into the
 // reserve flow, never a combined edit (AT-5, FR-008). `today` is an input defaulting to the
@@ -28,7 +30,7 @@ import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 @Component({
   selector: 'roomy-my-reservations-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, InfiniteScroll, Page, Message, Button],
+  imports: [TranslocoDirective, InfiniteScroll, Page, Message, Button, ReservationItem],
   templateUrl: './my-reservations-page.html',
   styleUrl: './my-reservations-page.css',
 })

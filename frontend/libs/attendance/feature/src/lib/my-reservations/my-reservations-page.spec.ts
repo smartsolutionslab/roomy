@@ -86,7 +86,9 @@ describe('MyReservationsPage', () => {
   it('offers cancel only on an upcoming reservation, not a past one', async () => {
     renderPage([upcoming, past]);
 
-    expect(await screen.findByRole('button', { name: /Cancel the reservation for A1/ })).toBeTruthy();
+    expect(
+      await screen.findByRole('button', { name: /Cancel the reservation for A1/ }),
+    ).toBeTruthy();
     expect(screen.queryByRole('button', { name: /Cancel the reservation for B1/ })).toBeNull();
   });
 
