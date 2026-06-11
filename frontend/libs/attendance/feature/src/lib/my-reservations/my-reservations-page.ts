@@ -21,7 +21,7 @@ import {
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
 
-import { ReservationItem } from './reservation-item';
+import { ReservationItem } from '../reservation-item/reservation-item';
 
 // The signed-in employee's own reservations (AT-4): past and upcoming, with cancel offered only on
 // upcoming rows (FR-006/FR-007) and "change" performed as cancel + re-reserve — a navigation into the
