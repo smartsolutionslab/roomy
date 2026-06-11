@@ -18,11 +18,12 @@ import {
   isSameMonth,
   monthGrid,
   rangeFor,
-  roomId,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { Button, Message, Page, Select, type SelectOption } from '@roomy/shared-ui';
+import { Button, Message, Page } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
+
+import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
 
 // The occupancy calendar (OC-3, FR-004): a month grid where each in-month day shows its occupancy figure
 // (the office rollup for the chosen scope) and the days the viewer holds a reservation are highlighted
@@ -31,7 +32,7 @@ import { EMPTY, expand, reduce } from 'rxjs';
 @Component({
   selector: 'roomy-occupancy-calendar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, Message, Button, Select],
+  imports: [TranslocoDirective, Page, Message, Button, OfficeRoomPicker],
   templateUrl: './occupancy-calendar.html',
   styleUrl: './occupancy-calendar.css',
 })
@@ -44,8 +45,7 @@ export class OccupancyCalendar {
 
   protected readonly offices = signal<BookableOffice[] | null>(null);
   protected readonly loadFailed = signal(false);
-  protected readonly selectedOfficeId = signal<string | null>(null);
-  protected readonly selectedRoomId = signal<string>('');
+  protected readonly scope = signal<OccupancyScope | null>(null);
   protected readonly anchorMonth = signal<string | null>(null);
   protected readonly occupancyByDate = signal<Map<string, OccupancyDay>>(new Map());
   protected readonly myDays = signal<ReadonlySet<string>>(new Set());
@@ -54,16 +54,9 @@ export class OccupancyCalendar {
     initialValue: this.transloco.getActiveLang(),
   });
 
-  protected readonly selectedOffice = computed<BookableOffice | null>(
-    () => this.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
+  protected readonly month = computed(
+    () => this.anchorMonth() ?? rangeFor('month', this.today()).from,
   );
-  protected readonly officeOptions = computed<SelectOption[]>(() =>
-    (this.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
-  );
-  protected readonly roomOptions = computed<SelectOption[]>(() =>
-    (this.selectedOffice()?.rooms ?? []).map((room) => ({ value: room.id, label: room.name })),
-  );
-  protected readonly month = computed(() => this.anchorMonth() ?? rangeFor('month', this.today()).from);
   protected readonly weeks = computed(() => monthGrid(this.month()));
   protected readonly weekdayLabels = computed(() =>
     this.weeks()[0].map((date) =>
@@ -93,14 +86,8 @@ export class OccupancyCalendar {
       });
   }
 
-  protected chooseOffice(officeId: string): void {
-    this.selectedOfficeId.set(officeId || null);
-    this.selectedRoomId.set('');
-    this.load();
-  }
-
-  protected chooseRoom(roomValue: string): void {
-    this.selectedRoomId.set(roomValue);
+  protected onScope(scope: OccupancyScope | null): void {
+    this.scope.set(scope);
     this.load();
   }
 
@@ -127,13 +114,11 @@ export class OccupancyCalendar {
   }
 
   private load(): void {
-    const office = this.selectedOffice();
-    if (office === null) {
+    const scope = this.scope();
+    if (scope === null) {
       return;
     }
 
-    const room = this.selectedRoomId();
-    const scope = room ? { roomId: roomId(room) } : { officeId: office.id };
     const { from, to } = rangeFor('month', this.month());
 
     this.gateway
@@ -155,7 +140,8 @@ export class OccupancyCalendar {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (reservations) => this.myDays.set(new Set(reservations.map((reservation) => reservation.date))),
+        next: (reservations) =>
+          this.myDays.set(new Set(reservations.map((reservation) => reservation.date))),
         error: () => this.myDays.set(new Set()),
       });
   }
