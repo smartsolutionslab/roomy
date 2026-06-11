@@ -1,6 +1,6 @@
 # Feature Specification: Hire Employee Web (admin hiring page)
 
-**Feature Branch:** `feat/015-hire-employee-web`
+**Feature Branch:** `feat/018-hire-employee-web`
 **Status:** Draft
 **Created:** 2026-06-11
 **Updated:** 2026-06-11
@@ -29,7 +29,7 @@ This follows the established `*-web` slice shape (006/007/008-web): a thin **`Em
 `@roomy/organization-api` wrapping the generated `hireEmployee` and mapping the DTO to a branded view model
 at the boundary (ADR-0020); a routed, admin-gated **`HireEmployeePage`** (`organization-feature`) built from
 the shared design system (`roomy-page`, `roomy-form-field`, `roomy-select`, `roomy-message`, `roomyButton`);
-and a **navigation entry** declared on the route via `data.nav` (ADR-0050), so the sidebar and dashboard pick
+and a **navigation entry** declared on the route via `data.nav` (ADR-0056), so the sidebar and dashboard pick
 it up automatically. It is standalone/signal-based/zoneless/OnPush (ADR-0016/0035), localized DE + EN
 (Transloco, ADR-0024), accessible (WCAG 2.2 AA, ADR-0024), and same-origin with no token in the SPA
 (ADR-0013/0030). The typed client stays generated and drift-gated (ADR-0036).
@@ -107,7 +107,7 @@ login account is provisioned for them to sign in with once it is ready.
   message. In neither case may it claim the colleague was hired.
 - **FR-6** The page MUST NOT present an "email already in use" outcome (not observable at hire time).
 - **FR-7** The hiring route MUST be gated to administrators (`authGuard + adminGuard`) and MUST declare a
-  `data.nav` entry (ADR-0050) so it appears in the admin navigation and dashboard.
+  `data.nav` entry (ADR-0056) so it appears in the admin navigation and dashboard.
 - **FR-8** All text MUST be localized (DE + EN); the screen MUST meet the WCAG 2.2 AA baseline (labelled
   fields, error association, focus management consistent with the other forms).
 
