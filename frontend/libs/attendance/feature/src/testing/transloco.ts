@@ -4,7 +4,7 @@ import { TranslocoTestingModule } from '@jsverse/transloco';
 // Test-only Transloco setup for this library's components. It carries just the keys the attendance
 // screens use, so the library's specs stay independent of the app's global translation files (importing
 // those would cross the context:web boundary). Excluded from the library build. Kept in key parity with
-// apps/web/public/i18n/{en,de}.json (FR-010).
+// apps/web/public/i18n/{en,de}.json.
 const english = {
   shared: {
     list: {
