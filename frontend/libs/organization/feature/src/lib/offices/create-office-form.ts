@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { Button, FormField, Message } from '@roomy/shared-ui';
+import { Button, FieldError, FormField } from '@roomy/shared-ui';
 
 export type CreateOfficeFormGroup = FormGroup<{
   name: FormControl<string>;
@@ -11,7 +11,7 @@ export type CreateOfficeFormGroup = FormGroup<{
 @Component({
   selector: 'roomy-create-office-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReactiveFormsModule, FormField, Message, Button],
+  imports: [TranslocoDirective, ReactiveFormsModule, FormField, FieldError, Button],
   templateUrl: './create-office-form.html',
 })
 export class CreateOfficeForm {

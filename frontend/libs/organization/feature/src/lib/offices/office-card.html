@@ -4,11 +4,11 @@
     <roomy-form-field [label]="translate('organization.edit.nameLabel')">
       <input type="text" formControlName="value" />
     </roomy-form-field>
-    @if (editConflict()) {
-    <roomy-message variant="error">{{ translate('organization.edit.nameConflict') }}</roomy-message>
-    } @if (editFailed()) {
-    <roomy-message variant="error">{{ translate('organization.edit.error') }}</roomy-message>
-    }
+    <roomy-field-error
+      [show]="editConflict()"
+      [message]="translate('organization.edit.nameConflict')"
+    />
+    <roomy-field-error [show]="editFailed()" [message]="translate('organization.edit.error')" />
     <button roomyButton variant="accent" type="submit">
       {{ translate('organization.edit.save') }}
     </button>
@@ -26,9 +26,7 @@
     <roomy-form-field [label]="translate('organization.edit.locationLabel')">
       <input type="text" formControlName="value" />
     </roomy-form-field>
-    @if (editFailed()) {
-    <roomy-message variant="error">{{ translate('organization.edit.error') }}</roomy-message>
-    }
+    <roomy-field-error [show]="editFailed()" [message]="translate('organization.edit.error')" />
     <button roomyButton variant="accent" type="submit">
       {{ translate('organization.edit.save') }}
     </button>
@@ -76,19 +74,19 @@
     <roomy-form-field [label]="translate('organization.rooms.capacityLabel')">
       <input type="number" formControlName="capacity" min="1" />
     </roomy-form-field>
-    @if (roomAttempted() && roomForm().controls.name.invalid) {
-    <roomy-message variant="error"
-      >{{ translate('organization.rooms.nameRequired') }}</roomy-message
-    >
-    } @if (roomAttempted() && roomForm().controls.capacity.invalid) {
-    <roomy-message variant="error">{{ translate('organization.rooms.capacityMin') }}</roomy-message>
-    } @if (editConflict()) {
-    <roomy-message variant="error"
-      >{{ translate('organization.rooms.nameConflict') }}</roomy-message
-    >
-    } @if (editFailed()) {
-    <roomy-message variant="error">{{ translate('organization.rooms.error') }}</roomy-message>
-    }
+    <roomy-field-error
+      [show]="roomAttempted() && roomForm().controls.name.invalid"
+      [message]="translate('organization.rooms.nameRequired')"
+    />
+    <roomy-field-error
+      [show]="roomAttempted() && roomForm().controls.capacity.invalid"
+      [message]="translate('organization.rooms.capacityMin')"
+    />
+    <roomy-field-error
+      [show]="editConflict()"
+      [message]="translate('organization.rooms.nameConflict')"
+    />
+    <roomy-field-error [show]="editFailed()" [message]="translate('organization.rooms.error')" />
     <button roomyButton variant="accent" type="submit">
       {{ translate('organization.rooms.submit') }}
     </button>

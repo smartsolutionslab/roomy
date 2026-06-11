@@ -4,12 +4,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { EmployeeRole, EmployeesGateway } from '@roomy/organization-api';
-import { Button, FormField, Message, Page, Select } from '@roomy/shared-ui';
+import { Button, FieldError, FormField, Message, Page, Select } from '@roomy/shared-ui';
 
 @Component({
   selector: 'roomy-hire-employee-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReactiveFormsModule, Page, FormField, Select, Message, Button],
+  imports: [
+    TranslocoDirective,
+    ReactiveFormsModule,
+    Page,
+    FormField,
+    Select,
+    Message,
+    Button,
+    FieldError,
+  ],
   templateUrl: './hire-employee-page.html',
   styleUrl: './hire-employee-page.css',
 })

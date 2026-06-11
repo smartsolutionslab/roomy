@@ -7,13 +7,11 @@
     <roomy-form-field [label]="translate('organization.create.locationLabel')">
       <input type="text" formControlName="location" />
     </roomy-form-field>
-    @if (conflict()) {
-    <roomy-message variant="error"
-      >{{ translate('organization.create.nameConflict') }}</roomy-message
-    >
-    } @if (failed()) {
-    <roomy-message variant="error">{{ translate('organization.create.error') }}</roomy-message>
-    }
+    <roomy-field-error
+      [show]="conflict()"
+      [message]="translate('organization.create.nameConflict')"
+    />
+    <roomy-field-error [show]="failed()" [message]="translate('organization.create.error')" />
     <button roomyButton variant="accent" type="submit">
       {{ translate('organization.create.submit') }}
     </button>
