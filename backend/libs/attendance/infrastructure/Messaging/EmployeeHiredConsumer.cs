@@ -8,8 +8,7 @@ public sealed class EmployeeHiredConsumer(AttendanceDbContext context)
 {
     public async Task Handle(EmployeeHired message, CancellationToken cancellationToken)
     {
-        var existing = await context.Employees
-            .FindAsync([message.EmployeeId], cancellationToken).ConfigureAwait(false);
+        var existing = await context.Employees.FindAsync([message.EmployeeId], cancellationToken);
 
         if (existing is null)
         {
