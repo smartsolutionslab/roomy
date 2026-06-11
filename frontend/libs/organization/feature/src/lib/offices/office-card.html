@@ -9,12 +9,14 @@
       [message]="translate('organization.edit.nameConflict')"
     />
     <roomy-field-error [show]="editFailed()" [message]="translate('organization.edit.error')" />
-    <button roomyButton variant="accent" type="submit">
-      {{ translate('organization.edit.save') }}
-    </button>
-    <button roomyButton type="button" (click)="editCancel.emit()">
-      {{ translate('organization.edit.cancel') }}
-    </button>
+    <div class="offices__actions">
+      <button roomyButton variant="accent" type="submit">
+        {{ translate('organization.edit.save') }}
+      </button>
+      <button roomyButton type="button" (click)="editCancel.emit()">
+        {{ translate('organization.edit.cancel') }}
+      </button>
+    </div>
   </form>
   } @else {
   <h2 class="offices__name">{{ office().name }}</h2>
@@ -27,12 +29,14 @@
       <input type="text" formControlName="value" />
     </roomy-form-field>
     <roomy-field-error [show]="editFailed()" [message]="translate('organization.edit.error')" />
-    <button roomyButton variant="accent" type="submit">
-      {{ translate('organization.edit.save') }}
-    </button>
-    <button roomyButton type="button" (click)="editCancel.emit()">
-      {{ translate('organization.edit.cancel') }}
-    </button>
+    <div class="offices__actions">
+      <button roomyButton variant="accent" type="submit">
+        {{ translate('organization.edit.save') }}
+      </button>
+      <button roomyButton type="button" (click)="editCancel.emit()">
+        {{ translate('organization.edit.cancel') }}
+      </button>
+    </div>
   </form>
   } @else {
   <dl class="roomy-dl">
@@ -87,12 +91,14 @@
       [message]="translate('organization.rooms.nameConflict')"
     />
     <roomy-field-error [show]="editFailed()" [message]="translate('organization.rooms.error')" />
-    <button roomyButton variant="accent" type="submit">
-      {{ translate('organization.rooms.submit') }}
-    </button>
-    <button roomyButton type="button" (click)="editCancel.emit()">
-      {{ translate('organization.edit.cancel') }}
-    </button>
+    <div class="offices__actions">
+      <button roomyButton variant="accent" type="submit">
+        {{ translate('organization.rooms.submit') }}
+      </button>
+      <button roomyButton type="button" (click)="editCancel.emit()">
+        {{ translate('organization.edit.cancel') }}
+      </button>
+    </div>
   </form>
   } @else {
   <button roomyButton type="button" (click)="addRoomOpen.emit()">
