@@ -1,26 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { Office, OfficeId, OfficesGateway, Room, RoomId } from '@roomy/organization-api';
-import { Button, Card, FormField, Message, Page } from '@roomy/shared-ui';
+import { Card, Message, Page } from '@roomy/shared-ui';
 import { Observable, catchError, of } from 'rxjs';
 
-type ActiveEditor =
-  | { kind: 'rename-office'; officeId: OfficeId }
-  | { kind: 'relocate-office'; officeId: OfficeId }
-  | { kind: 'add-room'; officeId: OfficeId }
-  | { kind: 'rename-room'; officeId: OfficeId; roomId: RoomId };
+import { CreateOfficeForm } from './create-office-form';
+import { ActiveEditor, OfficeCard } from './office-card';
 
 type ResultMessage = { key: string; params?: Record<string, unknown> };
 
 @Component({
   selector: 'roomy-offices-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReactiveFormsModule, Page, Card, FormField, Message, Button],
+  imports: [TranslocoDirective, Page, Card, Message, CreateOfficeForm, OfficeCard],
   templateUrl: './offices-page.html',
-  styleUrl: './offices-page.css',
 })
 export class OfficesPage {
   private readonly officesGateway = inject(OfficesGateway);
@@ -98,16 +94,6 @@ export class OfficesPage {
       });
   }
 
-  protected isActive(kind: ActiveEditor['kind'], officeId: OfficeId): boolean {
-    const editor = this.activeEditor();
-    return editor?.kind === kind && editor.officeId === officeId;
-  }
-
-  protected isRenamingRoom(officeId: OfficeId, roomId: RoomId): boolean {
-    const editor = this.activeEditor();
-    return editor?.kind === 'rename-room' && editor.officeId === officeId && editor.roomId === roomId;
-  }
-
   protected openRenameOffice(office: Office): void {
     this.beginEdit({ kind: 'rename-office', officeId: office.id });
     this.textForm.setValue({ value: office.name });
@@ -144,7 +130,9 @@ export class OfficesPage {
     if (this.textForm.invalid) {
       return;
     }
-    this.submitOfficeChange(this.officesGateway.renameOffice(office, this.textForm.getRawValue().value));
+    this.submitOfficeChange(
+      this.officesGateway.renameOffice(office, this.textForm.getRawValue().value),
+    );
   }
 
   protected saveOfficeLocation(office: OfficeId): void {

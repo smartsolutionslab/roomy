@@ -1,0 +1,21 @@
+<ng-container *transloco="let translate">
+  <form [formGroup]="form()" (ngSubmit)="submitted.emit()">
+    <h2>{{ translate('organization.create.heading') }}</h2>
+    <roomy-form-field [label]="translate('organization.create.nameLabel')">
+      <input type="text" formControlName="name" />
+    </roomy-form-field>
+    <roomy-form-field [label]="translate('organization.create.locationLabel')">
+      <input type="text" formControlName="location" />
+    </roomy-form-field>
+    @if (conflict()) {
+    <roomy-message variant="error"
+      >{{ translate('organization.create.nameConflict') }}</roomy-message
+    >
+    } @if (failed()) {
+    <roomy-message variant="error">{{ translate('organization.create.error') }}</roomy-message>
+    }
+    <button roomyButton variant="accent" type="submit">
+      {{ translate('organization.create.submit') }}
+    </button>
+  </form>
+</ng-container>
