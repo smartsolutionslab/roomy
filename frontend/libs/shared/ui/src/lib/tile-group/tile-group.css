@@ -1,0 +1,41 @@
+/* Stacked label + a horizontal, wrapping row of tiles. The focus ring comes from the global normalized
+   :focus-visible (design-system.css); the active tile is marked with the accent. */
+.tile-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+}
+
+.tile-group__label {
+  font-weight: var(--roomy-font-weight-medium);
+}
+
+.tile-group__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--roomy-space-sm);
+}
+
+.tile {
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  background: var(--roomy-color-surface);
+  color: var(--roomy-color-text);
+  cursor: pointer;
+  transition:
+    border-color var(--roomy-transition),
+    background var(--roomy-transition),
+    color var(--roomy-transition);
+}
+
+.tile:hover {
+  border-color: var(--roomy-color-accent);
+}
+
+.tile[aria-pressed='true'] {
+  border-color: var(--roomy-color-accent);
+  background: var(--roomy-color-accent-subtle);
+  color: var(--roomy-color-accent-strong);
+  font-weight: var(--roomy-font-weight-medium);
+}
