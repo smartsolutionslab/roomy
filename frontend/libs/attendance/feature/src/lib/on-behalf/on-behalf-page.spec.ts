@@ -12,7 +12,7 @@ import {
 } from '@roomy/attendance-api';
 import type { Page } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { Observable, of } from 'rxjs';
 
 import { importAttendanceTestTransloco } from '../../testing/transloco';
@@ -73,10 +73,18 @@ function renderPage(stub: Stub = {}) {
   });
 }
 
+// Pick an employee through the search combobox: open it, then click the named match.
+async function pickEmployee(user: UserEvent, name: string) {
+  await user.click(await screen.findByRole('combobox', { name: 'Employee' }));
+  await user.click(await screen.findByRole('option', { name }));
+}
+
 describe('OnBehalfPage', () => {
   it('lists employees and prompts before one is chosen', async () => {
+    const user = userEvent.setup();
     await renderPage();
 
+    await user.click(await screen.findByRole('combobox', { name: 'Employee' }));
     expect(await screen.findByRole('option', { name: 'Ada' })).toBeTruthy();
     expect(
       screen.getByText('Select an employee to reserve or cancel on their behalf.'),
@@ -89,7 +97,7 @@ describe('OnBehalfPage', () => {
     const user = userEvent.setup();
     await renderPage();
 
-    await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
+    await pickEmployee(user, 'Ada');
 
     expect(await screen.findByRole('heading', { name: 'Reserve a place' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Their reservations' })).toBeTruthy();
@@ -107,7 +115,7 @@ describe('OnBehalfPage', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
+    await pickEmployee(user, 'Ada');
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
@@ -126,7 +134,7 @@ describe('OnBehalfPage', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
+    await pickEmployee(user, 'Ada');
     await user.click(await screen.findByRole('button', { name: /Cancel the reservation for A1/ }));
 
     expect(cancelledWith).toEqual({ id: 'res1', date: '2026-06-10' });
@@ -152,7 +160,7 @@ describe('OnBehalfPage', () => {
         of(cursor === undefined ? page([adasUpcoming], 'cursor-2') : page([later], null)),
     });
 
-    await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
+    await pickEmployee(user, 'Ada');
     expect(await screen.findByText('A1')).toBeTruthy();
     expect(screen.queryByText('C1')).toBeNull();
 
@@ -161,11 +169,10 @@ describe('OnBehalfPage', () => {
     expect(await screen.findByText('C1')).toBeTruthy();
   });
 
-  it('offers a labelled search box for the employee directory', async () => {
+  it('offers a labelled search combobox for the employee directory', async () => {
     await renderPage();
 
-    const search = await screen.findByLabelText('Search employees');
-    expect(search.getAttribute('type')).toBe('search');
+    expect(await screen.findByRole('combobox', { name: 'Employee' })).toBeTruthy();
   });
 
   it('narrows the directory by name, passing the query to the gateway', async () => {
@@ -178,8 +185,11 @@ describe('OnBehalfPage', () => {
       },
     });
 
+    const search = await screen.findByRole('combobox', { name: 'Employee' });
+    await user.click(search);
     expect(await screen.findByRole('option', { name: 'Ada' })).toBeTruthy();
-    await user.type(await screen.findByLabelText('Search employees'), 'han');
+
+    await user.type(search, 'han');
 
     // reset() replaces the list, so once Hannah is present the unmatched Ada is gone.
     expect(await screen.findByRole('option', { name: 'Hannah' })).toBeTruthy();
@@ -193,7 +203,7 @@ describe('OnBehalfPage', () => {
       employees: (query) => of(page(query ? [hannah] : [ada])),
     });
 
-    const search = await screen.findByLabelText('Search employees');
+    const search = await screen.findByRole('combobox', { name: 'Employee' });
     await user.type(search, 'han');
     expect(await screen.findByRole('option', { name: 'Hannah' })).toBeTruthy();
 
@@ -208,10 +218,10 @@ describe('OnBehalfPage', () => {
       employees: (query) => of(page(query ? [] : [ada])),
     });
 
-    await user.type(await screen.findByLabelText('Search employees'), 'zzz');
+    await user.type(await screen.findByRole('combobox', { name: 'Employee' }), 'zzz');
 
     expect(await screen.findByText('No employees match your search.')).toBeTruthy();
     // The search box stays so the query can be refined or cleared.
-    expect(screen.getByLabelText('Search employees')).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: 'Employee' })).toBeTruthy();
   });
 });

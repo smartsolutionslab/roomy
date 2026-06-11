@@ -1,0 +1,37 @@
+/* The input owns the field; the listbox is an absolutely-positioned popup anchored to the host. The
+   option look (active/hover highlight) uses the accent-subtle surface from the design system. */
+:host {
+  display: block;
+  position: relative;
+}
+
+.combobox__listbox {
+  position: absolute;
+  z-index: 10;
+  inset-inline: 0;
+  margin-block: var(--roomy-space-xs) 0;
+  padding: var(--roomy-space-xs);
+  list-style: none;
+  max-block-size: 16rem;
+  overflow-y: auto;
+  background: var(--roomy-color-surface-raised);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  box-shadow: var(--roomy-shadow-lg);
+}
+
+.combobox__option {
+  padding: var(--roomy-space-xs) var(--roomy-space-sm);
+  border-radius: var(--roomy-radius-sm);
+  cursor: pointer;
+}
+
+.combobox__option--active,
+.combobox__option:hover {
+  background: var(--roomy-color-accent-subtle);
+}
+
+.combobox__empty {
+  margin-block: var(--roomy-space-xs) 0;
+  color: var(--roomy-color-text-muted);
+}

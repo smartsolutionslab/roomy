@@ -9,7 +9,6 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import {
   AttendanceGateway,
@@ -20,15 +19,8 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-api';
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
-import {
-  FormField,
-  InfiniteScroll,
-  Message,
-  Page,
-  Select,
-  type SelectOption,
-} from '@roomy/shared-ui';
-import { EMPTY, debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { Combobox, InfiniteScroll, Message, Page, type SelectOption } from '@roomy/shared-ui';
+import { EMPTY, Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { ReservationItem } from '../reservation-item/reservation-item';
 import { ReservePage } from '../reserve/reserve-page';
@@ -42,14 +34,12 @@ import { ReservePage } from '../reserve/reserve-page';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     TranslocoDirective,
-    ReactiveFormsModule,
     ReservePage,
     ReservationItem,
     InfiniteScroll,
     Page,
     Message,
-    Select,
-    FormField,
+    Combobox,
   ],
   templateUrl: './on-behalf-page.html',
   styleUrl: './on-behalf-page.css',
@@ -61,7 +51,7 @@ export class OnBehalfPage {
   readonly today = input<string>(todayInBerlin());
 
   // The debounced name search over the on-behalf directory (012, FR-009). Blank means "no filter".
-  protected readonly searchControl = new FormControl('', { nonNullable: true });
+  private readonly searchInput = new Subject<string>();
   protected readonly query = signal('');
 
   // The endless employee directory (ADR-0044/0049) feeding the picker. The fetch reads the current
@@ -106,7 +96,7 @@ export class OnBehalfPage {
   protected readonly past = computed(() => this.schedule().past);
 
   constructor() {
-    this.searchControl.valueChanges
+    this.searchInput
       .pipe(
         debounceTime(250),
         map((value) => value.trim()),
@@ -114,6 +104,10 @@ export class OnBehalfPage {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((query) => this.applySearch(query));
+  }
+
+  protected onSearch(query: string): void {
+    this.searchInput.next(query);
   }
 
   // A new query reloads the directory from the first page (ranked by similarity) and drops any pick the
