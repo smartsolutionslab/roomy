@@ -11,8 +11,8 @@ import {
 } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 
-// The endless-list primitive (ADR-0044, ADR-0024): the parent projects the loaded items and owns the
-// accumulation; this component signals when to fetch the next page. An IntersectionObserver auto-loads
+// The endless-list primitive: the parent projects the loaded items and owns the accumulation; this
+// component signals when to fetch the next page. An IntersectionObserver auto-loads
 // when the sentinel scrolls into view (progressive enhancement), and an always-present "Load more"
 // button is the keyboard / screen-reader / no-JS path (WCAG 2.2 AA). When no further page exists it
 // announces the end of the list. The parent passes hasMore (nextCursor !== null) and loading.

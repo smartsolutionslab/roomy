@@ -4,8 +4,8 @@ import { CanActivateFn } from '@angular/router';
 import { SessionService } from '@roomy/shared-data-access';
 
 // Requires a BFF session for the route. Waits for the first session resolution, then either allows
-// navigation or sends the browser to the BFF sign-in with a return URL back to the attempted route
-// (ADR-0013). The redirect is a full-page navigation to the gateway, not an Angular route.
+// navigation or sends the browser to the BFF sign-in with a return URL back to the attempted route.
+// The redirect is a full-page navigation to the gateway, not an Angular route.
 export const authGuard: CanActivateFn = async (_route, state) => {
   const session = inject(SessionService);
   const document = inject(DOCUMENT);

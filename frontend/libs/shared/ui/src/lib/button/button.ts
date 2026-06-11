@@ -2,7 +2,7 @@ import { Directive, input } from '@angular/core';
 
 // Applies the design-system button styling to a native <button> or <a> (keeping native semantics —
 // form submit, links). `variant="accent"` is the primary call-to-action. The classes live in the
-// global design-system stylesheet (ADR-0048); this directive is the typed, discoverable API.
+// global design-system stylesheet; this directive is the typed, discoverable API.
 @Directive({
   selector: '[roomyButton]',
   host: {
