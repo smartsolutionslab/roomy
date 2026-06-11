@@ -20,7 +20,7 @@ import {
   rangeFor,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { Button, Message, Page } from '@roomy/shared-ui';
+import { Button, Heat, Message, Page } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
 
 import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
@@ -32,7 +32,7 @@ import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
 @Component({
   selector: 'roomy-occupancy-calendar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, Message, Button, OfficeRoomPicker],
+  imports: [TranslocoDirective, Page, Message, Button, OfficeRoomPicker, Heat],
   templateUrl: './occupancy-calendar.html',
   styleUrl: './occupancy-calendar.css',
 })
@@ -107,6 +107,16 @@ export class OccupancyCalendar {
 
   protected figureFor(date: string): OccupancyDay | undefined {
     return this.occupancyByDate().get(date);
+  }
+
+  // How full the office is on this day, 0–1, for the heat tint; null when the day has no figure (outside
+  // the month or not yet loaded) so the cell stays untinted.
+  protected occupancyRatio(date: string): number | null {
+    const day = this.occupancyByDate().get(date);
+    if (day === undefined) {
+      return null;
+    }
+    return day.office.capacity > 0 ? day.office.occupied / day.office.capacity : 0;
   }
 
   protected isMine(date: string): boolean {

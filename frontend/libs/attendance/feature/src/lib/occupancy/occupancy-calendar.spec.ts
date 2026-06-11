@@ -130,4 +130,15 @@ describe('OccupancyCalendar', () => {
     expect(calls.at(-1)).toEqual({ from: '2026-07-01', to: '2026-07-31' });
     expect(await screen.findByRole('heading', { name: 'July 2026' })).toBeTruthy();
   });
+
+  it('tints the day cell by how occupied the office is, leaving days without a figure untinted', async () => {
+    const user = userEvent.setup();
+    const { container } = await renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
+    await screen.findByText('5/13');
+
+    // Only the one day with a returned figure (2026-06-10) is tinted; the rest stay untinted.
+    expect(container.querySelectorAll('td[style*="background-color"]').length).toBe(1);
+  });
 });
