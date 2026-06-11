@@ -1,3 +1,17 @@
 :host {
   display: contents;
 }
+
+.offices__room-name {
+  font-weight: var(--roomy-font-weight-medium);
+}
+
+.offices__room-capacity {
+  font-size: var(--roomy-font-size-sm);
+  color: var(--roomy-color-text-muted);
+}
+
+/* Pin the action to the foot of the tile so buttons line up when a name wraps. */
+.offices__room-rename {
+  margin-block-start: auto;
+}

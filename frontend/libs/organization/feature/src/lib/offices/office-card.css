@@ -18,17 +18,23 @@
   gap: var(--roomy-space-sm);
 }
 
+/* Rooms read as a responsive grid of tiles (about two to three columns, dropping to one as the card
+   narrows), mirroring the reserve room picker. */
 .offices__rooms {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--roomy-space-xs);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--roomy-space-sm);
 }
 
 .offices__room {
   display: flex;
-  justify-content: space-between;
-  gap: var(--roomy-space-sm);
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  background: var(--roomy-color-surface);
 }
