@@ -38,14 +38,41 @@
   gap: 2px;
 }
 
-.sidebar__section {
-  margin-block-start: var(--roomy-space-lg);
-  padding: var(--roomy-space-xs) var(--roomy-space-sm);
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.6875rem;
-  font-weight: var(--roomy-font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+/* The administration disclosure button reuses the navlink look but resets the native button defaults
+   and pushes the caret to the trailing edge. */
+.navgroup {
+  margin-block-start: var(--roomy-space-md);
+  border: none;
+  background: none;
+  inline-size: 100%;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.navgroup__caret {
+  margin-inline-start: auto;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--roomy-transition);
+}
+
+.navgroup[aria-expanded='false'] .navgroup__caret {
+  transform: rotate(-45deg);
+}
+
+/* The admin sub-items sit indented under the disclosure. */
+.subnav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navlink--sub {
+  padding-inline-start: calc(1.25rem + var(--roomy-space-md));
 }
 
 .navlink {

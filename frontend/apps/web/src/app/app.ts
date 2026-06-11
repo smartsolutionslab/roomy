@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
@@ -38,6 +38,9 @@ export class App {
   protected readonly currentUser = this.session.currentUser;
   protected readonly mainNav = this.navigation.mainItems;
   protected readonly adminNav = this.navigation.adminItems;
+  // The administration group is a disclosure: open by default so admins see their views, collapsible to
+  // declutter the sidebar.
+  protected readonly adminExpanded = signal(true);
   private readonly activeLang = toSignal(this.transloco.langChanges$, {
     initialValue: this.transloco.getActiveLang(),
   });
@@ -48,5 +51,9 @@ export class App {
     effect(() => this.document.documentElement.setAttribute('lang', this.activeLang()));
 
     this.session.load();
+  }
+
+  protected toggleAdmin(): void {
+    this.adminExpanded.update((expanded) => !expanded);
   }
 }
