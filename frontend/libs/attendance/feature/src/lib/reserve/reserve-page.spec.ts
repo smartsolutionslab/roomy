@@ -98,6 +98,23 @@ describe('ReservePage', () => {
     expect((screen.getByRole('button', { name: /B1/ }) as HTMLButtonElement).disabled).toBe(false);
   });
 
+  it('shows an availability bar for each room only once the day reveals availability', async () => {
+    const user = userEvent.setup();
+    const { container } = await renderPage([munich], { occupancy: () => of(allFree) });
+
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
+    // No day chosen yet → availability unknown → no bars, only the capacity figure.
+    expect(container.querySelectorAll('.reserve__room-bar').length).toBe(0);
+
+    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await screen.findByText('8 of 8 places left');
+
+    expect(container.querySelectorAll('.reserve__room-bar').length).toBe(2);
+    expect(
+      (container.querySelector('.reserve__room-bar-fill') as HTMLElement).getAttribute('style'),
+    ).toContain('inline-size');
+  });
+
   it('reserves the chosen room for the chosen day and announces success', async () => {
     const user = userEvent.setup();
     let reservedWith: { office: string; room: string; date: string } | undefined;

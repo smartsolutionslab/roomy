@@ -139,6 +139,13 @@ export class ReservePage {
     return availability ? availability.capacity - availability.occupied : room.capacity;
   }
 
+  // How full the room is, 0–100, for the availability bar. Unknown availability (no day chosen yet) reads
+  // as empty.
+  protected occupiedPercent(room: BookableRoom): number {
+    const availability = this.availabilityFor(room);
+    return availability ? Math.round((availability.occupied / availability.capacity) * 100) : 0;
+  }
+
   protected canReserve(): boolean {
     const room = this.selectedRoomId();
     return this.selectedOffice() !== null && this.selectedDay() !== null && room !== null;

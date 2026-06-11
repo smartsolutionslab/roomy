@@ -30,28 +30,39 @@
 
     @if (selectedOffice(); as office) {
     <h2>{{ translate('attendance.reserve.roomsHeading') }}</h2>
-    <ul class="roomy-list">
+    <ul class="reserve__rooms">
       @for (room of office.rooms; track room.id) {
       <li>
         <button
           type="button"
-          class="reserve__room-button"
+          class="roomy-tile reserve__room"
           [disabled]="isFull(room)"
           [attr.aria-pressed]="selectedRoomId() === room.id"
           (click)="chooseRoom(room)"
         >
-          <span class="reserve__room-name">{{ room.name }}</span>
-          @if (availabilityFor(room)) { @if (isFull(room)) {
-          <span class="reserve__room-full">{{ translate('attendance.reserve.full') }}</span>
-          } @else {
-          <span class="reserve__room-places"
-            >{{ translate('attendance.reserve.placesLeft', { remaining: remaining(room), capacity:
-            room.capacity }) }}</span
-          >
-          } } @else {
-          <span class="reserve__room-capacity"
-            >{{ translate('attendance.reserve.capacityLabel', { capacity: room.capacity }) }}</span
-          >
+          <span class="reserve__room-row">
+            <span class="reserve__room-name">{{ room.name }}</span>
+            @if (availabilityFor(room)) { @if (isFull(room)) {
+            <span class="reserve__room-figure">{{ translate('attendance.reserve.full') }}</span>
+            } @else {
+            <span class="reserve__room-figure"
+              >{{ translate('attendance.reserve.placesLeft', { remaining: remaining(room), capacity:
+              room.capacity }) }}</span
+            >
+            } } @else {
+            <span class="reserve__room-figure"
+              >{{ translate('attendance.reserve.capacityLabel', { capacity: room.capacity })
+              }}</span
+            >
+            }
+          </span>
+          @if (availabilityFor(room)) {
+          <span class="reserve__room-bar" aria-hidden="true">
+            <span
+              class="reserve__room-bar-fill"
+              [style.inline-size.%]="occupiedPercent(room)"
+            ></span>
+          </span>
           }
         </button>
       </li>
