@@ -27,5 +27,7 @@ public readonly record struct BookingDateRange : IValueObject
         }
     }
 
+    public IEnumerable<BookingDate> WorkingDays() => Days().Where(date => date.IsWorkingDay);
+
     public override string ToString() => $"{From}..{To}";
 }

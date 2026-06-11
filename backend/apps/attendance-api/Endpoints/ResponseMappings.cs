@@ -1,4 +1,5 @@
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 
@@ -19,6 +20,12 @@ internal static class ResponseMappings
     {
         public Response.Page.Reservation ToResponse() =>
             new(reservations.Select(reservation => reservation.ToResponse()).ToList(), NextCursor: null);
+    }
+
+    extension(Request.Reserve request)
+    {
+        public Response.Reservation ToResponse(ReservationIdentifier reservation, EmployeeIdentifier employee) =>
+            new(reservation.Value, request.OfficeId, request.RoomId, request.Date, employee.Value);
     }
 
     extension(MyReservationView reservation)
