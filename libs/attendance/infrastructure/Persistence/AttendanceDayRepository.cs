@@ -56,4 +56,24 @@ public sealed class AttendanceDayRepository(
         attendanceDay.ClearUncommittedEvents();
         return Result.Success();
     }
+
+    public Task<Result<TResult>> MutateAsync<TResult>(
+        CompanyIdentifier company,
+        BookingDate date,
+        Func<AttendanceDay, Result<TResult>> decide,
+        CancellationToken cancellationToken) =>
+        OptimisticWrite.ExecuteAsync(
+            () => LoadAsync(company, date, cancellationToken),
+            decide,
+            attendanceDay => SaveAsync(attendanceDay, cancellationToken));
+
+    public Task<Result> MutateAsync(
+        CompanyIdentifier company,
+        BookingDate date,
+        Func<AttendanceDay, Result> decide,
+        CancellationToken cancellationToken) =>
+        OptimisticWrite.ExecuteAsync(
+            () => LoadAsync(company, date, cancellationToken),
+            decide,
+            attendanceDay => SaveAsync(attendanceDay, cancellationToken));
 }
