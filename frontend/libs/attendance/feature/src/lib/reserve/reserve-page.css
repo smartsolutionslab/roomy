@@ -1,11 +1,12 @@
 /* Page container, fields, and error text come from the shared design system (roomyPage /
-   roomy-form-field / roomy-message). The room picker is a vertical list of selectable room tiles
-   (roomy-room-cell). */
+   roomy-form-field / roomy-message). The room picker is a responsive grid of selectable room tiles
+   (roomy-room-cell): about four columns on a wide form, dropping to three then two as the screen
+   narrows (auto-fill keeps a consistent tile width rather than stretching a few rooms across the row). */
 .reserve__rooms {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
   gap: var(--roomy-space-sm);
 }
