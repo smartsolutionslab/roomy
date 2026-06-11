@@ -75,8 +75,10 @@ describe('ReservePage', () => {
   it('offers only bookable days — today is offered, the weekend is not', async () => {
     await renderPage([munich]);
 
-    expect(await screen.findByRole('option', { name: '2026-06-08' })).toBeTruthy();
-    expect(screen.queryByRole('option', { name: '2026-06-13' })).toBeNull();
+    const dayPicker = (await screen.findByRole('combobox', { name: 'Day' })) as HTMLSelectElement;
+    const offered = Array.from(dayPicker.options).map((option) => option.value);
+    expect(offered).toContain('2026-06-08');
+    expect(offered).not.toContain('2026-06-13');
   });
 
   it('shows each room with its remaining places and disables a full room', async () => {
@@ -90,7 +92,7 @@ describe('ReservePage', () => {
     });
 
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
-    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
 
     expect(await screen.findByText('Full')).toBeTruthy();
     expect(screen.getByText('4 of 5 places left')).toBeTruthy();
@@ -106,7 +108,7 @@ describe('ReservePage', () => {
     // No day chosen yet → availability unknown → no bars, only the capacity figure.
     expect(container.querySelectorAll('.reserve__room-bar').length).toBe(0);
 
-    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
     await screen.findByText('8 of 8 places left');
 
     expect(container.querySelectorAll('.reserve__room-bar').length).toBe(2);
@@ -127,7 +129,7 @@ describe('ReservePage', () => {
     });
 
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
-    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
 
@@ -153,7 +155,7 @@ describe('ReservePage', () => {
       });
 
       await user.click(await screen.findByRole('button', { name: 'Munich' }));
-      await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+      await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
       await user.click(await screen.findByRole('button', { name: /A1/ }));
       await user.click(screen.getByRole('button', { name: 'Reserve' }));
 
@@ -185,7 +187,7 @@ describe('ReservePage', () => {
     });
 
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
-    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
 

@@ -109,7 +109,7 @@ describe('OnBehalfPage', () => {
 
     await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
-    await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Day' }), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
 

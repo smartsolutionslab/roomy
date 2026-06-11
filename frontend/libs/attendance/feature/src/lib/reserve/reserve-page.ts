@@ -9,8 +9,8 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslocoDirective } from '@jsverse/transloco';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import {
   AttendanceGateway,
   BookableOffice,
@@ -24,7 +24,15 @@ import {
   todayInBerlin,
 } from '@roomy/attendance-api';
 import { type ResultMessage } from '@roomy/shared-data-access';
-import { Button, DaySelect, Message, Page, TileGroup, type SelectOption } from '@roomy/shared-ui';
+import {
+  Button,
+  DaySelect,
+  type DayOption,
+  Message,
+  Page,
+  TileGroup,
+  type SelectOption,
+} from '@roomy/shared-ui';
 
 import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
@@ -45,6 +53,10 @@ import { RoomCell } from './room-cell';
 export class ReservePage {
   private readonly gateway = inject(AttendanceGateway);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly transloco = inject(TranslocoService);
+  private readonly activeLang = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang(),
+  });
 
   readonly today = input<string>(todayInBerlin());
   // When set (administrator on-behalf, 009 AT-6), the reservation is created for that employee; null ⇒
@@ -67,6 +79,21 @@ export class ReservePage {
   protected readonly errorKey = signal<string | null>(null);
 
   protected readonly bookableDays = computed(() => bookableDaysFrom(this.today()));
+  // Each bookable day as a tile: the weekday over the date, localised in the active language. Formatted
+  // in UTC so the ISO day is not shifted by the runtime's timezone.
+  protected readonly dayOptions = computed<DayOption[]>(() => {
+    const language = this.activeLang();
+    const weekday = new Intl.DateTimeFormat(language, { weekday: 'short', timeZone: 'UTC' });
+    const date = new Intl.DateTimeFormat(language, {
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    });
+    return this.bookableDays().map((day) => {
+      const instant = new Date(`${day}T00:00:00Z`);
+      return { value: day, weekday: weekday.format(instant), date: date.format(instant) };
+    });
+  });
   protected readonly selectedOffice = computed<BookableOffice | null>(
     () => this.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
   );

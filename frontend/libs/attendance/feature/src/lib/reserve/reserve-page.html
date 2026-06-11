@@ -24,7 +24,8 @@
     <roomy-day-select
       [label]="translate('attendance.reserve.dayLabel')"
       [placeholder]="translate('attendance.reserve.dayPlaceholder')"
-      [days]="bookableDays()"
+      [options]="dayOptions()"
+      [value]="selectedDay()"
       (daySelected)="chooseDay($event)"
     />
 
