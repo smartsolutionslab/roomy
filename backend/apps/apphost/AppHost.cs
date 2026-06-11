@@ -123,6 +123,11 @@ var gateway = builder.AddProject<Projects.Roomy_Gateway>("gateway")
     .WaitFor(attendanceApi)
     .WithExternalHttpEndpoints();
 
+// The BFF login only completes over HTTPS (__Host- session cookie + SameSite=None form_post correlation
+// cookie both require Secure), so the gateway redirects plain-http callers to its external HTTPS port.
+// Behind the Aspire/DCP proxy Kestrel can't infer that port, so feed it in from the endpoint itself.
+gateway.WithEnvironment("HttpsRedirection__HttpsPort", gateway.GetEndpoint("https").Property(EndpointProperty.Port));
+
 _ = gateway;
 
 builder.Build().Run();
