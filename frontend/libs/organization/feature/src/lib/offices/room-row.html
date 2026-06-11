@@ -1,0 +1,33 @@
+<ng-container *transloco="let translate">
+  @if (renaming()) {
+  <form [formGroup]="form()" (ngSubmit)="save.emit()">
+    <roomy-form-field [label]="translate('organization.rooms.renameLabel')">
+      <input type="text" formControlName="value" />
+    </roomy-form-field>
+    @if (conflict()) {
+    <roomy-message variant="error"
+      >{{ translate('organization.rooms.nameConflict') }}</roomy-message
+    >
+    } @if (failed()) {
+    <roomy-message variant="error">{{ translate('organization.edit.error') }}</roomy-message>
+    }
+    <button roomyButton variant="accent" type="submit">
+      {{ translate('organization.edit.save') }}
+    </button>
+    <button roomyButton type="button" (click)="cancelEdit.emit()">
+      {{ translate('organization.edit.cancel') }}
+    </button>
+  </form>
+  } @else {
+  <span class="offices__room-name">{{ room().name }}</span>
+  <span class="offices__room-capacity">{{ room().capacity }}</span>
+  <button
+    roomyButton
+    type="button"
+    [attr.aria-label]="translate('organization.rooms.renameRoom', { name: room().name })"
+    (click)="rename.emit()"
+  >
+    {{ translate('organization.edit.rename') }}
+  </button>
+  }
+</ng-container>

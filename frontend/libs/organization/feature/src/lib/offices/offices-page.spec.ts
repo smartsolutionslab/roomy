@@ -43,9 +43,11 @@ function renderPage(offices: Office[], stub: GatewayStub = {}) {
       stub.create ??
       ((name: string, location: string) =>
         of<Office>({ id: officeId('created'), name, location, capacity: 0, rooms: [] })),
-    renameOffice: stub.rename ?? ((_office: OfficeId, name: string) => of<Office>({ ...berlin, name })),
+    renameOffice:
+      stub.rename ?? ((_office: OfficeId, name: string) => of<Office>({ ...berlin, name })),
     relocateOffice:
-      stub.relocate ?? ((_office: OfficeId, location: string) => of<Office>({ ...berlin, location })),
+      stub.relocate ??
+      ((_office: OfficeId, location: string) => of<Office>({ ...berlin, location })),
     addRoom:
       stub.addRoom ??
       ((_office: OfficeId, name: string, capacity: number) =>
@@ -240,7 +242,10 @@ describe('OfficesPage', () => {
   it('renames a room and reflects the new name', async () => {
     await renderPage([berlin], {
       renameRoom: (_office, room, name) =>
-        of<Office>({ ...berlin, rooms: berlin.rooms.map((r) => (r.id === room ? { ...r, name } : r)) }),
+        of<Office>({
+          ...berlin,
+          rooms: berlin.rooms.map((r) => (r.id === room ? { ...r, name } : r)),
+        }),
     });
 
     await userEvent.click(screen.getByRole('button', { name: 'Rename room Sky' }));
@@ -251,5 +256,26 @@ describe('OfficesPage', () => {
 
     expect(await screen.findByText('Sky Lounge')).toBeTruthy();
     expect(await screen.findByText('Room Sky Lounge renamed.')).toBeTruthy();
+  });
+
+  it('keeps only one inline editor open at a time across offices', async () => {
+    const munich: Office = {
+      id: officeId('0199a0b0-0000-7000-8000-000000000030'),
+      name: 'Munich',
+      location: 'Munich, DE',
+      capacity: 0,
+      rooms: [],
+    };
+    await renderPage([berlin, munich]);
+
+    // Open the first office's rename editor; its own Rename button is then replaced by the form,
+    // so the one Rename button left belongs to the second office.
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Rename' }))[0]);
+    expect(screen.getAllByLabelText('New name')).toHaveLength(1);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Rename' }));
+
+    // The first editor closed when the second opened — still exactly one editor on the page.
+    expect(screen.getAllByLabelText('New name')).toHaveLength(1);
   });
 });

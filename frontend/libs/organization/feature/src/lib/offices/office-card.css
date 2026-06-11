@@ -1,0 +1,21 @@
+/* The host carries no box so its content are direct flex children of the surrounding roomyCard
+   (preserving the card's column gap). The nested per-room row layout is specific to this card; the
+   card, list, fields, buttons, and meta list come from the shared design system (ADR-0048). */
+:host {
+  display: contents;
+}
+
+.offices__rooms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+}
+
+.offices__room {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--roomy-space-sm);
+}
