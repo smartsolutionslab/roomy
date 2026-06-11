@@ -274,7 +274,9 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   the test name, not in code comments. If you reach for a comment to explain *what*, rename
   instead. No abbreviations or single-letter names, including lambda/LINQ parameters.
 - **No primitive obsession** — domain concepts are types, not raw primitives: C# value
-  objects (invariants enforced with `Ensure.That(...)`) and TypeScript branded types.
+  objects (invariants enforced by a validating `From`/`TryParse` factory pair — `From` is
+  `TryParse(raw) ?? throw`; `Ensure.That(...)` is reserved for trust-boundary argument checks)
+  and TypeScript branded types.
 - **Domain modelling** — organize the domain **by aggregate** (a folder + namespace per
   aggregate holds the root, its value objects, **and its repository interface**). Identifiers
   are GUIDv7 branded types named `…Identifier` (never `…Id`) with implicit `Guid` conversions
