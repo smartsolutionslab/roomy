@@ -137,7 +137,7 @@ describe('OccupancyPage', () => {
     });
 
     await user.click(await screen.findByRole('button', { name: 'Munich' }));
-    await user.selectOptions(screen.getByLabelText('Room'), 'r2');
+    await user.click(screen.getByRole('button', { name: 'B1' }));
 
     expect(calls.at(-1)?.scope).toEqual({ roomId: 'r2' });
   });
