@@ -27,7 +27,9 @@ const munich: BookableOffice = {
   rooms: [{ id: roomId('r1'), name: 'A1', capacity: 8 }],
 };
 
-const allFree: RoomAvailability[] = [{ roomId: roomId('r1'), occupied: 0, capacity: 8, isFull: false }];
+const allFree: RoomAvailability[] = [
+  { roomId: roomId('r1'), occupied: 0, capacity: 8, isFull: false },
+];
 
 const adasUpcoming: MyReservation = {
   id: reservationId('res1'),
@@ -63,7 +65,10 @@ function renderPage(stub: Stub = {}) {
   return render(OnBehalfPage, {
     imports: [importAttendanceTestTransloco()],
     inputs: { today: '2026-06-08' },
-    providers: [provideZonelessChangeDetection(), { provide: AttendanceGateway, useValue: gateway }],
+    providers: [
+      provideZonelessChangeDetection(),
+      { provide: AttendanceGateway, useValue: gateway },
+    ],
   });
 }
 
@@ -72,7 +77,9 @@ describe('OnBehalfPage', () => {
     await renderPage();
 
     expect(await screen.findByRole('option', { name: 'Ada' })).toBeTruthy();
-    expect(screen.getByText('Select an employee to reserve or cancel on their behalf.')).toBeTruthy();
+    expect(
+      screen.getByText('Select an employee to reserve or cancel on their behalf.'),
+    ).toBeTruthy();
     // The embedded reserve flow is not shown until an employee is chosen.
     expect(screen.queryByRole('heading', { name: 'Reserve a place' })).toBeNull();
   });
@@ -100,7 +107,7 @@ describe('OnBehalfPage', () => {
     });
 
     await user.selectOptions(await screen.findByLabelText('Employee'), 'e1');
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
@@ -108,7 +115,7 @@ describe('OnBehalfPage', () => {
     expect(received).toEqual(['o1', 'r1', '2026-06-08', 'e1']);
   });
 
-  it('cancels the employee\'s upcoming reservation and announces', async () => {
+  it("cancels the employee's upcoming reservation and announces", async () => {
     const user = userEvent.setup();
     let cancelledWith: { id: string; date: string } | undefined;
     await renderPage({
@@ -133,7 +140,12 @@ describe('OnBehalfPage', () => {
 
   it("appends the next page of the chosen employee's reservations on Load more", async () => {
     const user = userEvent.setup();
-    const later: MyReservation = { ...adasUpcoming, id: reservationId('res2'), roomName: 'C1', date: '2026-06-12' };
+    const later: MyReservation = {
+      ...adasUpcoming,
+      id: reservationId('res2'),
+      roomName: 'C1',
+      date: '2026-06-12',
+    };
     await renderPage({
       reservationsFor: (_employee, cursor) =>
         of(cursor === undefined ? page([adasUpcoming], 'cursor-2') : page([later], null)),

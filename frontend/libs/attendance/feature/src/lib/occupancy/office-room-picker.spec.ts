@@ -34,18 +34,18 @@ async function renderPicker() {
 }
 
 describe('OfficeRoomPicker', () => {
-  it('offers an option per office and hides the room select until one is chosen', async () => {
+  it('offers a tile per office and hides the room select until one is chosen', async () => {
     await renderPicker();
 
-    expect(await screen.findByRole('option', { name: 'Munich' })).toBeTruthy();
-    expect(screen.getByRole('option', { name: 'Berlin' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Munich' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Berlin' })).toBeTruthy();
     expect(screen.queryByLabelText('Room')).toBeNull();
   });
 
-  it('emits an office scope and reveals the room select when an office is chosen', async () => {
+  it('emits an office scope and reveals the room select when an office tile is chosen', async () => {
     const { scopes } = await renderPicker();
 
-    await userEvent.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
 
     expect(screen.getByLabelText('Room')).toBeTruthy();
     expect(scopes.at(-1)).toEqual({ officeId: 'o1' });
@@ -54,7 +54,7 @@ describe('OfficeRoomPicker', () => {
   it("lists the chosen office's rooms and emits a room scope when a room is chosen", async () => {
     const { scopes } = await renderPicker();
 
-    await userEvent.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
     expect(screen.getByRole('option', { name: 'A1' })).toBeTruthy();
 
     await userEvent.selectOptions(screen.getByLabelText('Room'), 'r2');
@@ -65,9 +65,9 @@ describe('OfficeRoomPicker', () => {
   it('falls back to the office scope and resets the room when the office changes', async () => {
     const { scopes } = await renderPicker();
 
-    await userEvent.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
     await userEvent.selectOptions(screen.getByLabelText('Room'), 'r2');
-    await userEvent.selectOptions(screen.getByLabelText('Office'), 'o2');
+    await userEvent.click(screen.getByRole('button', { name: 'Berlin' }));
 
     expect(scopes.at(-1)).toEqual({ officeId: 'o2' });
     // Only the newly chosen office's rooms are offered.
@@ -75,13 +75,16 @@ describe('OfficeRoomPicker', () => {
     expect(screen.queryByRole('option', { name: 'A1' })).toBeNull();
   });
 
-  it('emits null and hides the room select when the office is deselected', async () => {
-    const { scopes } = await renderPicker();
+  it('marks the chosen office tile as pressed', async () => {
+    await renderPicker();
 
-    await userEvent.selectOptions(await screen.findByLabelText('Office'), 'o1');
-    await userEvent.selectOptions(screen.getByLabelText('Office'), '');
+    await userEvent.click(await screen.findByRole('button', { name: 'Munich' }));
 
-    expect(scopes.at(-1)).toBeNull();
-    expect(screen.queryByLabelText('Room')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Munich' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Berlin' }).getAttribute('aria-pressed')).toBe(
+      'false',
+    );
   });
 });

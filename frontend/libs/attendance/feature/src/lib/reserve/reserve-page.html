@@ -3,24 +3,20 @@
     <h1>{{ translate('attendance.reserve.title') }}</h1>
 
     <roomy-message>
-      @if (result(); as message) {
-      {{ translate(message.key, message.params) }}
-      }
+      @if (result(); as message) { {{ translate(message.key, message.params) }} }
     </roomy-message>
 
     @if (errorKey(); as key) {
     <roomy-message variant="error">{{ translate(key) }}</roomy-message>
-    }
-
-    @if (loadFailed()) {
+    } @if (loadFailed()) {
     <roomy-message variant="error">{{ translate('attendance.reserve.loadError') }}</roomy-message>
     } @else if (offices(); as items) { @if (items.length === 0) {
     <p>{{ translate('attendance.reserve.empty') }}</p>
     } @else {
-    <roomy-select
+    <roomy-tile-group
       [label]="translate('attendance.reserve.officeLabel')"
-      [placeholder]="translate('attendance.reserve.officePlaceholder')"
       [options]="officeOptions()"
+      [value]="selectedOfficeId()"
       (selected)="chooseOffice($event)"
     />
 
@@ -47,27 +43,30 @@
           @if (availabilityFor(room)) { @if (isFull(room)) {
           <span class="reserve__room-full">{{ translate('attendance.reserve.full') }}</span>
           } @else {
-          <span class="reserve__room-places">{{
-            translate('attendance.reserve.placesLeft', {
-              remaining: remaining(room),
-              capacity: room.capacity
-            })
-          }}</span>
+          <span class="reserve__room-places"
+            >{{ translate('attendance.reserve.placesLeft', { remaining: remaining(room), capacity:
+            room.capacity }) }}</span
+          >
           } } @else {
-          <span class="reserve__room-capacity">{{
-            translate('attendance.reserve.capacityLabel', { capacity: room.capacity })
-          }}</span>
+          <span class="reserve__room-capacity"
+            >{{ translate('attendance.reserve.capacityLabel', { capacity: room.capacity }) }}</span
+          >
           }
         </button>
       </li>
       }
     </ul>
 
-    <button roomyButton variant="accent" type="button" [disabled]="!canReserve()" (click)="reserve()">
+    <button
+      roomyButton
+      variant="accent"
+      type="button"
+      [disabled]="!canReserve()"
+      (click)="reserve()"
+    >
       {{ translate('attendance.reserve.confirm') }}
     </button>
-    } }
-    } @else {
+    } } } @else {
     <p>{{ translate('attendance.reserve.loading') }}</p>
     }
   </section>

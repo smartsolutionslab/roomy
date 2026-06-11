@@ -30,8 +30,22 @@ const todayDay: OccupancyDay = {
   date: '2026-06-08',
   office: { officeId: officeId('o1'), name: 'Munich', occupied: 9, capacity: 13, isFull: false },
   rooms: [
-    { roomId: roomId('r1'), name: 'A1', occupied: 8, capacity: 8, isFull: true, occupants: [{ employeeId: 'e1', name: 'Ada' }] },
-    { roomId: roomId('r2'), name: 'B1', occupied: 1, capacity: 5, isFull: false, occupants: [{ employeeId: 'e2', name: 'Ben' }] },
+    {
+      roomId: roomId('r1'),
+      name: 'A1',
+      occupied: 8,
+      capacity: 8,
+      isFull: true,
+      occupants: [{ employeeId: 'e1', name: 'Ada' }],
+    },
+    {
+      roomId: roomId('r2'),
+      name: 'B1',
+      occupied: 1,
+      capacity: 5,
+      isFull: false,
+      occupants: [{ employeeId: 'e2', name: 'Ben' }],
+    },
   ],
 };
 
@@ -39,8 +53,22 @@ const futureDay: OccupancyDay = {
   date: '2026-06-15',
   office: { officeId: officeId('o1'), name: 'Munich', occupied: 2, capacity: 13, isFull: false },
   rooms: [
-    { roomId: roomId('r1'), name: 'A1', occupied: 2, capacity: 8, isFull: false, occupants: undefined },
-    { roomId: roomId('r2'), name: 'B1', occupied: 0, capacity: 5, isFull: false, occupants: undefined },
+    {
+      roomId: roomId('r1'),
+      name: 'A1',
+      occupied: 2,
+      capacity: 8,
+      isFull: false,
+      occupants: undefined,
+    },
+    {
+      roomId: roomId('r2'),
+      name: 'B1',
+      occupied: 0,
+      capacity: 5,
+      isFull: false,
+      occupants: undefined,
+    },
   ],
 };
 
@@ -66,14 +94,18 @@ function renderPage(offices: BookableOffice[], stub: Stub = {}) {
   return render(OccupancyPage, {
     imports: [importAttendanceTestTransloco()],
     inputs: { today: '2026-06-08' },
-    providers: [provideZonelessChangeDetection(), { provide: AttendanceGateway, useValue: gateway }],
+    providers: [
+      provideZonelessChangeDetection(),
+      { provide: AttendanceGateway, useValue: gateway },
+    ],
   });
 }
 
 describe('OccupancyPage', () => {
   it('shows the office rollup and per-room figures for the chosen office and day', async () => {
     const user = userEvent.setup();
-    const calls: { scope: { officeId?: OfficeId; roomId?: RoomId }; from: string; to: string }[] = [];
+    const calls: { scope: { officeId?: OfficeId; roomId?: RoomId }; from: string; to: string }[] =
+      [];
     await renderPage([munich], {
       occupancy: (scope, from, to) => {
         calls.push({ scope, from, to });
@@ -81,9 +113,13 @@ describe('OccupancyPage', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
 
-    expect(calls.at(-1)).toEqual({ scope: { officeId: 'o1' }, from: '2026-06-08', to: '2026-06-08' });
+    expect(calls.at(-1)).toEqual({
+      scope: { officeId: 'o1' },
+      from: '2026-06-08',
+      to: '2026-06-08',
+    });
     expect(await screen.findByText('Office: 9 of 13 occupied')).toBeTruthy();
     expect(screen.getByText('8 of 8 occupied')).toBeTruthy();
     expect(screen.getByText('1 of 5 occupied')).toBeTruthy();
@@ -100,7 +136,7 @@ describe('OccupancyPage', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByLabelText('Room'), 'r2');
 
     expect(calls.at(-1)?.scope).toEqual({ roomId: 'r2' });
@@ -116,7 +152,7 @@ describe('OccupancyPage', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByLabelText('Range'), 'month');
 
     expect(calls.at(-1)).toEqual({ from: '2026-06-01', to: '2026-06-30' });
@@ -128,7 +164,7 @@ describe('OccupancyPage', () => {
     const user = userEvent.setup();
     await renderPage([munich], { occupancy: () => of([todayDay, futureDay]) });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
 
     expect(await screen.findByText('Ada')).toBeTruthy();
     expect(screen.getByText('Ben')).toBeTruthy();
@@ -145,10 +181,11 @@ describe('OccupancyPage', () => {
   it('surfaces a localized message when the scope is unknown', async () => {
     const user = userEvent.setup();
     await renderPage([munich], {
-      occupancy: () => throwError(() => new HttpErrorResponse({ status: 404, error: { code: 'unknown_office' } })),
+      occupancy: () =>
+        throwError(() => new HttpErrorResponse({ status: 404, error: { code: 'unknown_office' } })),
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
 
     expect(await screen.findByText('That office or room is no longer available.')).toBeTruthy();
   });
