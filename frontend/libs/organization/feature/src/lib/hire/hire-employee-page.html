@@ -8,14 +8,18 @@
         <input type="text" formControlName="displayName" autocomplete="off" />
       </roomy-form-field>
       @if (attempted() && hireForm.controls.displayName.invalid) {
-      <roomy-message variant="error">{{ translate('organization.hire.nameRequired') }}</roomy-message>
+      <roomy-message variant="error"
+        >{{ translate('organization.hire.nameRequired') }}</roomy-message
+      >
       }
 
       <roomy-form-field [label]="translate('organization.hire.emailLabel')">
         <input type="email" formControlName="email" autocomplete="off" />
       </roomy-form-field>
       @if (attempted() && hireForm.controls.email.invalid) {
-      <roomy-message variant="error">{{ translate('organization.hire.emailInvalid') }}</roomy-message>
+      <roomy-message variant="error"
+        >{{ translate('organization.hire.emailInvalid') }}</roomy-message
+      >
       }
 
       <roomy-select
@@ -28,17 +32,19 @@
         (selected)="selectRole($event)"
       />
       @if (attempted() && hireForm.controls.role.invalid) {
-      <roomy-message variant="error">{{ translate('organization.hire.roleRequired') }}</roomy-message>
+      <roomy-message variant="error"
+        >{{ translate('organization.hire.roleRequired') }}</roomy-message
+      >
       }
 
       <roomy-form-field [label]="translate('organization.hire.passwordLabel')">
         <input type="password" formControlName="initialPassword" autocomplete="new-password" />
       </roomy-form-field>
       @if (attempted() && hireForm.controls.initialPassword.invalid) {
-      <roomy-message variant="error">{{ translate('organization.hire.passwordRequired') }}</roomy-message>
-      }
-
-      @if (invalid()) {
+      <roomy-message variant="error"
+        >{{ translate('organization.hire.passwordRequired') }}</roomy-message
+      >
+      } @if (invalid()) {
       <roomy-message variant="error">{{ translate('organization.hire.invalid') }}</roomy-message>
       } @if (failed()) {
       <roomy-message variant="error">{{ translate('organization.hire.error') }}</roomy-message>
