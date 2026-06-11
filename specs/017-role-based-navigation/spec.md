@@ -1,6 +1,6 @@
 # Feature Specification: Role-Based Navigation (router-config-driven)
 
-**Feature Branch:** `feat/014-role-based-navigation`
+**Feature Branch:** `feat/017-role-based-navigation`
 **Status:** Draft
 **Created:** 2026-06-11
 **Updated:** 2026-06-11
@@ -133,4 +133,4 @@ am never offered a link that would only send me to a "not authorized" page.
 - [ ] The links shown per role, their order, labels, icons, and dashboard descriptions match the
       pre-refactor screens exactly.
 - [ ] DE + EN render correctly; no hardcoded strings; no a11y regressions.
-- [ ] ADR-0050 recorded; all quality gates green; no suppressions.
+- [ ] ADR-0056 recorded; all quality gates green; no suppressions.

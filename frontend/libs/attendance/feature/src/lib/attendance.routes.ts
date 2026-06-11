@@ -4,7 +4,7 @@ import { adminGuard, authGuard, NavMeta } from '@roomy/shared-feature';
 // The attendance section is self-service for any signed-in employee (FR-009): authGuard only, never
 // adminGuard. Reserve is the default; my-reservations hosts cancel/change (AT-4/AT-5); occupancy and
 // calendar are the read-only views (008, OC-1..4/6). Each navigable route carries its sidebar/dashboard
-// presentation in `data.nav`; visibility follows the guard above (ADR-0050).
+// presentation in `data.nav`; visibility follows the guard above (ADR-0056).
 export const attendanceRoutes: Routes = [
   {
     path: 'reserve',
