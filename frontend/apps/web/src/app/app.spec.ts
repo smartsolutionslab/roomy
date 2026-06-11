@@ -43,7 +43,7 @@ describe('App shell', () => {
     await renderShell();
 
     // German is the default language (ADR-0045 / spec 012), so the shell renders in German.
-    expect(screen.getByText('Planen Sie, wer an welchem Tag in welchem Büro ist.')).toBeTruthy();
+    expect(screen.getByText('Räume buchen war noch nie so einfach.')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Zum Hauptinhalt springen' })).toBeTruthy();
     expect(screen.getByRole('main')).toBeTruthy();
   });
@@ -51,12 +51,12 @@ describe('App shell', () => {
   it('switches the rendered language at runtime', async () => {
     const { fixture } = await renderShell();
 
-    expect(screen.getByText('Planen Sie, wer an welchem Tag in welchem Büro ist.')).toBeTruthy();
+    expect(screen.getByText('Räume buchen war noch nie so einfach.')).toBeTruthy();
 
     fixture.debugElement.injector.get(TranslocoService).setActiveLang('en');
     await fixture.whenStable();
 
-    expect(screen.getByText('Plan who is in which office, on which day.')).toBeTruthy();
+    expect(screen.getByText('Booking rooms has never been this easy.')).toBeTruthy();
   });
 
   it('offers a sign-in link when there is no session', async () => {
