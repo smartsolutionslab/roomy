@@ -308,6 +308,10 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   `RoomyRoles.Administrator` literal (no per-host `AdministratorRole` constant). Authorization *rules*
   live in the use-case handler (which gets the decision as a command field, e.g. `ActorIsAdmin`), not in
   the endpoint; handlers never see `ClaimsPrincipal` (ADR-0053).
+- **Company-local "today" comes from `IBusinessClock`** — never derive a timezone in a handler or endpoint.
+  The port (`Today: BookingDate`, `Now: DateTimeOffset`) is implemented once in attendance infrastructure
+  over `TimeProvider` + a configured zone (`Attendance:TimeZone`, default `Europe/Berlin`, resolved at the
+  composition root); `TimeProvider` stays the raw instant source for event timestamps (ADR-0054).
 - **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`. Unit-test
   doubles use **NSubstitute** (`Substitute.For<T>()`, `.Returns(...)`, `.Received(...)`, `Arg.*`);
   assertions stay in the Assert, never inside a double; integration/e2e run against the real stack and
