@@ -302,6 +302,12 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   code by the qualified short form; the stable OpenAPI schema id (`EmployeeResponse`, `EmployeePage`, …)
   is reconstructed from the namespace tail by `web-http`'s `EndpointSchemaIds`, so the wire contract and
   generated client are unchanged (ADR-0050).
+- **Read the current user at the API edge via `CurrentUser`** — endpoints take the bound
+  `ClaimsPrincipal` but never parse it inline: `principal.Subject()` (the single `NameIdentifier ?? "sub"`
+  parse, a `Result<Guid>`) and `principal.IsAdministrator()` live in `web-http`, with one
+  `RoomyRoles.Administrator` literal (no per-host `AdministratorRole` constant). Authorization *rules*
+  live in the use-case handler (which gets the decision as a command field, e.g. `ActorIsAdmin`), not in
+  the endpoint; handlers never see `ClaimsPrincipal` (ADR-0053).
 - **Tests assert with Shouldly** (`actual.ShouldBe(expected)`), not raw xUnit `Assert.*`. Unit-test
   doubles use **NSubstitute** (`Substitute.For<T>()`, `.Returns(...)`, `.Received(...)`, `Arg.*`);
   assertions stay in the Assert, never inside a double; integration/e2e run against the real stack and

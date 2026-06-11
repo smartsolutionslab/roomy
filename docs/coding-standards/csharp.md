@@ -155,6 +155,17 @@ extend the architecture decisions in ADR-0003 (Clean Architecture + DDD) and ADR
 - Use domain-specific exception types where it aids handling; don't catch `Exception`
   broadly. Don't log-and-rethrow at every layer.
 
+## API host edge
+
+- **Read the caller once via `CurrentUser`.** Endpoints take the framework-bound `ClaimsPrincipal`
+  but never parse it inline: `principal.Subject()` (a `Result<Guid>` doing the single
+  `NameIdentifier ?? "sub"` parse) and `principal.IsAdministrator()` live in `web-http`. There is one
+  role literal — `RoomyRoles.Administrator`; no per-host `AdministratorRole` constant. Authorization
+  *rules* (e.g. "only an administrator may act on behalf of another") belong in the use-case handler,
+  which receives the decision as a command field (`ActorIsAdmin`), not in the endpoint. The edge turns
+  claims into the primitives a command/query already accepts; handlers never see `ClaimsPrincipal`
+  (ADR-0053).
+
 ## Dependencies (Clean Architecture) ⚙ via architecture tests
 
 - `domain` depends on nothing; `application` only on `domain`; `infrastructure` depends
