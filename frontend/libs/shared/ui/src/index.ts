@@ -4,6 +4,7 @@ export { Avatar } from './lib/avatar/avatar';
 export { AppLayout } from './lib/layout/layout';
 export { Button } from './lib/button/button';
 export { Card } from './lib/card/card';
+export { Heat, heatColor } from './lib/heat/heat';
 export { Page } from './lib/page/page';
 export { FormField } from './lib/form-field/form-field';
 export { Message } from './lib/message/message';
