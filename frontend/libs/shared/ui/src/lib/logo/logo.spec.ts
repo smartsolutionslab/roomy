@@ -24,11 +24,13 @@ describe('RoomyLogo', () => {
     expect(screen.getByText('Roomy')).toBeTruthy();
   });
 
-  it('renders the visible "Roomy" wordmark when requested', async () => {
+  it('shows the visible "oomy" wordmark — the mark supplies the R — when requested', async () => {
     await renderLogo(true);
 
-    const wordmark = screen.getByText('Roomy');
+    const wordmark = screen.getByText('oomy');
     expect(wordmark.classList.contains('roomy-logo__wordmark')).toBe(true);
+    // The mark stands in for the leading R, but the wordmark still reads "Roomy" to assistive tech.
+    expect(wordmark.textContent).toBe('Roomy');
   });
 
   it('defaults to the flat brand mark — a two-stop gradient', async () => {
