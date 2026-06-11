@@ -78,3 +78,4 @@ ADRs are written **before** the implementing code, not after.
 | [0058](0058-roomy-user-id-token-claim.md) | Carry the Roomy UserIdentifier as a token claim; resolve the current user from it | Accepted |
 | [0059](0059-defaultadmin-bootstrap-organization-led.md) | DefaultAdmin bootstrap is organization-led | Accepted |
 | [0060](0060-feature-local-presentational-components.md) | Feature-local presentational components; the page stays the single smart orchestrator | Accepted |
+| [0063](0063-employee-credential-provisioning-without-plaintext-on-the-bus.md) | Provision employee credentials without a plaintext password on the bus | Accepted |
