@@ -30,8 +30,7 @@ public sealed class BookableRoomsReadModel(AttendanceDbContext context) : IBooka
                 room.Capacity,
             }).ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return rows
-            .Select(row => new BookableRoomView(
+        return rows.Select(row => new BookableRoomView(
                 OfficeIdentifier.From(row.OfficeId),
                 row.OfficeName,
                 RoomIdentifier.From(row.RoomId),

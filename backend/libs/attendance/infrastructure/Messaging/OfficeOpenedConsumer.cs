@@ -8,8 +8,7 @@ public sealed class OfficeOpenedConsumer(AttendanceDbContext context)
 {
     public async Task Handle(OfficeOpened message, CancellationToken cancellationToken)
     {
-        var existing = await context.Offices
-            .FindAsync([message.OfficeId], cancellationToken).ConfigureAwait(false);
+        var existing = await context.Offices.FindAsync([message.OfficeId], cancellationToken);
 
         if (existing is null)
         {

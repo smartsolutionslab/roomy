@@ -10,20 +10,13 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 
 public sealed class MyReservationsReadModel(AttendanceDbContext context) : IMyReservationsReadModel
 {
-    public async Task<Result<Page<MyReservationView>>> GetAsync(
-        EmployeeIdentifier employee,
-        PageRequest request,
-        CancellationToken cancellationToken)
+    public async Task<Result<Page<MyReservationView>>> GetAsync(EmployeeIdentifier employee, PageRequest request, CancellationToken cancellationToken)
     {
         var decoded = request.DecodeCursor<ReservationCursor>();
-        if (decoded.IsFailure)
-        {
-            return decoded.Error;
-        }
+        if (decoded.IsFailure) return decoded.Error;
 
         var employeeId = employee.Value;
-        var reservations = context.Reservations.AsNoTracking()
-            .Where(reservation => reservation.EmployeeId == employeeId);
+        var reservations = context.Reservations.AsNoTracking().Where(reservation => reservation.EmployeeId == employeeId);
         if (decoded.Value is { } after)
         {
             var afterDate = after.Date;

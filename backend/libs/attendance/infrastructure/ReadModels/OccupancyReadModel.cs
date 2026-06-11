@@ -16,10 +16,7 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
         CancellationToken cancellationToken)
     {
         var scopeResult = await ResolveScopeAsync(scope, cancellationToken).ConfigureAwait(false);
-        if (scopeResult.IsFailure)
-        {
-            return scopeResult.Error;
-        }
+        if (scopeResult.IsFailure) return scopeResult.Error;
 
         var (officeId, officeName, rooms) = scopeResult.Value;
         var roomIds = rooms.Select(room => room.RoomId).ToList();

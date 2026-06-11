@@ -8,8 +8,7 @@ public sealed class RoomAddedConsumer(AttendanceDbContext context)
 {
     public async Task Handle(RoomAdded message, CancellationToken cancellationToken)
     {
-        var existing = await context.Rooms
-            .FindAsync([message.RoomId], cancellationToken).ConfigureAwait(false);
+        var existing = await context.Rooms.FindAsync([message.RoomId], cancellationToken);
 
         if (existing is null)
         {
