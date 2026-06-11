@@ -7,6 +7,5 @@ namespace SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 
 public interface IMyReservationsReadModel
 {
-    Task<Result<Page<MyReservationView>>> GetAsync(
-        EmployeeIdentifier employee, PageRequest request, CancellationToken cancellationToken);
+    Task<Result<Page<MyReservationView>>> GetAsync(EmployeeIdentifier employee, PageRequest request, CancellationToken cancellationToken);
 }
