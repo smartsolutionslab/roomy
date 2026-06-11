@@ -38,11 +38,10 @@ import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
 import { RoomCell } from './room-cell';
 
-// The reserve flow (AT-1/AT-2): pick an office, then a day, then a room with a remaining place, then
-// confirm. The catalogue and the per-day availability come from the attendance context only; the day
-// chooser offers only bookable days (FR-003), so a past/weekend/out-of-window day cannot be picked, and
-// a full room is shown unbookable before submit (FR-002). `today` is an input defaulting to the
-// Europe/Berlin calendar day, so the day rules are deterministic under test.
+// The reserve flow: pick an office, then a day, then a room with a remaining place, then confirm. The
+// day chooser offers only bookable days, so a past/weekend/out-of-window day cannot be picked, and a
+// full room is shown unbookable before submit. `today` is an input defaulting to the Europe/Berlin
+// calendar day, so the day rules are deterministic under test.
 @Component({
   selector: 'roomy-reserve-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,8 +58,8 @@ export class ReservePage {
   });
 
   readonly today = input<string>(todayInBerlin());
-  // When set (administrator on-behalf, 009 AT-6), the reservation is created for that employee; null ⇒
-  // the signed-in caller reserves for themselves (007, unchanged).
+  // When set (administrator on-behalf), the reservation is created for that employee; null ⇒ the
+  // signed-in caller reserves for themselves.
   readonly onBehalfOf = input<EmployeeId | null>(null);
   // Emitted after a successful reservation so a host (the on-behalf page) can refresh; ignored by the
   // self-service route.

@@ -25,12 +25,12 @@ import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 import { OccupancyShell } from './occupancy-shell';
 import { OccupancyScope } from './office-room-picker';
 
-// The occupancy list (OC-1/2/4/6): pick an office (optionally a single room) and a day / week / month
-// range, and read each day's office rollup + per-room figures. Occupant names render only when the
-// response carries them (today/tomorrow, FR-003); the view is read-only, so a past range simply shows
-// history (FR-005). `today` is an input defaulting to the Europe/Berlin day, so the presets are
-// deterministic under test. The office/room selection is owned by roomy-office-room-picker (shared with
-// the calendar); this page reacts only to the emitted scope.
+// The occupancy list: pick an office (optionally a single room) and a day / week / month range, and
+// read each day's office rollup + per-room figures. Occupant names render only when the response
+// carries them (today/tomorrow); the view is read-only, so a past range simply shows history. `today`
+// is an input defaulting to the Europe/Berlin day, so the presets are deterministic under test. The
+// office/room selection is owned by roomy-office-room-picker (shared with the calendar); this page
+// reacts only to the emitted scope.
 @Component({
   selector: 'roomy-occupancy-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
