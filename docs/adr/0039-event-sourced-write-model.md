@@ -9,7 +9,7 @@
 The **attendance** context (`003-attendance`) is the first **event-sourced** context. ADR-0012
 chose a hand-rolled append-only event store on PostgreSQL and ADR-0026 drew the consistency
 boundary as the `AttendanceDay` aggregate (`CompanyId + Date`). The store *seam* already exists
-(`libs/infrastructure-persistence/EventStore`: `IEventStore`, `EfCoreEventStore`,
+(`backend/libs/infrastructure-persistence/EventStore`: `IEventStore`, `EfCoreEventStore`,
 `EventStoreDbContext`, `EventTypeRegistry`, `StreamId`, `StreamVersion`, `EventEnvelope`). What
 does **not** exist is the **write model on top of that seam**: how an aggregate is reconstructed
 from its stream and records new events, how a repository bridges the aggregate to `IEventStore`,

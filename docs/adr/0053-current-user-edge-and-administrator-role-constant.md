@@ -52,7 +52,7 @@ owns it.
 
 ## Decision
 
-**Option C**, in the existing `libs/web-http` (`SmartSolutionsLab.Roomy.Web.Http`) — already
+**Option C**, in the existing `backend/libs/web-http` (`SmartSolutionsLab.Roomy.Web.Http`) — already
 referenced by all three hosts and deliberately outside the layer taxonomy (ADR-0046).
 
 1. **`CurrentUser` extension methods on `ClaimsPrincipal`:**

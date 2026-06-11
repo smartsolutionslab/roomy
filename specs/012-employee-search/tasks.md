@@ -14,8 +14,8 @@ each acceptance criterion lands as a failing test *before* its implementation (R
 
 ## Conventions / paths
 
-- Backend libs: `libs/<context>/{domain,application,infrastructure}`; hosts: `apps/<context>-api`.
-- Frontend libs: `libs/<context>/{feature,ui,data-access}`; SPA: `apps/web`.
+- Backend libs: `backend/libs/<context>/{domain,application,infrastructure}`; hosts: `backend/apps/<context>-api`.
+- Frontend libs: `backend/libs/<context>/{feature,ui,data-access}`; SPA: `apps/web`.
 - Backend tests against **real Postgres** (Aspire fixture, no SQLite). Architecture tests already
   reference attendance + organization layers — **no new project reference needed**.
 
@@ -25,10 +25,10 @@ each acceptance criterion lands as a failing test *before* its implementation (R
 
 **Purpose**: shared test data the backend stories assert against.
 
-- [x] T001 [P] Add a bulk employee test-data builder to `tests/` TestSupport (e.g.
+- [x] T001 [P] Add a bulk employee test-data builder to `backend/tests/` TestSupport (e.g.
   `Roomy.TestSupport`) that seeds many employees with diverse, near-duplicate, typo-adjacent, and
   accented names (e.g. "Hannah Schmidt", "José Müller") for both the attendance read model and the
-  organization `Employee` table — file under `libs/test-support`/`tests/...TestSupport`.
+  organization `Employee` table — file under `backend/libs/test-support`/`backend/tests/...TestSupport`.
 
 ---
 
@@ -37,10 +37,10 @@ each acceptance criterion lands as a failing test *before* its implementation (R
 **Purpose**: the shared `q` validation both backend stories depend on. **No story work starts until
 this is done.**
 
-- [x] T002 [P] RED: unit tests for `SearchTerm` in `tests/...SharedKernel.Tests/Search/SearchTermTests.cs`
+- [x] T002 [P] RED: unit tests for `SearchTerm` in `backend/tests/...SharedKernel.Tests/Search/SearchTermTests.cs`
   — trims input, blank/whitespace ⇒ "no filter" (empty), length > 100 ⇒ `Result` failure
   (`Error.Validation`).
-- [x] T003 `SearchTerm` value object in `libs/shared-kernel/src/Search/SearchTerm.cs`
+- [x] T003 `SearchTerm` value object in `backend/libs/shared-kernel/src/Search/SearchTerm.cs`
   (`…SharedKernel.Search`) — `SearchTerm.From(string?) → Result<SearchTerm>`, exposes `IsEmpty` and
   the normalized term; `Ensure.That(...)` guards (GREEN for T002).
 
@@ -57,7 +57,7 @@ employee on page 1; non-admin → 403.
 
 ### Tests (RED first)
 
-- [x] T004 [P] [US1] RED integration tests in `tests/attendance-integration/EmployeesEndpointTests.cs`:
+- [x] T004 [P] [US1] RED integration tests in `backend/tests/attendance-integration/EmployeesEndpointTests.cs`:
   (a) single-typo `q` returns the intended employee on page 1 (SC-002); (b) results ordered
   most-similar first; (c) search paging stable across an insert (page 1, insert a matching employee,
   page via `nextCursor` — no skip/duplicate); (d) blank/omitted `q` reproduces the existing
@@ -67,23 +67,23 @@ employee on page 1; non-admin → 403.
 ### Implementation (GREEN)
 
 - [x] T005 [US1] EF migration on the **attendance read-model DB** in
-  `libs/attendance/infrastructure/Persistence/Migrations/` — `CREATE EXTENSION IF NOT EXISTS pg_trgm`
+  `backend/libs/attendance/infrastructure/Persistence/Migrations/` — `CREATE EXTENSION IF NOT EXISTS pg_trgm`
   + `unaccent`, the `immutable_unaccent(text)` IMMUTABLE wrapper, and a GIN trigram index on
   `immutable_unaccent(display_name)` (research.md R3).
 - [x] T006 [US1] Extend the read port to carry the term:
   `IEmployeeCatalog.GetAsync(SearchTerm term, PageRequest request, ct)` in
-  `libs/attendance/application/Ports/IEmployeeCatalog.cs`.
-- [x] T007 [US1] In `libs/attendance/infrastructure/ReadModels/Employees/EmployeeCatalog.cs`: add the
+  `backend/libs/attendance/application/Ports/IEmployeeCatalog.cs`.
+- [x] T007 [US1] In `backend/libs/attendance/infrastructure/ReadModels/Employees/EmployeeCatalog.cs`: add the
   `EmployeeSearchCursor(double Similarity, string Name, Guid EmployeeId)` record and the non-blank-`q`
   raw-SQL branch — `@q <% immutable_unaccent(display_name)` keyset on
   `(word_similarity DESC, display_name, employee_id)` per data-model.md; blank `q` keeps the existing
   `(display_name, employee_id)` query.
 - [x] T008 [US1] Thread the term through `ViewEmployees` + handler in
-  `libs/attendance/application/UseCases/ViewEmployees.cs` and `ViewEmployeesHandler.cs`.
+  `backend/libs/attendance/application/UseCases/ViewEmployees.cs` and `ViewEmployeesHandler.cs`.
 - [x] T009 [US1] Add optional `q` to `ViewEmployeesAsync` in
-  `apps/attendance-api/Endpoints/ReservationEndpoints.cs` — parse via `SearchTerm.From`, 400 on
+  `backend/apps/attendance-api/Endpoints/ReservationEndpoints.cs` — parse via `SearchTerm.From`, 400 on
   failure; keep `operationId` `ViewEmployees` and the `EmployeePage` response (no schema drift).
-- [x] T010 [US1] Re-emit attendance OpenAPI (`apps/attendance-api/Roomy.Attendance.Api.json`) +
+- [x] T010 [US1] Re-emit attendance OpenAPI (`backend/apps/attendance-api/Roomy.Attendance.Api.json`) +
   `pnpm nx run attendance-data-access:generate-client`; commit regenerated client (drift gate).
 
 **Checkpoint**: US1 independently shippable (MVP). Tests T004 green.
@@ -99,28 +99,28 @@ non-admin → 403; blank `q` → stable name order.
 
 ### Tests (RED first)
 
-- [ ] T011 [P] [US2] RED integration tests in `tests/organization-integration/EmployeeEndpointsTests.cs`:
+- [ ] T011 [P] [US2] RED integration tests in `backend/tests/organization-integration/EmployeeEndpointsTests.cs`:
   `GET /employees` returns `{ items, nextCursor }`; ranks a typo'd `q` (SC-002); blank `q` lists in
   stable name order; `q` > 100 / bad cursor ⇒ 400; non-admin ⇒ 403; `POST /employees` unaffected.
 
 ### Implementation (GREEN)
 
 - [ ] T012 [US2] EF migration on the **organization DB** in
-  `libs/organization/infrastructure/Persistence/Migrations/` — `pg_trgm` + `unaccent` +
+  `backend/libs/organization/infrastructure/Persistence/Migrations/` — `pg_trgm` + `unaccent` +
   `immutable_unaccent` wrapper + GIN trigram index on `immutable_unaccent(name)`.
 - [ ] T013 [US2] New read port `IEmployeeDirectory.SearchAsync(SearchTerm term, PageRequest request, ct)
   → Result<Page<EmployeeListItem>>` and `EmployeeListItem(EmployeeIdentifier Employee, string Name)`
-  in `libs/organization/application/Ports/` + `…/UseCases/`. Write-side `IEmployeeRepository`
+  in `backend/libs/organization/application/Ports/` + `…/UseCases/`. Write-side `IEmployeeRepository`
   untouched.
 - [ ] T014 [US2] Infra impl `EmployeeDirectory` (raw-SQL keyset + word-similarity, same shape as
-  attendance) in `libs/organization/infrastructure/Persistence/EmployeeDirectory.cs`; register in the
+  attendance) in `backend/libs/organization/infrastructure/Persistence/EmployeeDirectory.cs`; register in the
   organization composition root DI.
-- [ ] T015 [US2] `ListEmployees` query + handler in `libs/organization/application/UseCases/`.
-- [ ] T016 [US2] New `GET /employees` in `apps/organization-api/Endpoints/EmployeeEndpoints.cs` —
+- [ ] T015 [US2] `ListEmployees` query + handler in `backend/libs/organization/application/UseCases/`.
+- [ ] T016 [US2] New `GET /employees` in `backend/apps/organization-api/Endpoints/EmployeeEndpoints.cs` —
   admin-only (403 otherwise), optional `q` via `SearchTerm.From` (400 on failure), concrete
   `EmployeePage`/`EmployeeResponse` records, `operationId` `ListEmployees`. `POST /employees`
   unchanged.
-- [ ] T017 [US2] Re-emit organization OpenAPI (`apps/organization-api/Roomy.Organization.Api.json`) +
+- [ ] T017 [US2] Re-emit organization OpenAPI (`backend/apps/organization-api/Roomy.Organization.Api.json`) +
   `pnpm nx run organization-data-access:generate-client`; commit (drift gate).
 
 **Checkpoint**: US2 independently shippable.

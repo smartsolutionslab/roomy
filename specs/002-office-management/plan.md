@@ -18,7 +18,7 @@ its own PostgreSQL database (ADR-0014).
 
 **Explicitly out of this slice** (kept lean per *simplicity-first*): the `Employee` aggregate
 and the `HireEmployee` → `EmployeeHired` provisioning saga (ADR-0025) — that is a separate spec;
-its `EmployeeHired` contract already exists in `libs/organization/contracts` only because
+its `EmployeeHired` contract already exists in `backend/libs/organization/contracts` only because
 identity's US3 consumes it. Office/Room management publishes **no** integration events yet
 (occupancy's `OfficeOpened`/`RoomAdded` are introduced when the **attendance** context first
 consumes them — "as late as the design allows", ADR-0005), so this service wires **no Wolverine
@@ -40,9 +40,9 @@ context provisions nothing in Keycloak; it only *authorizes* against the forward
 `companies` row.
 
 **Testing**: xUnit v3 (unit + integration); NetArchTest dependency-rule + no-MediatR rules in
-`tests/architecture` (the new organization layers MUST be referenced there or they enforce nothing
-vacuously — see `tests/architecture/README.md`); EF mapping verified against **real PostgreSQL** via
-a minimal Aspire test app host (mirroring `tests/identity-integration-apphost`); HTTP endpoints via
+`backend/tests/architecture` (the new organization layers MUST be referenced there or they enforce nothing
+vacuously — see `backend/tests/architecture/README.md`); EF mapping verified against **real PostgreSQL** via
+a minimal Aspire test app host (mirroring `backend/tests/identity-integration-apphost`); HTTP endpoints via
 `WebApplicationFactory` with a `TestAuthHandler` standing in for the BFF-forwarded token; Shouldly
 assertions.
 
@@ -69,7 +69,7 @@ US2 (create office) + US3 (edit office) plus room management.
 |---|---|---|
 | I. Spec-Driven & Test-First | ✅ | Spec exists with testable AC (scenarios 1–7, FR-001…010); each criterion becomes a failing test first. |
 | II. Clean Architecture & DDD | ✅ | `Office` aggregate root **contains** its `Room` entities (the consistency boundary for room-name uniqueness + derived capacity); `Company` is a minimal seeded root. Layers enforced by NetArchTest. |
-| III. Context Isolation — IDs & integration events | ✅ | Organization owns its DB. No cross-context references. **No events published this slice** (none consumed yet); when attendance needs capacity, `OfficeOpened`/`RoomAdded` land in `libs/organization/contracts` (ADR-0031) over the outbox. |
+| III. Context Isolation — IDs & integration events | ✅ | Organization owns its DB. No cross-context references. **No events published this slice** (none consumed yet); when attendance needs capacity, `OfficeOpened`/`RoomAdded` land in `backend/libs/organization/contracts` (ADR-0031) over the outbox. |
 | IV. No Framework in the Core | ✅ | EF Core lives only in `infrastructure`; auth wiring only in the host. `domain`/`application` stay framework-free. |
 | V. Decisions Are Recorded (ADR-before-code) | ✅ | No **new** ADR required: the three-service topology (ADR-0014), persistence baseline (ADR-0012), and BFF/JWT authorization (ADR-0013) already cover this slice. The aggregate-boundary and single-seeded-`Company` choices are recorded in `data-model.md`/`research.md` (standard modelling, not a contested structural decision). |
 | VI. Green Before Done | ✅ | Standard gates apply (`dotnet build -warnaserror`, `dotnet test`, `dotnet format`, Nx affected lint). |
@@ -94,17 +94,17 @@ specs/002-office-management/
 ### Source Code (repository root)
 
 ```text
-apps/
+backend/apps/
 └─ organization-api/                 # ASP.NET Core host (composition root: EF Core, JWT auth, endpoints, Company seeder)
 
-libs/
+backend/libs/
 └─ organization/
    ├─ domain/                        # Office aggregate (+ Room entity), Company, value objects, repository ports  (no infra deps)
    ├─ application/                   # Create/Rename office, Change location, Add/Rename room use cases; IUnitOfWork
    ├─ infrastructure/               # EF Core persistence (OrganizationDbContext, configurations, repository, migration)
    └─ contracts/                    # (exists) EmployeeHired/HiredRole — NOT touched by this slice
 
-tests/
+backend/tests/
 ├─ architecture/                     # add organization domain/application/infrastructure ProjectReferences
 ├─ organization/                     # unit: domain + application (Shouldly, fast, Docker-free)
 ├─ organization-integration/         # EF round-trip (real Postgres) + HTTP endpoint tests (WebApplicationFactory)

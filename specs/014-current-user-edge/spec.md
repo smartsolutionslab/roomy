@@ -15,7 +15,7 @@ parse is open-coded in two hosts, the `"administrator"` role string is a literal
 classes, and the
 "only an administrator may reserve on behalf of another" rule sits in the attendance endpoint where
 it cannot be unit-tested. This slice introduces shared `CurrentUser` extensions and one `RoomyRoles`
-constant in `libs/web-http`, and moves the on-behalf authorization rule into `ReservePlaceHandler`.
+constant in `backend/libs/web-http`, and moves the on-behalf authorization rule into `ReservePlaceHandler`.
 No route, status code, or response body changes — the wire contract and the OpenAPI specs are
 untouched, so no client regeneration.
 

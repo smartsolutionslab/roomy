@@ -26,7 +26,7 @@ Building the first context-specific UI (identity: account page, admin screens, r
 ## Decision
 
 **1 — Frontend feature libraries per context, mirroring the backend folder/alias convention.**
-Angular libraries live at `libs/<context>/<type>` with the import alias `@roomy/<context>-<type>`
+Angular libraries live at `backend/libs/<context>/<type>` with the import alias `@roomy/<context>-<type>`
 (ADR-0016). This slice introduces `libs/identity/feature` → `@roomy/identity-feature`.
 
 **2 — Extend the `type:*` axis with frontend library types:** `feature` (smart, routed UI for a
@@ -78,7 +78,7 @@ and libs; only the runner wiring differs.
 Two structural refinements supersede the paths and type names above:
 
 1. **All Angular/Nx projects moved under `frontend/`.** Libraries now live at
-   `frontend/libs/<context>/<type>` and the app at `frontend/apps/web`; `libs/` and `apps/` hold
+   `frontend/libs/<context>/<type>` and the app at `frontend/apps/web`; `backend/libs/` and `backend/apps/` hold
    only .NET projects. Import aliases (`@roomy/<context>-<type>`) and Nx tags are unchanged by the
    move — only directory paths and the path-relative config (tsconfig/eslint/vite depth,
    `tsconfig.base.json` aliases, `pnpm-workspace.yaml`, CI generated-client paths) shifted.

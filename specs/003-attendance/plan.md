@@ -21,7 +21,7 @@ local read models — never a cross-service join (ADR-0014). See [research.md](.
 
 **Language/Version**: C# / .NET 10
 **Primary Dependencies**: EF Core (Npgsql) on PostgreSQL; the owned event store
-(`libs/infrastructure-persistence/EventStore`); Wolverine outbox/inbox over RabbitMQ
+(`backend/libs/infrastructure-persistence/EventStore`); Wolverine outbox/inbox over RabbitMQ
 (ADR-0005/0015); the owned `ICommandHandler`/`Result`/`Ensure` abstractions (no MediatR, no
 framework in core)
 **Storage**: PostgreSQL — append-only events table (write model) + `Rooms`/`Employees`
@@ -29,7 +29,7 @@ state-based read models, attendance's **own** database (ADR-0014)
 **Testing**: xUnit v3 + Shouldly (domain/unit, integration against real Postgres via the sibling
 Aspire test host), WebApplicationFactory (API/contract), NetArchTest (architecture)
 **Target Platform**: Linux server (containerised), composed locally by Aspire
-**Project Type**: Backend bounded-context service (`apps/attendance-api`) + `libs/attendance/*`
+**Project Type**: Backend bounded-context service (`backend/apps/attendance-api`) + `backend/libs/attendance/*`
 **Performance Goals**: v1 single-tenant; small booking volume per company-day (ADR-0026) — no
 throughput target; correctness/invariants first
 **Constraints**: no cross-service join/DB access; domain & application reference no framework;
@@ -45,7 +45,7 @@ no tokens in the SPA (BFF, ADR-0013); Europe/Berlin calendar; warnings-as-errors
 |---|---|---|
 | I. Spec-Driven & Test-First | ✅ | Every scenario (1–13) + edges becomes a failing test first (quickstart §1–4); Red→Green→Refactor. |
 | II. Clean Architecture & DDD | ✅ | `domain`(no deps)→`application`→`infrastructure`→`apps`; behaviour in the `AttendanceDay` aggregate; value objects over primitives; aggregate = consistency boundary (ADR-0026). New context projects added to `Roomy.ArchitectureTests` so the rules aren't vacuous. |
-| III. Context Isolation — IDs & Events | ✅ | Capacity/employee learned via `OfficeOpened`/`RoomAdded`/`EmployeeHired`; wire event → internal command at the edge; attendance owns its DB; consumes only `libs/organization/contracts`. |
+| III. Context Isolation — IDs & Events | ✅ | Capacity/employee learned via `OfficeOpened`/`RoomAdded`/`EmployeeHired`; wire event → internal command at the edge; attendance owns its DB; consumes only `backend/libs/organization/contracts`. |
 | IV. No Framework in Core | ✅ | Domain/application use owned `ICommandHandler`/`Result`/`Ensure`/`TimeProvider`-at-edge only; event store & Wolverine wired at the composition root. |
 | V. Decisions Recorded (ADR-before-code) | ⚠️→✅ | **ADR-0039 (event-sourced write model: aggregate base + repository + optimistic-retry)** MUST be authored before the write-model code — it is task #1. Reuses ADR-0012/0026 otherwise. |
 | VI. Green Before Done — No Suppressions | ✅ | Full gate suite in quickstart §DoD; no analyzer/test suppression. |
@@ -71,7 +71,7 @@ specs/003-attendance/
 ### Source Code (repository root)
 
 ```text
-libs/
+backend/libs/
   shared-kernel/src/
     EventSourcedAggregate.cs            # NEW (ADR-0039) — replay/Apply/Raise/Version base
   attendance/
@@ -104,21 +104,21 @@ libs/
       AttendanceInfrastructureServiceCollectionExtensions.cs
   organization/contracts/               # NEW events (organization's published language)
     OfficeOpened.cs RoomAdded.cs        # + publish wired in 002 infra (PR #113) — see Dependency
-apps/
+backend/apps/
   attendance-api/                       # Roomy.Attendance.Api (type:app, context:attendance)
-    Program.cs Endpoints/ ...           # mirrors apps/identity-api
+    Program.cs Endpoints/ ...           # mirrors backend/apps/identity-api
   gateway/appsettings.json              # NEW /attendance route (cluster attendance)
   apphost/                              # register attendance-api + its DB (Aspire)
-tests/
+backend/tests/
   architecture/Roomy.ArchitectureTests/ # ADD ProjectReferences to the 3 attendance projects
-  attendance/                           # domain/integration/api tests (mirrors tests/identity)
+  attendance/                           # domain/integration/api tests (mirrors backend/tests/identity)
 ```
 
 **Structure Decision**: Mirror the proven `identity` context layout — `domain`/`application`/
-`infrastructure` libs under `libs/attendance/` + an `apps/attendance-api` host — tagged
+`infrastructure` libs under `backend/libs/attendance/` + an `backend/apps/attendance-api` host — tagged
 `type:* / context:attendance`. The single new cross-cutting primitive
 (`EventSourcedAggregate`) lives in `shared-kernel` beside `Aggregate`/`IAggregate`. The two new
-organization contracts live in `libs/organization/contracts` (organization's published language),
+organization contracts live in `backend/libs/organization/contracts` (organization's published language),
 consumed by attendance.
 
 ## Dependency & sequencing note (important)
@@ -129,7 +129,7 @@ in the organization context, whose Office/Room domain is in **PR #113** (green, 
 `main`). Therefore:
 
 1. **Merge PR #113 first** (your call), then rebase `feat/003-attendance` on `main`.
-2. Add `OfficeOpened`/`RoomAdded` to `libs/organization/contracts` and the publish in
+2. Add `OfficeOpened`/`RoomAdded` to `backend/libs/organization/contracts` and the publish in
    organization's create-office / add-room handlers (a small 002 addition).
 3. Build the attendance consumers + read models against those contracts.
 

@@ -58,7 +58,7 @@ How do we get the cleaner C# names without changing the wire contract or collidi
    `…Endpoints.Request.<Name>`. Endpoint classes reference them by the qualified short form
    (`Response.Reservation`, `Response.Page.Employee`, `Request.Reserve`) rather than importing the
    sub-namespace, so the role stays legible at the use site.
-2. `libs/web-http` owns `EndpointSchemaIds.ForEndpointDto`, a `Func<JsonTypeInfo, string?>` that maps a
+2. `backend/libs/web-http` owns `EndpointSchemaIds.ForEndpointDto`, a `Func<JsonTypeInfo, string?>` that maps a
    DTO's namespace tail back to the historical wire id — `…Response.Page.Employee` → `EmployeePage`,
    `…Response.Employee` → `EmployeeResponse`, `…Request.Reserve` → `ReserveRequest`. Any type whose
    namespace does not end in one of those three segments returns the framework default

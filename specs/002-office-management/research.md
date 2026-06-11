@@ -53,12 +53,12 @@ published.
 yet — the **attendance** context's occupancy projection is the future consumer of office/room
 capacity, and attendance does not exist. Publishing now would be speculative (golden rule:
 simplicity-first, no speculative features). When attendance lands, `OfficeOpened`/`RoomAdded` are
-added to `libs/organization/contracts` (ADR-0031) and published over the transactional outbox in a
+added to `backend/libs/organization/contracts` (ADR-0031) and published over the transactional outbox in a
 dedicated slice. Avoiding Wolverine here also keeps the host free of the static-codegen step
 (ADR-0034) entirely.
 
 **Consequence.** The host is simpler than `identity-api` (no `AddRoomyMessaging`, no generated
-handlers). The `libs/organization/contracts` library is **not** modified by this slice.
+handlers). The `backend/libs/organization/contracts` library is **not** modified by this slice.
 
 ## D5 — Authorization is mirrored locally, not shared (yet)
 

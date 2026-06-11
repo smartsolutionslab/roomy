@@ -73,7 +73,7 @@ untouched (the reserve flow depends on its narrow shape).
 
 ### D-OcW2 — Extend `@roomy/attendance-feature`, do not add an occupancy lib
 Occupancy is the read side of the **attendance** context (`004` is a projection inside attendance, not a
-fourth service). ADR-0035's `libs/<context>/<type>` is one feature lib per context, so the pages live in
+fourth service). ADR-0035's `backend/libs/<context>/<type>` is one feature lib per context, so the pages live in
 `@roomy/attendance-feature` (`occupancy/` folder) beside `reserve/` and `my-reservations/`. Rejected: a
 separate `occupancy-feature` (would duplicate the context tag and break the `<context>/<type>` layout).
 

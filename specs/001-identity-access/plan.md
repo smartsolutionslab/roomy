@@ -30,7 +30,7 @@ to provision users and assign roles. The YARP gateway is the OIDC client and hol
 stores the account/role projection and the link to the Keycloak subject; **credentials live in
 Keycloak, never in this database** (no `PasswordHash` stored here).
 
-**Testing**: xUnit (unit + integration); NetArchTest architecture rules in `tests/architecture`;
+**Testing**: xUnit (unit + integration); NetArchTest architecture rules in `backend/tests/architecture`;
 integration tests against PostgreSQL (and a Keycloak container) via Testcontainers, per
 `docs/testing-strategy.md`. Auth/BFF flow covered by an e2e check (Playwright) in a later UI slice.
 
@@ -85,16 +85,16 @@ specs/001-identity-access/
 ### Source Code (repository root)
 
 ```text
-apps/
+backend/apps/
 └─ identity-api/                     # ASP.NET Core host (composition root: EF Core, Wolverine, Keycloak adapter)
 
-libs/
+backend/libs/
 └─ identity/
    ├─ domain/                        # User aggregate, Email/Role value objects, domain events  (no infra deps)
    ├─ application/                   # RegisterUser / RecordLogin use cases, ports (IUserRepository, IIdentityProviderPort, IIntegrationEventPublisher)
    └─ infrastructure/               # EF Core persistence, Keycloak Admin adapter, integration-event publishing
 
-tests/
+backend/tests/
 ├─ architecture/                     # NetArchTest dependency-rule + no-MediatR rules
 └─ identity/                         # unit + integration (Testcontainers: Postgres + Keycloak)
 ```

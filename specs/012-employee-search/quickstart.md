@@ -63,7 +63,7 @@ In the running app (admin), on each search-enabled list:
 
 ```
 dotnet build Roomy.slnx -warnaserror -p:OpenApiGenerateDocumentsOnBuild=true   # re-emit specs
-git diff --exit-code -- apps/attendance-api/Roomy.Attendance.Api.json apps/organization-api/Roomy.Organization.Api.json
+git diff --exit-code -- backend/apps/attendance-api/Roomy.Attendance.Api.json backend/apps/organization-api/Roomy.Organization.Api.json
 pnpm nx run attendance-data-access:generate-client && git diff --exit-code -- libs/attendance/data-access/src/lib/generated
 pnpm nx run organization-data-access:generate-client && git diff --exit-code -- libs/organization/data-access/src/lib/generated
 ```

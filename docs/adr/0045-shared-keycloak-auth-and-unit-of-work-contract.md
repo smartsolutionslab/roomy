@@ -11,13 +11,13 @@ Keycloak access token the same way (ADR-0013): a JWT bearer against the realm, a
 realm roles flattened from `realm_access.roles` to `ClaimTypes.Role` claims. That ~40-line composition block
 and the `KeycloakRealmRoles` claims-transformer were **copied verbatim into all three hosts** (the organization
 copy even carried a comment that it was "mirrored from identity-api… to keep this slice surgical"). Separately,
-the `IUnitOfWork` commit-seam port was **defined identically** in both `libs/identity/application` and
-`libs/organization/application` (the attendance context is event-sourced and has no such seam). Three copies of
+the `IUnitOfWork` commit-seam port was **defined identically** in both `backend/libs/identity/application` and
+`backend/libs/organization/application` (the attendance context is event-sourced and has no such seam). Three copies of
 the auth wiring and two of the port mean three/two places to change and a real chance of drift.
 
 ## Decision
 
-**1. A shared Keycloak JWT auth composition lib.** Introduce `libs/infrastructure-authentication`
+**1. A shared Keycloak JWT auth composition lib.** Introduce `backend/libs/infrastructure-authentication`
 (`SmartSolutionsLab.Roomy.Infrastructure.Authentication`) holding the single `KeycloakRealmRoles` and an
 `AddKeycloakJwtBearer(this IServiceCollection, Uri keycloakBaseAddress, string realm)` extension that
 encapsulates the JWT-bearer registration + `AddAuthorization()`. Each host reads its Keycloak base address and
@@ -26,7 +26,7 @@ realm from configuration (kept inline) and calls the extension. The lib depends 
 it cannot perturb a host's Wolverine static codegen (ADR-0034). It is referenced by the API hosts only.
 
 **2. `IUnitOfWork` moves to the owned-abstractions lib.** The identical port moves to
-`libs/application-contracts` (`SmartSolutionsLab.Roomy.Application.Contracts.Messaging`), next to
+`backend/libs/application-contracts` (`SmartSolutionsLab.Roomy.Application.Contracts.Messaging`), next to
 `ICommandHandler`/`IQueryHandler`. The two context application libs already reference that lib, and the handlers
 already import its namespace, so no handler changes are needed; each context's infrastructure still implements
 the port over its own DbContext.

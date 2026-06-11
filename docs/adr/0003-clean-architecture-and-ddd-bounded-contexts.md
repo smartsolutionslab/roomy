@@ -31,7 +31,7 @@ aggregates, value objects, domain events) depends on nothing; `application` (use
 ports) depends only on `domain`; `infrastructure` implements ports and depends inward;
 hosts compose everything. Contexts integrate only via IDs and integration events —
 never by referencing another context's aggregate types. The dependency rule and key
-DDD invariants are enforced by architecture tests (NetArchTest) in `tests/architecture`.
+DDD invariants are enforced by architecture tests (NetArchTest) in `backend/tests/architecture`.
 
 ## Consequences
 

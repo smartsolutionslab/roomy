@@ -6,7 +6,7 @@
 
 ## Context and problem statement
 
-The unit suites (`tests/attendance`, `tests/identity`, `tests/organization`) drive application
+The unit suites (`backend/tests/attendance`, `backend/tests/identity`, `backend/tests/organization`) drive application
 handlers against the ports they depend on (`IAttendanceDayRepository`, `IUserRepository`,
 `IIdentityProviderPort`, `IUnitOfWork`, the read-model ports, …). Until now every such double was
 hand-rolled: a `private sealed class FakeRepository : IPort` per test file, implementing the whole
@@ -48,7 +48,7 @@ Which mocking/substitution library, if any, should the unit tests standardise on
 **Option C.** Adopt **NSubstitute** as the standard test-double library for the .NET **unit** suites.
 
 - Added to Central Package Management (`Directory.Packages.props`, ADR-0043) and referenced by the unit
-  test projects (`tests/attendance`, `tests/identity`, `tests/organization`).
+  test projects (`backend/tests/attendance`, `backend/tests/identity`, `backend/tests/organization`).
 - **Stubs** return canned values with `port.Method(Arg.Any<…>()).Returns(Result.Success(value))`;
   **interaction** is verified in the Assert with `await port.Received(1).Method(expectedArg, …)` /
   `DidNotReceive()`; arguments are captured with `Arg.Do<T>(list.Add)` and asserted with the existing

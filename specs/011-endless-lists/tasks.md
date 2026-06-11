@@ -25,7 +25,7 @@ context; no write-model change.
 
 ## Phase 1: Shared primitives (US1)
 - [x] T001 [US1] `Page<T>(IReadOnlyList<T> Items, string? NextCursor)` in
-  `libs/shared-kernel/src/Pagination/`.
+  `backend/libs/shared-kernel/src/Pagination/`.
 - [x] T002 [US1] `CursorCodec.Encode<TKey>/TryDecode<TKey>` (base64url JSON). Test:
   round-trip a sort-key record; `TryDecode` returns false on malformed input.
 - [x] T003 [US1] `PageRequest` value object + `PageRequest.From(string? cursor, int? limit) →

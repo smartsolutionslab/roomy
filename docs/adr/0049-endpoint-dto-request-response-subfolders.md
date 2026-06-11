@@ -7,9 +7,9 @@
 ## Context and problem statement
 
 Each API host exposes its endpoints from an `Endpoints/` folder (e.g.
-`apps/attendance-api/Endpoints/`). The one-type-per-file rule (csharp.md) recently split every
+`backend/apps/attendance-api/Endpoints/`). The one-type-per-file rule (csharp.md) recently split every
 request/response DTO into its own file, which left the `Endpoints/` folder flat and crowded —
-`apps/attendance-api/Endpoints/` alone held three endpoint classes mixed with eleven response
+`backend/apps/attendance-api/Endpoints/` alone held three endpoint classes mixed with eleven response
 records and a request record, with no visual separation between the HTTP *contract* types (the
 JSON shapes crossing the wire) and the *routing* code (the endpoint classes that map and handle).
 
@@ -54,7 +54,7 @@ discoverable and separated from the routing code?
 3. The endpoint classes stay in `Endpoints/` and add `using …Endpoints.Response;` /
    `using …Endpoints.Request;` as needed.
 4. The same split applies to the gateway BFF endpoint area: its `whoami` response (`CurrentUser`)
-   moves to `apps/gateway/Bff/Response/`, namespace `…Gateway.Bff.Response`.
+   moves to `backend/apps/gateway/Bff/Response/`, namespace `…Gateway.Bff.Response`.
 
 The OpenAPI schema name is the simple type name, independent of namespace, so the emitted spec and
 the generated client are unchanged — verified by the existing drift gate and the

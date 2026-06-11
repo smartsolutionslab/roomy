@@ -11,7 +11,7 @@ Each context service owns its own PostgreSQL database (ADR-0014) and maps it wit
 example, runs the `DefaultAdmin` seeder at startup, which queries the `users` table.
 
 Today the schema is applied **in-process at API startup**: `IdentityDatabaseMigrator`, an
-`IHostedService` in `apps/identity-api`, calls `DbContext.Database.MigrateAsync()` before
+`IHostedService` in `backend/apps/identity-api`, calls `DbContext.Database.MigrateAsync()` before
 the seeder runs. Its own comment concedes this is a stopgap — *"single-instance dev/MVP
 convention; production schema rollout is a separate ops concern."* As more contexts land
 (`organization`, `attendance`) the pattern would be copied into each host, and the
@@ -43,7 +43,7 @@ serving processes.
 
 ## Considered options
 
-- **A — Single shared migration runner (`apps/db-migrator`).** One console process
+- **A — Single shared migration runner (`backend/apps/db-migrator`).** One console process
   references every context's `infrastructure` (today: `identity`), creates each database and
   applies its EF migrations in one pass, then exits. The context APIs declare
   `WaitForCompletion(db-migrator)` and no longer self-migrate. One resource, one gate.
@@ -56,7 +56,7 @@ serving processes.
 
 ## Decision
 
-We chose **Option A**: a dedicated, shared migration runner at `apps/db-migrator`.
+We chose **Option A**: a dedicated, shared migration runner at `backend/apps/db-migrator`.
 
 - It is a **run-once console** (`Host.CreateApplicationBuilder` + `AddServiceDefaults` for
   logging/telemetry, no web surface). It composes each context's persistence through that

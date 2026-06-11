@@ -92,9 +92,9 @@ jobs:
       # The specs were emitted by the build above; fail if any committed spec drifted.
       - name: Verify the OpenAPI specs are current
         run: |
-          git diff --exit-code -- apps/identity-api/Roomy.Identity.Api.json
-          git diff --exit-code -- apps/organization-api/Roomy.Organization.Api.json
-          git diff --exit-code -- apps/attendance-api/Roomy.Attendance.Api.json
+          git diff --exit-code -- backend/apps/identity-api/Roomy.Identity.Api.json
+          git diff --exit-code -- backend/apps/organization-api/Roomy.Organization.Api.json
+          git diff --exit-code -- backend/apps/attendance-api/Roomy.Attendance.Api.json
 
       # Regenerate the Wolverine handler code (--no-build, reusing the build above) so a handler or
       # Wolverine-config change that was not re-generated cannot reach production (no runtime compiler).
@@ -107,11 +107,11 @@ jobs:
       - name: Verify Wolverine codegen is current
         run: |
           set -euo pipefail
-          dotnet run --project apps/identity-api --configuration Release --no-build -- codegen write
-          dotnet run --project apps/organization-api --configuration Release --no-build -- codegen write
-          dotnet run --project apps/attendance-api --configuration Release --no-build -- codegen write
+          dotnet run --project backend/apps/identity-api --configuration Release --no-build -- codegen write
+          dotnet run --project backend/apps/organization-api --configuration Release --no-build -- codegen write
+          dotnet run --project backend/apps/attendance-api --configuration Release --no-build -- codegen write
 
-          generated="apps/identity-api/Internal/Generated apps/organization-api/Internal/Generated apps/attendance-api/Internal/Generated"
+          generated="backend/apps/identity-api/Internal/Generated backend/apps/organization-api/Internal/Generated backend/apps/attendance-api/Internal/Generated"
           drift=0
           normalize() { sed 's,//.*,,' | tr -d '[:space:]' | tr ';' '\n' | sort; }
 
@@ -184,27 +184,27 @@ jobs:
           # domain+application unit suites, so the coverage floor is enforced here.
           - shard: unit
             projects: >-
-              tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj
-              tests/identity/Roomy.Identity.Tests.csproj
-              tests/organization/Roomy.Organization.Tests.csproj
-              tests/attendance/Roomy.Attendance.Tests.csproj
-              tests/apphost/Roomy.AppHost.Tests.csproj
-              apps/gateway/tests/Roomy.Gateway.Tests.csproj
-              libs/shared-kernel/tests/Roomy.SharedKernel.Tests.csproj
-              libs/infrastructure-messaging/tests/Roomy.Infrastructure.Messaging.Tests.csproj
-              libs/infrastructure-persistence/tests/Roomy.Infrastructure.Persistence.Tests.csproj
+              backend/tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj
+              backend/tests/identity/Roomy.Identity.Tests.csproj
+              backend/tests/organization/Roomy.Organization.Tests.csproj
+              backend/tests/attendance/Roomy.Attendance.Tests.csproj
+              backend/tests/apphost/Roomy.AppHost.Tests.csproj
+              backend/apps/gateway/tests/Roomy.Gateway.Tests.csproj
+              backend/libs/shared-kernel/tests/Roomy.SharedKernel.Tests.csproj
+              backend/libs/infrastructure-messaging/tests/Roomy.Infrastructure.Messaging.Tests.csproj
+              backend/libs/infrastructure-persistence/tests/Roomy.Infrastructure.Persistence.Tests.csproj
           - shard: identity-integration
-            projects: tests/identity-integration/Roomy.Identity.IntegrationTests.csproj
+            projects: backend/tests/identity-integration/Roomy.Identity.IntegrationTests.csproj
           - shard: organization-integration
-            projects: tests/organization-integration/Roomy.Organization.IntegrationTests.csproj
+            projects: backend/tests/organization-integration/Roomy.Organization.IntegrationTests.csproj
           - shard: attendance-integration
-            projects: tests/attendance-integration/Roomy.Attendance.IntegrationTests.csproj
+            projects: backend/tests/attendance-integration/Roomy.Attendance.IntegrationTests.csproj
           # The provisioning-saga e2e boots the full stack (Postgres x2 + RabbitMQ + Keycloak +
           # both API hosts), so it gets its own runner to avoid contending for Docker containers
           # with the other integration fixtures (ADR-0041; e2e tier, ADR-0022). Its app host
           # carries fixed test credentials, so it needs no extra environment. Not coverage-gated.
           - shard: saga-e2e
-            projects: tests/saga-e2e/Roomy.Saga.E2ETests.csproj
+            projects: backend/tests/saga-e2e/Roomy.Saga.E2ETests.csproj
     steps:
       - uses: actions/checkout@v6
 

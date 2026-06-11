@@ -8,7 +8,7 @@
 
 ## Context and problem statement
 
-ADR-0034 commits each host's Wolverine handler code (`apps/<host>/Internal/Generated`) and runs it in
+ADR-0034 commits each host's Wolverine handler code (`backend/apps/<host>/Internal/Generated`) and runs it in
 production with `TypeLoadMode.Static` — there is no Roslyn compiler at runtime (GH-2876). To stop the
 committed code drifting from the handlers, CI re-runs `codegen write` and gates on
 `git diff --exit-code`.

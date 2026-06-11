@@ -55,11 +55,11 @@ tests in xUnit + Shouldly.
 
 ## Project Structure (this feature)
 ```text
-libs/attendance/application/
+backend/libs/attendance/application/
 ├─ UseCases/ViewEmployees.cs + EmployeeView.cs + ViewEmployeesHandler.cs   # NEW directory query
 └─ Ports/IEmployeeCatalog.cs                                               # NEW
-libs/attendance/infrastructure/ReadModels/Employees/EmployeeCatalog.cs     # NEW adapter (+ DI)
-apps/attendance-api/Endpoints/ReservationEndpoints.cs                      # + GET /reservations/employees, /by-employee/{id} (admin)
+backend/libs/attendance/infrastructure/ReadModels/Employees/EmployeeCatalog.cs     # NEW adapter (+ DI)
+backend/apps/attendance-api/Endpoints/ReservationEndpoints.cs                      # + GET /reservations/employees, /by-employee/{id} (admin)
 libs/attendance/data-access/src/lib/
 ├─ booking.ts             # + EmployeeId brand
 ├─ employee.ts            # Employee view model + toEmployee (+spec)

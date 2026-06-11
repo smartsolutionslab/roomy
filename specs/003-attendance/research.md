@@ -4,7 +4,7 @@ Phase 0 decisions. Each resolves an unknown the plan depends on. Format: Decisio
 Rationale / Alternatives considered.
 
 This is the **first event-sourced context** (ADR-0012). The event-store *seam* already
-exists (`libs/infrastructure-persistence/src/EventStore`: `IEventStore`, `EfCoreEventStore`,
+exists (`backend/libs/infrastructure-persistence/src/EventStore`: `IEventStore`, `EfCoreEventStore`,
 `EventStoreDbContext`, `EventTypeRegistry`, `StreamId`, `StreamVersion`, `EventEnvelope`,
 `EventMetadata`, outbox). What is missing is the **write model on top of that seam** — an
 event-sourced aggregate base, an event-sourced repository, and the concurrency-retry policy —
@@ -95,7 +95,7 @@ The `Rooms` read model (state-based EF table: `RoomId` PK, `OfficeId`, `CompanyI
 - `OfficeOpened(OfficeId, CompanyId, Name, Location, OccurredAt)`
 - `RoomAdded(RoomId, OfficeId, CompanyId, Name, Capacity, OccurredAt)`
 
-These are added to organization's **published language** (`libs/organization/contracts`,
+These are added to organization's **published language** (`backend/libs/organization/contracts`,
 namespace `SmartSolutionsLab.Roomy.Contracts.Organization`, ADR-0031) and **emitted by the
 organization context** when an office/room is created (the publish side lives in 002's
 infrastructure — see the dependency note in plan.md). Attendance consumes them at its

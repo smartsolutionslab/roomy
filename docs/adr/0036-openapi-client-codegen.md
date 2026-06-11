@@ -52,7 +52,7 @@ turns it into the Angular client, where generated code lives, and how CI keeps i
 
 - **Backend** emits a static OpenAPI document per host with `Microsoft.AspNetCore.OpenApi`
   (`AddOpenApi`) and `Microsoft.Extensions.ApiDescription.Server` (`OpenApiGenerateDocuments`),
-  written to `apps/<host>/<AssemblyName>.json` and **committed**. Endpoints carry explicit
+  written to `backend/apps/<host>/<AssemblyName>.json` and **committed**. Endpoints carry explicit
   `.Produces<T>()`/`.ProducesProblem(...)`/`.WithName(...)` metadata so the document — and thus
   the generated types and method names — are accurate and stable.
 - **Client** is generated with **`ng-openapi-gen`** (version-pinned), root URL configured to
@@ -67,7 +67,7 @@ turns it into the Angular client, where generated code lives, and how CI keeps i
 - **Regeneration is an Nx target** — `nx run <context>-api:generate-client` — driven from
   the committed spec; it requires no running app and no JRE.
 - **CI gates drift** with the established `git diff --exit-code` pattern (ADR-0034): the .NET job
-  re-emits the spec on build and fails if `apps/<host>/<AssemblyName>.json` changed; the Nx job
+  re-emits the spec on build and fails if `backend/apps/<host>/<AssemblyName>.json` changed; the Nx job
   re-runs `generate-client` and fails if the committed generated tree changed. The build-time
   spec emit reuses the same dummy-config env block the Wolverine codegen step already uses.
 

@@ -114,7 +114,7 @@ reserve flow after cancelling — no combined edit. Bookable-day selection is co
 ## Project Structure (this feature)
 
 ```text
-apps/attendance-api/
+backend/apps/attendance-api/
 ├─ Program.cs                              # + AddOpenApi/MapOpenApi + OpenApi:EmitDocument skip-guards; MapRoomCatalogueEndpoints
 ├─ Endpoints/RoomCatalogueEndpoints.cs     # NEW: GET /rooms (bookable catalogue) + .WithName/.Produces
 ├─ Endpoints/ReservationEndpoints.cs       # + .WithName/.Produces/.ProducesProblem annotations
@@ -122,11 +122,11 @@ apps/attendance-api/
 ├─ Roomy.Attendance.Api.csproj             # + OpenApi package refs + emit props (ADR codegen)
 └─ Roomy.Attendance.Api.json               # committed emitted spec (generated)
 
-libs/attendance/application/
+backend/libs/attendance/application/
 ├─ Ports/IBookableRoomsReadModel.cs        # NEW: list bookable offices+rooms (attendance read models)
 └─ UseCases/ViewBookableRooms.cs + BookableRoomView.cs + handler   # NEW: catalogue query (RED→GREEN)
 
-libs/attendance/infrastructure/
+backend/libs/attendance/infrastructure/
 └─ ReadModels/Rooms/BookableRoomsReadModel.cs  # NEW: adapter over Offices+Rooms read models (+ tests)
 
 libs/attendance/data-access/               # @roomy/attendance-data-access (type:data-access, context:attendance) — NEW lib
@@ -143,13 +143,13 @@ libs/attendance/feature/                   # @roomy/attendance-feature (type:fea
    └─ attendance.routes.ts                 # exported routes, guarded by authGuard
    src/index.ts                            # public API: attendanceRoutes
 
-apps/gateway/appsettings.json              # + attendance-rooms route (/rooms/{**catch-all} → attendance)
+backend/apps/gateway/appsettings.json              # + attendance-rooms route (/rooms/{**catch-all} → attendance)
 apps/web/src/app/app.routes.ts             # lazy-load @roomy/attendance-feature routes
 apps/web/src/app/<shell>                   # nav entry "Attendance" / "My reservations", shown to any signed-in user
 apps/web/public/i18n/{en,de}.json          # add `attendance.*` namespace (FR-010)
 
 .github/workflows/ci.yml                   # + attendance spec emit + generated-client drift gates
-tests/architecture                         # (attendance projects already referenced; query/port stay in-layer)
+backend/tests/architecture                         # (attendance projects already referenced; query/port stay in-layer)
 ```
 
 ## Phasing (see tasks.md)

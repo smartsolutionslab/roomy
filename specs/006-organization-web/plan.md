@@ -91,7 +91,7 @@ localized, `aria-live`-announced messages.
 ## Project Structure (this feature)
 
 ```text
-apps/organization-api/
+backend/apps/organization-api/
 ├─ Program.cs                              # + AddOpenApi/MapOpenApi + OpenApi:EmitDocument skip-guards
 ├─ Roomy.Organization.Api.csproj          # + OpenApi package refs + emit props (ADR-0036)
 └─ Roomy.Organization.Api.json            # committed emitted spec (generated)
