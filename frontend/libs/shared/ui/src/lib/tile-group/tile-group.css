@@ -1,5 +1,6 @@
-/* Stacked label + a horizontal, wrapping row of tiles. The focus ring comes from the global normalized
-   :focus-visible (design-system.css); the active tile is marked with the accent. */
+/* Stacked label + tiles. On smartphones the tiles give way to a native dropdown of the same options
+   (the fallback). The focus ring comes from the global normalized :focus-visible (design-system.css);
+   the active tile is filled with the primary accent. */
 .tile-group {
   display: flex;
   flex-direction: column;
@@ -16,12 +17,19 @@
   gap: var(--roomy-space-sm);
 }
 
+.tile-group__tiles--vertical {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
 .tile {
   padding: var(--roomy-space-sm) var(--roomy-space-md);
   border: 1px solid var(--roomy-color-border);
   border-radius: var(--roomy-radius-md);
   background: var(--roomy-color-surface);
   color: var(--roomy-color-text);
+  text-align: start;
   cursor: pointer;
   transition:
     border-color var(--roomy-transition),
@@ -35,7 +43,22 @@
 
 .tile[aria-pressed='true'] {
   border-color: var(--roomy-color-accent);
-  background: var(--roomy-color-accent-subtle);
-  color: var(--roomy-color-accent-strong);
+  background: var(--roomy-color-accent);
+  color: var(--roomy-color-on-accent);
   font-weight: var(--roomy-font-weight-medium);
+}
+
+/* The dropdown fallback is hidden on wide screens; the tiles take over. */
+.tile-group__fallback {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .tile-group__tiles {
+    display: none;
+  }
+
+  .tile-group__fallback {
+    display: block;
+  }
 }
