@@ -29,9 +29,6 @@ public static class AdminUserEndpoints
         return endpoints;
     }
 
-    private static RouteHandlerBuilder RequireAdministrator(this RouteHandlerBuilder builder) =>
-        builder.RequireAuthorization(policy => policy.RequireRole(RoomyRoles.Administrator));
-
     private static async Task<IResult> ListAccountsAsync(
         string? cursor,
         int? limit,

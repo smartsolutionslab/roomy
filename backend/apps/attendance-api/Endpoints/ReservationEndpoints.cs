@@ -39,13 +39,13 @@ public static class ReservationEndpoints
             .Produces<Response.Page.MyReservation>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/reservations/employees", ViewEmployeesAsync)
-            .RequireAuthorization()
+            .RequireAdministrator()
             .WithName("ViewEmployees")
             .Produces<Response.Page.Employee>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);
         endpoints.MapGet("/reservations/by-employee/{employeeId:guid}", ViewForEmployeeAsync)
-            .RequireAuthorization()
+            .RequireAdministrator()
             .WithName("ViewReservationsForEmployee")
             .Produces<Response.Page.MyReservation>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -96,12 +96,9 @@ public static class ReservationEndpoints
         string? q,
         string? cursor,
         int? limit,
-        ClaimsPrincipal principal,
         IQueryHandler<ViewEmployees, Page<EmployeeView>> view,
         CancellationToken cancellationToken)
     {
-        if (!principal.IsAdministrator()) return Error.Forbidden("not_authorized", "Only an administrator may list employees.").ToHttpResult();
-
         var searchTerm = SearchTerm.From(q);
         if (searchTerm.IsFailure) return BadRequest(searchTerm.Error);
 
@@ -117,12 +114,9 @@ public static class ReservationEndpoints
         Guid employeeId,
         string? cursor,
         int? limit,
-        ClaimsPrincipal principal,
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
-        if (!principal.IsAdministrator()) return Error.Forbidden("not_authorized", "Only an administrator may view another employee's reservations.").ToHttpResult();
-
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
 
