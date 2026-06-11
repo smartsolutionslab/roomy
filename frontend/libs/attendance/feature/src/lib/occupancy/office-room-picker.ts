@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { BookableOffice, OfficeId, RoomId, roomId } from '@roomy/attendance-api';
-import { Select, type SelectOption } from '@roomy/shared-ui';
+import { Select, type SelectOption, TileGroup } from '@roomy/shared-ui';
 
 // The occupancy scope chosen in the picker: a whole office, or a single room within it.
 export type OccupancyScope = { readonly officeId: OfficeId } | { readonly roomId: RoomId };
@@ -15,7 +15,7 @@ export type OccupancyScope = { readonly officeId: OfficeId } | { readonly roomId
 @Component({
   selector: 'roomy-office-room-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Select],
+  imports: [TranslocoDirective, Select, TileGroup],
   templateUrl: './office-room-picker.html',
 })
 export class OfficeRoomPicker {

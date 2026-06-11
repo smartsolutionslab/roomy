@@ -1,8 +1,8 @@
 <ng-container *transloco="let translate">
-  <roomy-select
+  <roomy-tile-group
     [label]="translate('attendance.occupancy.officeLabel')"
-    [placeholder]="translate('attendance.occupancy.officePlaceholder')"
     [options]="officeOptions()"
+    [value]="selectedOfficeId()"
     (selected)="chooseOffice($event)"
   />
 

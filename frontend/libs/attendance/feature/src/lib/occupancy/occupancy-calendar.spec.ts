@@ -28,7 +28,16 @@ const munich: BookableOffice = {
 const june10: OccupancyDay = {
   date: '2026-06-10',
   office: { officeId: officeId('o1'), name: 'Munich', occupied: 5, capacity: 13, isFull: false },
-  rooms: [{ roomId: roomId('r1'), name: 'A1', occupied: 5, capacity: 8, isFull: false, occupants: undefined }],
+  rooms: [
+    {
+      roomId: roomId('r1'),
+      name: 'A1',
+      occupied: 5,
+      capacity: 8,
+      isFull: false,
+      occupants: undefined,
+    },
+  ],
 };
 
 const myJune10: MyReservation = {
@@ -49,7 +58,10 @@ interface Stub {
   mine?: (cursor?: string) => Observable<Page<MyReservation>>;
 }
 
-function reservationPage(items: MyReservation[], nextCursor: string | null = null): Page<MyReservation> {
+function reservationPage(
+  items: MyReservation[],
+  nextCursor: string | null = null,
+): Page<MyReservation> {
   return { items, nextCursor };
 }
 
@@ -66,7 +78,10 @@ function renderPage(stub: Stub = {}) {
   return render(OccupancyCalendar, {
     imports: [importAttendanceTestTransloco()],
     inputs: { today: '2026-06-10' },
-    providers: [provideZonelessChangeDetection(), { provide: AttendanceGateway, useValue: gateway }],
+    providers: [
+      provideZonelessChangeDetection(),
+      { provide: AttendanceGateway, useValue: gateway },
+    ],
   });
 }
 
@@ -75,7 +90,7 @@ describe('OccupancyCalendar', () => {
     const user = userEvent.setup();
     await renderPage();
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
 
     expect(await screen.findByRole('heading', { name: 'June 2026' })).toBeTruthy();
     expect(screen.getByRole('columnheader', { name: 'Mon' })).toBeTruthy();
@@ -92,7 +107,7 @@ describe('OccupancyCalendar', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
 
     expect(calls.at(-1)).toEqual({ from: '2026-06-01', to: '2026-06-30' });
     expect(await screen.findByText('5/13')).toBeTruthy();
@@ -109,7 +124,7 @@ describe('OccupancyCalendar', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.click(screen.getByRole('button', { name: 'Next month' }));
 
     expect(calls.at(-1)).toEqual({ from: '2026-07-01', to: '2026-07-31' });

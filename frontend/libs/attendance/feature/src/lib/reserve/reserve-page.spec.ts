@@ -52,7 +52,10 @@ function renderPage(offices: BookableOffice[], stub: Stub = {}) {
   return render(ReservePage, {
     imports: [importAttendanceTestTransloco()],
     inputs: { today: '2026-06-08' },
-    providers: [provideZonelessChangeDetection(), { provide: AttendanceGateway, useValue: gateway }],
+    providers: [
+      provideZonelessChangeDetection(),
+      { provide: AttendanceGateway, useValue: gateway },
+    ],
   });
 }
 
@@ -60,15 +63,13 @@ describe('ReservePage', () => {
   it('lists the bookable offices in the office picker', async () => {
     await renderPage([munich]);
 
-    expect(await screen.findByRole('option', { name: 'Munich' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Munich' })).toBeTruthy();
   });
 
   it('shows an empty state when nothing is bookable', async () => {
     await renderPage([]);
 
-    expect(
-      await screen.findByText('No offices or rooms are available to book yet.'),
-    ).toBeTruthy();
+    expect(await screen.findByText('No offices or rooms are available to book yet.')).toBeTruthy();
   });
 
   it('offers only bookable days — today is offered, the weekend is not', async () => {
@@ -88,7 +89,7 @@ describe('ReservePage', () => {
         ]),
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
 
     expect(await screen.findByText('Full')).toBeTruthy();
@@ -108,7 +109,7 @@ describe('ReservePage', () => {
       },
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
@@ -134,7 +135,7 @@ describe('ReservePage', () => {
         reserve: () => throwError(() => new HttpErrorResponse({ status, error: { code } })),
       });
 
-      await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+      await user.click(await screen.findByRole('button', { name: 'Munich' }));
       await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
       await user.click(await screen.findByRole('button', { name: /A1/ }));
       await user.click(screen.getByRole('button', { name: 'Reserve' }));
@@ -160,10 +161,13 @@ describe('ReservePage', () => {
     await render(ReservePage, {
       imports: [importAttendanceTestTransloco()],
       inputs: { today: '2026-06-08', onBehalfOf: employeeId('e9') },
-      providers: [provideZonelessChangeDetection(), { provide: AttendanceGateway, useValue: gateway }],
+      providers: [
+        provideZonelessChangeDetection(),
+        { provide: AttendanceGateway, useValue: gateway },
+      ],
     });
 
-    await user.selectOptions(await screen.findByLabelText('Office'), 'o1');
+    await user.click(await screen.findByRole('button', { name: 'Munich' }));
     await user.selectOptions(screen.getByLabelText('Day'), '2026-06-08');
     await user.click(await screen.findByRole('button', { name: /A1/ }));
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
