@@ -169,12 +169,13 @@ internal sealed class Seeder(
         var random = new Random(20260610);
         var byOffice = employees.GroupBy(employee => employee.Office)
             .ToDictionary(group => group.Key, group => group.ToList());
-        var total = (end.DayNumber - start.DayNumber) + 1;
+        var range = BookingDateRange.Between(BookingDate.From(start), BookingDate.From(end));
+        var total = range.LengthInDays;
         var placed = 0;
 
-        for (var date = start; date <= end; date = date.AddDays(1))
+        foreach (var bookingDate in range.WorkingDays())
         {
-            if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) continue;
+            var date = bookingDate.Value;
 
             var dayEvents = new List<object>();
             foreach (var office in offices)
@@ -193,7 +194,7 @@ internal sealed class Seeder(
                 continue;
             }
 
-            var streamId = AttendanceDayStreamId.For(company, BookingDate.From(date));
+            var streamId = AttendanceDayStreamId.For(company, bookingDate);
             await eventStore.AppendAsync(streamId, StreamVersion.None, dayEvents, EventMetadata.None, cancellationToken);
             placed += dayEvents.Count;
         }

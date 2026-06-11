@@ -9,9 +9,8 @@ public static class BookingWindow
         var day = candidate.Value;
         var from = today.Value;
 
-        var isWorkingDay = day.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday);
         var isWithinWindow = day >= from && day <= from.AddDays(WindowDays);
 
-        return isWorkingDay && isWithinWindow;
+        return candidate.IsWorkingDay && isWithinWindow;
     }
 }

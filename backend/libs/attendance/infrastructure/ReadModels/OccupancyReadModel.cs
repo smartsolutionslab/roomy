@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Reservations;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
@@ -21,15 +22,10 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
         var (officeId, officeName, rooms) = scopeResult.Value;
         var roomIds = rooms.Select(room => room.RoomId).ToList();
         var companyId = company.Value;
-        var fromDate = range.From.Value;
-        var toDate = range.To.Value;
 
         var occupantRows = await context.Reservations.AsNoTracking()
-            .Where(reservation =>
-                reservation.CompanyId == companyId
-                && reservation.Date >= fromDate
-                && reservation.Date <= toDate
-                && roomIds.Contains(reservation.RoomId))
+            .Where(reservation => reservation.CompanyId == companyId && roomIds.Contains(reservation.RoomId))
+            .WithinRange(range)
             .GroupJoin(
                 context.Employees.AsNoTracking(),
                 reservation => reservation.EmployeeId,

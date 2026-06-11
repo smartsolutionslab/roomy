@@ -160,12 +160,7 @@ public static class ReservationEndpoints
         return result.Match(
             reservationId => Results.Created(
                 $"/reservations/{reservationId.Value}",
-                new Response.Reservation(
-                    reservationId.Value,
-                    request.OfficeId,
-                    request.RoomId,
-                    request.Date,
-                    employee.Value)),
+                request.ToResponse(reservationId, employee)),
             error => error.ToHttpResult());
     }
 
