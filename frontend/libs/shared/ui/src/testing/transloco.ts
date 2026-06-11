@@ -4,7 +4,7 @@ import { TranslocoTestingModule } from '@jsverse/transloco';
 // Test-only Transloco setup for this library's components. It carries just the keys the shared UI
 // primitives use, so the library's specs stay independent of the app's global translation files
 // (importing those would cross the context:web boundary). Excluded from the library build. Kept in key
-// parity with apps/web/public/i18n/{en,de}.json under shared.list (ADR-0024).
+// parity with apps/web/public/i18n/{en,de}.json under shared.list.
 const english = {
   shared: {
     list: {
