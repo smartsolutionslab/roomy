@@ -6,12 +6,10 @@ namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
 public static class EmployeeEndpoints
 {
-    private const string AdministratorRole = "administrator";
-
     public static IEndpointRouteBuilder MapEmployeeEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/employees", HireEmployeeAsync)
-            .RequireAuthorization(policy => policy.RequireRole(AdministratorRole))
+            .RequireAuthorization(policy => policy.RequireRole(RoomyRoles.Administrator))
             .WithName("HireEmployee")
             .Produces<Response.HiredEmployee>(StatusCodes.Status202Accepted)
             .ProducesProblem(StatusCodes.Status400BadRequest);

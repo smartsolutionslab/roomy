@@ -7,8 +7,6 @@ namespace SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 
 public static class AdminUserEndpoints
 {
-    private const string AdministratorRole = "administrator";
-
     public static IEndpointRouteBuilder MapAdminUserEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapGet("/admin/users", ListAccountsAsync)
@@ -32,7 +30,7 @@ public static class AdminUserEndpoints
     }
 
     private static RouteHandlerBuilder RequireAdministrator(this RouteHandlerBuilder builder) =>
-        builder.RequireAuthorization(policy => policy.RequireRole(AdministratorRole));
+        builder.RequireAuthorization(policy => policy.RequireRole(RoomyRoles.Administrator));
 
     private static async Task<IResult> ListAccountsAsync(
         string? cursor,

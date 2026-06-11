@@ -7,8 +7,6 @@ namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
 public static class OfficeEndpoints
 {
-    private const string AdministratorRole = "administrator";
-
     public static IEndpointRouteBuilder MapOfficeEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/offices", CreateOfficeAsync)
@@ -58,7 +56,7 @@ public static class OfficeEndpoints
     }
 
     private static RouteHandlerBuilder RequireAdministrator(this RouteHandlerBuilder builder) =>
-        builder.RequireAuthorization(policy => policy.RequireRole(AdministratorRole));
+        builder.RequireAuthorization(policy => policy.RequireRole(RoomyRoles.Administrator));
 
     private static async Task<IResult> CreateOfficeAsync(
         Request.CreateOffice request,

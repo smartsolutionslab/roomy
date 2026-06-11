@@ -18,15 +18,11 @@ public static class AccountEndpoints
 
     private static async Task<IResult> GetCurrentAccountAsync(ClaimsPrincipal principal, IUserRepository users, CancellationToken cancellationToken)
     {
-        var subjectClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? principal.FindFirstValue("sub");
-        if (subjectClaim is null || !Guid.TryParse(subjectClaim, out var subjectValue))
-        {
-            return Results.Unauthorized();
-        }
+        var subject = principal.Subject();
+        if (subject.IsFailure) return Results.Unauthorized();
 
-        var subject = KeycloakSubjectIdentifier.From(subjectValue);
-        var lookup = await users.GetByKeycloakSubjectAsync(subject, cancellationToken);
+        var keycloakSubject = KeycloakSubjectIdentifier.From(subject.Value);
+        var lookup = await users.GetByKeycloakSubjectAsync(keycloakSubject, cancellationToken);
 
         return lookup.Match(user => Results.Ok(user.ToAccount()), error => error.ToHttpResult());
     }
