@@ -1,150 +1,69 @@
 <Solution>
-  <Folder Name="/backend/apps/" />
-  <Folder Name="/backend/apps/apphost/">
-    <Project Path="backend/apps/apphost/Roomy.AppHost.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/db-migrator/">
-    <Project Path="backend/apps/db-migrator/Roomy.DbMigrator.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/dev-seeder/">
-    <Project Path="backend/apps/dev-seeder/Roomy.DevSeeder.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/gateway/">
-    <Project Path="backend/apps/gateway/Roomy.Gateway.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/gateway/tests/">
-    <Project Path="backend/apps/gateway/tests/Roomy.Gateway.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/identity-api/">
-    <Project Path="backend/apps/identity-api/Roomy.Identity.Api.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/organization-api/">
-    <Project Path="backend/apps/organization-api/Roomy.Organization.Api.csproj" />
-  </Folder>
-  <Folder Name="/backend/apps/attendance-api/">
+  <Folder Name="/Attendance - API/">
     <Project Path="backend/apps/attendance-api/Roomy.Attendance.Api.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/" />
-  <Folder Name="/backend/libs/application-contracts/">
-    <Project Path="backend/libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/identity/" />
-  <Folder Name="/backend/libs/identity/domain/">
-    <Project Path="backend/libs/identity/domain/Roomy.Identity.Domain.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/identity/application/">
-    <Project Path="backend/libs/identity/application/Roomy.Identity.Application.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/identity/infrastructure/">
-    <Project Path="backend/libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/identity/contracts/">
-    <Project Path="backend/libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/organization/" />
-  <Folder Name="/backend/libs/organization/contracts/">
-    <Project Path="backend/libs/organization/contracts/Roomy.Contracts.Organization.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/organization/domain/">
-    <Project Path="backend/libs/organization/domain/Roomy.Organization.Domain.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/organization/application/">
-    <Project Path="backend/libs/organization/application/Roomy.Organization.Application.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/organization/infrastructure/">
-    <Project Path="backend/libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/attendance/" />
-  <Folder Name="/backend/libs/attendance/domain/">
-    <Project Path="backend/libs/attendance/domain/Roomy.Attendance.Domain.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/attendance/application/">
     <Project Path="backend/libs/attendance/application/Roomy.Attendance.Application.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/attendance/infrastructure/">
+    <Project Path="backend/libs/attendance/domain/Roomy.Attendance.Domain.csproj" />
     <Project Path="backend/libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/infrastructure-authentication/src/">
-    <Project Path="backend/libs/infrastructure-authentication/src/Roomy.Infrastructure.Authentication.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/infrastructure-messaging/src/">
-    <Project Path="backend/libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/infrastructure-messaging/tests/">
-    <Project Path="backend/libs/infrastructure-messaging/tests/Roomy.Infrastructure.Messaging.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/infrastructure-persistence/src/">
-    <Project Path="backend/libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/infrastructure-persistence/tests/">
-    <Project Path="backend/libs/infrastructure-persistence/tests/Roomy.Infrastructure.Persistence.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/service-defaults/">
-    <Project Path="backend/libs/service-defaults/Roomy.ServiceDefaults.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/web-http/src/">
-    <Project Path="backend/libs/web-http/src/Roomy.Web.Http.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/web-http/tests/">
-    <Project Path="backend/libs/web-http/tests/Roomy.Web.Http.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/shared-kernel/" />
-  <Folder Name="/backend/libs/shared-kernel/src/">
-    <Project Path="backend/libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
-  </Folder>
-  <Folder Name="/backend/libs/shared-kernel/tests/">
-    <Project Path="backend/libs/shared-kernel/tests/Roomy.SharedKernel.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/" />
-  <Folder Name="/backend/tests/test-support/">
-    <Project Path="backend/tests/test-support/Roomy.TestSupport.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/apphost/">
-    <Project Path="backend/tests/apphost/Roomy.AppHost.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/architecture/">
-    <Project Path="backend/tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/attendance/">
+    <Project Path="backend/tests/attendance-infrastructure/Roomy.Attendance.Infrastructure.Tests.csproj" />
+    <Project Path="backend/tests/attendance-integration-apphost/Roomy.Attendance.TestAppHost.csproj" />
+    <Project Path="backend/tests/attendance-integration/Roomy.Attendance.IntegrationTests.csproj" />
     <Project Path="backend/tests/attendance/Roomy.Attendance.Tests.csproj" />
   </Folder>
-  <Folder Name="/backend/tests/attendance-infrastructure/">
-    <Project Path="backend/tests/attendance-infrastructure/Roomy.Attendance.Infrastructure.Tests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/attendance-integration/">
-    <Project Path="backend/tests/attendance-integration/Roomy.Attendance.IntegrationTests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/attendance-integration-apphost/">
-    <Project Path="backend/tests/attendance-integration-apphost/Roomy.Attendance.TestAppHost.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/identity/">
+  <Folder Name="/Identity API/">
+    <Project Path="backend/apps/identity-api/Roomy.Identity.Api.csproj" />
+    <Project Path="backend/libs/identity/application/Roomy.Identity.Application.csproj" />
+    <Project Path="backend/libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
+    <Project Path="backend/libs/identity/domain/Roomy.Identity.Domain.csproj" />
+    <Project Path="backend/libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
+    <Project Path="backend/tests/identity-integration-apphost/Roomy.Identity.TestAppHost.csproj" />
+    <Project Path="backend/tests/identity-integration/Roomy.Identity.IntegrationTests.csproj" />
     <Project Path="backend/tests/identity/Roomy.Identity.Tests.csproj" />
   </Folder>
-  <Folder Name="/backend/tests/organization/">
+  <Folder Name="/Organization API/">
+    <Project Path="backend/apps/organization-api/Roomy.Organization.Api.csproj" />
+    <Project Path="backend/libs/organization/application/Roomy.Organization.Application.csproj" />
+    <Project Path="backend/libs/organization/contracts/Roomy.Contracts.Organization.csproj" />
+    <Project Path="backend/libs/organization/domain/Roomy.Organization.Domain.csproj" />
+    <Project Path="backend/libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
+    <Project Path="backend/tests/organization-integration-apphost/Roomy.Organization.TestAppHost.csproj" />
+    <Project Path="backend/tests/organization-integration/Roomy.Organization.IntegrationTests.csproj" />
     <Project Path="backend/tests/organization/Roomy.Organization.Tests.csproj" />
   </Folder>
-  <Folder Name="/backend/tests/organization-integration/">
-    <Project Path="backend/tests/organization-integration/Roomy.Organization.IntegrationTests.csproj" />
+  <Folder Name="/Tools and Helpers/">
+    <Project Path="backend/apps/db-migrator/Roomy.DbMigrator.csproj" />
+    <Project Path="backend/apps/dev-seeder/Roomy.DevSeeder.csproj" />
   </Folder>
-  <Folder Name="/backend/tests/organization-integration-apphost/">
-    <Project Path="backend/tests/organization-integration-apphost/Roomy.Organization.TestAppHost.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/saga-e2e/">
-    <Project Path="backend/tests/saga-e2e/Roomy.Saga.E2ETests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/saga-e2e-apphost/">
-    <Project Path="backend/tests/saga-e2e-apphost/Roomy.Saga.TestAppHost.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/eventstore-integration-apphost/">
+  <Folder Name="/_Common/">
+    <Project Path="backend/libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
+    <Project Path="backend/libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <Project Path="backend/libs/shared-kernel/tests/Roomy.SharedKernel.Tests.csproj" />
+    <Project Path="backend/libs/web-http/src/Roomy.Web.Http.csproj" />
+    <Project Path="backend/libs/web-http/tests/Roomy.Web.Http.Tests.csproj" />
     <Project Path="backend/tests/eventstore-integration-apphost/Roomy.EventStore.TestAppHost.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/identity-integration/">
-    <Project Path="backend/tests/identity-integration/Roomy.Identity.IntegrationTests.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/identity-integration-apphost/">
-    <Project Path="backend/tests/identity-integration-apphost/Roomy.Identity.TestAppHost.csproj" />
-  </Folder>
-  <Folder Name="/backend/tests/identity-keycloak-apphost/">
     <Project Path="backend/tests/identity-keycloak-apphost/Roomy.Identity.KeycloakTestAppHost.csproj" />
+  </Folder>
+  <Folder Name="/_Common/Architecture/">
+    <Project Path="backend/tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/_Common/Gateway/">
+    <Project Path="backend/apps/gateway/Roomy.Gateway.csproj" />
+    <Project Path="backend/apps/gateway/tests/Roomy.Gateway.Tests.csproj" />
+  </Folder>
+  <Folder Name="/_Common/Infrastructure/">
+    <Project Path="backend/libs/infrastructure-authentication/src/Roomy.Infrastructure.Authentication.csproj" />
+    <Project Path="backend/libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
+    <Project Path="backend/libs/infrastructure-messaging/tests/Roomy.Infrastructure.Messaging.Tests.csproj" />
+    <Project Path="backend/libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <Project Path="backend/libs/infrastructure-persistence/tests/Roomy.Infrastructure.Persistence.Tests.csproj" />
+  </Folder>
+  <Folder Name="/_Common/Testing/">
+    <Project Path="backend/tests/saga-e2e-apphost/Roomy.Saga.TestAppHost.csproj" />
+    <Project Path="backend/tests/saga-e2e/Roomy.Saga.E2ETests.csproj" />
+    <Project Path="backend/tests/test-support/Roomy.TestSupport.csproj" />
+  </Folder>
+  <Folder Name="/_Start/">
+    <Project Path="backend/apps/apphost/Roomy.AppHost.csproj" />
+    <Project Path="backend/libs/service-defaults/Roomy.ServiceDefaults.csproj" />
+    <Project Path="backend/tests/apphost/Roomy.AppHost.Tests.csproj" />
   </Folder>
 </Solution>
