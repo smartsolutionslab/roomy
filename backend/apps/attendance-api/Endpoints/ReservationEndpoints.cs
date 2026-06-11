@@ -82,14 +82,14 @@ public static class ReservationEndpoints
         if (userId.IsFailure) return Results.Unauthorized();
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
+        if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
         var actor = await employees.FindByUserAsync(UserIdentifier.From(userId.Value), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
 
-        return result.Match(page => Results.Ok(page.ToResponse()), BadRequest);
+        return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
     }
 
     private static async Task<IResult> ViewEmployeesAsync(
@@ -100,14 +100,14 @@ public static class ReservationEndpoints
         CancellationToken cancellationToken)
     {
         var searchTerm = SearchTerm.From(q);
-        if (searchTerm.IsFailure) return BadRequest(searchTerm.Error);
+        if (searchTerm.IsFailure) return searchTerm.Error.ToBadRequest();
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
+        if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
         var result = await view.HandleAsync(new ViewEmployees(searchTerm.Value, pageRequest.Value), cancellationToken);
 
-        return result.Match(employees => Results.Ok(employees.ToResponse()), BadRequest);
+        return result.Match(employees => Results.Ok(employees.ToResponse()), error => error.ToBadRequest());
     }
 
     private static async Task<IResult> ViewForEmployeeAsync(
@@ -118,15 +118,12 @@ public static class ReservationEndpoints
         CancellationToken cancellationToken)
     {
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure) return BadRequest(pageRequest.Error);
+        if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
         var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest.Value), cancellationToken);
 
-        return result.Match(page => Results.Ok(page.ToResponse()), BadRequest);
+        return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
     }
-
-    private static IResult BadRequest(Error error) =>
-        Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: StatusCodes.Status400BadRequest);
 
     private static async Task<IResult> ReserveAsync(
         Request.Reserve request,
