@@ -20,6 +20,7 @@ public sealed class DefaultAdminSeederTests(PostgresDatabaseFixture fixture)
         public Role LastRole { get; private set; }
 
         public Task<Result<KeycloakSubjectIdentifier>> ProvisionUserAsync(
+            UserIdentifier userIdentifier,
             Email email,
             DisplayName displayName,
             string initialPassword,
@@ -28,7 +29,7 @@ public sealed class DefaultAdminSeederTests(PostgresDatabaseFixture fixture)
         {
             Calls++;
             LastRole = role;
-            return Task.FromResult(Result.Success(KeycloakSubjectIdentifier.From(Guid.NewGuid())));
+            return Task.FromResult(Result.Success(KeycloakSubjectIdentifier.From(userIdentifier.Value)));
         }
 
         public Task<Result> AssignAdministratorRoleAsync(

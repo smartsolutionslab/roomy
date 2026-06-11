@@ -12,11 +12,32 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
     private static Email UniqueEmail() => Email.From($"user-{Guid.NewGuid():N}@example.com");
 
     [Fact]
+    public async Task Provisions_the_user_with_the_roomy_user_id_attribute()
+    {
+        var provider = fixture.CreateProvider();
+        var userIdentifier = UserIdentifier.New();
+
+        var result = await provider.ProvisionUserAsync(
+            userIdentifier,
+            UniqueEmail(),
+            DisplayName.From("Ada Lovelace"),
+            ValidPassword,
+            Role.Employee,
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.ShouldBeTrue();
+        var attribute = await fixture.GetUserAttributeAsync(
+            result.Value, "roomy_user_id", TestContext.Current.CancellationToken);
+        attribute.ShouldBe(userIdentifier.Value.ToString());
+    }
+
+    [Fact]
     public async Task Provisions_an_employee_and_assigns_the_employee_role()
     {
         var provider = fixture.CreateProvider();
 
         var result = await provider.ProvisionUserAsync(
+            UserIdentifier.New(),
             UniqueEmail(),
             DisplayName.From("Ada Lovelace"),
             ValidPassword,
@@ -37,6 +58,7 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
         var provider = fixture.CreateProvider();
 
         var result = await provider.ProvisionUserAsync(
+            UserIdentifier.New(),
             UniqueEmail(),
             DisplayName.From("Grace Hopper"),
             ValidPassword,
@@ -57,11 +79,11 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
         var email = UniqueEmail();
 
         var first = await provider.ProvisionUserAsync(
-            email, DisplayName.From("First"), ValidPassword, Role.Employee, TestContext.Current.CancellationToken);
+            UserIdentifier.New(), email, DisplayName.From("First"), ValidPassword, Role.Employee, TestContext.Current.CancellationToken);
         first.IsSuccess.ShouldBeTrue();
 
         var second = await provider.ProvisionUserAsync(
-            email, DisplayName.From("Second"), ValidPassword, Role.Employee, TestContext.Current.CancellationToken);
+            UserIdentifier.New(), email, DisplayName.From("Second"), ValidPassword, Role.Employee, TestContext.Current.CancellationToken);
 
         second.IsFailure.ShouldBeTrue();
         second.Error.Type.ShouldBe(ErrorType.Conflict);
@@ -73,7 +95,7 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
     {
         var provider = fixture.CreateProvider();
         var provisioned = await provider.ProvisionUserAsync(
-            UniqueEmail(), DisplayName.From("Ada Lovelace"), ValidPassword, Role.Employee,
+            UserIdentifier.New(), UniqueEmail(), DisplayName.From("Ada Lovelace"), ValidPassword, Role.Employee,
             TestContext.Current.CancellationToken);
         provisioned.IsSuccess.ShouldBeTrue();
 
@@ -92,7 +114,7 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
     {
         var provider = fixture.CreateProvider();
         var provisioned = await provider.ProvisionUserAsync(
-            UniqueEmail(), DisplayName.From("Grace Hopper"), ValidPassword,
+            UserIdentifier.New(), UniqueEmail(), DisplayName.From("Grace Hopper"), ValidPassword,
             Role.Employee.GrantAdministrator(), TestContext.Current.CancellationToken);
         provisioned.IsSuccess.ShouldBeTrue();
 
@@ -111,6 +133,7 @@ public sealed class KeycloakIdentityProviderTests(KeycloakRealmFixture fixture)
         var provider = fixture.CreateProvider();
 
         var result = await provider.ProvisionUserAsync(
+            UserIdentifier.New(),
             UniqueEmail(),
             DisplayName.From("Short Pass"),
             "short",

@@ -100,6 +100,7 @@ internal sealed class Seeder(
             var email = $"{Slug(seed.DisplayName)}@{SeedData.EmailDomain}";
 
             var provisioned = await identityProvider.ProvisionUserAsync(
+                IdentityUserId.From(userId),
                 Email.From(email),
                 DisplayName.From(seed.DisplayName),
                 options.EmployeePassword,

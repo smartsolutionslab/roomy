@@ -68,6 +68,23 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
             .ToList();
     }
 
+    public async Task<string?> GetUserAttributeAsync(
+        KeycloakSubjectIdentifier subject,
+        string attribute,
+        CancellationToken cancellationToken)
+    {
+        var token = await AcquireAdminTokenAsync(cancellationToken);
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"admin/realms/{Realm}/users/{subject.Value}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        using var response = await Client.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var user = await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken);
+        return user?["attributes"]?[attribute]?[0]?.GetValue<string>();
+    }
+
     private HttpClient Client =>
         httpClient ?? throw new InvalidOperationException("The fixture is not initialised.");
 

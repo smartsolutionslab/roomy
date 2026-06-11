@@ -103,7 +103,7 @@ public sealed class ProvisioningTests
     {
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         identityProvider.ProvisionUserAsync(
-                Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
+                Arg.Any<UserIdentifier>(), Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success(subject));
         return identityProvider;
     }
@@ -112,7 +112,7 @@ public sealed class ProvisioningTests
     {
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         identityProvider.ProvisionUserAsync(
-                Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
+                Arg.Any<UserIdentifier>(), Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
             .Returns(Result.Failure<KeycloakSubjectIdentifier>(error));
         return identityProvider;
     }

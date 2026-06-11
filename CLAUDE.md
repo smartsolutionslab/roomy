@@ -304,11 +304,15 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   is reconstructed from the namespace tail by `web-http`'s `EndpointSchemaIds`, so the wire contract and
   generated client are unchanged (ADR-0050).
 - **Read the current user at the API edge via `CurrentUser`** — endpoints take the bound
-  `ClaimsPrincipal` but never parse it inline: `principal.Subject()` (the single `NameIdentifier ?? "sub"`
-  parse, a `Result<Guid>`) and `principal.IsAdministrator()` live in `web-http`, with one
-  `RoomyRoles.Administrator` literal (no per-host `AdministratorRole` constant). Authorization *rules*
-  live in the use-case handler (which gets the decision as a command field, e.g. `ActorIsAdmin`), not in
-  the endpoint; handlers never see `ClaimsPrincipal` (ADR-0053).
+  `ClaimsPrincipal` but never parse it inline. Two reads live in `web-http`: `principal.Subject()`
+  (the Keycloak subject, `NameIdentifier ?? "sub"`, a `Result<Guid>`) and `principal.UserId()` (the
+  Roomy `UserIdentifier`, from the `roomy_user_id` claim, `RoomyClaims.UserId`). They differ — Keycloak
+  mints its own `sub` and ignores a forced id — so identity resolves the account by `Subject()` (it owns
+  the Keycloak↔Roomy mapping) while contexts that key on the domain user (attendance) use `UserId()`
+  (ADR-0058). `principal.IsAdministrator()` also lives in `web-http`, with one `RoomyRoles.Administrator`
+  literal (no per-host `AdministratorRole` constant). Authorization *rules* live in the use-case handler
+  (which gets the decision as a command field, e.g. `ActorIsAdmin`), not in the endpoint; handlers never
+  see `ClaimsPrincipal` (ADR-0053, ADR-0058).
 - **Company-local "today" comes from `IBusinessClock`** — never derive a timezone in a handler or endpoint.
   The port (`Today: BookingDate`, `Now: DateTimeOffset`) is implemented once in attendance infrastructure
   over `TimeProvider` + a configured zone (`Attendance:TimeZone`, default `Europe/Berlin`, resolved at the
