@@ -24,22 +24,28 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
         var fromDate = range.From.Value;
         var toDate = range.To.Value;
 
-        var occupantRows = await (
-            from reservation in context.Reservations.AsNoTracking()
-            where reservation.CompanyId == companyId
+        var occupantRows = await context.Reservations.AsNoTracking()
+            .Where(reservation =>
+                reservation.CompanyId == companyId
                 && reservation.Date >= fromDate
                 && reservation.Date <= toDate
-                && roomIds.Contains(reservation.RoomId)
-            join employee in context.Employees.AsNoTracking()
-                on reservation.EmployeeId equals employee.EmployeeId into matched
-            from employee in matched.DefaultIfEmpty()
-            select new
-            {
-                reservation.Date,
-                reservation.RoomId,
-                reservation.EmployeeId,
-                Name = employee != null ? employee.DisplayName : string.Empty,
-            }).ToListAsync(cancellationToken).ConfigureAwait(false);
+                && roomIds.Contains(reservation.RoomId))
+            .GroupJoin(
+                context.Employees.AsNoTracking(),
+                reservation => reservation.EmployeeId,
+                employee => employee.EmployeeId,
+                (reservation, matched) => new { reservation, matched })
+            .SelectMany(
+                joined => joined.matched.DefaultIfEmpty(),
+                (joined, employee) => new
+                {
+                    joined.reservation.Date,
+                    joined.reservation.RoomId,
+                    joined.reservation.EmployeeId,
+                    Name = employee != null ? employee.DisplayName : string.Empty,
+                })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         var descriptors = rooms
             .Select(room => new RoomDescriptor(

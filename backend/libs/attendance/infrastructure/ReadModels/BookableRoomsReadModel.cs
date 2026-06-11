@@ -8,27 +8,32 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 
 public sealed class BookableRoomsReadModel(AttendanceDbContext context) : IBookableRoomsReadModel
 {
-    public async Task<IReadOnlyList<BookableRoomView>> GetAsync(
-        CompanyIdentifier company,
-        CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<BookableRoomView>> GetAsync(CompanyIdentifier company, CancellationToken cancellationToken)
     {
         var companyId = company.Value;
 
-        var rows = await (
-            from room in context.Rooms.AsNoTracking()
-            where room.CompanyId == companyId
-            join office in context.Offices.AsNoTracking()
-                on room.OfficeId equals office.OfficeId into offices
-            from office in offices.DefaultIfEmpty()
-            orderby office != null ? office.Name : string.Empty, room.Name
-            select new
+        var rows = await context.Rooms.AsNoTracking()
+            .Where(room => room.CompanyId == companyId)
+            .GroupJoin(
+                context.Offices.AsNoTracking(),
+                room => room.OfficeId,
+                office => office.OfficeId,
+                (room, offices) => new { room, offices })
+            .SelectMany(
+                joined => joined.offices.DefaultIfEmpty(),
+                (joined, office) => new { joined.room, office })
+            .OrderBy(row => row.office != null ? row.office.Name : string.Empty)
+            .ThenBy(row => row.room.Name)
+            .Select(row => new
             {
-                room.OfficeId,
-                OfficeName = office != null ? office.Name : string.Empty,
-                room.RoomId,
-                RoomName = room.Name,
-                room.Capacity,
-            }).ToListAsync(cancellationToken).ConfigureAwait(false);
+                row.room.OfficeId,
+                OfficeName = row.office != null ? row.office.Name : string.Empty,
+                row.room.RoomId,
+                RoomName = row.room.Name,
+                row.room.Capacity,
+            })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         return rows.Select(row => new BookableRoomView(
                 OfficeIdentifier.From(row.OfficeId),
