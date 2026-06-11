@@ -23,23 +23,32 @@ public sealed class MyReservationsReadModel(AttendanceDbContext context) : IMyRe
             reservations = reservations.Where(reservation => reservation.Date > afterDate);
         }
 
-        var rows = await (
-            from reservation in reservations
-            join office in context.Offices.AsNoTracking()
-                on reservation.OfficeId equals office.OfficeId into offices
-            from office in offices.DefaultIfEmpty()
-            join room in context.Rooms.AsNoTracking()
-                on reservation.RoomId equals room.RoomId into rooms
-            from room in rooms.DefaultIfEmpty()
-            orderby reservation.Date
-            select new
+        var rows = await reservations
+            .GroupJoin(
+                context.Offices.AsNoTracking(),
+                reservation => reservation.OfficeId,
+                office => office.OfficeId,
+                (reservation, offices) => new { reservation, offices })
+            .SelectMany(
+                joined => joined.offices.DefaultIfEmpty(),
+                (joined, office) => new { joined.reservation, office })
+            .GroupJoin(
+                context.Rooms.AsNoTracking(),
+                joined => joined.reservation.RoomId,
+                room => room.RoomId,
+                (joined, rooms) => new { joined.reservation, joined.office, rooms })
+            .SelectMany(
+                joined => joined.rooms.DefaultIfEmpty(),
+                (joined, room) => new { joined.reservation, joined.office, room })
+            .OrderBy(row => row.reservation.Date)
+            .Select(row => new
             {
-                reservation.ReservationId,
-                reservation.OfficeId,
-                OfficeName = office != null ? office.Name : string.Empty,
-                reservation.RoomId,
-                RoomName = room != null ? room.Name : string.Empty,
-                reservation.Date,
+                row.reservation.ReservationId,
+                row.reservation.OfficeId,
+                OfficeName = row.office != null ? row.office.Name : string.Empty,
+                row.reservation.RoomId,
+                RoomName = row.room != null ? row.room.Name : string.Empty,
+                row.reservation.Date,
             })
             .Take(request.Limit + 1)
             .ToListAsync(cancellationToken)
