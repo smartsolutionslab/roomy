@@ -1,4 +1,4 @@
-# 0059. Feature-local presentational components, with the page as the single smart orchestrator
+# 0060. Feature-local presentational components, with the page as the single smart orchestrator
 
 - **Status:** Accepted
 - **Date:** 2026-06-11
@@ -113,5 +113,5 @@ while the page remains the one smart component.
 
 **Follow-ups**
 - No Nx taxonomy change; the `type:feature`/`context:organization` rules are unchanged.
-- The first application is spec `019-offices-page-components`. If/when a child is reused, create
+- The first application is spec `020-offices-page-components`. If/when a child is reused, create
   `organization/ui` under ADR-0035's rules and move it there in that slice.
