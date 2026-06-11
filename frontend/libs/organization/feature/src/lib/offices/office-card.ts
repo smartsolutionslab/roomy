@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { Office, OfficeId, Room, RoomId } from '@roomy/organization-api';
-import { Button, FormField, Message } from '@roomy/shared-ui';
+import { Button, FieldError, FormField } from '@roomy/shared-ui';
 
 import { RoomRow, TextFormGroup } from './room-row';
 
@@ -20,7 +20,7 @@ export type RoomFormGroup = FormGroup<{
 @Component({
   selector: 'roomy-office-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, ReactiveFormsModule, FormField, Message, Button, RoomRow],
+  imports: [TranslocoDirective, ReactiveFormsModule, FormField, FieldError, Button, RoomRow],
   templateUrl: './office-card.html',
   styleUrl: './office-card.css',
 })

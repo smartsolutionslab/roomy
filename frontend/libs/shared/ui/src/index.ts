@@ -8,6 +8,7 @@ export { Heat, heatColor } from './lib/heat/heat';
 export { Page } from './lib/page/page';
 export { FormField } from './lib/form-field/form-field';
 export { Message } from './lib/message/message';
+export { FieldError } from './lib/field-error/field-error';
 export { Icon, type IconName } from './lib/icon/icon';
 export { DaySelect } from './lib/day-select/day-select';
 export { Select, type SelectOption } from './lib/select/select';
