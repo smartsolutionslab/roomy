@@ -67,5 +67,39 @@ public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixtu
         reloaded.Reservations.Count.ShouldBe(1);
     }
 
+    [Fact]
+    public async Task MutateAsync_reloads_and_retries_after_a_real_concurrency_conflict()
+    {
+        var company = CompanyIdentifier.New();
+        var room = SomeRoom();
+        var repository = fixture.CreateRepository();
+        var attempts = 0;
+
+        var result = await repository.MutateAsync(
+            company,
+            bookingDate,
+            day =>
+            {
+                attempts++;
+                if (attempts == 1)
+                {
+                    var rival = fixture.CreateRepository();
+                    var rivalDay = rival.LoadAsync(company, bookingDate, TestContext.Current.CancellationToken).GetAwaiter().GetResult();
+                    rivalDay.Reserve(EmployeeIdentifier.New(), room, RoomCapacity.From(8), bookingDate, occurredAt);
+                    rival.SaveAsync(rivalDay, TestContext.Current.CancellationToken).GetAwaiter().GetResult();
+                }
+
+                return day.Reserve(EmployeeIdentifier.New(), room, RoomCapacity.From(8), bookingDate, occurredAt);
+            },
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.ShouldBeTrue();
+        attempts.ShouldBe(2);
+
+        var reloaded = await fixture.CreateRepository().LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
+        reloaded.Version.ShouldBe(2);
+        reloaded.Reservations.Count.ShouldBe(2);
+    }
+
     private static RoomReference SomeRoom() => RoomReference.From(OfficeIdentifier.New(), RoomIdentifier.New());
 }
