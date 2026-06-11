@@ -10,3 +10,4 @@ export { Message } from './lib/message/message';
 export { Icon, type IconName } from './lib/icon/icon';
 export { DaySelect } from './lib/day-select/day-select';
 export { Select, type SelectOption } from './lib/select/select';
+export { TileGroup } from './lib/tile-group/tile-group';
