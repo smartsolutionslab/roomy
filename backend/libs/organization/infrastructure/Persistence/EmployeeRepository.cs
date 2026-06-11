@@ -17,4 +17,7 @@ public sealed class EmployeeRepository(OrganizationDbContext context) : IEmploye
 
         return employee;
     }
+
+    public async Task<bool> ExistsByWorkEmailAsync(WorkEmail email, CancellationToken cancellationToken) =>
+        await context.Employees.AnyAsync(candidate => candidate.Email == email, cancellationToken);
 }

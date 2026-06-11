@@ -52,6 +52,20 @@ if (!emittingOpenApiDocument)
     builder.Services
         .AddScoped<CompanySeeder>()
         .AddHostedService<CompanySeederHostedService>();
+
+    // The seeded administrator is hired here so it becomes a first-class employee (ADR-0059). Registered
+    // after the company seeder so it runs once the seeded Company exists; the hire saga provisions the
+    // identity User + Keycloak and the attendance directory row.
+    var defaultAdmin = builder.Configuration.GetSection(DefaultAdminOptions.SectionName);
+    builder.Services.AddSingleton(new DefaultAdminOptions
+    {
+        Email = defaultAdmin["Email"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:Email'."),
+        DisplayName = defaultAdmin["DisplayName"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:DisplayName'."),
+        InitialPassword = defaultAdmin["InitialPassword"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
+    });
+    builder.Services
+        .AddScoped<DefaultAdminSeeder>()
+        .AddHostedService<DefaultAdminSeederHostedService>();
 }
 
 var app = builder.Build();

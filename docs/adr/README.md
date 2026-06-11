@@ -75,3 +75,5 @@ ADRs are written **before** the implementing code, not after.
 | [0051](0051-application-commands-queries-handlers-folders.md) | Application use cases split into Commands/ and Queries/ with a Handlers/ subfolder | Accepted |
 | [0056](0056-router-config-driven-navigation.md) | Navigation derived from the router config, with role inferred from the route guard | Accepted |
 | [0057](0057-backend-folder-layout.md) | Nest all backend (.NET) projects under backend/ | Accepted |
+| [0058](0058-roomy-user-id-token-claim.md) | Carry the Roomy UserIdentifier as a token claim; resolve the current user from it | Accepted |
+| [0059](0059-defaultadmin-bootstrap-organization-led.md) | DefaultAdmin bootstrap is organization-led | Accepted |

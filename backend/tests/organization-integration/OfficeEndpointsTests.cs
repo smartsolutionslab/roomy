@@ -32,6 +32,9 @@ public sealed class OfficeEndpointsTests : IClassFixture<PostgresDatabaseFixture
             webHost.UseSetting("Keycloak:BaseAddress", "http://keycloak.localhost");
             webHost.UseSetting("Keycloak:Realm", "roomy");
             webHost.UseSetting("Company:Name", "Roomy Test Company");
+            webHost.UseSetting("DefaultAdmin:Email", "default-admin@roomy.test");
+            webHost.UseSetting("DefaultAdmin:DisplayName", "Default Admin");
+            webHost.UseSetting("DefaultAdmin:InitialPassword", "default-admin-password");
 
             webHost.ConfigureTestServices(services =>
             {
