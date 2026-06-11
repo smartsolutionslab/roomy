@@ -85,6 +85,9 @@
   <Folder Name="/libs/web-http/src/">
     <Project Path="libs/web-http/src/Roomy.Web.Http.csproj" />
   </Folder>
+  <Folder Name="/libs/web-http/tests/">
+    <Project Path="libs/web-http/tests/Roomy.Web.Http.Tests.csproj" />
+  </Folder>
   <Folder Name="/libs/shared-kernel/" />
   <Folder Name="/libs/shared-kernel/src/">
     <Project Path="libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
