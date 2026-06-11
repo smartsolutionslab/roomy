@@ -18,7 +18,9 @@ export class AdminUsersPage {
 
   // The endless account list (ADR-0044/0049): the helper owns the cursor accumulation, so this page
   // declares only the fetch and binds the helper's signals to roomy-infinite-scroll.
-  protected readonly list = cursorList<AdminUser>((cursor) => this.adminUsersGateway.getAll(cursor));
+  protected readonly list = cursorList<AdminUser>((cursor) =>
+    this.adminUsersGateway.getAll(cursor),
+  );
 
   protected readonly grantFailed = signal(false);
   protected readonly confirmingUserId = signal<UserId | null>(null);

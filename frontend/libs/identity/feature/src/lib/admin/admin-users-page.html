@@ -3,7 +3,9 @@
     <h1>{{ translate('admin.users.title') }}</h1>
 
     @if (grantSucceeded(); as grantedName) {
-    <roomy-message>{{ translate('admin.users.grantSuccess', { name: grantedName }) }}</roomy-message>
+    <roomy-message
+      >{{ translate('admin.users.grantSuccess', { name: grantedName }) }}</roomy-message
+    >
     } @if (grantFailed()) {
     <roomy-message variant="error">{{ translate('admin.users.grantError') }}</roomy-message>
     } @if (list.failed()) {
@@ -16,41 +18,41 @@
       [loading]="list.loading()"
       (loadMore)="list.loadMore()"
     >
-    <table class="roomy-table admin-users__table">
-      <thead>
-        <tr>
-          <th scope="col">{{ translate('admin.users.nameHeader') }}</th>
-          <th scope="col">{{ translate('admin.users.emailHeader') }}</th>
-          <th scope="col">{{ translate('admin.users.roleHeader') }}</th>
-          <th scope="col">{{ translate('admin.users.statusHeader') }}</th>
-          <th scope="col">{{ translate('admin.users.actionsHeader') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (account of accounts; track account.userId) {
-        <tr>
-          <td>{{ account.displayName }}</td>
-          <td>{{ account.email }}</td>
-          <td>{{ translate('account.role.' + account.role) }}</td>
-          <td>{{ translate('admin.users.status.' + account.status) }}</td>
-          <td>
-            @if (account.role === 'employee') { @if (confirmingUserId() === account.userId) {
-            <button roomyButton variant="accent" type="button" (click)="confirmGrant(account)">
-              {{ translate('admin.users.confirm') }}
-            </button>
-            <button roomyButton type="button" (click)="cancelGrant()">
-              {{ translate('admin.users.cancel') }}
-            </button>
-            } @else {
-            <button roomyButton type="button" (click)="requestGrant(account)">
-              {{ translate('admin.users.grant') }}
-            </button>
-            } }
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+      <table class="roomy-table admin-users__table">
+        <thead>
+          <tr>
+            <th scope="col">{{ translate('admin.users.nameHeader') }}</th>
+            <th scope="col">{{ translate('admin.users.emailHeader') }}</th>
+            <th scope="col">{{ translate('admin.users.roleHeader') }}</th>
+            <th scope="col">{{ translate('admin.users.statusHeader') }}</th>
+            <th scope="col">{{ translate('admin.users.actionsHeader') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (account of accounts; track account.userId) {
+          <tr>
+            <td>{{ account.displayName }}</td>
+            <td>{{ account.email }}</td>
+            <td>{{ translate('account.role.' + account.role) }}</td>
+            <td>{{ translate('admin.users.status.' + account.status) }}</td>
+            <td>
+              @if (account.role === 'employee') { @if (confirmingUserId() === account.userId) {
+              <button roomyButton variant="accent" type="button" (click)="confirmGrant(account)">
+                {{ translate('admin.users.confirm') }}
+              </button>
+              <button roomyButton type="button" (click)="cancelGrant()">
+                {{ translate('admin.users.cancel') }}
+              </button>
+              } @else {
+              <button roomyButton type="button" (click)="requestGrant(account)">
+                {{ translate('admin.users.grant') }}
+              </button>
+              } }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </roomy-infinite-scroll>
     } } @else {
     <p>{{ translate('admin.users.loading') }}</p>

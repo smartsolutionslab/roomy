@@ -68,7 +68,11 @@ export function toBookableOffices(rooms: readonly BookableRoomResponse[]): Booka
       office = { id: officeId(room.officeId), name: room.officeName, rooms: [] };
       offices.set(room.officeId, office);
     }
-    office.rooms.push({ id: roomId(room.roomId), name: room.roomName, capacity: Number(room.capacity) });
+    office.rooms.push({
+      id: roomId(room.roomId),
+      name: room.roomName,
+      capacity: Number(room.capacity),
+    });
   }
   return [...offices.values()];
 }
