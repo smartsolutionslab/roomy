@@ -152,7 +152,7 @@
       "dayPlaceholder": "Tag auswählen",
       "roomsHeading": "Räume",
       "capacityLabel": "{{capacity}} Plätze",
-      "placesLeft": "{{remaining}} von {{capacity}} Plätzen frei",
+      "free": "{{remaining}} von {{capacity}} frei",
       "full": "Belegt",
       "confirm": "Reservieren",
       "reserved": "{{room}} für {{date}} reserviert.",

@@ -1,0 +1,19 @@
+/* The bar inherits currentColor: a muted track and a solid fill, so it adapts to its surface (text
+   colour on a normal tile, the on-accent colour on a selected one). */
+:host {
+  display: block;
+}
+
+.usage-bar {
+  display: block;
+  block-size: 0.375rem;
+  border-radius: var(--roomy-radius-full);
+  background: color-mix(in srgb, currentColor 20%, transparent);
+  overflow: hidden;
+}
+
+.usage-bar__fill {
+  display: block;
+  block-size: 100%;
+  background: currentColor;
+}

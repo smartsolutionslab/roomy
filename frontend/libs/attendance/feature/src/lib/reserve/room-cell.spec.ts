@@ -42,17 +42,17 @@ describe('RoomCell', () => {
     const { container } = await renderHost({ availability: undefined });
 
     expect(screen.getByText('A1')).toBeTruthy();
-    expect(container.querySelector('.reserve__room-bar')).toBeNull();
+    expect(container.querySelector('roomy-usage-bar')).toBeNull();
     expect((screen.getByRole('button', { name: /A1/ }) as HTMLButtonElement).disabled).toBe(false);
   });
 
-  it('shows remaining places and an availability bar when not full', async () => {
+  it('shows the free places and a usage bar when not full', async () => {
     const { container } = await renderHost({
       availability: { roomId: room.id, occupied: 1, capacity: 5, isFull: false },
     });
 
-    expect(screen.getByText('4 of 5 places left')).toBeTruthy();
-    expect(container.querySelector('.reserve__room-bar')).not.toBeNull();
+    expect(screen.getByText('4 of 5 free')).toBeTruthy();
+    expect(container.querySelector('roomy-usage-bar')).not.toBeNull();
     expect((screen.getByRole('button', { name: /A1/ }) as HTMLButtonElement).disabled).toBe(false);
   });
 

@@ -6,25 +6,22 @@
     [attr.aria-pressed]="selected()"
     (click)="chosen.emit()"
   >
-    <span class="reserve__room-row">
-      <span class="reserve__room-name">{{ room().name }}</span>
-      @if (availability(); as availability) { @if (availability.isFull) {
-      <span class="reserve__room-figure">{{ translate('attendance.reserve.full') }}</span>
-      } @else {
-      <span class="reserve__room-figure"
-        >{{ translate('attendance.reserve.placesLeft', { remaining: remaining(), capacity:
-        room().capacity }) }}</span
-      >
-      } } @else {
-      <span class="reserve__room-figure"
-        >{{ translate('attendance.reserve.capacityLabel', { capacity: room().capacity }) }}</span
-      >
+    <span class="reserve__room-name">{{ room().name }}</span>
+    @if (availability(); as availability) {
+    <span class="reserve__room-figure">
+      @if (availability.isFull) { {{ translate('attendance.reserve.full') }} } @else { {{
+      translate('attendance.reserve.free', { remaining: remaining(), capacity: room().capacity }) }}
       }
     </span>
-    @if (availability()) {
-    <span class="reserve__room-bar" aria-hidden="true">
-      <span class="reserve__room-bar-fill" [style.inline-size.%]="occupiedPercent()"></span>
-    </span>
+    <roomy-usage-bar
+      class="reserve__room-meter"
+      [occupied]="availability.occupied"
+      [capacity]="availability.capacity"
+    />
+    } @else {
+    <span class="reserve__room-figure"
+      >{{ translate('attendance.reserve.capacityLabel', { capacity: room().capacity }) }}</span
+    >
     }
   </button>
 </ng-container>
