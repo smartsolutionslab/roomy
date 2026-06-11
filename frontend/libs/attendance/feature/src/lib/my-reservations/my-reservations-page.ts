@@ -18,10 +18,8 @@ import {
   partitionReservationsByDay,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { cursorList } from '@roomy/shared-data-access';
+import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import { Button, InfiniteScroll, Message, Page } from '@roomy/shared-ui';
-
-type ResultMessage = { key: string; params?: Record<string, unknown> };
 
 // The signed-in employee's own reservations (AT-4): past and upcoming, with cancel offered only on
 // upcoming rows (FR-006/FR-007) and "change" performed as cancel + re-reserve — a navigation into the
@@ -66,9 +64,7 @@ export class MyReservationsPage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.list.update((items) =>
-            items.filter((candidate) => candidate.id !== reservation.id),
-          );
+          this.list.update((items) => items.filter((candidate) => candidate.id !== reservation.id));
           this.result.set({ key: 'attendance.mine.cancelled' });
         },
         error: (error: HttpErrorResponse) => this.handleCancelError(error),
@@ -86,9 +82,7 @@ export class MyReservationsPage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.list.update((items) =>
-            items.filter((candidate) => candidate.id !== reservation.id),
-          );
+          this.list.update((items) => items.filter((candidate) => candidate.id !== reservation.id));
           this.goToReserve();
         },
         error: (error: HttpErrorResponse) => this.handleCancelError(error),

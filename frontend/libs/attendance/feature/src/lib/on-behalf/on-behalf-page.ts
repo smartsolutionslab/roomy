@@ -19,7 +19,7 @@ import {
   partitionReservationsByDay,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { cursorList } from '@roomy/shared-data-access';
+import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import {
   Button,
   FormField,
@@ -32,8 +32,6 @@ import {
 import { EMPTY, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { ReservePage } from '../reserve/reserve-page';
-
-type ResultMessage = { key: string; params?: Record<string, unknown> };
 
 // The administrator on-behalf page (009, AT-6): pick an employee, then reserve for them (the embedded
 // 007 reserve flow with `onBehalfOf` set) and view/cancel their reservations. Admin-gated by the route

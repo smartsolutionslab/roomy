@@ -4,13 +4,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { Office, OfficeId, OfficesGateway, Room, RoomId } from '@roomy/organization-api';
+import { type ResultMessage } from '@roomy/shared-data-access';
 import { Card, Message, Page } from '@roomy/shared-ui';
 import { Observable, catchError, of } from 'rxjs';
 
 import { CreateOfficeForm } from './create-office-form';
 import { ActiveEditor, OfficeCard } from './office-card';
-
-type ResultMessage = { key: string; params?: Record<string, unknown> };
 
 @Component({
   selector: 'roomy-offices-page',
