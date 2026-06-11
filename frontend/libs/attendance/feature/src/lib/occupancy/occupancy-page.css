@@ -8,26 +8,67 @@
   padding: 0;
 }
 
+/* Range and date sit side by side, wrapping to a stack only when the row runs out of width. */
+.occupancy__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--roomy-space-md);
+  align-items: end;
+}
+
 .occupancy__days {
   display: flex;
   flex-direction: column;
-  gap: var(--roomy-space-md);
+  gap: var(--roomy-space-lg);
 }
 
-.occupancy__room {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: baseline;
-}
-
-/* The usage bar sits on its own line under the figure, kept compact rather than spanning the page. */
-.occupancy__rollup-meter,
-.occupancy__room-meter {
+/* The office rollup bar stays compact under the day's figure rather than spanning the page. */
+.occupancy__rollup-meter {
   max-inline-size: 16rem;
   margin-block-start: var(--roomy-space-xs);
 }
 
+/* Each room renders as a bordered tile (the shared .roomy-tile look, but read-only), laid out in a
+   responsive grid that matches the reserve room picker. */
+.occupancy__rooms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--roomy-space-sm);
+  margin-block-start: var(--roomy-space-sm);
+}
+
+.occupancy__room {
+  display: flex;
+  flex-direction: column;
+  gap: var(--roomy-space-xs);
+  padding: var(--roomy-space-sm) var(--roomy-space-md);
+  border: 1px solid var(--roomy-color-border);
+  border-radius: var(--roomy-radius-md);
+  background: var(--roomy-color-surface);
+}
+
+.occupancy__room-name {
+  font-weight: var(--roomy-font-weight-medium);
+}
+
+.occupancy__room-figure {
+  font-size: var(--roomy-font-size-sm);
+  opacity: 0.85;
+}
+
+.occupancy__room-full {
+  font-size: var(--roomy-font-size-sm);
+  font-weight: var(--roomy-font-weight-medium);
+  color: var(--roomy-color-accent-strong);
+}
+
+/* The usage bar fills the tile and is pinned to its foot so tiles in a row align. */
 .occupancy__room-meter {
-  flex-basis: 100%;
+  margin-block-start: auto;
+}
+
+.occupancy__booked-heading {
+  margin-block-start: var(--roomy-space-xs);
+  font-size: var(--roomy-font-size-sm);
+  opacity: 0.85;
 }
