@@ -18,11 +18,12 @@ import {
   rangeFor,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { FormField, Message, Page } from '@roomy/shared-ui';
+import { FormField } from '@roomy/shared-ui';
 
 import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
-import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
+import { OccupancyShell } from './occupancy-shell';
+import { OccupancyScope } from './office-room-picker';
 
 // The occupancy list (OC-1/2/4/6): pick an office (optionally a single room) and a day / week / month
 // range, and read each day's office rollup + per-room figures. Occupant names render only when the
@@ -33,7 +34,7 @@ import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
 @Component({
   selector: 'roomy-occupancy-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, FormField, Message, OfficeRoomPicker],
+  imports: [TranslocoDirective, FormField, OccupancyShell],
   templateUrl: './occupancy-page.html',
   styleUrl: './occupancy-page.css',
 })

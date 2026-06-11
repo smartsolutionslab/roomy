@@ -1,0 +1,18 @@
+<ng-container *transloco="let translate">
+  <section roomyPage size="content">
+    <h1>{{ translate(titleKey()) }}</h1>
+
+    @if (errorKey(); as key) {
+    <roomy-message variant="error">{{ translate(key) }}</roomy-message>
+    } @if (loadFailed()) {
+    <roomy-message variant="error">{{ translate('attendance.occupancy.loadError') }}</roomy-message>
+    } @else if (offices(); as items) { @if (items.length === 0) {
+    <p>{{ translate('attendance.occupancy.empty') }}</p>
+    } @else {
+    <roomy-office-room-picker [offices]="items" (scopeChange)="scopeChange.emit($event)" />
+    <ng-content />
+    } } @else {
+    <p>{{ translate('attendance.occupancy.loading') }}</p>
+    }
+  </section>
+</ng-container>

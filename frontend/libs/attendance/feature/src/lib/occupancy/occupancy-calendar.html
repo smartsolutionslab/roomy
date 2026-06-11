@@ -1,14 +1,10 @@
 <ng-container *transloco="let translate">
-  <section roomyPage size="content">
-    <h1>{{ translate('attendance.calendar.title') }}</h1>
-
-    @if (loadFailed()) {
-    <roomy-message variant="error">{{ translate('attendance.occupancy.loadError') }}</roomy-message>
-    } @else if (offices(); as items) { @if (items.length === 0) {
-    <p>{{ translate('attendance.occupancy.empty') }}</p>
-    } @else {
-    <roomy-office-room-picker [offices]="items" (scopeChange)="onScope($event)" />
-
+  <roomy-occupancy-shell
+    [titleKey]="'attendance.calendar.title'"
+    [offices]="offices()"
+    [loadFailed]="loadFailed()"
+    (scopeChange)="onScope($event)"
+  >
     @if (scope()) {
     <div class="calendar__nav">
       <button
@@ -67,8 +63,6 @@
         }
       </tbody>
     </table>
-    } } } @else {
-    <p>{{ translate('attendance.occupancy.loading') }}</p>
     }
-  </section>
+  </roomy-occupancy-shell>
 </ng-container>

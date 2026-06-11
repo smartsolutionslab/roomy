@@ -19,12 +19,13 @@ import {
   rangeFor,
   todayInBerlin,
 } from '@roomy/attendance-api';
-import { Button, Heat, Message, Page } from '@roomy/shared-ui';
+import { Button, Heat } from '@roomy/shared-ui';
 import { EMPTY, expand, reduce } from 'rxjs';
 
 import { bookableOfficesCatalogue } from '../bookable-offices-catalogue';
 
-import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
+import { OccupancyShell } from './occupancy-shell';
+import { OccupancyScope } from './office-room-picker';
 
 // The occupancy calendar (OC-3, FR-004): a month grid where each in-month day shows its occupancy figure
 // (the office rollup for the chosen scope) and the days the viewer holds a reservation are highlighted
@@ -33,7 +34,7 @@ import { OccupancyScope, OfficeRoomPicker } from './office-room-picker';
 @Component({
   selector: 'roomy-occupancy-calendar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoDirective, Page, Message, Button, OfficeRoomPicker, Heat],
+  imports: [TranslocoDirective, Button, OccupancyShell, Heat],
   templateUrl: './occupancy-calendar.html',
   styleUrl: './occupancy-calendar.css',
 })
