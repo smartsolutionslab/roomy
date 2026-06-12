@@ -69,4 +69,15 @@ public sealed class Employee : Aggregate
         FailureReason = reason;
         return Result.Success();
     }
+
+    public Result RetryProvisioning(string initialPassword)
+    {
+        if (State == ProvisioningState.Active)
+            return Result.Success();
+
+        State = ProvisioningState.Provisioning;
+        FailureReason = null;
+        RaiseDomainEvent(new EmployeeHired(Identifier, CompanyIdentifier, UserIdentifier, Name, Email, Role, initialPassword));
+        return Result.Success();
+    }
 }

@@ -85,3 +85,20 @@ credential provider.
 - Define the integration-event contracts and the compensating action for an abandoned saga.
 - Decide how the seeded `DefaultAdmin` (which must exist before any saga runs) provisions
   both its `User` and its `Employee` record at startup.
+
+## Amendment (2026-06-12): startup reconvergence of the seeded admin
+
+The startup seeder originally hired the `DefaultAdmin` only when no admin `Employee` existed
+(idempotent on *existence*). On a cold boot the admin's first `EmployeeHired` could be lost or
+fail before the downstream credential side was ready, leaving the admin `Employee` permanently
+stuck in *provisioning* — with no recovery path, because every code path that creates the admin
+was gated on its absence.
+
+The seeder now converges on a *usable* admin rather than merely an existing one: on each startup,
+when the admin exists but is **not** `Active`, it re-drives provisioning by re-emitting
+`EmployeeHired` for that same `Employee` (reusing its identifiers and the configured initial
+password), so the saga re-runs once the credential side is reachable. An already-`Active` admin is
+left untouched (no-op). This is a reconvergence step **within** option A's saga — not a new entry
+point — and heals on the next startup; it does not prevent the first-boot message loss, and the
+silent-failure handling in the credential-side consumer remains a separate follow-up. See
+`specs/021-resilient-admin-provisioning`.

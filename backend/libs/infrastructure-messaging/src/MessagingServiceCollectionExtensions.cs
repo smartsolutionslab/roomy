@@ -7,6 +7,7 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
+using Wolverine.ErrorHandling;
 using Wolverine.Postgresql;
 using Wolverine.RabbitMQ;
 
@@ -54,6 +55,18 @@ public static class MessagingServiceCollectionExtensions
             wolverine.Policies.AutoApplyTransactions();
             wolverine.Policies.UseDurableOutboxOnAllSendingEndpoints();
             wolverine.Policies.UseDurableInboxOnAllListeners();
+
+            // Retry a failing consumer with a widening cooldown before dead-lettering, so a transient
+            // downstream outage — e.g. a credential provider still warming up when a saga step runs at
+            // startup — is ridden out rather than silently lost. Terminal, non-retryable outcomes are
+            // handled inside the use case and never surface as an exception here (ADR-0060).
+            wolverine.OnException<Exception>()
+                .RetryWithCooldown(
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(15),
+                    TimeSpan.FromSeconds(30),
+                    TimeSpan.FromSeconds(60));
 
             foreach (var handlerAssembly in handlerAssemblies)
             {

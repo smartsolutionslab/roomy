@@ -53,6 +53,22 @@ public sealed class EmployeeHiredConsumerTests
         capturing.Command.ShouldNotBeNull().Role.IsAdministrator.ShouldBeFalse();
     }
 
+    [Fact]
+    public async Task Surfaces_a_failed_registration_so_the_message_is_retried()
+    {
+        var consumer = new EmployeeHiredConsumer(new FailingHandler(new Error("provider_error", "the identity provider is unavailable")));
+        var employeeHired = new EmployeeHired(
+            EmployeeId: Guid.CreateVersion7(),
+            UserId: Guid.CreateVersion7(),
+            Email: "ada@example.com",
+            DisplayName: "Ada Lovelace",
+            Role: HiredRole.Employee,
+            InitialPassword: "correct horse",
+            OccurredAt: DateTimeOffset.UtcNow);
+
+        await Should.ThrowAsync<Exception>(() => consumer.Handle(employeeHired, CancellationToken.None));
+    }
+
     private sealed class CapturingHandler : ICommandHandler<RegisterUser>
     {
         public RegisterUser? Command { get; private set; }
@@ -62,5 +78,11 @@ public sealed class EmployeeHiredConsumerTests
             Command = command;
             return Task.FromResult(Result.Success());
         }
+    }
+
+    private sealed class FailingHandler(Error error) : ICommandHandler<RegisterUser>
+    {
+        public Task<Result> HandleAsync(RegisterUser command, CancellationToken cancellationToken) =>
+            Task.FromResult(Result.Failure(error));
     }
 }

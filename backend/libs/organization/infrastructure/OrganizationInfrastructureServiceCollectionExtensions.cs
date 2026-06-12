@@ -38,7 +38,8 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
             .AddScoped<ICommandHandler<RenameRoom>, RenameRoomHandler>()
             .AddScoped<ICommandHandler<HireEmployee, HiredEmployee>, HireEmployeeHandler>()
             .AddScoped<ICommandHandler<CompleteEmployeeProvisioning>, CompleteEmployeeProvisioningHandler>()
-            .AddScoped<ICommandHandler<FailEmployeeProvisioning>, FailEmployeeProvisioningHandler>();
+            .AddScoped<ICommandHandler<FailEmployeeProvisioning>, FailEmployeeProvisioningHandler>()
+            .AddScoped<ICommandHandler<RetryEmployeeProvisioning>, RetryEmployeeProvisioningHandler>();
 
         return services;
     }

@@ -72,8 +72,7 @@ public sealed class ProvisioningTests
     [Theory]
     [InlineData("password_rejected", UserProvisioningFailureReason.PasswordRejected)]
     [InlineData("email_taken", UserProvisioningFailureReason.EmailTaken)]
-    [InlineData("provider_error", UserProvisioningFailureReason.ProviderError)]
-    public async Task Provisioning_failure_publishes_the_reason_and_persists_nothing(
+    public async Task A_terminal_provisioning_failure_compensates_the_saga_and_persists_nothing(
         string providerErrorCode,
         UserProvisioningFailureReason expectedReason)
     {
@@ -90,13 +89,33 @@ public sealed class ProvisioningTests
 
         var result = await handler.HandleAsync(command, CancellationToken.None);
 
-        result.IsFailure.ShouldBeTrue();
+        result.IsSuccess.ShouldBeTrue();
         await users.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
 
         var failed = published.ShouldHaveSingleItem().ShouldBeOfType<UserProvisioningFailed>();
         failed.UserId.ShouldBe(command.UserIdentifier.Value);
         failed.EmployeeId.ShouldBe(command.EmployeeId);
         failed.Reason.ShouldBe(expectedReason);
+    }
+
+    [Fact]
+    public async Task A_transient_provisioning_failure_is_retryable_and_does_not_compensate()
+    {
+        var users = Substitute.For<IUserRepository>();
+        var published = new List<IIntegrationEvent>();
+        var publisher = Substitute.For<IIntegrationEventPublisher>();
+        _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
+        var handler = new RegisterUserHandler(
+            users,
+            IdentityProviderFailing(new Error("provider_error", "the identity provider is unavailable")),
+            publisher,
+            TimeProvider.System);
+
+        var result = await handler.HandleAsync(Command(Role.Employee), CancellationToken.None);
+
+        result.IsFailure.ShouldBeTrue();
+        await users.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+        published.ShouldBeEmpty();
     }
 
     private static IIdentityProviderPort IdentityProviderSucceeding(KeycloakSubjectIdentifier subject)
