@@ -305,13 +305,13 @@ Then:
 
 | Who | Username / Email | Password | Use it for |
 |---|---|---|---|
-| **Roomy Admin** | `admin@roomy.local` | `DevAdmin.23456` | Full app: manage offices, rooms, hire employees, reserve |
-| **Normal user (employee)** | `jean-luc.picard@obexlabs.com` | `ObexLabs.2025` | Employee view: reserve a seat, see occupancy *(needs the seeder)* |
+| **Roomy Admin** | `admin@roomy.local` | `Test1234!` | Full app: manage offices, rooms, hire employees, reserve |
+| **Normal user (employee)** | `jean-luc.picard@obexlabs.com` | `Test1234!` | Employee view: reserve a seat, see occupancy *(needs the seeder)* |
 | **Keycloak admin console** | `admin` | *generated — see dashboard* | The Keycloak admin UI (realm `roomy`, users, clients) |
 
 - **All seeded employees** follow `firstname.lastname@obexlabs.com` (e.g.
   `data@obexlabs.com`, `kathryn.janeway@obexlabs.com`) with the same password
-  `ObexLabs.2025`. Names come from the *Obex Labs* dataset in
+  `Test1234!`. Names come from the *Obex Labs* dataset in
   [`backend/apps/dev-seeder`](backend/apps/dev-seeder).
 - The **Keycloak admin password** is a generated secret. Find it in the Aspire dashboard:
   open the **`keycloak`** resource → **Parameters / Environment** (`keycloak-password`).
@@ -543,13 +543,13 @@ Danach:
 
 | Wer | Benutzername / E-Mail | Passwort | Wofür |
 |---|---|---|---|
-| **Roomy-Admin** | `admin@roomy.local` | `DevAdmin.23456` | Volle App: Büros/Räume verwalten, einstellen, reservieren |
-| **Normale:r Nutzer:in (Mitarbeiter:in)** | `jean-luc.picard@obexlabs.com` | `ObexLabs.2025` | Mitarbeitersicht: Platz reservieren, Belegung sehen *(braucht den Seeder)* |
+| **Roomy-Admin** | `admin@roomy.local` | `Test1234!` | Volle App: Büros/Räume verwalten, einstellen, reservieren |
+| **Normale:r Nutzer:in (Mitarbeiter:in)** | `jean-luc.picard@obexlabs.com` | `Test1234!` | Mitarbeitersicht: Platz reservieren, Belegung sehen *(braucht den Seeder)* |
 | **Keycloak-Admin-Konsole** | `admin` | *generiert — siehe Dashboard* | Keycloak-Admin-UI (Realm `roomy`, Nutzer, Clients) |
 
 - **Alle geseedeten Mitarbeitenden** folgen `vorname.nachname@obexlabs.com` (z. B.
   `data@obexlabs.com`, `kathryn.janeway@obexlabs.com`) mit demselben Passwort
-  `ObexLabs.2025`. Die Namen stammen aus dem *Obex-Labs*-Datensatz in
+  `Test1234!`. Die Namen stammen aus dem *Obex-Labs*-Datensatz in
   [`backend/apps/dev-seeder`](backend/apps/dev-seeder).
 - Das **Keycloak-Admin-Passwort** ist ein generiertes Secret. Im Aspire-Dashboard unter der
   Ressource **`keycloak`** → **Parameter / Environment** (`keycloak-password`).
