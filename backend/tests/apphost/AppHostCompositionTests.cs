@@ -61,6 +61,20 @@ public sealed class AppHostCompositionTests
     }
 
     [Fact]
+    public async Task The_organization_service_waits_for_keycloak_so_admin_seeding_does_not_publish_before_identity_is_listening()
+    {
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
+            TestContext.Current.CancellationToken);
+        await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
+
+        var model = application.Services.GetRequiredService<DistributedApplicationModel>();
+
+        var organizationApi = model.Resources.Single(resource => resource.Name == "organization-api");
+        organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
+            wait => wait.Resource.Name == "keycloak" && wait.WaitType == WaitType.WaitUntilHealthy);
+    }
+
+    [Fact]
     public async Task Composes_a_scalar_reference_and_an_openapi_link_for_each_context_api()
     {
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(

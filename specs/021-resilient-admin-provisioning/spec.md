@@ -143,18 +143,18 @@ the admin stays active; (b) an empty system and assert the admin is hired as an 
 > credential-side consumer — originally deferred — was folded into this slice and is recorded in
 > **ADR-0060** (no-swallow consumer, terminal-vs-transient split, bounded retry-with-cooldown).
 
-## Known limitation — startup-window provisioning is not yet delivered
+## Resolved follow-up — why the admin did not converge (#189)
 
-End-to-end verification revealed a deeper, pre-existing defect that this slice does **not** fix: a
-provisioning message consumed during the credential service's **startup window** is acked into the
-durable inbox but **not processed** by the handler (no account is created, no failure surfaces, nothing
-is retried or dead-lettered). The seeded admin is provisioned at organization-service startup (both the
-original hire *and* this slice's re-drive run in `StartAsync`), so it consistently lands in that window
-and never converges — whereas employees seeded later, once messaging is warm, provision normally.
-
-Because the re-drive also runs at startup, the self-heal here cannot work around it. Fixing the
-startup-window drop (e.g. deferring admin seeding until messaging is fully started, or correcting the
-durable-inbox startup handling) is tracked as a **separate follow-up** (issue #189).
+End-to-end verification initially showed the admin still not converging, which looked like a
+startup-window durable-inbox problem. The real, pre-existing cause turned out to be **competing
+consumers on a shared queue**: `EmployeeHired` is consumed by both identity (provision the account) and
+attendance (directory), but Wolverine's conventional routing named both listeners' queue after the
+message type alone, so they **shared one queue and competed** — when attendance won the admin's single
+saga message, identity never provisioned it. Two fixes resolved it (issue #189): per-service listener
+queues so each subscriber gets its own copy (**ADR-0061**), and `organization-api` waiting for Keycloak
+so the startup seeder does not publish before identity has declared its queue binding. With those, the
+seeded admin provisions on first boot and signs in (verified end to end); this slice's re-drive remains
+the safety net for any residual stuck state.
 
 ## Review & Acceptance Checklist
 

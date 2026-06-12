@@ -64,11 +64,14 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
     .WithEnvironment("Keycloak__AdminPassword", keycloakPassword);
 
+// Wait for Keycloak so organization-api starts alongside identity-api (which also waits for it),
+// not 30-60s earlier: the startup DefaultAdminSeeder must not publish EmployeeHired before identity
+// has declared its queue binding, or the fanout exchange drops it and the admin never provisions (#189).
 var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organization-api")
     .WithHttpEndpoint()
     .WithReference(organizationDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
-    .WithReference(keycloak)
+    .WithReference(keycloak).WaitFor(keycloak)
     .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
     .WithEnvironment("Keycloak__Realm", "roomy")
     .WithEnvironment("Company__Name", "Roomy")
