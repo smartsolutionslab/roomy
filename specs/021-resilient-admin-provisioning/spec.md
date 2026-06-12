@@ -154,7 +154,7 @@ and never converges — whereas employees seeded later, once messaging is warm, 
 
 Because the re-drive also runs at startup, the self-heal here cannot work around it. Fixing the
 startup-window drop (e.g. deferring admin seeding until messaging is fully started, or correcting the
-durable-inbox startup handling) is tracked as a **separate follow-up**.
+durable-inbox startup handling) is tracked as a **separate follow-up** (issue #189).
 
 ## Review & Acceptance Checklist
 
