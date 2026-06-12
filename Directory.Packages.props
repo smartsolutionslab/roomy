@@ -9,6 +9,9 @@
   -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- Lets a <PackageVersion> below override a transitive dependency's resolved version — used for the
+         MessagePack security pin. -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +29,7 @@
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.6.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.6.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.6.0" />
@@ -64,6 +67,13 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.2" />
+
+    <!-- Transitive security pin -->
+    <!-- MessagePack < 2.5.301 has CVE-2026-48109 (GHSA-hv8m-jj95-wg3x, high): an out-of-bounds read in
+         LZ4 decompression. It arrives transitively via StreamJsonRpc (Aspire hosting), and NuGet audit
+         (NU1903) fails the warnings-as-errors restore. Pin the patched version; drop once the Aspire/
+         StreamJsonRpc chain resolves >= 2.5.301 on its own. -->
+    <PackageVersion Include="MessagePack" Version="2.5.301" />
   </ItemGroup>
 
 </Project>
