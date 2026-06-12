@@ -10,6 +10,7 @@ using Wolverine.EntityFrameworkCore;
 using Wolverine.ErrorHandling;
 using Wolverine.Postgresql;
 using Wolverine.RabbitMQ;
+using Wolverine.Util;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 
@@ -73,7 +74,8 @@ public static class MessagingServiceCollectionExtensions
                 wolverine.Discovery.IncludeAssembly(handlerAssembly);
             }
 
-            ConfigureTransport(wolverine, options);
+            var serviceName = applicationAssembly?.GetName().Name ?? wolverine.ServiceName ?? "roomy";
+            ConfigureTransport(wolverine, options, serviceName);
         });
 
         builder.Services.AddScoped<IIntegrationEventPublisher, WolverineIntegrationEventPublisher>();
@@ -88,7 +90,7 @@ public static class MessagingServiceCollectionExtensions
         return services;
     }
 
-    private static void ConfigureTransport(WolverineOptions wolverine, MessagingOptions options)
+    private static void ConfigureTransport(WolverineOptions wolverine, MessagingOptions options, string serviceName)
     {
         switch (options.Transport)
         {
@@ -96,7 +98,13 @@ public static class MessagingServiceCollectionExtensions
                 var connectionString = Ensure.That(options.ConnectionString).IsNotNullOrWhiteSpace().Value;
                 wolverine.UseRabbitMq(new Uri(connectionString))
                     .AutoProvision()
-                    .UseConventionalRouting();
+                    // Name each listener queue per service so independent subscribers of the same event each
+                    // get their own copy off the shared fanout exchange. The default names the queue after the
+                    // message type alone, so two contexts that both consume one event (e.g. identity AND
+                    // attendance on EmployeeHired) share one queue and compete — only one receives each message
+                    // and the other's reaction is silently skipped (#189).
+                    .UseConventionalRouting(convention => convention
+                        .QueueNameForListener(messageType => $"{messageType.ToMessageTypeName()}.{serviceName}"));
                 break;
 
             case MessagingTransport.AzureServiceBus:
