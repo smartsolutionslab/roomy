@@ -15,6 +15,8 @@
 > **B2B office-attendance planning.** Teams plan and coordinate who is in which office,
 > on which day, in which room — so a hybrid workforce always knows where there is a desk.
 
+> ⚠️ **Known issue with login data:** If you encounter login failures or seeded employee data is missing, check the [`fix-after-coding-challenge`](https://github.com/smartsolutionslab/roomy/tree/fix-after-coding-challenge) branch for a fix.
+
 Roomy is a full, running reference application: a Domain-Driven, event-driven system of
 three independently deployable bounded contexts behind a single gateway, with a zoneless
 Angular front end, Keycloak-backed authentication, and one-command local orchestration via
@@ -390,6 +392,8 @@ traceable — exactly so AI-generated code stays reviewable and correct.
 > welchem Büro und in welchem Raum ist — damit eine hybride Belegschaft immer weiß, wo ein
 > Platz frei ist.
 
+> ⚠️ **Bekanntes Problem mit Anmeldedaten:** Wenn Sie auf Anmeldungsfehler stoßen oder Seeded-Mitarbeiterdaten fehlen, schauen Sie sich den Branch [`fix-after-coding-challenge`](https://github.com/smartsolutionslab/roomy/tree/fix-after-coding-challenge) an.
+
 Roomy ist eine vollständige, lauffähige Referenzanwendung: ein Domain-getriebenes,
 event-getriebenes System aus drei unabhängig deploybaren Bounded Contexts hinter einem
 einzigen Gateway, mit einem zoneless Angular-Frontend, Keycloak-gestützter
@@ -603,7 +607,7 @@ durchgängig nachvollziehbar sind — genau damit KI-generierter Code prüfbar u
 > **Ein offenes Wort zum Vorgehen.** Ich habe für dieses Projekt stark auf KI gesetzt und sie
 > als primäre Implementierung genutzt. Bewusst habe ich **Spec-Driven Development** durchgängig
 > ausprobiert — erst Spec und Akzeptanzkriterien, dann den Agenten dagegen implementieren
-> lassen. In der Praxis war das keineswegs „hands-off“: Ich habe unterwegs **viel angepasst** —
+> lassen. In der Praxis war das keineswegs „hands-off": Ich habe unterwegs **viel angepasst** —
 > Specs geschärft, Kurs korrigiert, das Design umgeformt — und einen großen Teil des Feinschliffs
 > durch **gezieltes Prompten von Refactorings** erreicht, statt die erste Ausgabe zu übernehmen. Das
 > ehrliche Fazit: Spec-first + KI liefert schnell eine starke, konsistente Basis, aber die
