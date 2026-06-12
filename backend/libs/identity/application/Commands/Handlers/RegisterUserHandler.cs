@@ -22,6 +22,8 @@ public sealed class RegisterUserHandler(IUserRepository users, IIdentityProvider
 
         if (provisioning.IsFailure)
         {
+            if (!IsTerminal(provisioning.Error)) return provisioning.Error;
+
             var integrationEvent = new UserProvisioningFailed(
                 userIdentifier.Value,
                 employeeId,
@@ -29,7 +31,7 @@ public sealed class RegisterUserHandler(IUserRepository users, IIdentityProvider
                 timeProvider.GetUtcNow());
             await publisher.PublishAsync(integrationEvent, cancellationToken);
 
-            return provisioning.Error;
+            return Result.Success();
         }
 
         var subject = provisioning.Value;
@@ -49,6 +51,8 @@ public sealed class RegisterUserHandler(IUserRepository users, IIdentityProvider
 
         return Result.Success();
     }
+
+    private static bool IsTerminal(Error error) => error.Code is "email_taken" or "password_rejected";
 
     private static UserProvisioningFailureReason ReasonFor(Error error) => error.Code switch
     {
