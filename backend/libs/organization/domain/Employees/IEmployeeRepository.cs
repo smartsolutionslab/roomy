@@ -8,5 +8,7 @@ public interface IEmployeeRepository
 
     Task<Result<Employee>> GetByIdentifierAsync(EmployeeIdentifier identifier, CancellationToken cancellationToken);
 
+    Task<Result<Employee>> GetByWorkEmailAsync(WorkEmail email, CancellationToken cancellationToken);
+
     Task<bool> ExistsByWorkEmailAsync(WorkEmail email, CancellationToken cancellationToken);
 }

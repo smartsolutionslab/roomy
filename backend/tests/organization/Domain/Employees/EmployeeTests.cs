@@ -95,6 +95,53 @@ public sealed class EmployeeTests
         employee.State.ShouldBe(ProvisioningState.Failed);
     }
 
+    [Fact]
+    public void Retrying_a_provisioning_employee_re_raises_employee_hired()
+    {
+        var user = UserIdentifier.New();
+        var employee = Hire(user);
+        employee.ClearDomainEvents();
+
+        employee.RetryProvisioning("fresh-pw").IsSuccess.ShouldBeTrue();
+
+        employee.State.ShouldBe(ProvisioningState.Provisioning);
+        var hired = employee.DomainEvents.OfType<EmployeeHired>().ShouldHaveSingleItem();
+        hired.Employee.ShouldBe(employee.Identifier);
+        hired.Company.ShouldBe(company);
+        hired.User.ShouldBe(user);
+        hired.Name.ShouldBe(employee.Name);
+        hired.Email.ShouldBe(employee.Email);
+        hired.Role.ShouldBe(EmployeeRole.Employee);
+        hired.InitialPassword.ShouldBe("fresh-pw");
+    }
+
+    [Fact]
+    public void Retrying_a_failed_employee_returns_it_to_provisioning_and_re_raises()
+    {
+        var employee = Hire();
+        employee.FailProvisioning(ProvisioningFailureReason.ProviderError);
+        employee.ClearDomainEvents();
+
+        employee.RetryProvisioning("fresh-pw").IsSuccess.ShouldBeTrue();
+
+        employee.State.ShouldBe(ProvisioningState.Provisioning);
+        employee.FailureReason.ShouldBeNull();
+        employee.DomainEvents.OfType<EmployeeHired>().ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public void Retrying_an_already_active_employee_is_an_idempotent_no_op()
+    {
+        var employee = Hire();
+        employee.CompleteProvisioning();
+        employee.ClearDomainEvents();
+
+        employee.RetryProvisioning("fresh-pw").IsSuccess.ShouldBeTrue();
+
+        employee.State.ShouldBe(ProvisioningState.Active);
+        employee.DomainEvents.ShouldBeEmpty();
+    }
+
     private static Employee Hire(UserIdentifier? user = null) =>
         Employee.Hire(
             company,

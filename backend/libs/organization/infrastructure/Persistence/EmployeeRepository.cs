@@ -18,6 +18,15 @@ public sealed class EmployeeRepository(OrganizationDbContext context) : IEmploye
         return employee;
     }
 
+    public async Task<Result<Employee>> GetByWorkEmailAsync(WorkEmail email, CancellationToken cancellationToken)
+    {
+        var employee = await context.Employees.SingleOrDefaultAsync(candidate => candidate.Email == email, cancellationToken);
+
+        if (employee is null) return Error.NotFound("employee.not_found", $"No employee exists with work email '{email.Value}'.");
+
+        return employee;
+    }
+
     public async Task<bool> ExistsByWorkEmailAsync(WorkEmail email, CancellationToken cancellationToken) =>
         await context.Employees.AnyAsync(candidate => candidate.Email == email, cancellationToken);
 }
