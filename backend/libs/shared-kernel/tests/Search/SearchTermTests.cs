@@ -11,15 +11,14 @@ public class SearchTermTests
     {
         var term = SearchTerm.From(null);
 
-        term.IsSuccess.ShouldBeTrue();
-        term.Value.IsEmpty.ShouldBeTrue();
-        term.Value.Value.ShouldBeEmpty();
+        term.IsEmpty.ShouldBeTrue();
+        term.Value.ShouldBeEmpty();
     }
 
     [Fact]
     public void A_whitespace_only_term_is_the_empty_no_filter_term()
     {
-        SearchTerm.From("   ").Value.IsEmpty.ShouldBeTrue();
+        SearchTerm.From("   ").IsEmpty.ShouldBeTrue();
     }
 
     [Fact]
@@ -27,8 +26,8 @@ public class SearchTermTests
     {
         var term = SearchTerm.From("  Hannah  ");
 
-        term.Value.IsEmpty.ShouldBeFalse();
-        term.Value.Value.ShouldBe("Hannah");
+        term.IsEmpty.ShouldBeFalse();
+        term.Value.ShouldBe("Hannah");
     }
 
     [Fact]
@@ -36,21 +35,18 @@ public class SearchTermTests
     {
         var maxTerm = new string('a', SearchTerm.MaxLength);
 
-        var term = SearchTerm.From(maxTerm);
-
-        term.IsSuccess.ShouldBeTrue();
-        term.Value.Value.ShouldBe(maxTerm);
+        SearchTerm.From(maxTerm).Value.ShouldBe(maxTerm);
     }
 
     [Fact]
-    public void A_term_longer_than_the_maximum_is_a_validation_error()
+    public void A_term_longer_than_the_maximum_throws_a_bad_request()
     {
         var overLong = new string('a', SearchTerm.MaxLength + 1);
 
-        var term = SearchTerm.From(overLong);
+        var exception = Should.Throw<BadRequestException>(() => SearchTerm.From(overLong));
 
-        term.IsFailure.ShouldBeTrue();
-        term.Error.Type.ShouldBe(ErrorType.Validation);
+        exception.Error.Code.ShouldBe("search.term_too_long");
+        exception.Error.Type.ShouldBe(ErrorType.Validation);
     }
 
     [Fact]
@@ -58,7 +54,7 @@ public class SearchTermTests
     {
         var paddedToOverLength = $"  {new string('a', SearchTerm.MaxLength)}  ";
 
-        SearchTerm.From(paddedToOverLength).IsSuccess.ShouldBeTrue();
+        SearchTerm.From(paddedToOverLength).Value.Length.ShouldBe(SearchTerm.MaxLength);
     }
 
     [Fact]

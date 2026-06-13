@@ -77,4 +77,5 @@ factory `From` changes.
 ## Related
 
 - ADR-0046 (`web-http` domain-`Error` → HTTP mapping), CLAUDE.md value-object `From`/`TryParse` convention.
-- Same shape could later replace the `SearchTerm.From` `Result` unpacking at the edge; deferred.
+- `SearchTerm.From` follows the same shape — it throws `BadRequestException` on an over-long term, so the
+  employee-directory endpoint no longer unpacks a `Result` either.
