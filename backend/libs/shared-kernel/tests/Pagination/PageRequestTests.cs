@@ -24,19 +24,16 @@ public class PageRequestTests
     }
 
     [Fact]
-    public void A_limit_above_the_maximum_throws_a_bad_request()
+    public void A_limit_above_the_maximum_is_out_of_range()
     {
-        var exception = Should.Throw<BadRequestException>(() => PageRequest.From(cursor: null, limit: PageRequest.MaxLimit + 1));
-
-        exception.Error.Code.ShouldBe("pagination.limit_out_of_range");
-        exception.Error.Type.ShouldBe(ErrorType.Validation);
+        Should.Throw<ArgumentOutOfRangeException>(() => PageRequest.From(cursor: null, limit: PageRequest.MaxLimit + 1));
     }
 
     [Fact]
-    public void A_limit_below_one_throws_a_bad_request()
+    public void A_limit_below_one_is_out_of_range()
     {
-        Should.Throw<BadRequestException>(() => PageRequest.From(cursor: null, limit: 0));
-        Should.Throw<BadRequestException>(() => PageRequest.From(cursor: null, limit: -3));
+        Should.Throw<ArgumentOutOfRangeException>(() => PageRequest.From(cursor: null, limit: 0));
+        Should.Throw<ArgumentOutOfRangeException>(() => PageRequest.From(cursor: null, limit: -3));
     }
 
     [Fact]
