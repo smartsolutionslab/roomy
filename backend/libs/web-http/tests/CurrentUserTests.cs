@@ -66,6 +66,30 @@ public class CurrentUserTests
     }
 
     [Fact]
+    public void TryGetSubject_yields_the_value_when_present_and_false_when_absent()
+    {
+        var id = Guid.CreateVersion7();
+
+        PrincipalWith(new Claim(ClaimTypes.NameIdentifier, id.ToString())).TryGetSubject(out var subject).ShouldBeTrue();
+        subject.ShouldBe(id);
+
+        PrincipalWith().TryGetSubject(out var missing).ShouldBeFalse();
+        missing.ShouldBe(Guid.Empty);
+    }
+
+    [Fact]
+    public void TryGetUserId_yields_the_value_when_present_and_false_when_absent()
+    {
+        var id = Guid.CreateVersion7();
+
+        PrincipalWith(new Claim(RoomyClaims.UserId, id.ToString())).TryGetUserId(out var userId).ShouldBeTrue();
+        userId.ShouldBe(id);
+
+        PrincipalWith().TryGetUserId(out var missing).ShouldBeFalse();
+        missing.ShouldBe(Guid.Empty);
+    }
+
+    [Fact]
     public void IsAdministrator_is_true_when_the_administrator_role_is_present()
     {
         PrincipalWith(new Claim(ClaimTypes.Role, RoomyRoles.Administrator)).IsAdministrator().ShouldBeTrue();
