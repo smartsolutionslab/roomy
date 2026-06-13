@@ -27,6 +27,20 @@ public class BadRequestExceptionHandlerTests
     }
 
     [Fact]
+    public async Task An_argument_exception_is_written_as_a_400()
+    {
+        var context = ContextWithBodyBuffer();
+
+        var handled = await handler.TryHandleAsync(context, new ArgumentException("WorkEmail must be a valid email address.", "value"), CancellationToken.None);
+
+        handled.ShouldBeTrue();
+        context.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
+
+        var body = await ReadBodyAsync(context);
+        body.GetProperty("code").GetString().ShouldBe("bad_request");
+    }
+
+    [Fact]
     public async Task Any_other_exception_is_left_unhandled()
     {
         var context = ContextWithBodyBuffer();

@@ -8,12 +8,17 @@ public sealed class BadRequestExceptionHandler : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        if (exception is not BadRequestException badRequest) return false;
+        var body = exception switch
+        {
+            BadRequestException badRequest => new ErrorResponse(badRequest.Error.Code, badRequest.Error.Message),
+            ArgumentException argument => new ErrorResponse("bad_request", argument.Message),
+            _ => null,
+        };
+
+        if (body is null) return false;
 
         httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-        await httpContext.Response.WriteAsJsonAsync(
-            new ErrorResponse(badRequest.Error.Code, badRequest.Error.Message),
-            cancellationToken);
+        await httpContext.Response.WriteAsJsonAsync(body, cancellationToken);
 
         return true;
     }

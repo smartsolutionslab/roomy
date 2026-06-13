@@ -22,19 +22,18 @@ public static class EmployeeEndpoints
         ICommandHandler<HireEmployee, HiredEmployee> hireEmployee,
         CancellationToken cancellationToken)
     {
-        var name = EmployeeName.TryParse(request.DisplayName);
-        var email = WorkEmail.TryParse(request.Email);
-        if (name is null
-            || email is null
-            || string.IsNullOrWhiteSpace(request.InitialPassword)
-            || !Enum.TryParse<EmployeeRole>(request.Role, ignoreCase: true, out var role))
+        if (string.IsNullOrWhiteSpace(request.InitialPassword) || !Enum.TryParse<EmployeeRole>(request.Role, ignoreCase: true, out var role))
         {
             return Results.BadRequest("A hire requires a display name, a valid work email, a role (Employee or Administrator), and an initial password.");
         }
 
-        var result = await hireEmployee.HandleAsync(
-            new HireEmployee(name, email, role, request.InitialPassword),
-            cancellationToken);
+        var command = new HireEmployee(
+            EmployeeName.From(request.DisplayName),
+            WorkEmail.From(request.Email),
+            role,
+            request.InitialPassword);
+
+        var result = await hireEmployee.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var hired = result.Value;

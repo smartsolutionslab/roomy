@@ -61,11 +61,11 @@ public static class OfficeEndpoints
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        var name = OfficeName.TryParse(request.Name);
-        var location = Location.TryParse(request.Location);
-        if (name is null || location is null) return Results.BadRequest("An office requires a non-empty name and location.");
+        var command = new CreateOffice(
+            OfficeName.From(request.Name),
+            Location.From(request.Location));
 
-        var result = await createOffice.HandleAsync(new CreateOffice(name, location), cancellationToken);
+        var result = await createOffice.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var created = await offices.GetByIdentifierAsync(result.Value, cancellationToken);
