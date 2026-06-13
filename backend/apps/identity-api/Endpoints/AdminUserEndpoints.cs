@@ -35,7 +35,7 @@ public static class AdminUserEndpoints
 
         var page = await users.GetPageAsync(request, cancellationToken);
 
-        return page.Match(accounts => Results.Ok(accounts.ToResponse()), error => error.ToBadRequest());
+        return Results.Ok(page.ToResponse());
     }
 
     private static async Task<IResult> GetAccountAsync(Guid userId, IUserRepository users, CancellationToken cancellationToken)

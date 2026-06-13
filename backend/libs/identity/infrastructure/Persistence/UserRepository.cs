@@ -28,15 +28,14 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken) =>
         context.Users.AnyAsync(user => user.Email == email, cancellationToken);
 
-    public async Task<Result<Page<User>>> GetPageAsync(PageRequest request, CancellationToken cancellationToken)
+    public async Task<Page<User>> GetPageAsync(PageRequest request, CancellationToken cancellationToken)
     {
-        var decoded = request.DecodeCursor<UserCursor>();
-        if (decoded.IsFailure) return decoded.Error;
+        var after = request.DecodeCursor<UserCursor>();
 
         var probeLimit = request.Limit + 1;
-        var rows = decoded.Value is { } after
+        var rows = after is { } cursor
             ? await context.Users
-                .FromSql($@"SELECT * FROM ""users"" WHERE ""email"" > {after.Email} ORDER BY ""email"" LIMIT {probeLimit}")
+                .FromSql($@"SELECT * FROM ""users"" WHERE ""email"" > {cursor.Email} ORDER BY ""email"" LIMIT {probeLimit}")
                 .AsNoTracking()
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false)
