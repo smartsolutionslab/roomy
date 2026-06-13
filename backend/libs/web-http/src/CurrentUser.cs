@@ -27,6 +27,23 @@ public static class CurrentUser
             : Error.Unauthorized("no_user_id", "The caller has no Roomy user id claim.");
     }
 
+    // Endpoint-friendly forms of the two reads above: true with the value when the claim is present,
+    // false when the caller should be treated as unauthorized. Lets a handler write
+    // `if (!principal.TryGet…(out var x)) return Results.Unauthorized();` without unpacking a Result.
+    public static bool TryGetSubject(this ClaimsPrincipal principal, out Guid subject)
+    {
+        var result = principal.Subject();
+        subject = result.IsSuccess ? result.Value : default;
+        return result.IsSuccess;
+    }
+
+    public static bool TryGetUserId(this ClaimsPrincipal principal, out Guid userId)
+    {
+        var result = principal.UserId();
+        userId = result.IsSuccess ? result.Value : default;
+        return result.IsSuccess;
+    }
+
     public static bool IsAdministrator(this ClaimsPrincipal principal) =>
         principal.IsInRole(RoomyRoles.Administrator);
 }

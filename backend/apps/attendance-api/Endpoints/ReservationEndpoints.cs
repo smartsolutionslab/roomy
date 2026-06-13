@@ -78,13 +78,12 @@ public static class ReservationEndpoints
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
         CancellationToken cancellationToken)
     {
-        var userId = principal.UserId();
-        if (userId.IsFailure) return Results.Unauthorized();
+        if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
 
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId.Value), cancellationToken);
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
@@ -134,10 +133,9 @@ public static class ReservationEndpoints
         ICommandHandler<ReservePlace, ReservationIdentifier> reserve,
         CancellationToken cancellationToken)
     {
-        var userId = principal.UserId();
-        if (userId.IsFailure) return Results.Unauthorized();
+        if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
 
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId.Value), cancellationToken);
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var employee = request.OnBehalfOf is { } onBehalfOf
@@ -171,10 +169,9 @@ public static class ReservationEndpoints
         ICommandHandler<CancelReservation> cancel,
         CancellationToken cancellationToken)
     {
-        var userId = principal.UserId();
-        if (userId.IsFailure) return Results.Unauthorized();
+        if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
 
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId.Value), cancellationToken);
+        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var command = new CancelReservation(
