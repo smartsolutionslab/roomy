@@ -16,9 +16,7 @@ var connectionString = builder.Configuration.GetOrganizationConnectionString();
 
 builder.Services.AddOrganizationPersistence(connectionString);
 
-var keycloak = builder.Configuration.GetSection("Keycloak");
-var keycloakBaseAddress = new Uri(keycloak["BaseAddress"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
-var keycloakRealm = keycloak["Realm"] ?? "roomy";
+var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
 
 builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm)
     .AddOrganizationUseCases()
