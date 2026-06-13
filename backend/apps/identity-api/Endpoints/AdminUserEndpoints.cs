@@ -29,27 +29,19 @@ public static class AdminUserEndpoints
         return endpoints;
     }
 
-    private static async Task<IResult> ListAccountsAsync(
-        string? cursor,
-        int? limit,
-        IUserRepository users,
-        CancellationToken cancellationToken)
+    private static async Task<IResult> ListAccountsAsync(string? cursor, int? limit, IUserRepository users, CancellationToken cancellationToken)
     {
         var request = PageRequest.From(cursor, limit);
-        if (request.IsFailure)
-        {
-            return request.Error.ToBadRequest();
-        }
 
-        var page = await users.GetPageAsync(request.Value, cancellationToken);
+        var page = await users.GetPageAsync(request, cancellationToken);
 
         return page.Match(accounts => Results.Ok(accounts.ToResponse()), error => error.ToBadRequest());
     }
 
-    private static async Task<IResult> GetAccountAsync(
-        Guid userId, IUserRepository users, CancellationToken cancellationToken)
+    private static async Task<IResult> GetAccountAsync(Guid userId, IUserRepository users, CancellationToken cancellationToken)
     {
-        var lookup = await users.GetByIdentifierAsync(UserIdentifier.From(userId), cancellationToken);
+        var userIdentifier = UserIdentifier.From(userId);
+        var lookup = await users.GetByIdentifierAsync(userIdentifier, cancellationToken);
         return lookup.Match(user => Results.Ok(user.ToAdminUser()), error => error.ToHttpResult());
     }
 
@@ -58,8 +50,8 @@ public static class AdminUserEndpoints
         ICommandHandler<GrantAdministrator> grantAdministrator,
         CancellationToken cancellationToken)
     {
-        var result = await grantAdministrator.HandleAsync(
-            new GrantAdministrator(UserIdentifier.From(userId)), cancellationToken);
+        var command = new GrantAdministrator(UserIdentifier.From(userId));
+        var result = await grantAdministrator.HandleAsync(command, cancellationToken);
 
         return result.Match(Results.NoContent, error => error.ToHttpResult());
     }

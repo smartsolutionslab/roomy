@@ -13,43 +13,42 @@ public class PageRequestTests
     {
         var request = PageRequest.From(cursor: null, limit: null);
 
-        request.IsSuccess.ShouldBeTrue();
-        request.Value.Limit.ShouldBe(PageRequest.DefaultLimit);
-        request.Value.Limit.ShouldBe(50);
+        request.Limit.ShouldBe(PageRequest.DefaultLimit);
+        request.Limit.ShouldBe(50);
     }
 
     [Fact]
     public void A_limit_within_range_is_honoured()
     {
-        PageRequest.From(cursor: null, limit: 25).Value.Limit.ShouldBe(25);
+        PageRequest.From(cursor: null, limit: 25).Limit.ShouldBe(25);
     }
 
     [Fact]
-    public void A_limit_above_the_maximum_is_rejected()
+    public void A_limit_above_the_maximum_throws_a_bad_request()
     {
-        var request = PageRequest.From(cursor: null, limit: PageRequest.MaxLimit + 1);
+        var exception = Should.Throw<BadRequestException>(() => PageRequest.From(cursor: null, limit: PageRequest.MaxLimit + 1));
 
-        request.IsFailure.ShouldBeTrue();
-        request.Error.Type.ShouldBe(ErrorType.Validation);
+        exception.Error.Code.ShouldBe("pagination.limit_out_of_range");
+        exception.Error.Type.ShouldBe(ErrorType.Validation);
     }
 
     [Fact]
-    public void A_limit_below_one_is_rejected()
+    public void A_limit_below_one_throws_a_bad_request()
     {
-        PageRequest.From(cursor: null, limit: 0).IsFailure.ShouldBeTrue();
-        PageRequest.From(cursor: null, limit: -3).IsFailure.ShouldBeTrue();
+        Should.Throw<BadRequestException>(() => PageRequest.From(cursor: null, limit: 0));
+        Should.Throw<BadRequestException>(() => PageRequest.From(cursor: null, limit: -3));
     }
 
     [Fact]
     public void Blank_cursor_is_treated_as_the_first_page()
     {
-        PageRequest.From(cursor: "   ", limit: null).Value.Cursor.ShouldBeNull();
+        PageRequest.From(cursor: "   ", limit: null).Cursor.ShouldBeNull();
     }
 
     [Fact]
     public void Decoding_an_absent_cursor_yields_a_null_key_and_no_error()
     {
-        var request = PageRequest.From(cursor: null, limit: null).Value;
+        var request = PageRequest.From(cursor: null, limit: null);
 
         var decoded = request.DecodeCursor<SampleKey>();
 
@@ -61,7 +60,7 @@ public class PageRequestTests
     public void Decoding_a_valid_cursor_yields_the_key()
     {
         var key = new SampleKey("Ada", Guid.NewGuid());
-        var request = PageRequest.From(CursorCodec.Encode(key), limit: null).Value;
+        var request = PageRequest.From(CursorCodec.Encode(key), limit: null);
 
         var decoded = request.DecodeCursor<SampleKey>();
 
@@ -72,7 +71,7 @@ public class PageRequestTests
     [Fact]
     public void Decoding_a_malformed_cursor_is_a_validation_error()
     {
-        var request = PageRequest.From(cursor: "not-a-cursor", limit: null).Value;
+        var request = PageRequest.From(cursor: "not-a-cursor", limit: null);
 
         var decoded = request.DecodeCursor<SampleKey>();
 
