@@ -44,7 +44,7 @@ public class ViewEmployeesTests
     [Fact]
     public async Task It_forwards_the_search_term_to_the_catalog()
     {
-        var term = SearchTerm.From("hanah").Value;
+        var term = SearchTerm.From("hanah");
         var catalog = Substitute.For<IEmployeeCatalog>();
         catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success(new Page<EmployeeView>([], null)));
