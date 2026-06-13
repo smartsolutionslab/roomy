@@ -22,6 +22,8 @@ builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm)
     .AddOrganizationUseCases()
     .AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
+builder.Services.AddRoomyExceptionHandling();
+
 var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
 if (emittingOpenApiDocument)
 {
@@ -69,6 +71,8 @@ if (!emittingOpenApiDocument)
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication()
     .UseAuthorization();

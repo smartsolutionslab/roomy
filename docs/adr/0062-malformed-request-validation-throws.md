@@ -26,22 +26,34 @@ to a 400 on the spot — so it buys nothing over a throw, while the value-object
   form here only exists to be immediately unpacked at one call depth.
 - The throw must still produce the *same* structured 400 body (`{code, message}`) the `Result` path
   produced — the wire contract must not change.
-- A bare `throw` must not become a 500, and we must not map *every* exception to 400 (that would mask
-  genuine server bugs).
+- A bare `throw` must not become a 500 for input the client got wrong.
 
 ## Decision
 
 **`PageRequest.From` throws `BadRequestException` (carrying the structured `Error`) on invalid input and
-returns a `PageRequest` directly.** A single global `IExceptionHandler` translates that one exception
-type — and only that type — into the existing 400 `{code, message}` body; any other exception falls
-through to the default 500.
+returns a `PageRequest` directly.** A single global `IExceptionHandler` translates malformed-input
+exceptions into the existing 400 `{code, message}` body:
+
+- `BadRequestException` → its structured `Error` (`{code, message}`), unchanged from the `Result` path.
+- `ArgumentException` → a 400 with code `bad_request` and the exception message. This is what the
+  value-object `From` factories already throw (`From` is `TryParse(raw) ?? throw new ArgumentException`,
+  see CLAUDE.md), so the same edge factories used elsewhere (`WorkEmail.From`, `OfficeName.From`, …)
+  also surface a 400 when handed bad client input, instead of each endpoint pre-checking with `TryParse`.
+
+Any other exception falls through to the default 500.
+
+> **Trade-off, accepted:** mapping `ArgumentException` broadly means an `ArgumentException` thrown by a
+> genuine server-side bug (not just edge parsing) also returns 400, which can mask a 500. We accept this
+> to keep the value-object `From` convention usable directly at the API edge without a per-call `TryParse`
+> guard.
 
 - `BadRequestException(Error error)` lives in `shared-kernel` (`…SharedKernel.Results`) next to `Error`,
   so the value factory that throws it does not reach outside its layer.
 - `BadRequestExceptionHandler` and `AddRoomyExceptionHandling()` live in `web-http` (the existing
   HTTP-edge helper, ADR-0046). It reuses the `ErrorResponse` body so a malformed-request 400 is
   byte-for-byte what `Error.ToBadRequest()` produced.
-- Hosts opt in with `builder.Services.AddRoomyExceptionHandling()` + `app.UseExceptionHandler()`.
+- Hosts opt in with `builder.Services.AddRoomyExceptionHandling()` + `app.UseExceptionHandler()`
+  (identity, organization, and attendance APIs).
 
 `PageRequest.DecodeCursor` keeps returning `Result` — it is decoded deep inside the page query, not at
 the trust boundary, and its failure already surfaces as a 400 through the query result. Only the edge
