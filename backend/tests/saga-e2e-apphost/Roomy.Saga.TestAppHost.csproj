@@ -16,10 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The two saga participants + the schema-rollout runner; generate the Projects.* metadata the
-         host model references. No gateway/web/attendance-api — the saga is organization <-> identity. -->
+    <!-- The saga participants + the schema-rollout runner; generate the Projects.* metadata the host
+         model references. attendance-api is included because it is a second consumer of EmployeeHired,
+         so the stack exercises the per-service-queue fan-out (#189); no gateway/web. -->
     <ProjectReference Include="../../apps/identity-api/Roomy.Identity.Api.csproj" />
     <ProjectReference Include="../../apps/organization-api/Roomy.Organization.Api.csproj" />
+    <ProjectReference Include="../../apps/attendance-api/Roomy.Attendance.Api.csproj" />
     <ProjectReference Include="../../apps/db-migrator/Roomy.DbMigrator.csproj" />
   </ItemGroup>
 

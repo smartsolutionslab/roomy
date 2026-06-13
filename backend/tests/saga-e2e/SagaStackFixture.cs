@@ -28,6 +28,8 @@ public sealed class SagaStackFixture : IAsyncLifetime
 
     public HttpClient Organization { get; private set; } = new();
 
+    public HttpClient Attendance { get; private set; } = new();
+
     public async ValueTask InitializeAsync()
     {
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_Saga_TestAppHost>();
@@ -38,10 +40,12 @@ public sealed class SagaStackFixture : IAsyncLifetime
         var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
         await notifications.WaitForResourceHealthyAsync("organization-api", readiness.Token);
         await notifications.WaitForResourceHealthyAsync("identity-api", readiness.Token);
+        await notifications.WaitForResourceHealthyAsync("attendance-api", readiness.Token);
 
         await Task.Delay(TimeSpan.FromSeconds(30), readiness.Token);
 
         Organization = new HttpClient { BaseAddress = Endpoint("organization-api") };
+        Attendance = new HttpClient { BaseAddress = Endpoint("attendance-api") };
         keycloak = new HttpClient { BaseAddress = Endpoint("keycloak") };
         organizationConnectionString = await application.GetConnectionStringAsync("organization", readiness.Token)
             ?? throw new InvalidOperationException("No organization connection string.");
@@ -100,6 +104,36 @@ public sealed class SagaStackFixture : IAsyncLifetime
             $"Employee {employeeId} stayed Provisioning. Keycloak account for '{email}' exists: {keycloakUserExists} "
             + "(true => identity consumed EmployeeHired and provisioned, so the ack did not reach organization; "
             + "false => EmployeeHired did not reach identity).");
+    }
+
+    public async Task WaitForAttendanceDirectoryAsync(Guid employeeId, string displayName, CancellationToken cancellationToken)
+    {
+        var token = await AcquireUserTokenAsync(AdminEmail, AdminPassword, cancellationToken);
+        var deadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromMinutes(2);
+        var lastResponse = "(none)";
+        while (DateTimeOffset.UtcNow < deadlineAt)
+        {
+            using var request = new HttpRequestMessage(
+                HttpMethod.Get, $"reservations/employees?q={Uri.EscapeDataString(displayName)}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            using var response = await Attendance.SendAsync(request, cancellationToken);
+            lastResponse = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var items = JsonNode.Parse(lastResponse)?["items"]?.AsArray() ?? [];
+                if (items.Any(item => item?["employeeId"]?.GetValue<string>() == employeeId.ToString()))
+                {
+                    return;
+                }
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+        }
+
+        throw new InvalidOperationException(
+            $"Employee {employeeId} never appeared in the attendance directory — the attendance service did not "
+            + $"receive EmployeeHired (the per-service-queue fan-out, #189). Last response: {lastResponse}");
     }
 
     public async Task<bool> KeycloakUserExistsAsync(string email, CancellationToken cancellationToken)
@@ -251,6 +285,7 @@ public sealed class SagaStackFixture : IAsyncLifetime
     public async ValueTask DisposeAsync()
     {
         Organization.Dispose();
+        Attendance.Dispose();
         keycloak?.Dispose();
         if (application is not null)
         {

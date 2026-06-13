@@ -23,6 +23,23 @@ public sealed class HireEmployeeSagaTests(SagaStackFixture fixture) : IClassFixt
     }
 
     [Fact]
+    public async Task Hiring_a_colleague_reaches_both_identity_and_the_attendance_directory()
+    {
+        const string DisplayName = "Grace Hopper";
+        var email = UniqueEmail();
+
+        var hired = await HireAsync(DisplayName, email, "Employee", "Colleague.1");
+
+        var employee = await fixture.WaitForTerminalStateAsync(hired.EmployeeId, email, TestContext.Current.CancellationToken);
+        employee.State.ShouldBe(ProvisioningState.Active);
+
+        // identity and attendance both consume the SAME EmployeeHired off the fanout exchange. Without
+        // per-service queues (#189) they share one queue and compete, so only one receives the message —
+        // this asserts the employee lands in attendance's directory as well as the identity account.
+        await fixture.WaitForAttendanceDirectoryAsync(hired.EmployeeId, DisplayName, TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
     public async Task Hiring_with_an_already_used_email_fails_provisioning_without_a_half_account()
     {
         var hired = await HireAsync("Imposter", SagaStackFixture.AdminEmail, "Employee", "Imposter.1");
