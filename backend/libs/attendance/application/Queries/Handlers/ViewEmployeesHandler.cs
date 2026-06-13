@@ -9,5 +9,5 @@ public sealed class ViewEmployeesHandler(IEmployeeCatalog catalog)
     : IQueryHandler<ViewEmployees, Page<EmployeeView>>
 {
     public Task<Result<Page<EmployeeView>>> HandleAsync(ViewEmployees query, CancellationToken cancellationToken) =>
-        catalog.GetAsync(query.Term, query.Page, cancellationToken);
+        catalog.GetAsync(query.Filter.Term, query.Filter.Page, cancellationToken);
 }

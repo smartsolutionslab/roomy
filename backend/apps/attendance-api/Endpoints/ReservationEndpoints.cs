@@ -105,7 +105,8 @@ public static class ReservationEndpoints
         var pageRequest = PageRequest.From(cursor, limit);
         if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
-        var result = await view.HandleAsync(new ViewEmployees(searchTerm.Value, pageRequest.Value), cancellationToken);
+        var query = new ViewEmployees(new EmployeeFilter(searchTerm.Value, pageRequest.Value));
+        var result = await view.HandleAsync(query, cancellationToken);
 
         return result.Match(employees => Results.Ok(employees.ToResponse()), error => error.ToBadRequest());
     }
