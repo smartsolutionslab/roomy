@@ -49,9 +49,7 @@ builder.Services.AddSingleton(new AttendanceApiOptions
 var businessZone = BusinessTimeZone.Resolve(attendance["TimeZone"]);
 builder.Services.AddSingleton<IBusinessClock>(serviceProvider => new BusinessClock(serviceProvider.GetRequiredService<TimeProvider>(), businessZone));
 
-var keycloak = builder.Configuration.GetSection("Keycloak");
-var keycloakBaseAddress = new Uri(keycloak["BaseAddress"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
-var keycloakRealm = keycloak["Realm"] ?? "roomy";
+var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
 
 builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
