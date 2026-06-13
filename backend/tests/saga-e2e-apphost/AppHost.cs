@@ -47,4 +47,16 @@ _ = builder.AddProject<Projects.Roomy_Organization_Api>("organization-api")
     .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
     .WithEnvironment("DefaultAdmin__InitialPassword", "DevAdmin.23456");
 
+// attendance-api also consumes EmployeeHired (into its directory): including it here makes the saga
+// stack a faithful copy of production, so the per-service-queue fan-out (#189) is exercised end to end.
+_ = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
+    .WithHttpEndpoint()
+    .WithReference(attendanceDatabase).WaitForCompletion(dbMigrator)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
+    .WithReference(keycloak).WaitFor(keycloak)
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
+    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
+    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithEnvironment("Attendance__CompanyId", "0199a0b0-0000-7000-8000-000000000001");
+
 builder.Build().Run();
