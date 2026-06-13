@@ -20,9 +20,9 @@ public static class AccountEndpoints
     {
         if (!principal.TryGetSubject(out var subject)) return Results.Unauthorized();
 
-        var keycloakSubject = KeycloakSubjectIdentifier.From(subject);
-        var lookup = await users.GetByKeycloakSubjectAsync(keycloakSubject, cancellationToken);
+        var keycloakSubjectOfPrincipal = KeycloakSubjectIdentifier.From(subject);
+        var userByPrincipal = await users.GetByKeycloakSubjectAsync(keycloakSubjectOfPrincipal, cancellationToken);
 
-        return lookup.Match(user => Results.Ok(user.ToAccount()), error => error.ToHttpResult());
+        return userByPrincipal.Match(user => Results.Ok(user.ToAccount()), error => error.ToHttpResult());
     }
 }
