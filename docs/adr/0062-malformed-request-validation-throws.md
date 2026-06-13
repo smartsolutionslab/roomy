@@ -1,4 +1,4 @@
-# 0062. Malformed-request input throws a BadRequestException mapped to 400
+# 0062. Malformed-request input throws an Argument exception mapped to 400
 
 - **Status:** Accepted
 - **Date:** 2026-06-13
@@ -6,76 +6,64 @@
 
 ## Context and problem statement
 
-Query-string input that the client got wrong — an out-of-range page `limit`, a malformed cursor — is
-parsed at the API edge by a value factory (`PageRequest.From(cursor, limit)`). That factory returned
-`Result<PageRequest>`, so every endpoint repeated the same unpacking before it could use the value:
+Input the client got wrong — an out-of-range page `limit`, an over-long search term, a blank name or
+malformed email — is parsed at the API edge by a value factory (`PageRequest.From`, `SearchTerm.From`,
+`WorkEmail.From`, …). Two styles had grown up side by side:
 
-```csharp
-var request = PageRequest.From(cursor, limit);
-if (request.IsFailure) return request.Error.ToBadRequest();
-... request.Value ...
-```
+- Value objects follow the house convention: `From` is `TryParse(raw) ?? throw new ArgumentException`
+  (CLAUDE.md). They *throw* on bad input.
+- `PageRequest.From` / `SearchTerm.From` returned `Result<T>`, so every endpoint repeated
+  `if (x.IsFailure) return x.Error.ToBadRequest();` before it could use the value — a `Result` that was
+  never propagated, only unpacked on the spot.
 
-Four endpoints carried this boilerplate. The `Result` is never propagated anywhere — it is unpacked
-to a 400 on the spot — so it buys nothing over a throw, while the value-object convention
-(`From` is `TryParse(raw) ?? throw`, see CLAUDE.md) already says `From` should throw on bad input.
+We want one rule at the edge, not two, and the throwing convention is the one already in place for the
+dozen value objects.
 
 ## Decision drivers
 
-- A factory named `From` should follow the house convention and throw on invalid input; the `Result`
-  form here only exists to be immediately unpacked at one call depth.
-- The throw must still produce the *same* structured 400 body (`{code, message}`) the `Result` path
-  produced — the wire contract must not change.
-- A bare `throw` must not become a 500 for input the client got wrong.
+- A factory named `From` should follow the house convention and throw on invalid input.
+- A thrown parse failure must still produce a 400 — the client got the input wrong, not the server.
+- Don't invent a parallel exception hierarchy when the BCL already has the right one and the value
+  objects already throw it.
 
 ## Decision
 
-**`PageRequest.From` throws `BadRequestException` (carrying the structured `Error`) on invalid input and
-returns a `PageRequest` directly.** A single global `IExceptionHandler` translates malformed-input
-exceptions into the existing 400 `{code, message}` body:
+**Edge value factories throw an `Argument` exception on invalid input, and a single global
+`IExceptionHandler` maps `ArgumentException` (and its subclasses) to a 400.**
 
-- `BadRequestException` → its structured `Error` (`{code, message}`), unchanged from the `Result` path.
-- `ArgumentException` → a 400 with code `bad_request` and the exception message. This is what the
-  value-object `From` factories already throw (`From` is `TryParse(raw) ?? throw new ArgumentException`,
-  see CLAUDE.md), so the same edge factories used elsewhere (`WorkEmail.From`, `OfficeName.From`, …)
-  also surface a 400 when handed bad client input, instead of each endpoint pre-checking with `TryParse`.
-
-Any other exception falls through to the default 500.
-
-> **Trade-off, accepted:** mapping `ArgumentException` broadly means an `ArgumentException` thrown by a
-> genuine server-side bug (not just edge parsing) also returns 400, which can mask a 500. We accept this
-> to keep the value-object `From` convention usable directly at the API edge without a per-call `TryParse`
-> guard.
-
-- `BadRequestException(Error error)` lives in `shared-kernel` (`…SharedKernel.Results`) next to `Error`,
-  so the value factory that throws it does not reach outside its layer.
-- `BadRequestExceptionHandler` and `AddRoomyExceptionHandling()` live in `web-http` (the existing
-  HTTP-edge helper, ADR-0046). It reuses the `ErrorResponse` body so a malformed-request 400 is
-  byte-for-byte what `Error.ToBadRequest()` produced.
+- `PageRequest.From` and `SearchTerm.From` return their type directly and throw
+  `ArgumentOutOfRangeException` on a bad limit / over-long term (blank/whitespace still yields the
+  no-filter `SearchTerm.None`). They join the value objects, which already throw `ArgumentException`.
+- `ArgumentExceptionHandler` (in `web-http`, the HTTP-edge helper, ADR-0046) catches any
+  `ArgumentException` and writes the existing `ErrorResponse` body as a 400 with code `bad_request` and
+  the exception message. The 400 body *shape* (`{code, message}`) is unchanged, so the OpenAPI contract
+  and the generated Angular client are untouched.
 - Hosts opt in with `builder.Services.AddRoomyExceptionHandling()` + `app.UseExceptionHandler()`
   (identity, organization, and attendance APIs).
 
 `PageRequest.DecodeCursor` keeps returning `Result` — it is decoded deep inside the page query, not at
-the trust boundary, and its failure already surfaces as a 400 through the query result. Only the edge
-factory `From` changes.
+the trust boundary, and its failure already surfaces as a 400 through the query result.
+
+> **Trade-off, accepted:** mapping `ArgumentException` broadly means an `ArgumentException` thrown by a
+> genuine server-side bug also returns 400, which can mask a 500; and the 400 body carries a single
+> `bad_request` code rather than a per-failure code (`pagination.limit_out_of_range`, …). Nothing
+> consumes those codes today (no client, no i18n — only the factories' own unit tests did), so the loss
+> is theoretical, and we accept the masking risk to keep one validation rule at the edge.
 
 ## Consequences
 
 **Positive**
-- Endpoints read the value in one line; the repeated `IsFailure → ToBadRequest` unpacking is gone.
-- `From` now matches the value-object convention (`From` throws, the `Try`/`Result` form is the
-  non-throwing variant).
-- The 400 body is unchanged — same `{code, message}`, same status — so the OpenAPI contract and the
-  generated Angular client are untouched.
+- One rule at the edge: every `From` throws an `Argument` exception; one handler turns it into a 400.
+  No endpoint unpacks a `Result` or pre-checks with `TryParse`.
+- No bespoke exception type to maintain — the value objects, `PageRequest`, and `SearchTerm` all throw
+  the same BCL family.
 
 **Negative / trade-offs**
-- Expected client mistakes now travel as exceptions. Exceptions cost more than a returned value, but
-  this is a single throw per bad request on a non-hot path, and the handler scopes the cost to genuinely
-  invalid input.
+- The accepted trade-off above (broad `ArgumentException` → 400, single `bad_request` code).
 - A new cross-cutting pipeline step (`UseExceptionHandler`) that each API host must wire.
 
 ## Related
 
 - ADR-0046 (`web-http` domain-`Error` → HTTP mapping), CLAUDE.md value-object `From`/`TryParse` convention.
-- `SearchTerm.From` follows the same shape — it throws `BadRequestException` on an over-long term, so the
-  employee-directory endpoint no longer unpacks a `Result` either.
+- `Ensure` guards (`IsNotNullOrWhiteSpace`, `IsEnum<TEnum>`, …) throw `ArgumentException` too, so the same
+  handler renders guard failures at the edge as 400s.

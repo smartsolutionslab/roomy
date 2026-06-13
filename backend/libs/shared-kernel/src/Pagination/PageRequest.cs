@@ -22,8 +22,7 @@ public sealed record PageRequest
         var effectiveLimit = limit ?? DefaultLimit;
         if (effectiveLimit < 1 || effectiveLimit > MaxLimit)
         {
-            throw new BadRequestException(
-                Error.Validation("pagination.limit_out_of_range", $"The page limit must be between 1 and {MaxLimit}."));
+            throw new ArgumentOutOfRangeException(nameof(limit), $"The page limit must be between 1 and {MaxLimit}.");
         }
 
         var trimmedCursor = string.IsNullOrWhiteSpace(cursor) ? null : cursor;
