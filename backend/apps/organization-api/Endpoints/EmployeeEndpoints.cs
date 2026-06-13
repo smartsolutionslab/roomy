@@ -1,6 +1,7 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
+using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 
@@ -22,16 +23,14 @@ public static class EmployeeEndpoints
         ICommandHandler<HireEmployee, HiredEmployee> hireEmployee,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.InitialPassword) || !Enum.TryParse<EmployeeRole>(request.Role, ignoreCase: true, out var role))
-        {
-            return Results.BadRequest("A hire requires a display name, a valid work email, a role (Employee or Administrator), and an initial password.");
-        }
+        var role = Ensure.That(request.Role).IsEnum<EmployeeRole>().Value;
+        var password = Ensure.That(request.InitialPassword).IsNotNullOrWhiteSpace().Value;
 
         var command = new HireEmployee(
             EmployeeName.From(request.DisplayName),
             WorkEmail.From(request.Email),
             role,
-            request.InitialPassword);
+            password);
 
         var result = await hireEmployee.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();

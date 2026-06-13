@@ -44,6 +44,17 @@ public static class GuardExtensions
         return new Guard<string>(guard.Value, guard.Name);
     }
 
+    public static Guard<TEnum> IsEnum<TEnum>(this Guard<string?> guard)
+        where TEnum : struct, Enum
+    {
+        if (!Enum.TryParse<TEnum>(guard.Value, ignoreCase: true, out var parsed) || !Enum.IsDefined(parsed))
+        {
+            throw new ArgumentException($"Value must be one of: {string.Join(", ", Enum.GetNames<TEnum>())}.", guard.Name);
+        }
+
+        return new Guard<TEnum>(parsed, guard.Name);
+    }
+
     public static Guard<int> IsPositive(this Guard<int> guard)
     {
         if (guard.Value <= 0)
