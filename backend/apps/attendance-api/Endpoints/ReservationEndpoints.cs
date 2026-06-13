@@ -97,11 +97,9 @@ public static class ReservationEndpoints
         CancellationToken cancellationToken)
     {
         var searchTerm = SearchTerm.From(q);
-        if (searchTerm.IsFailure) return searchTerm.Error.ToBadRequest();
-
         var pageRequest = PageRequest.From(cursor, limit);
 
-        var query = new ViewEmployees(new EmployeeFilter(searchTerm.Value, pageRequest));
+        var query = new ViewEmployees(new EmployeeFilter(searchTerm, pageRequest));
         var result = await view.HandleAsync(query, cancellationToken);
 
         return result.Match(employees => Results.Ok(employees.ToResponse()), error => error.ToBadRequest());
