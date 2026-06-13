@@ -8,6 +8,6 @@ namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 public sealed class ViewMyReservationsHandler(IMyReservationsReadModel readModel)
     : IQueryHandler<ViewMyReservations, Page<MyReservationView>>
 {
-    public Task<Result<Page<MyReservationView>>> HandleAsync(ViewMyReservations query, CancellationToken cancellationToken) =>
-        readModel.GetAsync(query.Employee, query.Page, cancellationToken);
+    public async Task<Result<Page<MyReservationView>>> HandleAsync(ViewMyReservations query, CancellationToken cancellationToken) =>
+        await readModel.GetAsync(query.Employee, query.Page, cancellationToken);
 }

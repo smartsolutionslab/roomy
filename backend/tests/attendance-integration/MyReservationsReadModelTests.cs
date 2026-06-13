@@ -33,13 +33,13 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
         var page = await new MyReservationsReadModel(fixture.CreateDbContext())
             .GetAsync(EmployeeIdentifier.From(employee), FirstPage, TestContext.Current.CancellationToken);
 
-        var reservations = page.Value.Items;
+        var reservations = page.Items;
         reservations.Count.ShouldBe(2);
         reservations[0].Date.Value.ShouldBe(past);
         reservations[1].Date.Value.ShouldBe(future);
         reservations[0].OfficeName.ShouldBe("Munich");
         reservations[0].RoomName.ShouldBe("A1");
-        page.Value.NextCursor.ShouldBeNull();
+        page.NextCursor.ShouldBeNull();
     }
 
     [Fact]
@@ -65,15 +65,15 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
         var first = await readModel.GetAsync(
             EmployeeIdentifier.From(employee), Page(limit: 2), TestContext.Current.CancellationToken);
 
-        first.Value.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[0], days[1]]);
-        first.Value.NextCursor.ShouldNotBeNull();
+        first.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[0], days[1]]);
+        first.NextCursor.ShouldNotBeNull();
 
         var second = await readModel.GetAsync(
-            EmployeeIdentifier.From(employee), Page(limit: 2, cursor: first.Value.NextCursor),
+            EmployeeIdentifier.From(employee), Page(limit: 2, cursor: first.NextCursor),
             TestContext.Current.CancellationToken);
 
-        second.Value.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[2]]);
-        second.Value.NextCursor.ShouldBeNull();
+        second.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[2]]);
+        second.NextCursor.ShouldBeNull();
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
         var page = await new MyReservationsReadModel(fixture.CreateDbContext())
             .GetAsync(EmployeeIdentifier.From(mine), FirstPage, TestContext.Current.CancellationToken);
 
-        page.Value.Items.ShouldHaveSingleItem().Reservation.Value.ShouldNotBe(Guid.Empty);
+        page.Items.ShouldHaveSingleItem().Reservation.Value.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
         var page = await new MyReservationsReadModel(fixture.CreateDbContext())
             .GetAsync(EmployeeIdentifier.New(), FirstPage, TestContext.Current.CancellationToken);
 
-        page.Value.Items.ShouldBeEmpty();
-        page.Value.NextCursor.ShouldBeNull();
+        page.Items.ShouldBeEmpty();
+        page.NextCursor.ShouldBeNull();
     }
 
     private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null);

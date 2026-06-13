@@ -5,7 +5,6 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
@@ -18,7 +17,7 @@ public class ViewEmployeesTests
         var employee = new EmployeeView(EmployeeIdentifier.New(), "Ada");
         var catalog = Substitute.For<IEmployeeCatalog>();
         catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success(new Page<EmployeeView>([employee], null)));
+            .Returns(new Page<EmployeeView>([employee], null));
         var handler = new ViewEmployeesHandler(catalog);
 
         var result = await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(SearchTerm.None, FirstPage)), CancellationToken.None);
@@ -32,7 +31,7 @@ public class ViewEmployeesTests
     {
         var catalog = Substitute.For<IEmployeeCatalog>();
         catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success(new Page<EmployeeView>([], null)));
+            .Returns(new Page<EmployeeView>([], null));
         var handler = new ViewEmployeesHandler(catalog);
 
         var result = await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(SearchTerm.None, FirstPage)), CancellationToken.None);
@@ -47,7 +46,7 @@ public class ViewEmployeesTests
         var term = SearchTerm.From("hanah");
         var catalog = Substitute.For<IEmployeeCatalog>();
         catalog.GetAsync(Arg.Any<SearchTerm>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success(new Page<EmployeeView>([], null)));
+            .Returns(new Page<EmployeeView>([], null));
         var handler = new ViewEmployeesHandler(catalog);
 
         await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(term, FirstPage)), CancellationToken.None);

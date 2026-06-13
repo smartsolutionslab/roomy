@@ -4,20 +4,18 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 
 public sealed class MyReservationsReadModel(AttendanceDbContext context) : IMyReservationsReadModel
 {
-    public async Task<Result<Page<MyReservationView>>> GetAsync(EmployeeIdentifier employee, PageRequest request, CancellationToken cancellationToken)
+    public async Task<Page<MyReservationView>> GetAsync(EmployeeIdentifier employee, PageRequest request, CancellationToken cancellationToken)
     {
-        var decoded = request.DecodeCursor<ReservationCursor>();
-        if (decoded.IsFailure) return decoded.Error;
+        var cursor = request.DecodeCursor<ReservationCursor>();
 
         var employeeId = employee.Value;
         var reservations = context.Reservations.AsNoTracking().Where(reservation => reservation.EmployeeId == employeeId);
-        if (decoded.Value is { } after)
+        if (cursor is { } after)
         {
             var afterDate = after.Date;
             reservations = reservations.Where(reservation => reservation.Date > afterDate);
