@@ -81,12 +81,11 @@ public static class ReservationEndpoints
         if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
         var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
-        var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest.Value), cancellationToken);
+        var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest), cancellationToken);
 
         return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
     }
@@ -102,9 +101,8 @@ public static class ReservationEndpoints
         if (searchTerm.IsFailure) return searchTerm.Error.ToBadRequest();
 
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
-        var query = new ViewEmployees(new EmployeeFilter(searchTerm.Value, pageRequest.Value));
+        var query = new ViewEmployees(new EmployeeFilter(searchTerm.Value, pageRequest));
         var result = await view.HandleAsync(query, cancellationToken);
 
         return result.Match(employees => Results.Ok(employees.ToResponse()), error => error.ToBadRequest());
@@ -118,9 +116,8 @@ public static class ReservationEndpoints
         CancellationToken cancellationToken)
     {
         var pageRequest = PageRequest.From(cursor, limit);
-        if (pageRequest.IsFailure) return pageRequest.Error.ToBadRequest();
 
-        var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest.Value), cancellationToken);
+        var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest), cancellationToken);
 
         return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
     }

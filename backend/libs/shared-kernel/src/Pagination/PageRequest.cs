@@ -17,12 +17,13 @@ public sealed record PageRequest
 
     public int Limit { get; }
 
-    public static Result<PageRequest> From(string? cursor, int? limit)
+    public static PageRequest From(string? cursor, int? limit)
     {
         var effectiveLimit = limit ?? DefaultLimit;
         if (effectiveLimit < 1 || effectiveLimit > MaxLimit)
         {
-            return Error.Validation("pagination.limit_out_of_range", $"The page limit must be between 1 and {MaxLimit}.");
+            throw new BadRequestException(
+                Error.Validation("pagination.limit_out_of_range", $"The page limit must be between 1 and {MaxLimit}."));
         }
 
         var trimmedCursor = string.IsNullOrWhiteSpace(cursor) ? null : cursor;

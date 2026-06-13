@@ -76,10 +76,10 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
         page.IsFailure.ShouldBeTrue();
     }
 
-    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null);
 
     private static PageRequest Page(int limit, string? cursor = null) =>
-        PageRequest.From(cursor, limit).Value;
+        PageRequest.From(cursor, limit);
 
     private async Task SeedAsync(Action<AttendanceDbContext> seed)
     {

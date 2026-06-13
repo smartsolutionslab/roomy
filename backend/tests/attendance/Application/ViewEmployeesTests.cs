@@ -55,5 +55,5 @@ public class ViewEmployeesTests
         await catalog.Received(1).GetAsync(term, Arg.Any<PageRequest>(), Arg.Any<CancellationToken>());
     }
 
-    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null);
 }

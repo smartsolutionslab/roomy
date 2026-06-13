@@ -51,5 +51,5 @@ public class ViewMyReservationsTests
         result.Value.Items.ShouldBeEmpty();
     }
 
-    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null);
 }
