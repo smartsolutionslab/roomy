@@ -1,5 +1,4 @@
 using Shouldly;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.SharedKernel.Tests.Search;
@@ -39,14 +38,11 @@ public class SearchTermTests
     }
 
     [Fact]
-    public void A_term_longer_than_the_maximum_throws_a_bad_request()
+    public void A_term_longer_than_the_maximum_is_out_of_range()
     {
         var overLong = new string('a', SearchTerm.MaxLength + 1);
 
-        var exception = Should.Throw<BadRequestException>(() => SearchTerm.From(overLong));
-
-        exception.Error.Code.ShouldBe("search.term_too_long");
-        exception.Error.Type.ShouldBe(ErrorType.Validation);
+        Should.Throw<ArgumentOutOfRangeException>(() => SearchTerm.From(overLong));
     }
 
     [Fact]

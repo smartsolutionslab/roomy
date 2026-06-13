@@ -2,32 +2,15 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Shouldly;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Web.Http.Tests;
 
-public class BadRequestExceptionHandlerTests
+public class ArgumentExceptionHandlerTests
 {
-    private readonly BadRequestExceptionHandler handler = new();
+    private readonly ArgumentExceptionHandler handler = new();
 
     [Fact]
-    public async Task A_bad_request_exception_is_written_as_a_400_with_the_error_body()
-    {
-        var context = ContextWithBodyBuffer();
-        var exception = new BadRequestException(Error.Validation("pagination.limit_out_of_range", "The page limit must be between 1 and 100."));
-
-        var handled = await handler.TryHandleAsync(context, exception, CancellationToken.None);
-
-        handled.ShouldBeTrue();
-        context.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
-
-        var body = await ReadBodyAsync(context);
-        body.GetProperty("code").GetString().ShouldBe("pagination.limit_out_of_range");
-        body.GetProperty("message").GetString().ShouldBe("The page limit must be between 1 and 100.");
-    }
-
-    [Fact]
-    public async Task An_argument_exception_is_written_as_a_400()
+    public async Task An_argument_exception_is_written_as_a_400_with_the_message()
     {
         var context = ContextWithBodyBuffer();
 
@@ -38,6 +21,18 @@ public class BadRequestExceptionHandlerTests
 
         var body = await ReadBodyAsync(context);
         body.GetProperty("code").GetString().ShouldBe("bad_request");
+        body.GetProperty("message").GetString().ShouldBe("WorkEmail must be a valid email address. (Parameter 'value')");
+    }
+
+    [Fact]
+    public async Task An_argument_out_of_range_exception_is_also_written_as_a_400()
+    {
+        var context = ContextWithBodyBuffer();
+
+        var handled = await handler.TryHandleAsync(context, new ArgumentOutOfRangeException("limit", "The page limit must be between 1 and 100."), CancellationToken.None);
+
+        handled.ShouldBeTrue();
+        context.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
     }
 
     [Fact]

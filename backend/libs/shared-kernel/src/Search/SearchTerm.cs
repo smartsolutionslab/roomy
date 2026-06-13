@@ -1,5 +1,3 @@
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
-
 namespace SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 public sealed record SearchTerm : IValueObject
@@ -21,8 +19,7 @@ public sealed record SearchTerm : IValueObject
 
         if (trimmed.Length > MaxLength)
         {
-            throw new BadRequestException(
-                Error.Validation("search.term_too_long", $"The search term must be at most {MaxLength} characters."));
+            throw new ArgumentOutOfRangeException(nameof(value), $"The search term must be at most {MaxLength} characters.");
         }
 
         return new SearchTerm(trimmed);

@@ -6,7 +6,7 @@ public static class ExceptionHandling
 {
     public static IServiceCollection AddRoomyExceptionHandling(this IServiceCollection services)
     {
-        services.AddExceptionHandler<BadRequestExceptionHandler>();
+        services.AddExceptionHandler<ArgumentExceptionHandler>();
         services.AddProblemDetails();
 
         return services;
