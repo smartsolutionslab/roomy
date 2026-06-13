@@ -66,6 +66,28 @@ public class EnsureTests
         exception.ParamName.ShouldBe(nameof(customerName));
     }
 
+    private enum Sample
+    {
+        First,
+        Second,
+    }
+
+    [Fact]
+    public void IsEnum_parses_a_known_name_case_insensitively()
+    {
+        Ensure.That("second").IsEnum<Sample>().Value.ShouldBe(Sample.Second);
+    }
+
+    [Theory]
+    [InlineData("Third")]
+    [InlineData("5")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void IsEnum_throws_for_a_value_that_is_not_a_defined_member(string? value)
+    {
+        Should.Throw<ArgumentException>(() => Ensure.That(value).IsEnum<Sample>());
+    }
+
     [Fact]
     public void IsPositive_throws_for_zero_or_negative()
     {
