@@ -22,7 +22,7 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
         await using var query = fixture.CreateDbContext();
         var page = await new EmployeeCatalog(query).GetAsync(SearchTerm.None, FirstPage, TestContext.Current.CancellationToken);
 
-        var employees = page.Value.Items;
+        var employees = page.Items;
         employees.Select(employee => employee.Name).ShouldContain("Ada");
         employees.Select(employee => employee.Name).ShouldContain("Ben");
         employees.First().Name.ShouldBe("Ada");
@@ -49,13 +49,13 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
         do
         {
             var page = await catalog.GetAsync(SearchTerm.None, Page(limit: 2, cursor), TestContext.Current.CancellationToken);
-            if (page.Value.NextCursor is not null)
+            if (page.NextCursor is not null)
             {
-                page.Value.Items.Count.ShouldBe(2);
+                page.Items.Count.ShouldBe(2);
             }
 
-            mine.AddRange(page.Value.Items.Where(employee => seededIds.Contains(employee.Employee.Value)));
-            cursor = page.Value.NextCursor;
+            mine.AddRange(page.Items.Where(employee => seededIds.Contains(employee.Employee.Value)));
+            cursor = page.NextCursor;
             guard++;
         }
         while (cursor is not null && guard < 1000);
@@ -67,13 +67,13 @@ public sealed class EmployeeCatalogTests(PostgresEventStoreFixture fixture)
     }
 
     [Fact]
-    public async Task A_malformed_cursor_is_a_validation_failure()
+    public async Task A_malformed_cursor_throws()
     {
         await using var query = fixture.CreateDbContext();
-        var page = await new EmployeeCatalog(query)
-            .GetAsync(SearchTerm.None, Page(limit: 2, cursor: "not-a-cursor"), TestContext.Current.CancellationToken);
+        var catalog = new EmployeeCatalog(query);
 
-        page.IsFailure.ShouldBeTrue();
+        await Should.ThrowAsync<ArgumentException>(() =>
+            catalog.GetAsync(SearchTerm.None, Page(limit: 2, cursor: "not-a-cursor"), TestContext.Current.CancellationToken));
     }
 
     private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null);

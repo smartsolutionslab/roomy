@@ -1,5 +1,3 @@
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
-
 namespace SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 
 public sealed record PageRequest
@@ -29,12 +27,12 @@ public sealed record PageRequest
         return new PageRequest(trimmedCursor, effectiveLimit);
     }
 
-    public Result<TCursor?> DecodeCursor<TCursor>()
+    public TCursor? DecodeCursor<TCursor>()
         where TCursor : class
     {
-        if (Cursor is null) return Result.Success<TCursor?>(null);
-        if (CursorCodec.TryDecode<TCursor>(Cursor, out var decoded)) return Result.Success<TCursor?>(decoded);
+        if (Cursor is null) return null;
+        if (CursorCodec.TryDecode<TCursor>(Cursor, out var decoded)) return decoded;
 
-        return Error.Validation("pagination.cursor_invalid", "The pagination cursor is malformed.");
+        throw new ArgumentException("The pagination cursor is malformed.", "cursor");
     }
 }

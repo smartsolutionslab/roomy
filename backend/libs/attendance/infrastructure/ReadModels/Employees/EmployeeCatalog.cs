@@ -4,7 +4,6 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.SharedKernel.Search;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees;
@@ -22,7 +21,7 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
     private static readonly string setThresholdSql =
         FormattableString.Invariant($"SET LOCAL pg_trgm.word_similarity_threshold = {WordSimilarityThreshold}");
 
-    public Task<Result<Page<EmployeeView>>> GetAsync(
+    public Task<Page<EmployeeView>> GetAsync(
         SearchTerm term,
         PageRequest request,
         CancellationToken cancellationToken) =>
@@ -30,21 +29,17 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             ? ListAsync(request, cancellationToken)
             : SearchAsync(term.Value, request, cancellationToken);
 
-    private async Task<Result<Page<EmployeeView>>> ListAsync(
+    private async Task<Page<EmployeeView>> ListAsync(
         PageRequest request,
         CancellationToken cancellationToken)
     {
-        var decoded = request.DecodeCursor<EmployeeCursor>();
-        if (decoded.IsFailure)
-        {
-            return decoded.Error;
-        }
+        var after = request.DecodeCursor<EmployeeCursor>();
 
         var probeLimit = request.Limit + 1;
-        var rows = decoded.Value is { } after
+        var rows = after is { } cursor
             ? await context.Employees
                 .FromSql(
-                    $@"SELECT * FROM ""employees"" WHERE (""display_name"", ""employee_id"") > ({after.Name}, {after.EmployeeId}) ORDER BY ""display_name"", ""employee_id"" LIMIT {probeLimit}")
+                    $@"SELECT * FROM ""employees"" WHERE (""display_name"", ""employee_id"") > ({cursor.Name}, {cursor.EmployeeId}) ORDER BY ""display_name"", ""employee_id"" LIMIT {probeLimit}")
                 .AsNoTracking()
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false)
@@ -61,18 +56,12 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             row => new EmployeeCursor(row.DisplayName, row.EmployeeId));
     }
 
-    private async Task<Result<Page<EmployeeView>>> SearchAsync(
+    private async Task<Page<EmployeeView>> SearchAsync(
         string query,
         PageRequest request,
         CancellationToken cancellationToken)
     {
-        var decoded = request.DecodeCursor<EmployeeSearchCursor>();
-        if (decoded.IsFailure)
-        {
-            return decoded.Error;
-        }
-
-        var after = decoded.Value;
+        var after = request.DecodeCursor<EmployeeSearchCursor>();
         var probeLimit = request.Limit + 1;
 
         // SET LOCAL needs a transaction to scope the threshold to this query; the row-value keyset then pages

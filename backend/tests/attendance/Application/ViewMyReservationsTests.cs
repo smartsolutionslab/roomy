@@ -5,7 +5,6 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Tests.Application;
 
@@ -24,7 +23,7 @@ public class ViewMyReservationsTests
             BookingDate.From(new DateOnly(2026, 6, 8)));
         var readModel = Substitute.For<IMyReservationsReadModel>();
         readModel.GetAsync(Arg.Any<EmployeeIdentifier>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success(new Page<MyReservationView>([reservation], null)));
+            .Returns(new Page<MyReservationView>([reservation], null));
         var handler = new ViewMyReservationsHandler(readModel);
 
         var result = await handler.HandleAsync(
@@ -41,7 +40,7 @@ public class ViewMyReservationsTests
         var employee = EmployeeIdentifier.New();
         var readModel = Substitute.For<IMyReservationsReadModel>();
         readModel.GetAsync(Arg.Any<EmployeeIdentifier>(), Arg.Any<PageRequest>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Success(new Page<MyReservationView>([], null)));
+            .Returns(new Page<MyReservationView>([], null));
         var handler = new ViewMyReservationsHandler(readModel);
 
         var result = await handler.HandleAsync(

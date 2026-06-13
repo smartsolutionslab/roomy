@@ -8,6 +8,6 @@ namespace SmartSolutionsLab.Roomy.Attendance.Application.Queries.Handlers;
 public sealed class ViewEmployeesHandler(IEmployeeCatalog catalog)
     : IQueryHandler<ViewEmployees, Page<EmployeeView>>
 {
-    public Task<Result<Page<EmployeeView>>> HandleAsync(ViewEmployees query, CancellationToken cancellationToken) =>
-        catalog.GetAsync(query.Filter.Term, query.Filter.Page, cancellationToken);
+    public async Task<Result<Page<EmployeeView>>> HandleAsync(ViewEmployees query, CancellationToken cancellationToken) =>
+        await catalog.GetAsync(query.Filter.Term, query.Filter.Page, cancellationToken);
 }

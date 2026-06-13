@@ -41,8 +41,12 @@ dozen value objects.
 - Hosts opt in with `builder.Services.AddRoomyExceptionHandling()` + `app.UseExceptionHandler()`
   (identity, organization, and attendance APIs).
 
-`PageRequest.DecodeCursor` keeps returning `Result` — it is decoded deep inside the page query, not at
-the trust boundary, and its failure already surfaces as a 400 through the query result.
+`PageRequest.DecodeCursor` also throws `ArgumentException` on a malformed cursor — the cursor is the same
+client-supplied query input as `limit`. Because that was the only failure a page fetch could ever have, the
+page read paths (`IUserRepository.GetPageAsync`, the attendance read-model ports) now return a `Page<T>`
+directly rather than `Result<Page<T>>` — an empty page is a success, not a miss, so the `Result` wrapper was
+carrying nothing but the cursor error. (Query *handlers* still return `Result` because `IQueryHandler`
+mandates it; the malformed-cursor exception bubbles through them to the handler.)
 
 > **Trade-off, accepted:** mapping `ArgumentException` broadly means an `ArgumentException` thrown by a
 > genuine server-side bug also returns 400, which can mask a 500; and the 400 body carries a single
