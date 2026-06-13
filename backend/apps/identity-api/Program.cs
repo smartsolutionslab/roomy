@@ -37,6 +37,8 @@ builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 
 builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
+builder.Services.AddRoomyExceptionHandling();
+
 builder.Services.AddIdentityUseCases();
 
 // Emitting the OpenAPI spec (ADR-0036) runs the host through `getdocument`. AutoStartHost lets that
@@ -67,6 +69,8 @@ if (!emittingOpenApiDocument)
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();

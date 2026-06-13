@@ -110,10 +110,10 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
         page.Value.NextCursor.ShouldBeNull();
     }
 
-    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null).Value;
+    private static PageRequest FirstPage => PageRequest.From(cursor: null, limit: null);
 
     private static PageRequest Page(int limit, string? cursor = null) =>
-        PageRequest.From(cursor, limit).Value;
+        PageRequest.From(cursor, limit);
 
     private async Task SeedAsync(Action<AttendanceDbContext> seed)
     {

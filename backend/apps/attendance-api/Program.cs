@@ -18,6 +18,9 @@ var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionSt
 builder.Services.AddAttendancePersistence(attendanceConnectionString)
     .AddAttendanceUseCases()
     .AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
+
+builder.Services.AddRoomyExceptionHandling();
+
 var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
 
 if (emittingOpenApiDocument)
@@ -56,6 +59,8 @@ builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication()
     .UseAuthorization();
