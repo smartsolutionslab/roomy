@@ -7,9 +7,7 @@
   "paths": {
     "/reservations": {
       "post": {
-        "tags": [
-          "ReservationEndpoints"
-        ],
+        "tags": ["ReservationEndpoints"],
         "operationId": "Reserve",
         "requestBody": {
           "content": {
@@ -75,9 +73,7 @@
         }
       },
       "get": {
-        "tags": [
-          "ReservationEndpoints"
-        ],
+        "tags": ["ReservationEndpoints"],
         "operationId": "ViewDayReservations",
         "parameters": [
           {
@@ -106,9 +102,7 @@
     },
     "/reservations/{reservationId}": {
       "delete": {
-        "tags": [
-          "ReservationEndpoints"
-        ],
+        "tags": ["ReservationEndpoints"],
         "operationId": "CancelReservation",
         "parameters": [
           {
@@ -169,9 +163,7 @@
     },
     "/reservations/mine": {
       "get": {
-        "tags": [
-          "ReservationEndpoints"
-        ],
+        "tags": ["ReservationEndpoints"],
         "operationId": "ViewMyReservations",
         "parameters": [
           {
@@ -186,10 +178,7 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32"
             }
           }
@@ -220,9 +209,7 @@
     },
     "/reservations/employees": {
       "get": {
-        "tags": [
-          "ReservationEndpoints"
-        ],
+        "tags": ["ReservationEndpoints"],
         "operationId": "ViewEmployees",
         "parameters": [
           {
@@ -244,10 +231,7 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32"
             }
           }
@@ -288,9 +272,7 @@
     },
     "/reservations/by-employee/{employeeId}": {
       "get": {
-        "tags": [
-          "ReservationEndpoints"
-        ],
+        "tags": ["ReservationEndpoints"],
         "operationId": "ViewReservationsForEmployee",
         "parameters": [
           {
@@ -314,10 +296,7 @@
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32"
             }
           }
@@ -358,9 +337,7 @@
     },
     "/occupancy": {
       "get": {
-        "tags": [
-          "OccupancyEndpoints"
-        ],
+        "tags": ["OccupancyEndpoints"],
         "operationId": "ViewOccupancy",
         "parameters": [
           {
@@ -410,18 +387,18 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -435,9 +412,7 @@
     },
     "/rooms": {
       "get": {
-        "tags": [
-          "RoomCatalogueEndpoints"
-        ],
+        "tags": ["RoomCatalogueEndpoints"],
         "operationId": "ViewBookableRooms",
         "responses": {
           "200": {
@@ -460,13 +435,7 @@
   "components": {
     "schemas": {
       "BookableRoomResponse": {
-        "required": [
-          "officeId",
-          "officeName",
-          "roomId",
-          "roomName",
-          "capacity"
-        ],
+        "required": ["officeId", "officeName", "roomId", "roomName", "capacity"],
         "type": "object",
         "properties": {
           "officeId": {
@@ -485,19 +454,13 @@
           },
           "capacity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           }
         }
       },
       "EmployeePage": {
-        "required": [
-          "items",
-          "nextCursor"
-        ],
+        "required": ["items", "nextCursor"],
         "type": "object",
         "properties": {
           "items": {
@@ -507,18 +470,12 @@
             }
           },
           "nextCursor": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "EmployeeResponse": {
-        "required": [
-          "employeeId",
-          "name"
-        ],
+        "required": ["employeeId", "name"],
         "type": "object",
         "properties": {
           "employeeId": {
@@ -531,10 +488,7 @@
         }
       },
       "ErrorResponse": {
-        "required": [
-          "code",
-          "message"
-        ],
+        "required": ["code", "message"],
         "type": "object",
         "properties": {
           "code": {
@@ -546,10 +500,7 @@
         }
       },
       "MyReservationPage": {
-        "required": [
-          "items",
-          "nextCursor"
-        ],
+        "required": ["items", "nextCursor"],
         "type": "object",
         "properties": {
           "items": {
@@ -559,22 +510,12 @@
             }
           },
           "nextCursor": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "MyReservationResponse": {
-        "required": [
-          "reservationId",
-          "officeId",
-          "officeName",
-          "roomId",
-          "roomName",
-          "date"
-        ],
+        "required": ["reservationId", "officeId", "officeName", "roomId", "roomName", "date"],
         "type": "object",
         "properties": {
           "reservationId": {
@@ -602,11 +543,7 @@
         }
       },
       "OccupancyDayResponse": {
-        "required": [
-          "date",
-          "office",
-          "rooms"
-        ],
+        "required": ["date", "office", "rooms"],
         "type": "object",
         "properties": {
           "date": {
@@ -625,10 +562,7 @@
         }
       },
       "OccupantResponse": {
-        "required": [
-          "employeeId",
-          "name"
-        ],
+        "required": ["employeeId", "name"],
         "type": "object",
         "properties": {
           "employeeId": {
@@ -641,13 +575,7 @@
         }
       },
       "OfficeOccupancyResponse": {
-        "required": [
-          "officeId",
-          "name",
-          "occupied",
-          "capacity",
-          "isFull"
-        ],
+        "required": ["officeId", "name", "occupied", "capacity", "isFull"],
         "type": "object",
         "properties": {
           "officeId": {
@@ -659,18 +587,12 @@
           },
           "occupied": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "capacity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "isFull": {
@@ -682,45 +604,26 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "title": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "status": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
+            "type": ["null", "integer", "string"],
             "format": "int32"
           },
           "detail": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "instance": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "ReservationPage": {
-        "required": [
-          "items",
-          "nextCursor"
-        ],
+        "required": ["items", "nextCursor"],
         "type": "object",
         "properties": {
           "items": {
@@ -730,21 +633,12 @@
             }
           },
           "nextCursor": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "ReservationResponse": {
-        "required": [
-          "reservationId",
-          "officeId",
-          "roomId",
-          "date",
-          "employeeId"
-        ],
+        "required": ["reservationId", "officeId", "roomId", "date", "employeeId"],
         "type": "object",
         "properties": {
           "reservationId": {
@@ -770,11 +664,7 @@
         }
       },
       "ReserveRequest": {
-        "required": [
-          "officeId",
-          "roomId",
-          "date"
-        ],
+        "required": ["officeId", "roomId", "date"],
         "type": "object",
         "properties": {
           "officeId": {
@@ -790,23 +680,13 @@
             "format": "date"
           },
           "onBehalfOf": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "uuid"
           }
         }
       },
       "RoomOccupancyResponse": {
-        "required": [
-          "roomId",
-          "name",
-          "occupied",
-          "capacity",
-          "isFull",
-          "occupants"
-        ],
+        "required": ["roomId", "name", "occupied", "capacity", "isFull", "occupants"],
         "type": "object",
         "properties": {
           "roomId": {
@@ -818,28 +698,19 @@
           },
           "occupied": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "capacity": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "isFull": {
             "type": "boolean"
           },
           "occupants": {
-            "type": [
-              "null",
-              "array"
-            ],
+            "type": ["null", "array"],
             "items": {
               "$ref": "#/components/schemas/OccupantResponse"
             }
