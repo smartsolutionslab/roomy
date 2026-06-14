@@ -17,12 +17,13 @@ public static class RoomCatalogueEndpoints
 
     private static async Task<IResult> ListAsync(
         AttendanceApiOptions options,
-        IQueryHandler<ViewBookableRooms, IReadOnlyList<BookableRoomView>> view,
+        IQueryHandler<ViewBookableRooms, IReadOnlyList<BookableRoomView>> queryHandler,
         CancellationToken cancellationToken)
     {
-        var query = new ViewBookableRooms(CompanyIdentifier.From(options.CompanyId));
-
-        var result = await view.HandleAsync(query, cancellationToken);
+        var query = new ViewBookableRooms(
+            CompanyIdentifier.From(options.CompanyId)
+        );
+        var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(
             rooms => Results.Ok(rooms.Select(room => room.ToResponse())),

@@ -28,7 +28,7 @@ public static class OccupancyEndpoints
         DateOnly? to,
         AttendanceApiOptions options,
         IBusinessClock clock,
-        IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>> view,
+        IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>> queryHandler,
         CancellationToken cancellationToken)
     {
         if (officeId is null == roomId is null) return Error.Validation("unknown_scope", "Provide exactly one of officeId or roomId.").ToHttpResult();
@@ -40,9 +40,11 @@ public static class OccupancyEndpoints
             ? OccupancyScope.ForOffice(OfficeIdentifier.From(office))
             : OccupancyScope.ForRoom(RoomIdentifier.From(roomId!.Value));
 
-        var query = new ViewOccupancy(CompanyIdentifier.From(options.CompanyId), scope, range.Value);
-
-        var result = await view.HandleAsync(query, cancellationToken);
+        var query = new ViewOccupancy(
+            CompanyIdentifier.From(options.CompanyId),
+            scope,
+            range.Value);
+        var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(
             days => Results.Ok(days.Select(day => day.ToResponse())),

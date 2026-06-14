@@ -55,14 +55,13 @@ public static class ReservationEndpoints
     private static async Task<IResult> ViewAsync(
         DateOnly date,
         AttendanceApiOptions options,
-        IQueryHandler<ViewDayReservations, IReadOnlyList<ReservationView>> view,
+        IQueryHandler<ViewDayReservations, IReadOnlyList<ReservationView>> queryHandler,
         CancellationToken cancellationToken)
     {
         var query = new ViewDayReservations(
             CompanyIdentifier.From(options.CompanyId),
             BookingDate.From(date));
-
-        var result = await view.HandleAsync(query, cancellationToken);
+        var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(
             reservations => Results.Ok(reservations.ToResponse()),
@@ -74,17 +73,20 @@ public static class ReservationEndpoints
         int? limit,
         ClaimsPrincipal principal,
         IEmployeeDirectory employees,
-        IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
+        IQueryHandler<ViewMyReservations, Page<MyReservationView>> queryHandler,
         CancellationToken cancellationToken)
     {
         if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
 
-        var pageRequest = PageRequest.From(cursor, limit);
-
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
+        var userIdentifier = UserIdentifier.From(userId);
+        var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
-        var result = await view.HandleAsync(new ViewMyReservations(actor.Value, pageRequest), cancellationToken);
+        var query = new ViewMyReservations(
+            actor.Value,
+            PageRequest.From(cursor, limit)
+        );
+        var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
     }
@@ -93,14 +95,15 @@ public static class ReservationEndpoints
         string? q,
         string? cursor,
         int? limit,
-        IQueryHandler<ViewEmployees, Page<EmployeeView>> view,
+        IQueryHandler<ViewEmployees, Page<EmployeeView>> queryHandler,
         CancellationToken cancellationToken)
     {
-        var searchTerm = SearchTerm.From(q);
-        var pageRequest = PageRequest.From(cursor, limit);
-
-        var query = new ViewEmployees(new EmployeeFilter(searchTerm, pageRequest));
-        var result = await view.HandleAsync(query, cancellationToken);
+        var query = new ViewEmployees(
+            new EmployeeFilter(
+                SearchTerm.From(q),
+                PageRequest.From(cursor, limit)
+            ));
+        var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(employees => Results.Ok(employees.ToResponse()), error => error.ToBadRequest());
     }
@@ -109,12 +112,13 @@ public static class ReservationEndpoints
         Guid employeeId,
         string? cursor,
         int? limit,
-        IQueryHandler<ViewMyReservations, Page<MyReservationView>> view,
+        IQueryHandler<ViewMyReservations, Page<MyReservationView>> queryHandler,
         CancellationToken cancellationToken)
     {
-        var pageRequest = PageRequest.From(cursor, limit);
-
-        var result = await view.HandleAsync(new ViewMyReservations(EmployeeIdentifier.From(employeeId), pageRequest), cancellationToken);
+        var query = new ViewMyReservations(
+            EmployeeIdentifier.From(employeeId),
+            PageRequest.From(cursor, limit));
+        var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
     }
@@ -124,12 +128,12 @@ public static class ReservationEndpoints
         ClaimsPrincipal principal,
         AttendanceApiOptions options,
         IEmployeeDirectory employees,
-        ICommandHandler<ReservePlace, ReservationIdentifier> reserve,
+        ICommandHandler<ReservePlace, ReservationIdentifier> commandHandler,
         CancellationToken cancellationToken)
     {
         if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
-
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
+        var userIdentifier = UserIdentifier.From(userId);
+        var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var employee = request.OnBehalfOf is { } onBehalfOf
@@ -144,8 +148,7 @@ public static class ReservationEndpoints
             RoomIdentifier.From(request.RoomId),
             BookingDate.From(request.Date),
             principal.IsAdministrator());
-
-        var result = await reserve.HandleAsync(command, cancellationToken);
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
 
         return result.Match(
             reservationId => Results.Created(
@@ -160,12 +163,12 @@ public static class ReservationEndpoints
         ClaimsPrincipal principal,
         AttendanceApiOptions options,
         IEmployeeDirectory employees,
-        ICommandHandler<CancelReservation> cancel,
+        ICommandHandler<CancelReservation> commandHandler,
         CancellationToken cancellationToken)
     {
         if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
-
-        var actor = await employees.FindByUserAsync(UserIdentifier.From(userId), cancellationToken);
+        var userIdentifier = UserIdentifier.From(userId);
+        var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var command = new CancelReservation(
@@ -174,8 +177,7 @@ public static class ReservationEndpoints
             BookingDate.From(date),
             actor.Value,
             ActorIsAdmin: principal.IsAdministrator());
-
-        var result = await cancel.HandleAsync(command, cancellationToken);
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
 
         return result.Match(Results.NoContent, error => error.ToHttpResult());
     }
