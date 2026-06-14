@@ -61,26 +61,26 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
     }
 
     [Fact]
-    public async Task Neither_office_nor_room_returns_422_unknown_scope()
+    public async Task Neither_office_nor_room_is_a_bad_request()
     {
         var response = await Client().GetAsync("/occupancy", TestContext.Current.CancellationToken);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        (await Error(response)).Code.ShouldBe("unknown_scope");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await Error(response)).Message.ShouldBe("Provide exactly one of officeId or roomId.");
     }
 
     [Fact]
-    public async Task Both_office_and_room_returns_422_unknown_scope()
+    public async Task Both_office_and_room_is_a_bad_request()
     {
         var response = await Client().GetAsync(
             $"/occupancy?officeId={Guid.NewGuid()}&roomId={Guid.NewGuid()}", TestContext.Current.CancellationToken);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        (await Error(response)).Code.ShouldBe("unknown_scope");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await Error(response)).Message.ShouldBe("Provide exactly one of officeId or roomId.");
     }
 
     [Fact]
-    public async Task A_range_beyond_the_bound_returns_422_range_too_large()
+    public async Task A_range_beyond_the_bound_is_a_bad_request()
     {
         var to = today.AddMonths(3).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         var from = today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -88,8 +88,8 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
         var response = await Client().GetAsync(
             $"/occupancy?officeId={Guid.NewGuid()}&from={from}&to={to}", TestContext.Current.CancellationToken);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        (await Error(response)).Code.ShouldBe("range_too_large");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await Error(response)).Message.ShouldContain("at most");
     }
 
     [Fact]
