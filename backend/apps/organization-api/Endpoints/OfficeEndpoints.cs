@@ -57,15 +57,15 @@ public static class OfficeEndpoints
 
     private static async Task<IResult> CreateOfficeAsync(
         Request.CreateOffice request,
-        ICommandHandler<CreateOffice, OfficeIdentifier> createOffice,
+        ICommandHandler<CreateOffice, OfficeIdentifier> commandHandler,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
         var command = new CreateOffice(
             OfficeName.From(request.Name),
-            Location.From(request.Location));
-
-        var result = await createOffice.HandleAsync(command, cancellationToken);
+            Location.From(request.Location)
+        );
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var created = await offices.GetByIdentifierAsync(result.Value, cancellationToken);
@@ -93,47 +93,43 @@ public static class OfficeEndpoints
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        var name = OfficeName.TryParse(request.Name);
-        if (name is null) return Results.BadRequest("An office name must not be blank.");
-
         var identifier = OfficeIdentifier.From(officeId);
-        var result = await renameOffice.HandleAsync(new RenameOffice(identifier, name), cancellationToken);
+        var result = await renameOffice.HandleAsync(new RenameOffice(identifier, OfficeName.From(request.Name)), cancellationToken);
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
     private static async Task<IResult> ChangeLocationAsync(
         Guid officeId,
         Request.RelocateOffice request,
-        ICommandHandler<ChangeOfficeLocation> changeLocation,
+        ICommandHandler<ChangeOfficeLocation> commandHandler,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        var location = Location.TryParse(request.Location);
-        if (location is null) return Results.BadRequest("An office location must not be blank.");
-
-        var identifier = OfficeIdentifier.From(officeId);
-        var result = await changeLocation.HandleAsync(new ChangeOfficeLocation(identifier, location), cancellationToken);
-        return await OfficeResultAsync(result, identifier, offices, cancellationToken);
+        var officeIdentifier = OfficeIdentifier.From(officeId);
+        var command = new ChangeOfficeLocation(
+            officeIdentifier,
+            Location.From(request.Location)
+        );
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
+        return await OfficeResultAsync(result, officeIdentifier, offices, cancellationToken);
     }
 
     private static async Task<IResult> AddRoomAsync(
         Guid officeId,
         Request.AddRoom request,
-        ICommandHandler<AddRoomToOffice, RoomIdentifier> addRoom,
+        ICommandHandler<AddRoomToOffice, RoomIdentifier> commandHandler,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        var name = RoomName.TryParse(request.Name);
-        var capacity = Capacity.TryParse(request.Capacity);
-        if (name is null || capacity is null) return Results.BadRequest("A room requires a non-empty name and a capacity of at least 1.");
-
-        var identifier = OfficeIdentifier.From(officeId);
-        var result = await addRoom.HandleAsync(
-            new AddRoomToOffice(identifier, name, capacity.Value),
-            cancellationToken);
+        var officeIdentifier = OfficeIdentifier.From(officeId);
+        var command = new AddRoomToOffice(
+            officeIdentifier,
+            RoomName.From(request.Name),
+            Capacity.From(request.Capacity));
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
-        var office = await offices.GetByIdentifierAsync(identifier, cancellationToken);
+        var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
         return office.Match(
             found => found.Rooms.FirstOrDefault(room => room.Identifier == result.Value) is { } room
                 ? Results.Created($"/offices/{officeId}/rooms/{room.Identifier.Value}", room.ToResponse())
@@ -149,14 +145,13 @@ public static class OfficeEndpoints
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        var name = RoomName.TryParse(request.Name);
-        if (name is null) return Results.BadRequest("A room name must not be blank.");
-
-        var identifier = OfficeIdentifier.From(officeId);
-        var result = await renameRoom.HandleAsync(
-            new RenameRoom(identifier, RoomIdentifier.From(roomId), name),
-            cancellationToken);
-        return await OfficeResultAsync(result, identifier, offices, cancellationToken);
+        var officeIdentifier = OfficeIdentifier.From(officeId);
+        var command = new RenameRoom(
+            officeIdentifier,
+            RoomIdentifier.From(roomId),
+            RoomName.From(request.Name));
+        var result = await renameRoom.HandleAsync(command, cancellationToken);
+        return await OfficeResultAsync(result, officeIdentifier, offices, cancellationToken);
     }
 
     private static async Task<IResult> OfficeResultAsync(
