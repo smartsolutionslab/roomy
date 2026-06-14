@@ -20,7 +20,7 @@ public static class EmployeeEndpoints
 
     private static async Task<IResult> HireEmployeeAsync(
         Request.HireEmployee request,
-        ICommandHandler<HireEmployee, HiredEmployee> hireEmployee,
+        ICommandHandler<HireEmployee, HiredEmployee> commandHandler,
         CancellationToken cancellationToken)
     {
         var role = Ensure.That(request.Role).IsEnum<EmployeeRole>().Value;
@@ -31,8 +31,7 @@ public static class EmployeeEndpoints
             WorkEmail.From(request.Email),
             role,
             password);
-
-        var result = await hireEmployee.HandleAsync(command, cancellationToken);
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var hired = result.Value;

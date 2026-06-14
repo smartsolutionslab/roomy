@@ -47,11 +47,11 @@ public static class AdminUserEndpoints
 
     private static async Task<IResult> GrantAdministratorAsync(
         Guid userId,
-        ICommandHandler<GrantAdministrator> grantAdministrator,
+        ICommandHandler<GrantAdministrator> commandHandler,
         CancellationToken cancellationToken)
     {
         var command = new GrantAdministrator(UserIdentifier.From(userId));
-        var result = await grantAdministrator.HandleAsync(command, cancellationToken);
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
 
         return result.Match(Results.NoContent, error => error.ToHttpResult());
     }
