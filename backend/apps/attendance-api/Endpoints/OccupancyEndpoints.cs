@@ -2,7 +2,6 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 
@@ -16,8 +15,8 @@ public static class OccupancyEndpoints
             .RequireAuthorization()
             .WithName("ViewOccupancy")
             .Produces<IEnumerable<Response.OccupancyDay>>()
-            .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
-            .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         return endpoints;
     }
 
@@ -31,10 +30,9 @@ public static class OccupancyEndpoints
         IQueryHandler<ViewOccupancy, IReadOnlyList<OccupancyView>> queryHandler,
         CancellationToken cancellationToken)
     {
-        if (officeId is null == roomId is null) return Error.Validation("unknown_scope", "Provide exactly one of officeId or roomId.").ToHttpResult();
+        if (officeId is null == roomId is null) throw new ArgumentException("Provide exactly one of officeId or roomId.");
 
         var range = ResolveRange(from, to, clock);
-        if (range.IsFailure) return range.Error.ToHttpResult();
 
         var scope = officeId is { } office
             ? OccupancyScope.ForOffice(OfficeIdentifier.From(office))
@@ -43,7 +41,7 @@ public static class OccupancyEndpoints
         var query = new ViewOccupancy(
             CompanyIdentifier.From(options.CompanyId),
             scope,
-            range.Value);
+            range);
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
         return result.Match(
@@ -53,7 +51,7 @@ public static class OccupancyEndpoints
 
     // Resolves the optional from/to query params into a validated range: defaults to today, defaults an
     // open end to the start, and caps the span at MaxRangeDays.
-    private static Result<BookingDateRange> ResolveRange(DateOnly? from, DateOnly? to, IBusinessClock clock)
+    private static BookingDateRange ResolveRange(DateOnly? from, DateOnly? to, IBusinessClock clock)
     {
         var today = clock.Today.Value;
         var rangeFrom = from ?? today;
@@ -61,7 +59,7 @@ public static class OccupancyEndpoints
 
         if (BookingDateRange.TryParse(rangeFrom, rangeTo) is not { } range || range.LengthInDays > MaxRangeDays)
         {
-            return Error.Validation("range_too_large", $"The range must be a non-empty span of at most {MaxRangeDays} days.");
+            throw new ArgumentOutOfRangeException(nameof(to), $"The range must be a non-empty span of at most {MaxRangeDays} days.");
         }
 
         return range;

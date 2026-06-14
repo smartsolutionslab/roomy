@@ -21,7 +21,7 @@ scenarios 1–4, 7–9). Supplies the data for both the **list** (US6) and the *
   - `roomId` ⇒ a single room (its office rollup reflects that one room).
 - **Range:** `from`/`to` inclusive; `from == to` is a single day; `to` omitted ⇒ single day `from`;
   both omitted ⇒ **today** (Europe/Berlin). Past dates are allowed (FR-009). A bounded maximum span
-  (e.g. one month) keeps a request bounded — **422 `range_too_large`** beyond it.
+  (e.g. one month) keeps a request bounded — **400** beyond it.
 - **200:** one entry per day in `[from, to]`:
 
   ```json
@@ -47,8 +47,8 @@ scenarios 1–4, 7–9). Supplies the data for both the **list** (US6) and the *
     `Employees` display name.
   - A room with no reservations returns `occupied: 0` and is still listed; the rollup includes it
     (edge case).
-- **422 `unknown_scope`:** neither `officeId` nor `roomId` supplied, or both.
-- **422 `range_too_large`:** the requested span exceeds the bound.
+- **400:** neither `officeId` nor `roomId` supplied, or both; or the requested span exceeds the bound.
+  Malformed query input is rejected at the edge (a thrown `ArgumentException` → 400 `bad_request`, ADR-0062).
 - **404 `unknown_office` / `unknown_room`:** the office/room is not (yet) known to attendance.
 
 > The calendar's **own-day highlight** (FR-003, scenario 5) is computed by the client by intersecting
@@ -82,9 +82,10 @@ opened right after a booking or cancellation already reflects it. No live/push u
 
 ## Error body
 
-All non-2xx carry `{ code, message }` where `code` is the error code above, mapped from `Result`/`Error`
-(`ErrorType` → status: Validation→422, NotFound→404). No domain detail leaks beyond `code` + a human
-`message`.
+All non-2xx carry `{ code, message }`. Domain results map from `Result`/`Error` (`ErrorType` → status:
+Validation→422, NotFound→404). Malformed query input (bad/missing scope, an over-long range) instead
+throws at the edge and is mapped to **400 `bad_request`** (ADR-0062). No domain detail leaks beyond
+`code` + a human `message`.
 
 ## Gateway route
 

@@ -55,7 +55,7 @@ Drive `ViewOccupancy` / `ViewMyReservations` over a seeded read model with an in
 Assert the `contracts/attendance-api.md` surface:
 
 - `GET /occupancy?officeId&from&to` and `?roomId` shapes; `occupants` present only for today/tomorrow;
-  `unknown_scope`/`range_too_large`/`unknown_office`/`unknown_room` mappings (422/404).
+  bad/missing scope and an over-long range ⇒ 400; `unknown_office`/`unknown_room` ⇒ 404.
 - `GET /reservations/mine` returns the caller's reservations; `unknown_employee` ⇒ 404.
 - Any authenticated user may view any office/room (FR-005); only `GET` exists (read-only, FR-006).
 
