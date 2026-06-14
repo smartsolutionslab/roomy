@@ -63,8 +63,7 @@ public static class OfficeEndpoints
     {
         var command = new CreateOffice(
             OfficeName.From(request.Name),
-            Location.From(request.Location)
-        );
+            Location.From(request.Location));
         var result = await commandHandler.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
@@ -89,12 +88,15 @@ public static class OfficeEndpoints
     private static async Task<IResult> RenameOfficeAsync(
         Guid officeId,
         Request.RenameOffice request,
-        ICommandHandler<RenameOffice> renameOffice,
+        ICommandHandler<RenameOffice> commandHandler,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
         var identifier = OfficeIdentifier.From(officeId);
-        var result = await renameOffice.HandleAsync(new RenameOffice(identifier, OfficeName.From(request.Name)), cancellationToken);
+        var command = new RenameOffice(
+            identifier,
+            OfficeName.From(request.Name));
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
         return await OfficeResultAsync(result, identifier, offices, cancellationToken);
     }
 
@@ -108,8 +110,7 @@ public static class OfficeEndpoints
         var officeIdentifier = OfficeIdentifier.From(officeId);
         var command = new ChangeOfficeLocation(
             officeIdentifier,
-            Location.From(request.Location)
-        );
+            Location.From(request.Location));
         var result = await commandHandler.HandleAsync(command, cancellationToken);
         return await OfficeResultAsync(result, officeIdentifier, offices, cancellationToken);
     }
@@ -141,7 +142,7 @@ public static class OfficeEndpoints
         Guid officeId,
         Guid roomId,
         Request.RenameRoom request,
-        ICommandHandler<RenameRoom> renameRoom,
+        ICommandHandler<RenameRoom> commandHandler,
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
@@ -150,7 +151,7 @@ public static class OfficeEndpoints
             officeIdentifier,
             RoomIdentifier.From(roomId),
             RoomName.From(request.Name));
-        var result = await renameRoom.HandleAsync(command, cancellationToken);
+        var result = await commandHandler.HandleAsync(command, cancellationToken);
         return await OfficeResultAsync(result, officeIdentifier, offices, cancellationToken);
     }
 

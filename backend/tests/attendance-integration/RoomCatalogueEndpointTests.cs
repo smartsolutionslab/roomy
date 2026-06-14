@@ -90,5 +90,10 @@ public sealed class RoomCatalogueEndpointTests : IClassFixture<PostgresEventStor
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
 
-    private sealed record BookableRoomDto(Guid OfficeId, string OfficeName, Guid RoomId, string RoomName, int Capacity);
+    private sealed record BookableRoomDto(
+        Guid OfficeId,
+        string OfficeName,
+        Guid RoomId,
+        string RoomName,
+        int Capacity);
 }

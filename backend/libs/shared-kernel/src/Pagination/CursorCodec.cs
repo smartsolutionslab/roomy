@@ -28,10 +28,7 @@ public static class CursorCodec
         try
         {
             var decoded = JsonSerializer.Deserialize<TKey>(json);
-            if (decoded is null)
-            {
-                return false;
-            }
+            if (decoded is null) return false;
 
             key = decoded;
             return true;
