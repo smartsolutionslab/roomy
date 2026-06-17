@@ -44,9 +44,7 @@ public static class OccupancyEndpoints
             range);
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
-        return result.Match(
-            days => Results.Ok(days.Select(day => day.ToResponse())),
-            error => error.ToHttpResult());
+        return result.ToOk(days => days.Select(day => day.ToResponse()));
     }
 
     // Resolves the optional from/to query params into a validated range: defaults to today, defaults an

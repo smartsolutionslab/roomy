@@ -20,13 +20,9 @@ public static class RoomCatalogueEndpoints
         IQueryHandler<ViewBookableRooms, IReadOnlyList<BookableRoomView>> queryHandler,
         CancellationToken cancellationToken)
     {
-        var query = new ViewBookableRooms(
-            CompanyIdentifier.From(options.CompanyId)
-        );
+        var query = new ViewBookableRooms(CompanyIdentifier.From(options.CompanyId));
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
-        return result.Match(
-            rooms => Results.Ok(rooms.Select(room => room.ToResponse())),
-            error => error.ToHttpResult());
+        return result.ToOk(rooms => rooms.Select(room => room.ToResponse()));
     }
 }
