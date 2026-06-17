@@ -2,29 +2,14 @@
 // timezone-aware step is isolated in todayInBerlin. A day is bookable if it is a working day within
 // today .. today + BOOKING_WINDOW_DAYS (inclusive) — the same rule the server enforces.
 
+import { parse, weekday } from './date-parts';
+
 export const BOOKING_WINDOW_DAYS = 14;
-
-interface DateParts {
-  readonly year: number;
-  readonly month: number;
-  readonly day: number;
-}
-
-function parse(date: string): DateParts {
-  const [year, month, day] = date.split('-').map(Number);
-  return { year, month, day };
-}
 
 // Days since the Unix epoch, computed in UTC so it never shifts with the host timezone.
 function epochDay(date: string): number {
   const { year, month, day } = parse(date);
   return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
-}
-
-// 0 = Sunday … 6 = Saturday, computed in UTC (timezone-free).
-function weekday(date: string): number {
-  const { year, month, day } = parse(date);
-  return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 }
 
 function format(value: Date): string {

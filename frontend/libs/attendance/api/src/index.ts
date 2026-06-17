@@ -21,6 +21,7 @@ export {
   isWorkingDay,
   todayInBerlin,
 } from './lib/bookable-day';
+export { asUtcDate } from './lib/date-parts';
 export { errorCode } from './lib/gateway-error';
 export type { Occupant, OccupancyDay, OccupancyOffice, OccupancyRoom } from './lib/occupancy';
 export { toOccupancyDays } from './lib/occupancy';

@@ -14,6 +14,7 @@ import {
   MyReservation,
   OccupancyDay,
   addMonths,
+  asUtcDate,
   isSameMonth,
   monthGrid,
   rangeFor,
@@ -141,9 +142,4 @@ export class OccupancyCalendar {
         error: () => this.myDays.set(new Set()),
       });
   }
-}
-
-function asUtcDate(date: string): Date {
-  const [year, month, day] = date.split('-').map(Number);
-  return new Date(Date.UTC(year, month - 1, day));
 }
