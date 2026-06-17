@@ -1,3 +1,4 @@
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 using SmartSolutionsLab.Roomy.SharedKernel;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
@@ -65,15 +66,9 @@ public sealed class AttendanceDay : EventSourcedAggregate
         DateTimeOffset occurredAt)
     {
         var existing = reservations.Find(held => held.Identifier == reservation);
-        if (existing is null)
-        {
-            return Error.NotFound("reservation_not_found", "No such reservation for this day.");
-        }
+        if (existing is null) return Error.NotFound("reservation_not_found", "No such reservation for this day.");
 
-        if (Date.Value < today.Value)
-        {
-            return Error.Validation("past_immutable", "A reservation in the past cannot be cancelled.");
-        }
+        if (Date.Value < today.Value) return Error.Validation("past_immutable", "A reservation in the past cannot be cancelled.");
 
         if (!MayCancel(existing, actor, actorIsAdmin))
         {

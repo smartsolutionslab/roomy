@@ -5,6 +5,7 @@ using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Application.Commands;
 using SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.Identity.Domain.Users.Events;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Tests.Features;
@@ -14,13 +15,14 @@ public sealed class AdminManagementTests
     private static User ActiveEmployee()
     {
         var user = User.Register(
-            Email.From("ada@example.com"), DisplayName.From("Ada Lovelace"), Role.Employee);
+            Email.From("ada@example.com"),
+            DisplayName.From("Ada Lovelace"),
+            Role.Employee);
         user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
         return user;
     }
 
-    private static GrantAdministratorHandler Handler(
-        IUserRepository users, IIdentityProviderPort identityProvider, IUnitOfWork unitOfWork) =>
+    private static GrantAdministratorHandler Handler(IUserRepository users, IIdentityProviderPort identityProvider, IUnitOfWork unitOfWork) =>
         new(users, identityProvider, unitOfWork, TimeProvider.System);
 
     [Fact]
@@ -35,8 +37,7 @@ public sealed class AdminManagementTests
             .Returns(Result.Success());
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork)
-            .HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
         user.IsAdministrator.ShouldBeTrue();
@@ -51,7 +52,8 @@ public sealed class AdminManagementTests
     public async Task Granting_an_existing_administrator_is_an_idempotent_no_op()
     {
         var user = User.Register(
-            Email.From("grace@example.com"), DisplayName.From("Grace Hopper"),
+            Email.From("grace@example.com"),
+            DisplayName.From("Grace Hopper"),
             Role.Employee.GrantAdministrator());
         user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
         var users = Substitute.For<IUserRepository>();
@@ -59,8 +61,7 @@ public sealed class AdminManagementTests
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork)
-            .HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
         await identityProvider.DidNotReceive().AssignAdministratorRoleAsync(Arg.Any<KeycloakSubjectIdentifier>(), Arg.Any<CancellationToken>());
@@ -77,8 +78,7 @@ public sealed class AdminManagementTests
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork)
-            .HandleAsync(new GrantAdministrator(UserIdentifier.New()), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(UserIdentifier.New()), CancellationToken.None);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Type.ShouldBe(ErrorType.NotFound);
@@ -96,8 +96,7 @@ public sealed class AdminManagementTests
             .Returns(Result.Failure(new Error("provider_error", "sync failed")));
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork)
-            .HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
 
         result.IsFailure.ShouldBeTrue();
         await unitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());

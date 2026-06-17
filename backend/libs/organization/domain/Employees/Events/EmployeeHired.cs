@@ -1,7 +1,7 @@
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.SharedKernel;
 
-namespace SmartSolutionsLab.Roomy.Organization.Domain.Employees;
+namespace SmartSolutionsLab.Roomy.Organization.Domain.Employees.Events;
 
 public sealed record EmployeeHired(
     EmployeeIdentifier Employee,

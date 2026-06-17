@@ -1,4 +1,4 @@
-using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;

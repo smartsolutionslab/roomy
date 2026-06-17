@@ -1,8 +1,8 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
+using SmartSolutionsLab.Roomy.Organization.Domain.Employees.Events;
 using SmartSolutionsLab.Roomy.SharedKernel;
-using DomainEvents = SmartSolutionsLab.Roomy.Organization.Domain.Offices;
-using EmployeeEvents = SmartSolutionsLab.Roomy.Organization.Domain.Employees;
+using DomainEvents = SmartSolutionsLab.Roomy.Organization.Domain.Offices.Events;
 using IntegrationContracts = SmartSolutionsLab.Roomy.Contracts.Organization;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging;
@@ -27,7 +27,7 @@ internal static class OrganizationIntegrationEventMap
                 added.Capacity.Value,
                 occurredAt),
 
-            EmployeeEvents.EmployeeHired hired => new IntegrationContracts.EmployeeHired(
+            EmployeeHired hired => new IntegrationContracts.EmployeeHired(
                 hired.Employee.Value,
                 hired.User.Value,
                 hired.Email.Value,

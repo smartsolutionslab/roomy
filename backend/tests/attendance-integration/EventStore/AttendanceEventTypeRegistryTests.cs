@@ -1,5 +1,5 @@
 using Shouldly;
-using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 

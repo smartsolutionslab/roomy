@@ -1,4 +1,5 @@
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
+using SmartSolutionsLab.Roomy.Organization.Domain.Offices.Events;
 using SmartSolutionsLab.Roomy.SharedKernel;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
@@ -41,7 +42,9 @@ public sealed class Office : Aggregate
     public Result<Room> AddRoom(RoomName name, Capacity capacity)
     {
         if (rooms.Any(room => room.Name == name))
+        {
             return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
+        }
 
         var room = Room.Create(name, capacity);
         rooms.Add(room);
@@ -52,11 +55,12 @@ public sealed class Office : Aggregate
     public Result RenameRoom(RoomIdentifier roomIdentifier, RoomName name)
     {
         var room = rooms.SingleOrDefault(candidate => candidate.Identifier == roomIdentifier);
-        if (room is null)
-            return Error.NotFound("office.room_not_found", $"No room with identifier '{roomIdentifier}' exists in this office.");
+        if (room is null) return Error.NotFound("office.room_not_found", $"No room with identifier '{roomIdentifier}' exists in this office.");
 
         if (IsRoomNameTakenByAnother(roomIdentifier, name))
+        {
             return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
+        }
 
         room.Rename(name);
         return Result.Success();

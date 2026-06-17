@@ -1,6 +1,7 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
+using SmartSolutionsLab.Roomy.Organization.Domain.Offices.Events;
 
 namespace SmartSolutionsLab.Roomy.Organization.Tests.Domain.Offices;
 

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 using SmartSolutionsLab.Roomy.Identity.Application;
@@ -75,10 +76,7 @@ internal sealed class Seeder(
             foreach (var room in seed.Rooms)
             {
                 var added = office.AddRoom(RoomName.From(room.Name), Capacity.From(room.Capacity));
-                if (added.IsFailure)
-                {
-                    throw new InvalidOperationException($"Could not add room {room.Name} to {seed.Name}: {added.Error.Message}");
-                }
+                if (added.IsFailure) throw new InvalidOperationException($"Could not add room {room.Name} to {seed.Name}: {added.Error.Message}");
 
                 rooms.Add(new RoomData(added.Value.Identifier.Value, room.Name, room.Capacity));
             }
@@ -125,7 +123,10 @@ internal sealed class Seeder(
             employee.CompleteProvisioning();
             organizationDb.Employees.Add(employee);
 
-            result.Add(new EmployeeData(employee.Identifier.Value, userId, seed.DisplayName, seed.Office));
+            result.Add(new EmployeeData(
+                employee.Identifier.Value,
+                userId, seed.DisplayName,
+                seed.Office));
         }
 
         await identityDb.SaveChangesAsync(cancellationToken);
@@ -138,7 +139,12 @@ internal sealed class Seeder(
     {
         foreach (var office in offices)
         {
-            attendanceDb.Offices.Add(new ReadModelOffice { OfficeId = office.OfficeId, CompanyId = companyId, Name = office.Name });
+            attendanceDb.Offices.Add(new ReadModelOffice
+            {
+                OfficeId = office.OfficeId,
+                CompanyId = companyId,
+                Name = office.Name
+            });
             foreach (var room in office.Rooms)
             {
                 attendanceDb.Rooms.Add(new ReadModelRoom
@@ -189,10 +195,7 @@ internal sealed class Seeder(
                 AssignDay(companyId, office, staff, date, target, random, dayEvents);
             }
 
-            if (dayEvents.Count == 0)
-            {
-                continue;
-            }
+            if (dayEvents.Count == 0) continue;
 
             var streamId = AttendanceDayStreamId.For(company, bookingDate);
             await eventStore.AppendAsync(streamId, StreamVersion.None, dayEvents, EventMetadata.None, cancellationToken);

@@ -278,7 +278,9 @@ Full rules are authoritative in `docs/coding-standards/csharp.md` and
   `TryParse(raw) ?? throw`; `Ensure.That(...)` is reserved for trust-boundary argument checks)
   and TypeScript branded types.
 - **Domain modelling** — organize the domain **by aggregate** (a folder + namespace per
-  aggregate holds the root, its value objects, **and its repository interface**). Identifiers
+  aggregate holds the root, its value objects, **and its repository interface**). An aggregate's
+  **domain events live in an `Events/` subfolder** with the matching sub-namespace
+  (`…Domain.{Aggregate}.Events`) — one event per file, never alongside the root. Identifiers
   are GUIDv7 branded types named `…Identifier` (never `…Id`) with implicit `Guid` conversions
   for EF Core. Value objects implement `IValueObject`; aggregate roots `IAggregate`, other
   entities `IEntity` (markers in `shared-kernel`).
