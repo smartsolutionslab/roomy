@@ -28,7 +28,11 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         {
             var store = fixture.CreateEventStore(context, serializer);
             await store.AppendAsync(
-                streamId, StreamVersion.None, [booked, released], EventMetadata.None, CancellationToken.None);
+                streamId,
+                StreamVersion.None,
+                [booked, released],
+                EventMetadata.None,
+                CancellationToken.None);
         }
 
         await using (var context = fixture.CreateContext())
@@ -62,7 +66,11 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
 
-        await store.AppendAsync(streamId, StreamVersion.None, [], EventMetadata.None, CancellationToken.None);
+        await store.AppendAsync(
+            streamId,
+            StreamVersion.None,
+            [], EventMetadata.None,
+            CancellationToken.None);
 
         (await store.ReadStreamAsync(streamId, CancellationToken.None)).ShouldBeEmpty();
     }
@@ -77,7 +85,11 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         {
             var store = fixture.CreateEventStore(context, serializer);
             await store.AppendAsync(
-                streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None);
+                streamId,
+                StreamVersion.None,
+                [booked],
+                EventMetadata.None,
+                CancellationToken.None);
         }
 
         await using (var context = fixture.CreateContext())
@@ -86,7 +98,11 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
 
             var conflict = await Should.ThrowAsync<EventStoreConcurrencyException>(() =>
                 store.AppendAsync(
-                    streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None));
+                    streamId,
+                    StreamVersion.None,
+                    [booked],
+                    EventMetadata.None,
+                    CancellationToken.None));
 
             conflict.StreamId.ShouldBe(streamId);
             conflict.ExpectedVersion.ShouldBe(StreamVersion.None);
@@ -106,14 +122,22 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         var secondStore = fixture.CreateEventStore(second, serializer);
 
         await firstStore.AppendAsync(
-            streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None);
+            streamId,
+            StreamVersion.None,
+            [booked],
+            EventMetadata.None,
+            CancellationToken.None);
 
         // Sequential here: the second writer re-reads version 1, so the in-code version check rejects it.
         // The true concurrent race (both reading 0, the DB unique index rejecting the loser via SQLSTATE
         // 23505) is covered by EventStoreConcurrencyRaceTests (#67).
         await Should.ThrowAsync<EventStoreConcurrencyException>(() =>
             secondStore.AppendAsync(
-                streamId, StreamVersion.None, [booked], EventMetadata.None, CancellationToken.None));
+                streamId,
+                StreamVersion.None,
+                [booked],
+                EventMetadata.None,
+                CancellationToken.None));
 
         await using var verify = fixture.CreateContext();
         var verifyStore = fixture.CreateEventStore(verify, serializer);
@@ -129,7 +153,12 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
 
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
-        await store.AppendAsync(streamId, StreamVersion.None, [booked], metadata, CancellationToken.None);
+        await store.AppendAsync(
+            streamId,
+            StreamVersion.None,
+            [booked],
+            metadata,
+            CancellationToken.None);
 
         var stream = await store.ReadStreamAsync(streamId, CancellationToken.None);
 

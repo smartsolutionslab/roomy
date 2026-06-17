@@ -9,8 +9,8 @@ public static class KeycloakConfiguration
     public static (Uri BaseAddress, string Realm) ReadKeycloak(this IConfiguration configuration)
     {
         var keycloak = configuration.GetSection("Keycloak");
-        var baseAddress = new Uri(keycloak["BaseAddress"]
-            ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
+        var baseAddress = new Uri(keycloak["BaseAddress"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
+
         return (baseAddress, keycloak["Realm"] ?? "roomy");
     }
 }

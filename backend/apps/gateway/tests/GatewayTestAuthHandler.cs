@@ -6,10 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace SmartSolutionsLab.Roomy.Gateway.Tests;
 
-internal sealed class GatewayTestAuthHandler(
-    IOptionsMonitor<AuthenticationSchemeOptions> options,
-    ILoggerFactory logger,
-    UrlEncoder encoder)
+internal sealed class GatewayTestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     public const string SchemeName = "Test";
@@ -17,12 +14,11 @@ internal sealed class GatewayTestAuthHandler(
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.ContainsKey(AuthenticatedHeader))
-            return Task.FromResult(AuthenticateResult.NoResult());
+        if (!Request.Headers.ContainsKey(AuthenticatedHeader)) return Task.FromResult(AuthenticateResult.NoResult());
 
-        var identity = new ClaimsIdentity(
-            [new Claim(ClaimTypes.NameIdentifier, "test-subject")], SchemeName);
+        var identity = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "test-subject")], SchemeName);
         var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName);
+
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }

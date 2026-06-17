@@ -28,8 +28,7 @@ public sealed class OfficePersistenceTests(PostgresDatabaseFixture fixture)
         await PersistAsync(office);
 
         await using var context = fixture.CreateContext();
-        var found = await new OfficeRepository(context)
-            .GetByIdentifierAsync(office.Identifier, TestContext.Current.CancellationToken);
+        var found = await new OfficeRepository(context).GetByIdentifierAsync(office.Identifier, TestContext.Current.CancellationToken);
 
         found.IsSuccess.ShouldBeTrue();
         found.Value.Name.ShouldBe(OfficeName.From("HQ Berlin"));
@@ -46,18 +45,15 @@ public sealed class OfficePersistenceTests(PostgresDatabaseFixture fixture)
         await using var context = fixture.CreateContext();
         var offices = new OfficeRepository(context);
 
-        (await offices.ExistsByNameAsync(
-            company, OfficeName.From("Taken Office"), TestContext.Current.CancellationToken)).ShouldBeTrue();
-        (await offices.ExistsByNameAsync(
-            company, OfficeName.From("Absent Office"), TestContext.Current.CancellationToken)).ShouldBeFalse();
+        (await offices.ExistsByNameAsync(company, OfficeName.From("Taken Office"), TestContext.Current.CancellationToken)).ShouldBeTrue();
+        (await offices.ExistsByNameAsync(company, OfficeName.From("Absent Office"), TestContext.Current.CancellationToken)).ShouldBeFalse();
     }
 
     [Fact]
     public async Task GetByIdentifier_returns_NotFound_for_an_unknown_office()
     {
         await using var context = fixture.CreateContext();
-        var found = await new OfficeRepository(context)
-            .GetByIdentifierAsync(OfficeIdentifier.New(), TestContext.Current.CancellationToken);
+        var found = await new OfficeRepository(context).GetByIdentifierAsync(OfficeIdentifier.New(), TestContext.Current.CancellationToken);
 
         found.IsFailure.ShouldBeTrue();
         found.Error.Type.ShouldBe(ErrorType.NotFound);
@@ -68,7 +64,6 @@ public sealed class OfficePersistenceTests(PostgresDatabaseFixture fixture)
     {
         await PersistAsync(Office.Create(company, OfficeName.From("Duplicate"), Location.From("Berlin")));
 
-        await Should.ThrowAsync<DbUpdateException>(() =>
-            PersistAsync(Office.Create(company, OfficeName.From("Duplicate"), Location.From("Munich"))));
+        await Should.ThrowAsync<DbUpdateException>(() => PersistAsync(Office.Create(company, OfficeName.From("Duplicate"), Location.From("Munich"))));
     }
 }

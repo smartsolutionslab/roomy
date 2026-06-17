@@ -21,9 +21,7 @@ public sealed class SharedKernelPurityTests
             .GetResult();
 
         result.IsSuccessful.ShouldBeTrue(
-            FailureMessage(
-                "shared-kernel must not depend on MediatR, Wolverine, EF Core, ASP.NET Core, or YARP",
-                result));
+            FailureMessage("shared-kernel must not depend on MediatR, Wolverine, EF Core, ASP.NET Core, or YARP", result));
     }
 
     [Fact]

@@ -40,17 +40,18 @@ public sealed class ReservationsReadModelRebuilderTests(PostgresEventStoreFixtur
     {
         await using var query = fixture.CreateDbContext();
         var rows = await query.Reservations.AsNoTracking().ToListAsync(TestContext.Current.CancellationToken);
-        return rows
-            .Select(row => new ReservationSnapshot(
-                row.ReservationId, row.CompanyId, row.EmployeeId, row.OfficeId, row.RoomId, row.Date))
+        return rows.Select(row => new ReservationSnapshot(
+                row.ReservationId,
+                row.CompanyId,
+                row.EmployeeId,
+                row.OfficeId,
+                row.RoomId,
+                row.Date))
             .OrderBy(snapshot => snapshot.Reservation)
             .ToList();
     }
 
-    private async Task<ReservationIdentifier> ReserveAsync(
-        CompanyIdentifier company,
-        EmployeeIdentifier employee,
-        RoomReference room)
+    private async Task<ReservationIdentifier> ReserveAsync(CompanyIdentifier company, EmployeeIdentifier employee, RoomReference room)
     {
         var day = await fixture.CreateRepository().LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
         var decision = day.Reserve(employee, room, RoomCapacity.From(8), bookingDate, occurredAt);
@@ -59,10 +60,7 @@ public sealed class ReservationsReadModelRebuilderTests(PostgresEventStoreFixtur
         return decision.Value;
     }
 
-    private async Task CancelAsync(
-        CompanyIdentifier company,
-        ReservationIdentifier reservation,
-        EmployeeIdentifier employee)
+    private async Task CancelAsync(CompanyIdentifier company, ReservationIdentifier reservation, EmployeeIdentifier employee)
     {
         var day = await fixture.CreateRepository().LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
         day.Cancel(reservation, employee, actorIsAdmin: false, bookingDate, occurredAt).IsSuccess.ShouldBeTrue();

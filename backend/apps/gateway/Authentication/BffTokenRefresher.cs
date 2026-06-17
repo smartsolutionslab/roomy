@@ -15,24 +15,15 @@ public static class BffTokenRefresher
     public static async Task ValidateOrRefreshAsync(CookieValidatePrincipalContext context)
     {
         var expiresAtValue = context.Properties.GetTokenValue("expires_at");
-        if (expiresAtValue is null)
+        if (expiresAtValue is null) return;
+
+
+        if (!DateTimeOffset.TryParse(expiresAtValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var expiresAt))
         {
             return;
         }
 
-        if (!DateTimeOffset.TryParse(
-                expiresAtValue,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.RoundtripKind,
-                out var expiresAt))
-        {
-            return;
-        }
-
-        if (expiresAt - refreshSkew > DateTimeOffset.UtcNow)
-        {
-            return;
-        }
+        if (expiresAt - refreshSkew > DateTimeOffset.UtcNow) return;
 
         var refreshToken = context.Properties.GetTokenValue("refresh_token");
         if (string.IsNullOrEmpty(refreshToken))
@@ -45,11 +36,9 @@ public static class BffTokenRefresher
         var keycloak = services.GetRequiredService<IOptions<KeycloakOidcOptions>>().Value;
         var httpClient = services.GetRequiredService<IHttpClientFactory>().CreateClient(HttpClientName);
 
-        var tokenEndpoint = string.Create(
-            CultureInfo.InvariantCulture,
-            $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}/protocol/openid-connect/token");
+        var tokenEndpoint = string.Create(CultureInfo.InvariantCulture, $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}/protocol/openid-connect/token");
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint)
+        using HttpRequestMessage request = new(HttpMethod.Post, tokenEndpoint)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {

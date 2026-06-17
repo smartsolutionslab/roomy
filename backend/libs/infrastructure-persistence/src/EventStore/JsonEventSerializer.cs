@@ -22,7 +22,6 @@ public sealed class JsonEventSerializer(IEventTypeRegistry typeRegistry, JsonSer
 
         var eventType = typeRegistry.Resolve(eventTypeName);
 
-        return JsonSerializer.Deserialize(payload, eventType, serializerOptions)
-            ?? throw new EventDeserializationException($"Payload for event type '{eventTypeName}' deserialized to null.");
+        return JsonSerializer.Deserialize(payload, eventType, serializerOptions) ?? throw new EventDeserializationException($"Payload for event type '{eventTypeName}' deserialized to null.");
     }
 }

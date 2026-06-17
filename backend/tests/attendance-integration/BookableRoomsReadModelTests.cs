@@ -80,8 +80,7 @@ public sealed class BookableRoomsReadModelTests(PostgresEventStoreFixture fixtur
     private async Task<IReadOnlyList<BookableRoomView>> GetAsync(Guid company)
     {
         await using var query = fixture.CreateDbContext();
-        return await new BookableRoomsReadModel(query).GetAsync(
-            CompanyIdentifier.From(company), TestContext.Current.CancellationToken);
+        return await new BookableRoomsReadModel(query).GetAsync(CompanyIdentifier.From(company), TestContext.Current.CancellationToken);
     }
 
     private async Task SeedAsync(Action<AttendanceDbContext> seed)

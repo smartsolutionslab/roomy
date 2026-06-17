@@ -49,8 +49,6 @@ public sealed class BffAuthenticationOptionsTests
 
         using var provider = services.BuildServiceProvider();
 
-        return provider
-            .GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>()
-            .Get(BffAuthenticationExtensions.OidcScheme);
+        return provider.GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>().Get(BffAuthenticationExtensions.OidcScheme);
     }
 }

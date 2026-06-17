@@ -103,8 +103,7 @@ public static class MessagingServiceCollectionExtensions
                     // message type alone, so two contexts that both consume one event (e.g. identity AND
                     // attendance on EmployeeHired) share one queue and compete — only one receives each message
                     // and the other's reaction is silently skipped (#189).
-                    .UseConventionalRouting(convention => convention
-                        .QueueNameForListener(messageType => $"{messageType.ToMessageTypeName()}.{serviceName}"));
+                    .UseConventionalRouting(convention => convention.QueueNameForListener(messageType => $"{messageType.ToMessageTypeName()}.{serviceName}"));
                 break;
 
             case MessagingTransport.AzureServiceBus:

@@ -23,7 +23,10 @@ public sealed class HireEmployeeTests
         var handler = new HireEmployeeHandler(SeededCompany(), employees, unitOfWork);
 
         var result = await handler.HandleAsync(
-            new HireEmployee(EmployeeName.From("Ada"), WorkEmail.From("ada@example.com"), EmployeeRole.Employee, "pw"),
+            new HireEmployee(
+                EmployeeName.From("Ada"),
+                WorkEmail.From("ada@example.com"),
+                EmployeeRole.Employee, "pw"),
             CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
@@ -87,7 +90,12 @@ public sealed class HireEmployeeTests
     }
 
     private static Employee Hire() =>
-        Employee.Hire(company.Identifier, UserIdentifier.New(), EmployeeName.From("Ada"), WorkEmail.From("ada@example.com"), EmployeeRole.Employee, "pw");
+        Employee.Hire(
+            company.Identifier,
+            UserIdentifier.New(),
+            EmployeeName.From("Ada"),
+            WorkEmail.From("ada@example.com"),
+            EmployeeRole.Employee, "pw");
 
     private static ICompanyRepository SeededCompany()
     {

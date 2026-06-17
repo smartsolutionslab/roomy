@@ -6,7 +6,8 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 
-public sealed class RegisterUserHandler(IUserRepository users, IIdentityProviderPort identityProvider, IIntegrationEventPublisher publisher, TimeProvider timeProvider) : ICommandHandler<RegisterUser>
+public sealed class RegisterUserHandler(IUserRepository users, IIdentityProviderPort identityProvider, IIntegrationEventPublisher publisher, TimeProvider timeProvider)
+    : ICommandHandler<RegisterUser>
 {
     public async Task<Result> HandleAsync(RegisterUser command, CancellationToken cancellationToken)
     {

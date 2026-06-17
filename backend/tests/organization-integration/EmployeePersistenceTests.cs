@@ -20,8 +20,7 @@ public sealed class EmployeePersistenceTests(PostgresDatabaseFixture fixture)
         await PersistAsync(employee);
 
         await using var context = fixture.CreateContext();
-        var found = await new EmployeeRepository(context)
-            .GetByIdentifierAsync(employee.Identifier, TestContext.Current.CancellationToken);
+        var found = await new EmployeeRepository(context).GetByIdentifierAsync(employee.Identifier, TestContext.Current.CancellationToken);
 
         found.IsSuccess.ShouldBeTrue();
         found.Value.Name.ShouldBe(EmployeeName.From("Ada Lovelace"));
@@ -35,8 +34,7 @@ public sealed class EmployeePersistenceTests(PostgresDatabaseFixture fixture)
     public async Task GetByIdentifier_returns_NotFound_for_an_unknown_employee()
     {
         await using var context = fixture.CreateContext();
-        var found = await new EmployeeRepository(context)
-            .GetByIdentifierAsync(EmployeeIdentifier.New(), TestContext.Current.CancellationToken);
+        var found = await new EmployeeRepository(context).GetByIdentifierAsync(EmployeeIdentifier.New(), TestContext.Current.CancellationToken);
 
         found.IsFailure.ShouldBeTrue();
         found.Error.Type.ShouldBe(ErrorType.NotFound);

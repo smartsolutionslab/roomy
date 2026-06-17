@@ -18,33 +18,25 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
 
     // SET LOCAL is a utility statement and cannot be parameterized; the value is a constant we control, so it
     // is formatted once (invariant culture) into a plain command string with no injection surface.
-    private static readonly string setThresholdSql =
-        FormattableString.Invariant($"SET LOCAL pg_trgm.word_similarity_threshold = {WordSimilarityThreshold}");
+    private static readonly string setThresholdSql = FormattableString.Invariant($"SET LOCAL pg_trgm.word_similarity_threshold = {WordSimilarityThreshold}");
 
-    public Task<Page<EmployeeView>> GetAsync(
-        SearchTerm term,
-        PageRequest request,
-        CancellationToken cancellationToken) =>
+    public Task<Page<EmployeeView>> GetAsync(SearchTerm term, PageRequest request, CancellationToken cancellationToken) =>
         term.IsEmpty
             ? ListAsync(request, cancellationToken)
             : SearchAsync(term.Value, request, cancellationToken);
 
-    private async Task<Page<EmployeeView>> ListAsync(
-        PageRequest request,
-        CancellationToken cancellationToken)
+    private async Task<Page<EmployeeView>> ListAsync(PageRequest request, CancellationToken cancellationToken)
     {
         var after = request.DecodeCursor<EmployeeCursor>();
 
         var probeLimit = request.Limit + 1;
         var rows = after is { } cursor
             ? await context.Employees
-                .FromSql(
-                    $@"SELECT * FROM ""employees"" WHERE (""display_name"", ""employee_id"") > ({cursor.Name}, {cursor.EmployeeId}) ORDER BY ""display_name"", ""employee_id"" LIMIT {probeLimit}")
+                .FromSql($@"SELECT * FROM ""employees"" WHERE (""display_name"", ""employee_id"") > ({cursor.Name}, {cursor.EmployeeId}) ORDER BY ""display_name"", ""employee_id"" LIMIT {probeLimit}")
                 .AsNoTracking()
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false)
-            : await context.Employees
-                .FromSql($@"SELECT * FROM ""employees"" ORDER BY ""display_name"", ""employee_id"" LIMIT {probeLimit}")
+            : await context.Employees.FromSql($@"SELECT * FROM ""employees"" ORDER BY ""display_name"", ""employee_id"" LIMIT {probeLimit}")
                 .AsNoTracking()
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
@@ -56,10 +48,7 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             row => new EmployeeCursor(row.DisplayName, row.EmployeeId));
     }
 
-    private async Task<Page<EmployeeView>> SearchAsync(
-        string query,
-        PageRequest request,
-        CancellationToken cancellationToken)
+    private async Task<Page<EmployeeView>> SearchAsync(string query, PageRequest request, CancellationToken cancellationToken)
     {
         var after = request.DecodeCursor<EmployeeSearchCursor>();
         var probeLimit = request.Limit + 1;
@@ -71,8 +60,7 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
             .BeginTransactionAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        await context.Database
-            .ExecuteSqlRawAsync(setThresholdSql, cancellationToken)
+        await context.Database.ExecuteSqlRawAsync(setThresholdSql, cancellationToken)
             .ConfigureAwait(false);
 
         var sql = after is { } cursor
@@ -97,9 +85,7 @@ public sealed class EmployeeCatalog(AttendanceDbContext context) : IEmployeeCata
                  ORDER BY ""Similarity"" DESC, ""DisplayName"", ""EmployeeId""
                  LIMIT {probeLimit}";
 
-        var rows = await context.Database
-            .SqlQuery<EmployeeSearchRow>(sql)
-            .ToListAsync(cancellationToken)
+        var rows = await context.Database.SqlQuery<EmployeeSearchRow>(sql).ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);

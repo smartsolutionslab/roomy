@@ -38,8 +38,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
             webHost.ConfigureTestServices(services =>
             {
                 services.RemoveAll<IHostedService>();
-                services.AddAuthentication(TestAuthHandler.SchemeName)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+                services.AddAuthentication(TestAuthHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             });
         });
     }
@@ -67,8 +66,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
         await SeedAsync(seed =>
             seed.Employees.Add(new Employee { EmployeeId = employee, UserId = Guid.CreateVersion7(), DisplayName = "Ada" }));
 
-        var page = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees", TestContext.Current.CancellationToken);
+        var page = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees", TestContext.Current.CancellationToken);
 
         page.ShouldNotBeNull();
         page.Items.ShouldContain(candidate => candidate.EmployeeId == employee && candidate.Name == "Ada");
@@ -77,8 +75,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     [Fact]
     public async Task The_employee_directory_rejects_a_bad_page_request_with_400()
     {
-        var response = await AdminClient().GetAsync(
-            "/reservations/employees?limit=0", TestContext.Current.CancellationToken);
+        var response = await AdminClient().GetAsync("/reservations/employees?limit=0", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -100,8 +97,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     {
         await SeedCorpusAsync();
 
-        var page = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees?q=" + EmployeeNameSamples.TypoQuery, TestContext.Current.CancellationToken);
+        var page = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees?q=" + EmployeeNameSamples.TypoQuery, TestContext.Current.CancellationToken);
 
         page.ShouldNotBeNull();
         var names = page.Items.Select(employee => employee.Name).ToList();
@@ -110,8 +106,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
 
         names.ShouldContain(EmployeeNameSamples.TypoTarget);
         names.ShouldContain(EmployeeNameSamples.LooserTypoMatch);
-        names.IndexOf(EmployeeNameSamples.TypoTarget)
-            .ShouldBeLessThan(names.IndexOf(EmployeeNameSamples.LooserTypoMatch));
+        names.IndexOf(EmployeeNameSamples.TypoTarget).ShouldBeLessThan(names.IndexOf(EmployeeNameSamples.LooserTypoMatch));
     }
 
     [Fact]
@@ -119,11 +114,9 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     {
         await SeedCorpusAsync();
 
-        var byGivenName = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees?q=" + EmployeeNameSamples.AccentStrippedGivenNameQuery,
+        var byGivenName = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees?q=" + EmployeeNameSamples.AccentStrippedGivenNameQuery,
             TestContext.Current.CancellationToken);
-        var bySurname = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees?q=" + EmployeeNameSamples.AccentStrippedSurnameQuery,
+        var bySurname = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees?q=" + EmployeeNameSamples.AccentStrippedSurnameQuery,
             TestContext.Current.CancellationToken);
 
         byGivenName.ShouldNotBeNull();
@@ -148,8 +141,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
         });
 
         var seen = new List<Guid>();
-        var firstPage = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            $"/reservations/employees?q={surname}&limit=2", TestContext.Current.CancellationToken);
+        var firstPage = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>($"/reservations/employees?q={surname}&limit=2", TestContext.Current.CancellationToken);
         firstPage.ShouldNotBeNull();
         firstPage.Items.Length.ShouldBe(2);
         firstPage.NextCursor.ShouldNotBeNull();
@@ -162,8 +154,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
         var guard = 0;
         while (cursor is not null && guard++ < 100)
         {
-            var next = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-                $"/reservations/employees?q={surname}&limit=2&cursor={Uri.EscapeDataString(cursor)}",
+            var next = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>($"/reservations/employees?q={surname}&limit=2&cursor={Uri.EscapeDataString(cursor)}",
                 TestContext.Current.CancellationToken);
             next.ShouldNotBeNull();
             seen.AddRange(next.Items.Select(employee => employee.EmployeeId));
@@ -186,15 +177,12 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
             seed.Employees.Add(new Employee { EmployeeId = Guid.CreateVersion7(), UserId = Guid.CreateVersion7(), DisplayName = "Nadia" });
         });
 
-        var withoutQuery = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees?limit=100", TestContext.Current.CancellationToken);
-        var withBlankQuery = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees?q=%20%20&limit=100", TestContext.Current.CancellationToken);
+        var withoutQuery = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees?limit=100", TestContext.Current.CancellationToken);
+        var withBlankQuery = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees?q=%20%20&limit=100", TestContext.Current.CancellationToken);
 
         withoutQuery.ShouldNotBeNull();
         withBlankQuery.ShouldNotBeNull();
-        withBlankQuery.Items.Select(employee => employee.EmployeeId)
-            .ShouldBe(withoutQuery.Items.Select(employee => employee.EmployeeId));
+        withBlankQuery.Items.Select(employee => employee.EmployeeId).ShouldBe(withoutQuery.Items.Select(employee => employee.EmployeeId));
     }
 
     [Fact]
@@ -202,8 +190,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     {
         var overLong = new string('a', 101);
 
-        var response = await AdminClient().GetAsync(
-            "/reservations/employees?q=" + overLong, TestContext.Current.CancellationToken);
+        var response = await AdminClient().GetAsync("/reservations/employees?q=" + overLong, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -213,14 +200,11 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     {
         await SeedCorpusAsync();
 
-        var unfiltered = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>(
-            "/reservations/employees?limit=1", TestContext.Current.CancellationToken);
+        var unfiltered = await AdminClient().GetFromJsonAsync<PageDto<EmployeeDto>>("/reservations/employees?limit=1", TestContext.Current.CancellationToken);
         unfiltered.ShouldNotBeNull();
         unfiltered.NextCursor.ShouldNotBeNull();
 
-        var response = await AdminClient().GetAsync(
-            $"/reservations/employees?q=Hannah&cursor={Uri.EscapeDataString(unfiltered.NextCursor)}",
-            TestContext.Current.CancellationToken);
+        var response = await AdminClient().GetAsync($"/reservations/employees?q=Hannah&cursor={Uri.EscapeDataString(unfiltered.NextCursor)}", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -228,8 +212,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     [Fact]
     public async Task A_non_administrator_is_forbidden_from_the_directory_with_a_query()
     {
-        var response = await EmployeeClient().GetAsync(
-            "/reservations/employees?q=Hannah", TestContext.Current.CancellationToken);
+        var response = await EmployeeClient().GetAsync("/reservations/employees?q=Hannah", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
@@ -237,8 +220,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
     [Fact]
     public async Task A_non_administrator_is_forbidden_from_an_employees_reservations()
     {
-        var response = await EmployeeClient().GetAsync(
-            "/reservations/by-employee/" + Guid.NewGuid(), TestContext.Current.CancellationToken);
+        var response = await EmployeeClient().GetAsync("/reservations/by-employee/" + Guid.NewGuid(), TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
@@ -265,8 +247,7 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
             });
         });
 
-        var page = await AdminClient().GetFromJsonAsync<PageDto<MyReservationDto>>(
-            "/reservations/by-employee/" + employee, TestContext.Current.CancellationToken);
+        var page = await AdminClient().GetFromJsonAsync<PageDto<MyReservationDto>>("/reservations/by-employee/" + employee, TestContext.Current.CancellationToken);
 
         page.ShouldNotBeNull();
         var listed = page.Items.ShouldHaveSingleItem();
@@ -307,9 +288,17 @@ public sealed class EmployeesEndpointTests : IClassFixture<PostgresEventStoreFix
             }
         });
 
-    private sealed record EmployeeDto(Guid EmployeeId, string Name);
+    private sealed record EmployeeDto(
+        Guid EmployeeId,
+        string Name);
 
-    private sealed record MyReservationDto(Guid ReservationId, Guid OfficeId, string OfficeName, Guid RoomId, string RoomName, DateOnly Date);
+    private sealed record MyReservationDto(
+        Guid ReservationId,
+        Guid OfficeId,
+        string OfficeName,
+        Guid RoomId,
+        string RoomName,
+        DateOnly Date);
 
     private sealed record PageDto<T>(T[] Items, string? NextCursor);
 }

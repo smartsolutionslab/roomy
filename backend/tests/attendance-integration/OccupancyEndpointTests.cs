@@ -43,8 +43,7 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
             {
                 services.RemoveAll<IHostedService>();
 
-                services.AddAuthentication(TestAuthHandler.SchemeName)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+                services.AddAuthentication(TestAuthHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
 
                 services.RemoveAll<TimeProvider>();
                 services.AddSingleton<TimeProvider>(new FixedTimeProvider(now));
@@ -72,8 +71,7 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
     [Fact]
     public async Task Both_office_and_room_is_a_bad_request()
     {
-        var response = await Client().GetAsync(
-            $"/occupancy?officeId={Guid.NewGuid()}&roomId={Guid.NewGuid()}", TestContext.Current.CancellationToken);
+        var response = await Client().GetAsync($"/occupancy?officeId={Guid.NewGuid()}&roomId={Guid.NewGuid()}", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         (await Error(response)).Message.ShouldBe("Provide exactly one of officeId or roomId.");
@@ -85,8 +83,7 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
         var to = today.AddMonths(3).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         var from = today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        var response = await Client().GetAsync(
-            $"/occupancy?officeId={Guid.NewGuid()}&from={from}&to={to}", TestContext.Current.CancellationToken);
+        var response = await Client().GetAsync($"/occupancy?officeId={Guid.NewGuid()}&from={from}&to={to}", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         (await Error(response)).Message.ShouldContain("at most");
@@ -118,8 +115,7 @@ public sealed class OccupancyEndpointTests : IClassFixture<PostgresEventStoreFix
             seed.Reservations.Add(Reservation(employee, officeId, room, laterDay));
         });
 
-        var url = $"/occupancy?officeId={officeId}"
-            + $"&from={today:yyyy-MM-dd}&to={laterDay:yyyy-MM-dd}";
+        var url = $"/occupancy?officeId={officeId}" + $"&from={today:yyyy-MM-dd}&to={laterDay:yyyy-MM-dd}";
         var days = await Client().GetFromJsonAsync<DayDto[]>(url, TestContext.Current.CancellationToken);
 
         days.ShouldNotBeNull();

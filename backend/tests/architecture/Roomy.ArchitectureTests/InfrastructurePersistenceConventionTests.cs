@@ -34,9 +34,7 @@ public sealed class InfrastructurePersistenceConventionTests
             .GetResult();
 
         result.IsSuccessful.ShouldBeTrue(
-            SharedKernelPurityTests.FailureMessage(
-                "infrastructure must not depend on MediatR (ADR-0005)",
-                result));
+            SharedKernelPurityTests.FailureMessage("infrastructure must not depend on MediatR (ADR-0005)", result));
     }
 
     [Fact]

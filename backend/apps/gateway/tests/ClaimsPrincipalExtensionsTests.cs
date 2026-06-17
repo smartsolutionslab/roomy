@@ -58,5 +58,8 @@ public sealed class ClaimsPrincipalExtensionsTests
     }
 
     private static ClaimsPrincipal PrincipalWith(params Claim[] claims) =>
-        new(new ClaimsIdentity(claims, authenticationType: "TestCookie", JwtRegisteredClaimNames.PreferredUsername, ClaimTypes.Role));
+        new(new ClaimsIdentity(
+            claims,
+            authenticationType: "TestCookie",
+            JwtRegisteredClaimNames.PreferredUsername, ClaimTypes.Role));
 }

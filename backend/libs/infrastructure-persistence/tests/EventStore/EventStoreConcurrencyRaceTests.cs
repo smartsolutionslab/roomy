@@ -45,7 +45,10 @@ public sealed class EventStoreConcurrencyRaceTests(PostgresEventStoreFixture fix
             await fixture.CreateEventStore(context, serializer).AppendAsync(
                 streamId,
                 StreamVersion.None,
-                [new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8))],
+                [new DeskBooked(
+                    Guid.NewGuid(),
+                    "ada",
+                    new DateOnly(2026, 6, 8))],
                 EventMetadata.None,
                 TestContext.Current.CancellationToken);
             return true;

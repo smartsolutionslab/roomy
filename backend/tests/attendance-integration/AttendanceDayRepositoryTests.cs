@@ -15,8 +15,7 @@ public sealed class AttendanceDayRepositoryTests(PostgresEventStoreFixture fixtu
     [Fact]
     public async Task An_unbooked_day_loads_as_a_fresh_empty_aggregate()
     {
-        var day = await fixture.CreateRepository()
-            .LoadAsync(CompanyIdentifier.New(), bookingDate, TestContext.Current.CancellationToken);
+        var day = await fixture.CreateRepository().LoadAsync(CompanyIdentifier.New(), bookingDate, TestContext.Current.CancellationToken);
 
         day.Reservations.ShouldBeEmpty();
         day.Version.ShouldBe(0);
