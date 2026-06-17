@@ -37,8 +37,7 @@ public sealed class RoomCatalogueEndpointTests : IClassFixture<PostgresEventStor
             {
                 services.RemoveAll<IHostedService>();
 
-                services.AddAuthentication(TestAuthHandler.SchemeName)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+                services.AddAuthentication(TestAuthHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             });
         });
     }

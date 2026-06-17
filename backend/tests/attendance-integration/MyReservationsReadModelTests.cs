@@ -30,8 +30,7 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
             seed.Reservations.Add(Reservation(company, employee, officeId, roomId, past));
         });
 
-        var page = await new MyReservationsReadModel(fixture.CreateDbContext())
-            .GetAsync(EmployeeIdentifier.From(employee), FirstPage, TestContext.Current.CancellationToken);
+        var page = await new MyReservationsReadModel(fixture.CreateDbContext()).GetAsync(EmployeeIdentifier.From(employee), FirstPage, TestContext.Current.CancellationToken);
 
         var reservations = page.Items;
         reservations.Count.ShouldBe(2);
@@ -63,13 +62,16 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
 
         var readModel = new MyReservationsReadModel(fixture.CreateDbContext());
         var first = await readModel.GetAsync(
-            EmployeeIdentifier.From(employee), Page(limit: 2), TestContext.Current.CancellationToken);
+            EmployeeIdentifier.From(employee),
+            Page(limit: 2),
+            TestContext.Current.CancellationToken);
 
         first.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[0], days[1]]);
         first.NextCursor.ShouldNotBeNull();
 
         var second = await readModel.GetAsync(
-            EmployeeIdentifier.From(employee), Page(limit: 2, cursor: first.NextCursor),
+            EmployeeIdentifier.From(employee),
+            Page(limit: 2, cursor: first.NextCursor),
             TestContext.Current.CancellationToken);
 
         second.Items.Select(reservation => reservation.Date.Value).ShouldBe([days[2]]);
@@ -94,8 +96,10 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
             seed.Reservations.Add(Reservation(company, other, officeId, roomId, date));
         });
 
-        var page = await new MyReservationsReadModel(fixture.CreateDbContext())
-            .GetAsync(EmployeeIdentifier.From(mine), FirstPage, TestContext.Current.CancellationToken);
+        var page = await new MyReservationsReadModel(fixture.CreateDbContext()).GetAsync(
+            EmployeeIdentifier.From(mine),
+            FirstPage,
+            TestContext.Current.CancellationToken);
 
         page.Items.ShouldHaveSingleItem().Reservation.Value.ShouldNotBe(Guid.Empty);
     }
@@ -103,8 +107,10 @@ public sealed class MyReservationsReadModelTests(PostgresEventStoreFixture fixtu
     [Fact]
     public async Task An_employee_with_no_reservations_gets_an_empty_page()
     {
-        var page = await new MyReservationsReadModel(fixture.CreateDbContext())
-            .GetAsync(EmployeeIdentifier.New(), FirstPage, TestContext.Current.CancellationToken);
+        var page = await new MyReservationsReadModel(fixture.CreateDbContext()).GetAsync(
+            EmployeeIdentifier.New(),
+            FirstPage,
+            TestContext.Current.CancellationToken);
 
         page.Items.ShouldBeEmpty();
         page.NextCursor.ShouldBeNull();

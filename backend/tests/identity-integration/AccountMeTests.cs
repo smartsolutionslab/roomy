@@ -67,8 +67,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
             Email.From($"me-admin-{Guid.NewGuid():N}@example.com"),
             Role.Employee.GrantAdministrator());
 
-        var response = await ClientForSubject(subject)
-            .GetAsync("/account/me", TestContext.Current.CancellationToken);
+        var response = await ClientForSubject(subject).GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var account = await response.Content.ReadFromJsonAsync<Response.Account>(TestContext.Current.CancellationToken);
@@ -83,8 +82,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
             Email.From($"me-employee-{Guid.NewGuid():N}@example.com"),
             Role.Employee);
 
-        var response = await ClientForSubject(subject)
-            .GetAsync("/account/me", TestContext.Current.CancellationToken);
+        var response = await ClientForSubject(subject).GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var account = await response.Content.ReadFromJsonAsync<Response.Account>(TestContext.Current.CancellationToken);
@@ -95,8 +93,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
     [Fact]
     public async Task Returns_401_without_a_session()
     {
-        var response = await app.CreateClient()
-            .GetAsync("/account/me", TestContext.Current.CancellationToken);
+        var response = await app.CreateClient().GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
@@ -104,8 +101,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
     [Fact]
     public async Task Returns_404_when_the_authenticated_subject_has_no_account()
     {
-        var response = await ClientForSubject(KeycloakSubjectIdentifier.From(Guid.NewGuid()))
-            .GetAsync("/account/me", TestContext.Current.CancellationToken);
+        var response = await ClientForSubject(KeycloakSubjectIdentifier.From(Guid.NewGuid())).GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }

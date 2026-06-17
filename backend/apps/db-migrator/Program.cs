@@ -11,16 +11,13 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.AddServiceDefaults();
 
 var identityConnectionString = builder.Configuration.GetIdentityConnectionString();
-builder.Services.AddIdentityPersistence(identityConnectionString)
-    .AddMigrationTarget<IdentityDbContext>();
+builder.Services.AddIdentityPersistence(identityConnectionString).AddMigrationTarget<IdentityDbContext>();
 
 var organizationConnectionString = builder.Configuration.GetOrganizationConnectionString();
-builder.Services.AddOrganizationPersistence(organizationConnectionString)
-    .AddMigrationTarget<OrganizationDbContext>();
+builder.Services.AddOrganizationPersistence(organizationConnectionString).AddMigrationTarget<OrganizationDbContext>();
 
 var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
-builder.Services.AddAttendancePersistence(attendanceConnectionString)
-    .AddMigrationTarget<AttendanceDbContext>();
+builder.Services.AddAttendancePersistence(attendanceConnectionString).AddMigrationTarget<AttendanceDbContext>();
 
 builder.Services.AddSingleton<DatabaseMigrator>();
 

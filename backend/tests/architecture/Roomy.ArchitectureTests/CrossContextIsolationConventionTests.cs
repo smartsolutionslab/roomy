@@ -34,9 +34,8 @@ public sealed class CrossContextIsolationConventionTests
                     .GetResult();
 
                 result.IsSuccessful.ShouldBeTrue(
-                    SharedKernelPurityTests.FailureMessage(
-                        $"context '{context}' must not reference another context's types",
-                        result));
+                    SharedKernelPurityTests.FailureMessage($"context '{context}' must not reference another context's types", result)
+                );
             }
         }
 

@@ -26,8 +26,7 @@ public sealed class EmployeeHiredConsumer(ICommandHandler<RegisterUser> register
         {
             // A failed registration here is transient (a terminal failure is compensated inside the
             // handler and reported as success). Surface it so the message is retried rather than lost.
-            throw new InvalidOperationException(
-                $"User provisioning failed for employee {message.EmployeeId}: {result.Error.Code} — {result.Error.Message}");
+            throw new InvalidOperationException($"User provisioning failed for employee {message.EmployeeId}: {result.Error.Code} — {result.Error.Message}");
         }
     }
 }

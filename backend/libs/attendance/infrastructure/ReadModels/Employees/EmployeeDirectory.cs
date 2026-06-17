@@ -8,12 +8,9 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees
 
 public sealed class EmployeeDirectory(AttendanceDbContext context) : IEmployeeDirectory
 {
-    public async Task<Result<EmployeeIdentifier>> FindByUserAsync(
-        UserIdentifier user,
-        CancellationToken cancellationToken)
+    public async Task<Result<EmployeeIdentifier>> FindByUserAsync(UserIdentifier user, CancellationToken cancellationToken)
     {
-        var link = await context.Employees
-            .AsNoTracking()
+        var link = await context.Employees.AsNoTracking()
             .SingleOrDefaultAsync(employee => employee.UserId == user.Value, cancellationToken)
             .ConfigureAwait(false);
 

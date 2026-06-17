@@ -8,9 +8,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Rooms;
 
 public sealed class RoomDirectory(AttendanceDbContext context) : IRoomDirectory
 {
-    public async Task<Result<RoomCapacity>> FindCapacityAsync(
-        RoomIdentifier room,
-        CancellationToken cancellationToken)
+    public async Task<Result<RoomCapacity>> FindCapacityAsync(RoomIdentifier room, CancellationToken cancellationToken)
     {
         var known = await context.Rooms
             .AsNoTracking()

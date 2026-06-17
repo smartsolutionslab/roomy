@@ -11,8 +11,7 @@ public sealed class AppHostCompositionTests
     [Fact]
     public async Task Composes_the_identity_service_with_its_database_behind_the_gateway()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
-            TestContext.Current.CancellationToken);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
@@ -29,8 +28,7 @@ public sealed class AppHostCompositionTests
     [Fact]
     public async Task Runs_the_migration_runner_to_completion_before_the_identity_service_starts()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
-            TestContext.Current.CancellationToken);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
@@ -38,15 +36,13 @@ public sealed class AppHostCompositionTests
         model.Resources.Select(resource => resource.Name).ShouldContain("db-migrator");
 
         var identityApi = model.Resources.Single(resource => resource.Name == "identity-api");
-        identityApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
-            wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
+        identityApi.Annotations.OfType<WaitAnnotation>().ShouldContain(wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
     }
 
     [Fact]
     public async Task Composes_the_organization_service_with_its_database_gated_on_the_migration_runner()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
-            TestContext.Current.CancellationToken);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
@@ -56,29 +52,25 @@ public sealed class AppHostCompositionTests
         resourceNames.ShouldContain("organization");
 
         var organizationApi = model.Resources.Single(resource => resource.Name == "organization-api");
-        organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
-            wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
+        organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(wait => wait.Resource.Name == "db-migrator" && wait.WaitType == WaitType.WaitForCompletion);
     }
 
     [Fact]
     public async Task The_organization_service_waits_for_keycloak_so_admin_seeding_does_not_publish_before_identity_is_listening()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
-            TestContext.Current.CancellationToken);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
 
         var organizationApi = model.Resources.Single(resource => resource.Name == "organization-api");
-        organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(
-            wait => wait.Resource.Name == "keycloak" && wait.WaitType == WaitType.WaitUntilHealthy);
+        organizationApi.Annotations.OfType<WaitAnnotation>().ShouldContain(wait => wait.Resource.Name == "keycloak" && wait.WaitType == WaitType.WaitUntilHealthy);
     }
 
     [Fact]
     public async Task Composes_a_scalar_reference_and_an_openapi_link_for_each_context_api()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
-            TestContext.Current.CancellationToken);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
@@ -95,8 +87,7 @@ public sealed class AppHostCompositionTests
     [Fact]
     public async Task Each_context_api_has_its_own_http_endpoint_so_they_do_not_collide_on_the_default_port()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(
-            TestContext.Current.CancellationToken);
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Roomy_AppHost>(TestContext.Current.CancellationToken);
         await using var application = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
         var model = application.Services.GetRequiredService<DistributedApplicationModel>();
@@ -104,8 +95,7 @@ public sealed class AppHostCompositionTests
         foreach (var apiName in new[] { "identity-api", "organization-api", "attendance-api" })
         {
             var api = model.Resources.Single(resource => resource.Name == apiName);
-            api.Annotations.OfType<EndpointAnnotation>()
-                .ShouldContain(endpoint => endpoint.Name == "http");
+            api.Annotations.OfType<EndpointAnnotation>().ShouldContain(endpoint => endpoint.Name == "http");
         }
     }
 }

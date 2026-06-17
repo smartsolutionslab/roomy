@@ -24,8 +24,7 @@ public sealed class OrganizationUnitOfWorkTests
         context.Add(office);
         var outbox = new CapturingOutbox();
 
-        await new OrganizationUnitOfWork(context, outbox, new FixedTimeProvider(occurredAt))
-            .SaveChangesAsync(TestContext.Current.CancellationToken);
+        await new OrganizationUnitOfWork(context, outbox, new FixedTimeProvider(occurredAt)).SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var opened = outbox.Published.OfType<SmartSolutionsLab.Roomy.Contracts.Organization.OfficeOpened>().ShouldHaveSingleItem();
         opened.OfficeId.ShouldBe(office.Identifier.Value);
@@ -54,15 +53,14 @@ public sealed class OrganizationUnitOfWorkTests
         context.Add(employee);
         var outbox = new CapturingOutbox();
 
-        await new OrganizationUnitOfWork(context, outbox, new FixedTimeProvider(occurredAt))
-            .SaveChangesAsync(TestContext.Current.CancellationToken);
+        await new OrganizationUnitOfWork(context, outbox, new FixedTimeProvider(occurredAt)).SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var hired = outbox.Published.OfType<SmartSolutionsLab.Roomy.Contracts.Organization.EmployeeHired>().ShouldHaveSingleItem();
         hired.EmployeeId.ShouldBe(employee.Identifier.Value);
         hired.UserId.ShouldBe(user.Value);
         hired.Email.ShouldBe("ada@example.com");
         hired.DisplayName.ShouldBe("Ada");
-        hired.Role.ShouldBe(SmartSolutionsLab.Roomy.Contracts.Organization.HiredRole.Administrator);
+        hired.Role.ShouldBe(Contracts.Organization.HiredRole.Administrator);
         hired.InitialPassword.ShouldBe("transient-pw");
         hired.OccurredAt.ShouldBe(occurredAt);
         employee.DomainEvents.ShouldBeEmpty();
@@ -77,10 +75,7 @@ public sealed class OrganizationUnitOfWorkTests
     {
         public List<IIntegrationEvent> Published { get; } = [];
 
-        public Task SaveAndPublishAsync(
-            DbContext context,
-            IReadOnlyCollection<IIntegrationEvent> integrationEvents,
-            CancellationToken cancellationToken)
+        public Task SaveAndPublishAsync(DbContext context, IReadOnlyCollection<IIntegrationEvent> integrationEvents, CancellationToken cancellationToken)
         {
             Published.AddRange(integrationEvents);
             return Task.CompletedTask;

@@ -19,9 +19,7 @@ public sealed class NoMediatRTests
                 .GetResult();
 
             result.IsSuccessful.ShouldBeTrue(
-                SharedKernelPurityTests.FailureMessage(
-                    $"MediatR is forbidden (assembly {assembly.GetName().Name})",
-                    result));
+                SharedKernelPurityTests.FailureMessage($"MediatR is forbidden (assembly {assembly.GetName().Name})", result));
         }
     }
 }

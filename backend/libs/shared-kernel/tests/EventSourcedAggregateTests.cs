@@ -14,10 +14,7 @@ public class EventSourcedAggregateTests
 
         protected override void Apply(object @event)
         {
-            if (@event is Incremented incremented)
-            {
-                Total += incremented.By;
-            }
+            if (@event is Incremented incremented) Total += incremented.By;
         }
     }
 

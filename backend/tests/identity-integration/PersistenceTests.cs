@@ -25,8 +25,7 @@ public sealed class PersistenceTests(PostgresDatabaseFixture fixture) : IClassFi
         await PersistAsync(user);
 
         await using var context = fixture.CreateContext();
-        var found = await new UserRepository(context)
-            .GetByIdentifierAsync(user.Identifier, TestContext.Current.CancellationToken);
+        var found = await new UserRepository(context).GetByIdentifierAsync(user.Identifier, TestContext.Current.CancellationToken);
 
         found.IsSuccess.ShouldBeTrue();
         found.Value.Identifier.ShouldBe(user.Identifier);
@@ -49,8 +48,7 @@ public sealed class PersistenceTests(PostgresDatabaseFixture fixture) : IClassFi
         await PersistAsync(user);
 
         await using var context = fixture.CreateContext();
-        var found = await new UserRepository(context)
-            .GetByIdentifierAsync(user.Identifier, TestContext.Current.CancellationToken);
+        var found = await new UserRepository(context).GetByIdentifierAsync(user.Identifier, TestContext.Current.CancellationToken);
 
         found.IsSuccess.ShouldBeTrue();
         found.Value.Status.ShouldBe(UserStatus.Active);
@@ -62,8 +60,7 @@ public sealed class PersistenceTests(PostgresDatabaseFixture fixture) : IClassFi
     public async Task GetByIdentifier_returns_NotFound_for_an_unknown_identifier()
     {
         await using var context = fixture.CreateContext();
-        var found = await new UserRepository(context)
-            .GetByIdentifierAsync(UserIdentifier.New(), TestContext.Current.CancellationToken);
+        var found = await new UserRepository(context).GetByIdentifierAsync(UserIdentifier.New(), TestContext.Current.CancellationToken);
 
         found.IsFailure.ShouldBeTrue();
         found.Error.Type.ShouldBe(ErrorType.NotFound);

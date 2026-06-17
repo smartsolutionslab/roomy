@@ -13,7 +13,7 @@ public sealed class ViewDayReservationsHandler(IAttendanceDayRepository attendan
 
         var attendanceDay = await attendanceDays.LoadAsync(company, date, cancellationToken);
 
-        var reservations = attendanceDay.Reservations
+        IReadOnlyList<ReservationView> reservations = attendanceDay.Reservations
             .Select(reservation => new ReservationView(
                 reservation.Identifier,
                 reservation.Office,
@@ -22,6 +22,6 @@ public sealed class ViewDayReservationsHandler(IAttendanceDayRepository attendan
                 reservation.Employee))
             .ToList();
 
-        return Result.Success<IReadOnlyList<ReservationView>>(reservations);
+        return Result.Success(reservations);
     }
 }

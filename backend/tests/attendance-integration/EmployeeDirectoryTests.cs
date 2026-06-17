@@ -19,8 +19,7 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
         await ConsumeAsync(Hired(employeeId, userId));
 
         await using var query = fixture.CreateDbContext();
-        var resolved = await new EmployeeDirectory(query)
-            .FindByUserAsync(UserIdentifier.From(userId), TestContext.Current.CancellationToken);
+        var resolved = await new EmployeeDirectory(query).FindByUserAsync(UserIdentifier.From(userId), TestContext.Current.CancellationToken);
 
         resolved.IsSuccess.ShouldBeTrue();
         resolved.Value.Value.ShouldBe(employeeId);
@@ -31,8 +30,7 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
     {
         await using var query = fixture.CreateDbContext();
 
-        var resolved = await new EmployeeDirectory(query)
-            .FindByUserAsync(UserIdentifier.New(), TestContext.Current.CancellationToken);
+        var resolved = await new EmployeeDirectory(query).FindByUserAsync(UserIdentifier.New(), TestContext.Current.CancellationToken);
 
         resolved.IsFailure.ShouldBeTrue();
         resolved.Error.Code.ShouldBe("unknown_employee");
@@ -47,8 +45,7 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
         await ConsumeAsync(Hired(employeeId, userId));
 
         await using var query = fixture.CreateDbContext();
-        var resolved = await new EmployeeDirectory(query)
-            .FindByUserAsync(UserIdentifier.From(userId), TestContext.Current.CancellationToken);
+        var resolved = await new EmployeeDirectory(query).FindByUserAsync(UserIdentifier.From(userId), TestContext.Current.CancellationToken);
 
         resolved.Value.Value.ShouldBe(employeeId);
     }
@@ -60,8 +57,7 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
         await ConsumeAsync(Hired(employeeId, Guid.CreateVersion7()));
 
         await using var query = fixture.CreateDbContext();
-        var stored = await query.Employees
-            .SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
+        var stored = await query.Employees.SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
 
         stored.DisplayName.ShouldBe("Ada Lovelace");
     }
@@ -72,13 +68,18 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
         var employeeId = Guid.CreateVersion7();
         var userId = Guid.CreateVersion7();
         await ConsumeAsync(new EmployeeHired(
-            employeeId, userId, "ada@example.com", "Ada Lovelace", HiredRole.Employee, "pw", occurredAt));
+            employeeId,
+            userId,
+            "ada@example.com",
+            "Ada Lovelace",
+            HiredRole.Employee,
+            "pw",
+            occurredAt));
         await ConsumeAsync(new EmployeeHired(
             employeeId, userId, "ada@example.com", "Ada, Countess of Lovelace", HiredRole.Employee, "pw", occurredAt));
 
         await using var query = fixture.CreateDbContext();
-        var stored = await query.Employees
-            .SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
+        var stored = await query.Employees.SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
 
         stored.DisplayName.ShouldBe("Ada, Countess of Lovelace");
     }

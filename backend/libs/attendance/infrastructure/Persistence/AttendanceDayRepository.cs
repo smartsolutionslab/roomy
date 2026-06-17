@@ -5,15 +5,10 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 
-public sealed class AttendanceDayRepository(
-    IEventStore eventStore,
-    IReservationProjection projection,
-    AttendanceDbContext context) : IAttendanceDayRepository
+public sealed class AttendanceDayRepository(IEventStore eventStore, IReservationProjection projection, AttendanceDbContext context)
+    : IAttendanceDayRepository
 {
-    public async Task<AttendanceDay> LoadAsync(
-        CompanyIdentifier company,
-        BookingDate date,
-        CancellationToken cancellationToken)
+    public async Task<AttendanceDay> LoadAsync(CompanyIdentifier company, BookingDate date, CancellationToken cancellationToken)
     {
         var streamId = AttendanceDayStreamId.For(company, date);
         var stream = await eventStore.ReadStreamAsync(streamId, cancellationToken).ConfigureAwait(false);
@@ -26,10 +21,7 @@ public sealed class AttendanceDayRepository(
 
     public async Task<Result> SaveAsync(AttendanceDay attendanceDay, CancellationToken cancellationToken)
     {
-        if (attendanceDay.UncommittedEvents.Count == 0)
-        {
-            return Result.Success();
-        }
+        if (attendanceDay.UncommittedEvents.Count == 0) return Result.Success();
 
         var streamId = AttendanceDayStreamId.For(attendanceDay.Company, attendanceDay.Date);
         var expectedVersion = StreamVersion.From(attendanceDay.Version);
@@ -48,9 +40,7 @@ public sealed class AttendanceDayRepository(
         catch (EventStoreConcurrencyException)
         {
             context.ChangeTracker.Clear();
-            return Error.Conflict(
-                "concurrency_conflict",
-                "The attendance day was modified concurrently.");
+            return Error.Conflict("concurrency_conflict", "The attendance day was modified concurrently.");
         }
 
         attendanceDay.ClearUncommittedEvents();

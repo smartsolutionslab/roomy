@@ -13,7 +13,6 @@ public sealed class WolverineIntegrationEventPublisherTests
             .UseWolverine(opts =>
             {
                 opts.Discovery.DisableConventionalDiscovery();
-
                 opts.PublishMessage<TestIntegrationEvent>().ToLocalQueue("test-integration-events");
             })
             .StartAsync();
@@ -25,8 +24,7 @@ public sealed class WolverineIntegrationEventPublisherTests
         var publisher = new WolverineIntegrationEventPublisher(host.Services.GetRequiredService<IMessageBus>());
         var integrationEvent = new TestIntegrationEvent(Guid.NewGuid());
 
-        var session = await host.TrackActivity()
-            .ExecuteAndWaitAsync(_ => publisher.PublishAsync(integrationEvent, CancellationToken.None));
+        var session = await host.TrackActivity().ExecuteAndWaitAsync(_ => publisher.PublishAsync(integrationEvent, CancellationToken.None));
 
         var published = session.Sent.SingleMessage<TestIntegrationEvent>();
         published.ShouldBe(integrationEvent);

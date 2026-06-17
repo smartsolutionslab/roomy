@@ -22,8 +22,7 @@ public sealed class KeycloakRealmImportTests
 
         var mapper = bff.GetProperty("protocolMappers")
             .EnumerateArray()
-            .Single(candidate =>
-                candidate.GetProperty("protocolMapper").GetString() == "oidc-usermodel-realm-role-mapper");
+            .Single(candidate => candidate.GetProperty("protocolMapper").GetString() == "oidc-usermodel-realm-role-mapper");
 
         return mapper.GetProperty("config").Clone();
     }

@@ -95,12 +95,10 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     {
         var employee = await SeedUserAsync(Role.Employee);
 
-        var response = await AdministratorClient()
-            .GetAsync("/admin/users", TestContext.Current.CancellationToken);
+        var response = await AdministratorClient().GetAsync("/admin/users", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var page = await response.Content
-            .ReadFromJsonAsync<Response.Page.AdminUser>(TestContext.Current.CancellationToken);
+        var page = await response.Content.ReadFromJsonAsync<Response.Page.AdminUser>(TestContext.Current.CancellationToken);
         var listed = page.ShouldNotBeNull().Items.Single(user => user.UserId == employee.Identifier.Value);
         listed.Role.ShouldBe("employee");
         listed.Status.ShouldBe("active");
@@ -166,8 +164,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         string? cursor = firstPage.NextCursor;
         while (cursor is not null)
         {
-            var page = await client.GetFromJsonAsync<Response.Page.AdminUser>(
-                $"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}", TestContext.Current.CancellationToken);
+            var page = await client.GetFromJsonAsync<Response.Page.AdminUser>($"/admin/users?limit=2&cursor={Uri.EscapeDataString(cursor)}", TestContext.Current.CancellationToken);
             page.ShouldNotBeNull();
             remaining.AddRange(page.Items);
             cursor = page.NextCursor;
@@ -195,12 +192,10 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     {
         var employee = await SeedUserAsync(Role.Employee);
 
-        var response = await AdministratorClient()
-            .GetAsync($"/admin/users/{employee.Identifier.Value}", TestContext.Current.CancellationToken);
+        var response = await AdministratorClient().GetAsync($"/admin/users/{employee.Identifier.Value}", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var user = await response.Content
-            .ReadFromJsonAsync<Response.AdminUser>(TestContext.Current.CancellationToken);
+        var user = await response.Content.ReadFromJsonAsync<Response.AdminUser>(TestContext.Current.CancellationToken);
         user.ShouldNotBeNull();
         user.Email.ShouldBe(employee.Email.Value);
         user.Role.ShouldBe("employee");
@@ -209,8 +204,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     [Fact]
     public async Task Returns_404_for_an_unknown_account()
     {
-        var response = await AdministratorClient()
-            .GetAsync($"/admin/users/{Guid.NewGuid()}", TestContext.Current.CancellationToken);
+        var response = await AdministratorClient().GetAsync($"/admin/users/{Guid.NewGuid()}", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
@@ -229,8 +223,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
         identityProvider.AssignedSubjects.ShouldContain(employee.KeycloakSubjectIdentifier!.Value);
 
         await using var context = fixture.CreateContext();
-        var reloaded = await context.Users.SingleAsync(
-            user => user.Identifier == employee.Identifier, TestContext.Current.CancellationToken);
+        var reloaded = await context.Users.SingleAsync(user => user.Identifier == employee.Identifier, TestContext.Current.CancellationToken);
         reloaded.IsAdministrator.ShouldBeTrue();
     }
 
@@ -238,17 +231,16 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     public async Task Granting_administrator_to_a_provisioning_account_is_422_not_active()
     {
         var provisioning = User.Register(
-            Email.From($"prov-{Guid.NewGuid():N}@example.com"), DisplayName.From("Pending"), Role.Employee);
+            Email.From($"prov-{Guid.NewGuid():N}@example.com"),
+            DisplayName.From("Pending"),
+            Role.Employee);
         await using (var context = fixture.CreateContext())
         {
             context.Users.Add(provisioning);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
-        var response = await AdministratorClient().PostAsync(
-            $"/admin/users/{provisioning.Identifier.Value}:grant-administrator",
-            content: null,
-            TestContext.Current.CancellationToken);
+        var response = await AdministratorClient().PostAsync($"/admin/users/{provisioning.Identifier.Value}:grant-administrator", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var body = await response.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
@@ -258,8 +250,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     [Fact]
     public async Task Forbids_an_employee_from_listing_accounts()
     {
-        var response = await EmployeeClient()
-            .GetAsync("/admin/users", TestContext.Current.CancellationToken);
+        var response = await EmployeeClient().GetAsync("/admin/users", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
@@ -269,10 +260,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     {
         var employee = await SeedUserAsync(Role.Employee);
 
-        var response = await EmployeeClient().PostAsync(
-            $"/admin/users/{employee.Identifier.Value}:grant-administrator",
-            content: null,
-            TestContext.Current.CancellationToken);
+        var response = await EmployeeClient().PostAsync($"/admin/users/{employee.Identifier.Value}:grant-administrator", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
@@ -280,8 +268,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     [Fact]
     public async Task Requires_a_session_to_list_accounts()
     {
-        var response = await app.CreateClient()
-            .GetAsync("/admin/users", TestContext.Current.CancellationToken);
+        var response = await app.CreateClient().GetAsync("/admin/users", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }

@@ -51,9 +51,7 @@ public sealed class EventStoreModelTests
     {
         var entity = BuildModel().FindEntityType(typeof(StoredEvent))!;
 
-        var index = entity.GetIndexes().Single(candidate =>
-            candidate.Properties.Select(property => property.Name)
-                .SequenceEqual([nameof(StoredEvent.StreamId), nameof(StoredEvent.Version)]));
+        var index = entity.GetIndexes().Single(candidate => candidate.Properties.Select(property => property.Name).SequenceEqual([nameof(StoredEvent.StreamId), nameof(StoredEvent.Version)]));
 
         index.IsUnique.ShouldBeTrue();
     }

@@ -19,8 +19,7 @@ public static class KeycloakRealmRoles
         if (string.IsNullOrEmpty(realmAccess)) return;
 
         using var document = JsonDocument.Parse(realmAccess);
-        if (!document.RootElement.TryGetProperty("roles", out var roles)
-            || roles.ValueKind != JsonValueKind.Array)
+        if (!document.RootElement.TryGetProperty("roles", out var roles) || roles.ValueKind != JsonValueKind.Array)
         {
             return;
         }

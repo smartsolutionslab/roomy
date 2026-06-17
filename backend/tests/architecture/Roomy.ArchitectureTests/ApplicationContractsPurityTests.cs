@@ -21,9 +21,8 @@ public sealed class ApplicationContractsPurityTests
             .GetResult();
 
         result.IsSuccessful.ShouldBeTrue(
-            SharedKernelPurityTests.FailureMessage(
-                "application contracts must not depend on MediatR, Wolverine, EF Core, ASP.NET Core, or YARP",
-                result));
+            SharedKernelPurityTests.FailureMessage("application contracts must not depend on MediatR, Wolverine, EF Core, ASP.NET Core, or YARP", result)
+            );
     }
 
     [Fact]

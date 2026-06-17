@@ -10,11 +10,7 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels;
 
 public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancyReadModel
 {
-    public async Task<Result<OccupancyData>> GetAsync(
-        CompanyIdentifier company,
-        OccupancyScope scope,
-        BookingDateRange range,
-        CancellationToken cancellationToken)
+    public async Task<Result<OccupancyData>> GetAsync(CompanyIdentifier company, OccupancyScope scope, BookingDateRange range, CancellationToken cancellationToken)
     {
         var scopeResult = await ResolveScopeAsync(scope, cancellationToken).ConfigureAwait(false);
         if (scopeResult.IsFailure) return scopeResult.Error;
@@ -43,27 +39,27 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        var descriptors = rooms
-            .Select(room => new RoomDescriptor(
+        var descriptors = rooms.Select(room => new RoomDescriptor(
                 RoomIdentifier.From(room.RoomId),
                 room.Name,
                 RoomCapacity.From(room.Capacity)))
             .ToList();
 
-        var occupants = occupantRows
-            .Select(row => new OccupantRecord(
+        var occupants = occupantRows.Select(row => new OccupantRecord(
                 BookingDate.From(row.Date),
                 RoomIdentifier.From(row.RoomId),
                 EmployeeIdentifier.From(row.EmployeeId),
                 row.Name))
             .ToList();
 
-        return new OccupancyData(OfficeIdentifier.From(officeId), officeName, descriptors, occupants);
+        return new OccupancyData(
+            OfficeIdentifier.From(officeId),
+            officeName,
+            descriptors,
+            occupants);
     }
 
-    private async Task<Result<(Guid OfficeId, string OfficeName, List<Rooms.Room> Rooms)>> ResolveScopeAsync(
-        OccupancyScope scope,
-        CancellationToken cancellationToken)
+    private async Task<Result<(Guid OfficeId, string OfficeName, List<Rooms.Room> Rooms)>> ResolveScopeAsync(OccupancyScope scope, CancellationToken cancellationToken)
     {
         if (scope.Room is { } room)
         {
@@ -81,10 +77,7 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
         var officeId = scope.Office!.Value;
         var officeIsKnown = await context.Offices.AsNoTracking()
             .AnyAsync(office => office.OfficeId.Equals(officeId), cancellationToken).ConfigureAwait(false);
-        if (!officeIsKnown)
-        {
-            return Error.NotFound("unknown_office", "The office is not known to the attendance service yet.");
-        }
+        if (!officeIsKnown) return Error.NotFound("unknown_office", "The office is not known to the attendance service yet.");
 
         var officeRooms = await context.Rooms.AsNoTracking()
             .Where(candidate => candidate.OfficeId.Equals(officeId))

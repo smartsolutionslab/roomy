@@ -25,8 +25,7 @@ public sealed class GatewayApplicationFactory : WebApplicationFactory<RoomyGatew
         builder.ConfigureTestServices(services =>
         {
             services.AddAuthentication(GatewayTestAuthHandler.SchemeName)
-                .AddScheme<AuthenticationSchemeOptions, GatewayTestAuthHandler>(
-                    GatewayTestAuthHandler.SchemeName, _ => { });
+                .AddScheme<AuthenticationSchemeOptions, GatewayTestAuthHandler>(GatewayTestAuthHandler.SchemeName, _ => { });
 
             services.Configure<OpenIdConnectOptions>(BffAuthenticationExtensions.OidcScheme, options =>
                 options.Configuration = new OpenIdConnectConfiguration

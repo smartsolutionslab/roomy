@@ -25,7 +25,9 @@ public sealed class CreateOfficeTests
         var handler = new CreateOfficeHandler(companies, offices, unitOfWork);
 
         var result = await handler.HandleAsync(
-            new CreateOffice(OfficeName.From("HQ"), Location.From("Berlin")),
+            new CreateOffice(
+                OfficeName.From("HQ"),
+                Location.From("Berlin")),
             CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
@@ -45,7 +47,9 @@ public sealed class CreateOfficeTests
         var handler = new CreateOfficeHandler(companies, offices, unitOfWork);
 
         var result = await handler.HandleAsync(
-            new CreateOffice(OfficeName.From("HQ"), Location.From("Munich")),
+            new CreateOffice(
+                OfficeName.From("HQ"),
+                Location.From("Munich")),
             CancellationToken.None);
 
         result.IsFailure.ShouldBeTrue();

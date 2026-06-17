@@ -21,16 +21,14 @@ namespace SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 
 public static class AttendanceInfrastructureServiceCollectionExtensions
 {
-    public static IServiceCollection AddAttendancePersistence(
-        this IServiceCollection services,
-        string connectionString)
+    public static IServiceCollection AddAttendancePersistence(this IServiceCollection services, string connectionString)
     {
         Ensure.That(connectionString).IsNotNullOrWhiteSpace();
 
         services.AddRoomyDbContext<AttendanceDbContext>(connectionString);
         services.AddScoped<EventStoreDbContext>(provider => provider.GetRequiredService<AttendanceDbContext>());
 
-        services.AddSingleton<IEventTypeRegistry>(AttendanceEventTypeRegistry.Build());
+        services.AddSingleton(AttendanceEventTypeRegistry.Build());
         services.AddSingleton<IEventSerializer, JsonEventSerializer>();
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IEventStore, EfCoreEventStore>();

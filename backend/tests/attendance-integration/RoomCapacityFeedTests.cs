@@ -17,8 +17,9 @@ public sealed class RoomCapacityFeedTests(PostgresEventStoreFixture fixture) : I
         await ConsumeAsync(new RoomAdded(roomId, Guid.CreateVersion7(), Guid.CreateVersion7(), "A1", 8, occurredAt));
 
         await using var query = fixture.CreateDbContext();
-        var capacity = await new RoomDirectory(query)
-            .FindCapacityAsync(RoomIdentifier.From(roomId), TestContext.Current.CancellationToken);
+        var capacity = await new RoomDirectory(query).FindCapacityAsync(
+            RoomIdentifier.From(roomId),
+            TestContext.Current.CancellationToken);
 
         capacity.IsSuccess.ShouldBeTrue();
         capacity.Value.Value.ShouldBe(8);
@@ -46,8 +47,9 @@ public sealed class RoomCapacityFeedTests(PostgresEventStoreFixture fixture) : I
         await ConsumeAsync(new RoomAdded(roomId, office, company, "A1", 5, occurredAt));
 
         await using var query = fixture.CreateDbContext();
-        var capacity = await new RoomDirectory(query)
-            .FindCapacityAsync(RoomIdentifier.From(roomId), TestContext.Current.CancellationToken);
+        var capacity = await new RoomDirectory(query).FindCapacityAsync(
+            RoomIdentifier.From(roomId),
+            TestContext.Current.CancellationToken);
 
         capacity.Value.Value.ShouldBe(5);
     }

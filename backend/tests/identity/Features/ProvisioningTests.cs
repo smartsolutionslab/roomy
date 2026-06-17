@@ -31,8 +31,7 @@ public sealed class ProvisioningTests
         var published = new List<IIntegrationEvent>();
         var publisher = Substitute.For<IIntegrationEventPublisher>();
         _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
-        var handler = new RegisterUserHandler(
-            users, IdentityProviderSucceeding(subject), publisher, TimeProvider.System);
+        var handler = new RegisterUserHandler(users, IdentityProviderSucceeding(subject), publisher, TimeProvider.System);
         var command = Command(Role.Employee);
 
         var result = await handler.HandleAsync(command, CancellationToken.None);
@@ -79,7 +78,9 @@ public sealed class ProvisioningTests
         var users = Substitute.For<IUserRepository>();
         var published = new List<IIntegrationEvent>();
         var publisher = Substitute.For<IIntegrationEventPublisher>();
-        _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
+        _ = publisher.PublishAsync(
+            Arg.Do<IIntegrationEvent>(published.Add),
+            Arg.Any<CancellationToken>());
         var handler = new RegisterUserHandler(
             users,
             IdentityProviderFailing(new Error(providerErrorCode, "provisioning failed")),
@@ -122,7 +123,12 @@ public sealed class ProvisioningTests
     {
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         identityProvider.ProvisionUserAsync(
-                Arg.Any<UserIdentifier>(), Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
+                Arg.Any<UserIdentifier>(),
+                Arg.Any<Email>(),
+                Arg.Any<DisplayName>(),
+                Arg.Any<string>(),
+                Arg.Any<Role>(),
+                Arg.Any<CancellationToken>())
             .Returns(Result.Success(subject));
         return identityProvider;
     }
@@ -131,7 +137,12 @@ public sealed class ProvisioningTests
     {
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         identityProvider.ProvisionUserAsync(
-                Arg.Any<UserIdentifier>(), Arg.Any<Email>(), Arg.Any<DisplayName>(), Arg.Any<string>(), Arg.Any<Role>(), Arg.Any<CancellationToken>())
+                Arg.Any<UserIdentifier>(),
+                Arg.Any<Email>(),
+                Arg.Any<DisplayName>(),
+                Arg.Any<string>(),
+                Arg.Any<Role>(),
+                Arg.Any<CancellationToken>())
             .Returns(Result.Failure<KeycloakSubjectIdentifier>(error));
         return identityProvider;
     }

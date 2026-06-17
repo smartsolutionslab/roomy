@@ -39,8 +39,7 @@ public sealed class LayerDependencyConventionTests
         AssertConvention(
             "domain must not depend on any framework (MediatR, Wolverine, EF Core, ASP.NET, YARP)",
             ArchitectureConventions.DomainSegment,
-            predicate => predicate.ShouldNot()
-                .HaveDependencyOnAny(ArchitectureConventions.ForbiddenFrameworkNamespaces));
+            predicate => predicate.ShouldNot().HaveDependencyOnAny(ArchitectureConventions.ForbiddenFrameworkNamespaces));
     }
 
     [Fact]
@@ -49,8 +48,7 @@ public sealed class LayerDependencyConventionTests
         AssertConvention(
             "application must not depend on infrastructure",
             ArchitectureConventions.ApplicationSegment,
-            predicate => predicate.ShouldNot()
-                .HaveDependencyOn(ArchitectureConventions.InfrastructureSegment));
+            predicate => predicate.ShouldNot().HaveDependencyOn(ArchitectureConventions.InfrastructureSegment));
     }
 
     [Fact]
@@ -59,8 +57,7 @@ public sealed class LayerDependencyConventionTests
         AssertConvention(
             "application must not depend on any framework (MediatR, Wolverine, EF Core, ASP.NET, YARP)",
             ArchitectureConventions.ApplicationSegment,
-            predicate => predicate.ShouldNot()
-                .HaveDependencyOnAny(ArchitectureConventions.ForbiddenFrameworkNamespaces));
+            predicate => predicate.ShouldNot().HaveDependencyOnAny(ArchitectureConventions.ForbiddenFrameworkNamespaces));
     }
 
     /// <summary>
@@ -85,8 +82,7 @@ public sealed class LayerDependencyConventionTests
 
             var result = rule(predicate).GetResult();
 
-            result.IsSuccessful.ShouldBeTrue(
-                SharedKernelPurityTests.FailureMessage(description, result));
+            result.IsSuccessful.ShouldBeTrue(SharedKernelPurityTests.FailureMessage(description, result));
         }
 
         if (matchedTypes == 0)

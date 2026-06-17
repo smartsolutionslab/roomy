@@ -8,17 +8,16 @@ public sealed class LogoutTests(GatewayApplicationFactory factory) : IClassFixtu
 {
     private HttpClient AuthenticatedClient()
     {
-        var client = factory.CreateClient(
-            new WebApplicationFactoryClientOptions { AllowAutoRedirect = false, HandleCookies = false });
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false, HandleCookies = false });
         client.DefaultRequestHeaders.Add(GatewayTestAuthHandler.AuthenticatedHeader, "true");
+
         return client;
     }
 
     [Fact]
     public async Task Logout_ends_the_session_by_clearing_the_bff_cookie()
     {
-        var response = await AuthenticatedClient()
-            .PostAsync("/bff/logout", content: null, TestContext.Current.CancellationToken);
+        var response = await AuthenticatedClient().PostAsync("/bff/logout", content: null, TestContext.Current.CancellationToken);
 
         response.Headers.TryGetValues("Set-Cookie", out var setCookies).ShouldBeTrue();
         setCookies.ShouldContain(cookie =>
@@ -29,8 +28,7 @@ public sealed class LogoutTests(GatewayApplicationFactory factory) : IClassFixtu
     [Fact]
     public async Task Logout_redirects_to_keycloak_rp_initiated_end_session()
     {
-        var response = await AuthenticatedClient()
-            .PostAsync("/bff/logout", content: null, TestContext.Current.CancellationToken);
+        var response = await AuthenticatedClient().PostAsync("/bff/logout", content: null, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
         response.Headers.Location.ShouldNotBeNull();

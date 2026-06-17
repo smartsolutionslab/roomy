@@ -16,8 +16,7 @@ public static class RealmRoleReader
         using var document = TryParse(realmAccessJson);
         if (document is null) return [];
 
-        if (!document.RootElement.TryGetProperty(RolesProperty, out var roles)
-            || roles.ValueKind != JsonValueKind.Array)
+        if (!document.RootElement.TryGetProperty(RolesProperty, out var roles) || roles.ValueKind != JsonValueKind.Array)
         {
             return [];
         }
@@ -28,10 +27,7 @@ public static class RealmRoleReader
             if (role.ValueKind != JsonValueKind.String) continue;
 
             var value = role.GetString();
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                result.Add(value);
-            }
+            if (!string.IsNullOrWhiteSpace(value)) result.Add(value);
         }
 
         return result;
