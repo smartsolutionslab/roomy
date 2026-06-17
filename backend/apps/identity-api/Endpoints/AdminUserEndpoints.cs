@@ -42,7 +42,7 @@ public static class AdminUserEndpoints
     {
         var userIdentifier = UserIdentifier.From(userId);
         var lookup = await users.GetByIdentifierAsync(userIdentifier, cancellationToken);
-        return lookup.Match(user => Results.Ok(user.ToAdminUser()), error => error.ToHttpResult());
+        return lookup.ToOk(user => user.ToAdminUser());
     }
 
     private static async Task<IResult> GrantAdministratorAsync(
@@ -53,6 +53,6 @@ public static class AdminUserEndpoints
         var command = new GrantAdministrator(UserIdentifier.From(userId));
         var result = await commandHandler.HandleAsync(command, cancellationToken);
 
-        return result.Match(Results.NoContent, error => error.ToHttpResult());
+        return result.ToNoContent();
     }
 }

@@ -23,6 +23,6 @@ public static class AccountEndpoints
         var keycloakSubjectOfPrincipal = KeycloakSubjectIdentifier.From(subject);
         var userByPrincipal = await users.GetByKeycloakSubjectAsync(keycloakSubjectOfPrincipal, cancellationToken);
 
-        return userByPrincipal.Match(user => Results.Ok(user.ToAccount()), error => error.ToHttpResult());
+        return userByPrincipal.ToOk(user => user.ToAccount());
     }
 }

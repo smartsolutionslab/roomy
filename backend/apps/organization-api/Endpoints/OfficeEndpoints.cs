@@ -68,9 +68,7 @@ public static class OfficeEndpoints
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var created = await offices.GetByIdentifierAsync(result.Value, cancellationToken);
-        return created.Match(
-            office => Results.Created($"/offices/{office.Identifier.Value}", office.ToResponse()),
-            error => error.ToHttpResult());
+        return created.ToCreated(office => $"/offices/{office.Identifier.Value}", office => office.ToResponse());
     }
 
     private static async Task<IResult> ListOfficesAsync(IOfficeRepository offices, CancellationToken cancellationToken)
@@ -82,7 +80,7 @@ public static class OfficeEndpoints
     private static async Task<IResult> GetOfficeAsync(Guid officeId, IOfficeRepository offices, CancellationToken cancellationToken)
     {
         var office = await offices.GetByIdentifierAsync(OfficeIdentifier.From(officeId), cancellationToken);
-        return office.Match(found => Results.Ok(found.ToResponse()), error => error.ToHttpResult());
+        return office.ToOk(found => found.ToResponse());
     }
 
     private static async Task<IResult> RenameOfficeAsync(
@@ -92,12 +90,15 @@ public static class OfficeEndpoints
         IOfficeRepository offices,
         CancellationToken cancellationToken)
     {
-        var identifier = OfficeIdentifier.From(officeId);
+        var officeIdentifier = OfficeIdentifier.From(officeId);
         var command = new RenameOffice(
-            identifier,
+            officeIdentifier,
             OfficeName.From(request.Name));
         var result = await commandHandler.HandleAsync(command, cancellationToken);
-        return await OfficeResultAsync(result, identifier, offices, cancellationToken);
+        if (result.IsFailure) return result.Error.ToHttpResult();
+
+        var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
+        return office.ToOk(found => found.ToResponse());
     }
 
     private static async Task<IResult> ChangeLocationAsync(
@@ -112,7 +113,10 @@ public static class OfficeEndpoints
             officeIdentifier,
             Location.From(request.Location));
         var result = await commandHandler.HandleAsync(command, cancellationToken);
-        return await OfficeResultAsync(result, officeIdentifier, offices, cancellationToken);
+        if (result.IsFailure) return result.Error.ToHttpResult();
+
+        var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
+        return office.ToOk(found => found.ToResponse());
     }
 
     private static async Task<IResult> AddRoomAsync(
@@ -131,11 +135,13 @@ public static class OfficeEndpoints
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
-        return office.Match(
-            found => found.Rooms.FirstOrDefault(room => room.Identifier == result.Value) is { } room
-                ? Results.Created($"/offices/{officeId}/rooms/{room.Identifier.Value}", room.ToResponse())
-                : Results.NotFound(),
-            _ => Results.NotFound());
+        if (office.IsFailure) return office.Error.ToHttpResult();
+
+        var addedRoom = office.Value.Rooms.SingleOrDefault(room => room.Identifier == result.Value);
+
+        return addedRoom is { } room
+            ? Results.Created($"/offices/{officeId}/rooms/{room.Identifier.Value}", room.ToResponse())
+            : Results.NotFound();
     }
 
     private static async Task<IResult> RenameRoomAsync(
@@ -152,18 +158,9 @@ public static class OfficeEndpoints
             RoomIdentifier.From(roomId),
             RoomName.From(request.Name));
         var result = await commandHandler.HandleAsync(command, cancellationToken);
-        return await OfficeResultAsync(result, officeIdentifier, offices, cancellationToken);
-    }
-
-    private static async Task<IResult> OfficeResultAsync(
-        Result result,
-        OfficeIdentifier officeIdentifier,
-        IOfficeRepository offices,
-        CancellationToken cancellationToken)
-    {
         if (result.IsFailure) return result.Error.ToHttpResult();
 
         var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
-        return office.Match(found => Results.Ok(found.ToResponse()), error => error.ToHttpResult());
+        return office.ToOk(found => found.ToResponse());
     }
 }

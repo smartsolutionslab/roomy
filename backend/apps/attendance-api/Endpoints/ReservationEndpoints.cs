@@ -63,9 +63,7 @@ public static class ReservationEndpoints
             BookingDate.From(date));
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
-        return result.Match(
-            reservations => Results.Ok(reservations.ToResponse()),
-            error => error.ToHttpResult());
+        return result.ToOk(reservations => reservations.ToResponse());
     }
 
     private static async Task<IResult> ViewMineAsync(
@@ -82,13 +80,10 @@ public static class ReservationEndpoints
         var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
-        var query = new ViewMyReservations(
-            actor.Value,
-            PageRequest.From(cursor, limit)
-        );
+        var query = new ViewMyReservations(actor.Value, PageRequest.From(cursor, limit));
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
-        return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
+        return result.ToOk(page => page.ToResponse(), ErrorResults.ToBadRequest);
     }
 
     private static async Task<IResult> ViewEmployeesAsync(
@@ -101,11 +96,10 @@ public static class ReservationEndpoints
         var query = new ViewEmployees(
             new EmployeeFilter(
                 SearchTerm.From(q),
-                PageRequest.From(cursor, limit)
-            ));
+                PageRequest.From(cursor, limit)));
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
-        return result.Match(employees => Results.Ok(employees.ToResponse()), error => error.ToBadRequest());
+        return result.ToOk(employees => employees.ToResponse(), ErrorResults.ToBadRequest);
     }
 
     private static async Task<IResult> ViewForEmployeeAsync(
@@ -120,7 +114,7 @@ public static class ReservationEndpoints
             PageRequest.From(cursor, limit));
         var result = await queryHandler.HandleAsync(query, cancellationToken);
 
-        return result.Match(page => Results.Ok(page.ToResponse()), error => error.ToBadRequest());
+        return result.ToOk(page => page.ToResponse(), ErrorResults.ToBadRequest);
     }
 
     private static async Task<IResult> ReserveAsync(
@@ -150,11 +144,9 @@ public static class ReservationEndpoints
             principal.IsAdministrator());
         var result = await commandHandler.HandleAsync(command, cancellationToken);
 
-        return result.Match(
-            reservationId => Results.Created(
-                $"/reservations/{reservationId.Value}",
-                request.ToResponse(reservationId, employee)),
-            error => error.ToHttpResult());
+        return result.ToCreated(
+            reservationId => $"/reservations/{reservationId.Value}",
+            reservationId => request.ToResponse(reservationId, employee));
     }
 
     private static async Task<IResult> CancelAsync(
@@ -179,6 +171,6 @@ public static class ReservationEndpoints
             ActorIsAdmin: principal.IsAdministrator());
         var result = await commandHandler.HandleAsync(command, cancellationToken);
 
-        return result.Match(Results.NoContent, error => error.ToHttpResult());
+        return result.ToNoContent();
     }
 }
