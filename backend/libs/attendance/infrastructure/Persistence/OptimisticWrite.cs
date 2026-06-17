@@ -31,18 +31,12 @@ public static class OptimisticWrite
         Func<AttendanceDay, Result> decide,
         Func<AttendanceDay, Task<Result>> save)
     {
-        for (var attempt = 1; attempt <= MaxAttempts; attempt++)
-        {
-            var attendanceDay = await load();
+        var result = await ExecuteAsync(
+            load,
+            attendanceDay => decide(attendanceDay).Match<Result<bool>>(() => true, error => error),
+            save);
 
-            var decision = decide(attendanceDay);
-            if (decision.IsFailure) return decision.Error;
-
-            var saved = await save(attendanceDay);
-            if (saved.IsSuccess) return Result.Success();
-        }
-
-        return RetryExhausted;
+        return result.IsSuccess ? Result.Success() : result.Error;
     }
 
     private static Error RetryExhausted =>

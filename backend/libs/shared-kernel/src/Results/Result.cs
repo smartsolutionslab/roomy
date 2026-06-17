@@ -28,7 +28,7 @@ public readonly struct Result
     public static implicit operator Result(Error error) => Failure(error);
 
     public TResult Match<TResult>(Func<TResult> onSuccess, Func<Error, TResult> onFailure) =>
-        IsSuccess ? onSuccess() : onFailure(Error);
+        IsSuccess ? onSuccess() : onFailure(error!);
 }
 
 public readonly struct Result<T>
@@ -62,5 +62,5 @@ public readonly struct Result<T>
     public static implicit operator Result<T>(Error error) => Failure(error);
 
     public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<Error, TResult> onFailure) =>
-        IsSuccess ? onSuccess(Value) : onFailure(Error);
+        IsSuccess ? onSuccess(value!) : onFailure(error!);
 }

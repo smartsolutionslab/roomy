@@ -16,7 +16,7 @@ public sealed class CreateOfficeHandler(ICompanyRepository companies, IOfficeRep
 
         if (await offices.ExistsByNameAsync(company.Value.Identifier, name, cancellationToken))
         {
-            return Error.Conflict("office.name_taken", $"An office named '{name}' already exists.");
+            return OfficeErrors.NameTaken(name);
         }
 
         var office = Office.Create(company.Value.Identifier, name, location);

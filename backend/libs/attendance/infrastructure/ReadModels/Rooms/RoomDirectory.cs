@@ -16,7 +16,7 @@ public sealed class RoomDirectory(AttendanceDbContext context) : IRoomDirectory
             .ConfigureAwait(false);
 
         return known is null
-            ? Error.NotFound("unknown_room", "The room is not known to the attendance service yet.")
+            ? AttendanceReadModelErrors.UnknownRoom()
             : RoomCapacity.From(known.Capacity);
     }
 }

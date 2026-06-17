@@ -35,6 +35,9 @@ var keycloakPassword = builder.AddParameter(
 // default so local sign-in is predictable; override per environment via the `demo-password` parameter.
 var demoPassword = builder.AddParameter("demo-password", "Test1234!", secret: true);
 
+// The well-known seeded company id, shared by the attendance context and the dev seeder.
+const string seedCompanyId = "0199a0b0-0000-7000-8000-000000000001";
+
 var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, adminPassword: keycloakPassword)
     .WithDataVolume("roomy-keycloak-data")
     .WithContainerName("roomy-keycloak")
@@ -59,8 +62,7 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
     .WithReference(identityDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
-    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
-    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithKeycloakConnection(keycloak)
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
     .WithEnvironment("Keycloak__AdminPassword", keycloakPassword);
 
@@ -72,8 +74,7 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
     .WithReference(organizationDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
-    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
-    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithKeycloakConnection(keycloak)
     .WithEnvironment("Company__Name", "Roomy")
     .WithEnvironment("DefaultAdmin__Email", "admin@roomy.local")
     .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
@@ -84,9 +85,8 @@ var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendanc
     .WithReference(attendanceDatabase).WaitForCompletion(dbMigrator)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak)
-    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
-    .WithEnvironment("Keycloak__Realm", "roomy")
-    .WithEnvironment("Attendance__CompanyId", "0199a0b0-0000-7000-8000-000000000001");
+    .WithKeycloakConnection(keycloak)
+    .WithEnvironment("Attendance__CompanyId", seedCompanyId);
 
 _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithExplicitStart()
@@ -95,11 +95,10 @@ _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithReference(attendanceDatabase)
     .WithReference(keycloak).WaitFor(keycloak)
     .WaitForCompletion(dbMigrator)
-    .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
-    .WithEnvironment("Keycloak__Realm", "roomy")
+    .WithKeycloakConnection(keycloak)
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
     .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
-    .WithEnvironment("Seed__CompanyId", "0199a0b0-0000-7000-8000-000000000001")
+    .WithEnvironment("Seed__CompanyId", seedCompanyId)
     .WithEnvironment("Seed__EmployeePassword", demoPassword);
 
 _ = builder.AddScalarApiReference()
@@ -139,3 +138,15 @@ _ = gateway;
 builder.Build().Run();
 
 static GenerateParameterDefault GeneratedSecret() => new() { MinLength = 24, Special = false };
+
+internal static class AppHostKeycloakExtensions
+{
+    public const string Realm = "roomy";
+
+    public static IResourceBuilder<ProjectResource> WithKeycloakConnection(
+        this IResourceBuilder<ProjectResource> builder,
+        IResourceBuilder<KeycloakResource> keycloak) =>
+        builder
+            .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
+            .WithEnvironment("Keycloak__Realm", Realm);
+}

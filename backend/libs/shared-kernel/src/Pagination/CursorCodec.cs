@@ -5,9 +5,11 @@ namespace SmartSolutionsLab.Roomy.SharedKernel.Pagination;
 
 public static class CursorCodec
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new();
+
     public static string Encode<TKey>(TKey key)
     {
-        var json = JsonSerializer.SerializeToUtf8Bytes(key);
+        var json = JsonSerializer.SerializeToUtf8Bytes(key, SerializerOptions);
         return Base64Url.EncodeToString(json);
     }
 
@@ -27,7 +29,7 @@ public static class CursorCodec
 
         try
         {
-            var decoded = JsonSerializer.Deserialize<TKey>(json);
+            var decoded = JsonSerializer.Deserialize<TKey>(json, SerializerOptions);
             if (decoded is null) return false;
 
             key = decoded;

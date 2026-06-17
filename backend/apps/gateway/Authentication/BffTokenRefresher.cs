@@ -14,7 +14,7 @@ public static class BffTokenRefresher
 
     public static async Task ValidateOrRefreshAsync(CookieValidatePrincipalContext context)
     {
-        var expiresAtValue = context.Properties.GetTokenValue("expires_at");
+        var expiresAtValue = context.Properties.GetTokenValue(OidcTokenNames.ExpiresAt);
         if (expiresAtValue is null) return;
 
 
@@ -25,7 +25,7 @@ public static class BffTokenRefresher
 
         if (expiresAt - refreshSkew > DateTimeOffset.UtcNow) return;
 
-        var refreshToken = context.Properties.GetTokenValue("refresh_token");
+        var refreshToken = context.Properties.GetTokenValue(OidcTokenNames.RefreshToken);
         if (string.IsNullOrEmpty(refreshToken))
         {
             context.RejectPrincipal();
@@ -36,16 +36,14 @@ public static class BffTokenRefresher
         var keycloak = services.GetRequiredService<IOptions<KeycloakOidcOptions>>().Value;
         var httpClient = services.GetRequiredService<IHttpClientFactory>().CreateClient(HttpClientName);
 
-        var tokenEndpoint = string.Create(CultureInfo.InvariantCulture, $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}/protocol/openid-connect/token");
-
-        using HttpRequestMessage request = new(HttpMethod.Post, tokenEndpoint)
+        using HttpRequestMessage request = new(HttpMethod.Post, keycloak.TokenEndpoint)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["grant_type"] = "refresh_token",
+                ["grant_type"] = OidcTokenNames.RefreshToken,
                 ["client_id"] = keycloak.ClientId,
                 ["client_secret"] = keycloak.ClientSecret,
-                ["refresh_token"] = refreshToken,
+                [OidcTokenNames.RefreshToken] = refreshToken,
             }),
         };
 
@@ -65,32 +63,32 @@ public static class BffTokenRefresher
             return;
         }
 
-        context.Properties.UpdateTokenValue("access_token", refreshed.AccessToken);
+        context.Properties.UpdateTokenValue(OidcTokenNames.AccessToken, refreshed.AccessToken);
         if (!string.IsNullOrEmpty(refreshed.RefreshToken))
         {
-            context.Properties.UpdateTokenValue("refresh_token", refreshed.RefreshToken);
+            context.Properties.UpdateTokenValue(OidcTokenNames.RefreshToken, refreshed.RefreshToken);
         }
 
         if (!string.IsNullOrEmpty(refreshed.IdToken))
         {
-            context.Properties.UpdateTokenValue("id_token", refreshed.IdToken);
+            context.Properties.UpdateTokenValue(OidcTokenNames.IdToken, refreshed.IdToken);
         }
 
         var renewedExpiresAt = DateTimeOffset.UtcNow.AddSeconds(refreshed.ExpiresIn);
-        context.Properties.UpdateTokenValue("expires_at", renewedExpiresAt.ToString("o", CultureInfo.InvariantCulture));
+        context.Properties.UpdateTokenValue(OidcTokenNames.ExpiresAt, renewedExpiresAt.ToString("o", CultureInfo.InvariantCulture));
 
         context.ShouldRenew = true;
     }
 
     private sealed record TokenResponse
     {
-        [JsonPropertyName("access_token")]
+        [JsonPropertyName(OidcTokenNames.AccessToken)]
         public string AccessToken { get; init; } = string.Empty;
 
-        [JsonPropertyName("refresh_token")]
+        [JsonPropertyName(OidcTokenNames.RefreshToken)]
         public string? RefreshToken { get; init; }
 
-        [JsonPropertyName("id_token")]
+        [JsonPropertyName(OidcTokenNames.IdToken)]
         public string? IdToken { get; init; }
 
         [JsonPropertyName("expires_in")]

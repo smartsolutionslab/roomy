@@ -68,7 +68,7 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
                 .ConfigureAwait(false);
             if (known is null)
             {
-                return Error.NotFound("unknown_room", "The room is not known to the attendance service yet.");
+                return AttendanceReadModelErrors.UnknownRoom();
             }
 
             return (known.OfficeId, await OfficeNameAsync(known.OfficeId, cancellationToken).ConfigureAwait(false), [known]);
