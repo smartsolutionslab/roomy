@@ -5,6 +5,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Application.Queries;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
 using SmartSolutionsLab.Roomy.SharedKernel.Pagination;
+using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.SharedKernel.Search;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
@@ -74,10 +75,7 @@ public static class ReservationEndpoints
         IQueryHandler<ViewMyReservations, Page<MyReservationView>> queryHandler,
         CancellationToken cancellationToken)
     {
-        if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
-
-        var userIdentifier = UserIdentifier.From(userId);
-        var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
+        var actor = await CurrentActorAsync(principal, employees, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var query = new ViewMyReservations(actor.Value, PageRequest.From(cursor, limit));
@@ -125,9 +123,7 @@ public static class ReservationEndpoints
         ICommandHandler<ReservePlace, ReservationIdentifier> commandHandler,
         CancellationToken cancellationToken)
     {
-        if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
-        var userIdentifier = UserIdentifier.From(userId);
-        var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
+        var actor = await CurrentActorAsync(principal, employees, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var employee = request.OnBehalfOf is { } onBehalfOf
@@ -158,9 +154,7 @@ public static class ReservationEndpoints
         ICommandHandler<CancelReservation> commandHandler,
         CancellationToken cancellationToken)
     {
-        if (!principal.TryGetUserId(out var userId)) return Results.Unauthorized();
-        var userIdentifier = UserIdentifier.From(userId);
-        var actor = await employees.FindByUserAsync(userIdentifier, cancellationToken);
+        var actor = await CurrentActorAsync(principal, employees, cancellationToken);
         if (actor.IsFailure) return actor.Error.ToHttpResult();
 
         var command = new CancelReservation(
@@ -172,5 +166,16 @@ public static class ReservationEndpoints
         var result = await commandHandler.HandleAsync(command, cancellationToken);
 
         return result.ToNoContent();
+    }
+
+    private static async Task<Result<EmployeeIdentifier>> CurrentActorAsync(
+        ClaimsPrincipal principal,
+        IEmployeeDirectory employees,
+        CancellationToken cancellationToken)
+    {
+        var userId = principal.UserId();
+        if (userId.IsFailure) return userId.Error;
+
+        return await employees.FindByUserAsync(UserIdentifier.From(userId.Value), cancellationToken);
     }
 }
