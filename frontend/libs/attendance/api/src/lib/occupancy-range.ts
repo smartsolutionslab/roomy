@@ -1,4 +1,5 @@
 import { addDays } from './bookable-day';
+import { parse, weekday } from './date-parts';
 
 // Pure, clock-free range maths: callers pass an ISO yyyy-MM-dd anchor. The presets stay within the
 // backend's 31-day bound.
@@ -10,29 +11,18 @@ export interface DateRange {
   readonly to: string;
 }
 
-function parts(date: string): { year: number; month: number; day: number } {
-  const [year, month, day] = date.split('-').map(Number);
-  return { year, month, day };
-}
-
-// 0 = Sunday … 6 = Saturday, computed in UTC (timezone-free).
-function weekday(date: string): number {
-  const { year, month, day } = parts(date);
-  return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
-}
-
 // Days from the most recent Monday (Monday = 0 … Sunday = 6).
 function daysSinceMonday(date: string): number {
   return (weekday(date) + 6) % 7;
 }
 
 function firstOfMonth(date: string): string {
-  const { year, month } = parts(date);
+  const { year, month } = parse(date);
   return `${year}-${String(month).padStart(2, '0')}-01`;
 }
 
 function lastOfMonth(date: string): string {
-  const { year, month } = parts(date);
+  const { year, month } = parse(date);
   // Day 0 of the next month is the last day of this month.
   return new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
 }
@@ -71,10 +61,10 @@ export function monthGrid(anchor: string): string[][] {
 }
 
 export function isSameMonth(date: string, anchor: string): boolean {
-  return parts(date).year === parts(anchor).year && parts(date).month === parts(anchor).month;
+  return parse(date).year === parse(anchor).year && parse(date).month === parse(anchor).month;
 }
 
 export function addMonths(anchor: string, delta: number): string {
-  const { year, month } = parts(anchor);
+  const { year, month } = parse(anchor);
   return `${new Date(Date.UTC(year, month - 1 + delta, 1)).toISOString().slice(0, 10)}`;
 }
