@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  computed,
   inject,
   input,
   signal,
@@ -11,17 +10,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
-import {
-  AttendanceGateway,
-  MyReservation,
-  errorCode,
-  partitionReservationsByDay,
-  todayInBerlin,
-} from '@roomy/attendance-api';
+import { AttendanceGateway, MyReservation, todayInBerlin } from '@roomy/attendance-api';
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import { Button, Message, Page } from '@roomy/shared-ui';
 
+import { cancelErrorKey } from '../cancel-error-key';
 import { ReservationHistory } from '../reservation-history/reservation-history';
+import { reservationSchedule } from '../reservation-schedule';
 
 // The signed-in employee's own reservations: cancel is offered only on upcoming rows, and "change" is
 // cancel + re-reserve (a navigation into the reserve flow), never a combined edit. `today` is an input
@@ -49,11 +44,9 @@ export class MyReservationsPage {
   protected readonly result = signal<ResultMessage | null>(null);
   protected readonly errorKey = signal<string | null>(null);
 
-  private readonly schedule = computed(() =>
-    partitionReservationsByDay(this.list.items() ?? [], this.today()),
-  );
-  protected readonly upcoming = computed(() => this.schedule().upcoming);
-  protected readonly past = computed(() => this.schedule().past);
+  private readonly schedule = reservationSchedule(this.list.items, this.today);
+  protected readonly upcoming = this.schedule.upcoming;
+  protected readonly past = this.schedule.past;
 
   protected cancel(reservation: MyReservation): void {
     this.result.set(null);
@@ -94,10 +87,6 @@ export class MyReservationsPage {
   }
 
   private handleCancelError(error: HttpErrorResponse): void {
-    this.errorKey.set(
-      errorCode(error) === 'past_immutable'
-        ? 'attendance.mine.errors.pastImmutable'
-        : 'attendance.mine.errors.generic',
-    );
+    this.errorKey.set(cancelErrorKey(error, 'attendance.mine'));
   }
 }

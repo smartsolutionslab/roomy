@@ -10,19 +10,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective } from '@jsverse/transloco';
-import {
-  AttendanceGateway,
-  Employee,
-  MyReservation,
-  errorCode,
-  partitionReservationsByDay,
-  todayInBerlin,
-} from '@roomy/attendance-api';
+import { AttendanceGateway, Employee, MyReservation, todayInBerlin } from '@roomy/attendance-api';
 import { cursorList, type ResultMessage } from '@roomy/shared-data-access';
 import { Combobox, Message, Page, type SelectOption } from '@roomy/shared-ui';
 import { EMPTY, Subject, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
+import { cancelErrorKey } from '../cancel-error-key';
 import { ReservationHistory } from '../reservation-history/reservation-history';
+import { reservationSchedule } from '../reservation-schedule';
 import { ReservePage } from '../reserve/reserve-page';
 
 // The administrator on-behalf page: pick an employee, then reserve for them (the embedded reserve flow
@@ -80,11 +75,9 @@ export class OnBehalfPage {
     { autoLoad: false },
   );
 
-  private readonly schedule = computed(() =>
-    partitionReservationsByDay(this.reservationsList.items() ?? [], this.today()),
-  );
-  protected readonly upcoming = computed(() => this.schedule().upcoming);
-  protected readonly past = computed(() => this.schedule().past);
+  private readonly schedule = reservationSchedule(this.reservationsList.items, this.today);
+  protected readonly upcoming = this.schedule.upcoming;
+  protected readonly past = this.schedule.past;
 
   constructor() {
     this.searchInput
@@ -143,13 +136,8 @@ export class OnBehalfPage {
           );
           this.result.set({ key: 'attendance.onBehalf.cancelled' });
         },
-        error: (error: HttpErrorResponse) => {
-          this.errorKey.set(
-            errorCode(error) === 'past_immutable'
-              ? 'attendance.onBehalf.errors.pastImmutable'
-              : 'attendance.onBehalf.errors.generic',
-          );
-        },
+        error: (error: HttpErrorResponse) =>
+          this.errorKey.set(cancelErrorKey(error, 'attendance.onBehalf')),
       });
   }
 }
