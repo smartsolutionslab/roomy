@@ -89,14 +89,11 @@ public static class BffAuthenticationExtensions
     {
         var keycloak = keycloakOptions.Value;
 
-        options.Authority = BuildAuthority(keycloak);
+        options.Authority = keycloak.RealmUrl;
         options.ClientId = keycloak.ClientId;
         options.ClientSecret = keycloak.ClientSecret;
         options.RequireHttpsMetadata = keycloak.RequireHttpsMetadata;
     }
-
-    private static string BuildAuthority(KeycloakOidcOptions keycloak) =>
-        $"{keycloak.Authority.TrimEnd('/')}/realms/{keycloak.Realm}";
 
     // Keycloak nests realm roles inside the realm_access JSON claim. Promote each to a flat
     // role claim so authorization policies and the whoami endpoint can read them directly.

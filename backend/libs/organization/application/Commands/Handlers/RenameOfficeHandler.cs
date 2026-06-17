@@ -17,7 +17,7 @@ public sealed class RenameOfficeHandler(IOfficeRepository offices, IUnitOfWork u
 
         if (command.Name != office.Name && await offices.ExistsByNameAsync(office.CompanyIdentifier, name, cancellationToken))
         {
-            return Error.Conflict("office.name_taken", $"An office named '{name}' already exists.");
+            return OfficeErrors.NameTaken(name);
         }
 
         office.Rename(command.Name);

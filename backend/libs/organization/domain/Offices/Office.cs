@@ -43,7 +43,7 @@ public sealed class Office : Aggregate
     {
         if (rooms.Any(room => room.Name == name))
         {
-            return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
+            return OfficeErrors.RoomNameTaken(name);
         }
 
         var room = Room.Create(name, capacity);
@@ -59,7 +59,7 @@ public sealed class Office : Aggregate
 
         if (IsRoomNameTakenByAnother(roomIdentifier, name))
         {
-            return Error.Conflict("office.room_name_taken", $"A room named '{name}' already exists in this office.");
+            return OfficeErrors.RoomNameTaken(name);
         }
 
         room.Rename(name);

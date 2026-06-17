@@ -19,4 +19,8 @@ public sealed class KeycloakOidcOptions
     public string ClientSecret { get; set; } = string.Empty;
 
     public bool RequireHttpsMetadata { get; set; } = true;
+
+    public string RealmUrl => $"{Authority.TrimEnd('/')}/realms/{Realm}";
+
+    public string TokenEndpoint => $"{RealmUrl}/protocol/openid-connect/token";
 }

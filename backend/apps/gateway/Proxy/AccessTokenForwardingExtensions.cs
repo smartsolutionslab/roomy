@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Net.Http.Headers;
+using SmartSolutionsLab.Roomy.Gateway.Authentication;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 
@@ -7,8 +8,6 @@ namespace SmartSolutionsLab.Roomy.Gateway.Proxy;
 
 public static class AccessTokenForwardingExtensions
 {
-    private const string AccessTokenName = "access_token";
-
     public const string ForwardAccessTokenMetadataKey = "ForwardAccessToken";
 
     public static IReverseProxyBuilder AddAccessTokenForwarding(this IReverseProxyBuilder builder)
@@ -19,7 +18,7 @@ public static class AccessTokenForwardingExtensions
 
             context.AddRequestTransform(async transform =>
             {
-                var accessToken = await transform.HttpContext.GetTokenAsync(AccessTokenName).ConfigureAwait(false);
+                var accessToken = await transform.HttpContext.GetTokenAsync(OidcTokenNames.AccessToken).ConfigureAwait(false);
 
                 if (string.IsNullOrEmpty(accessToken)) return;
 

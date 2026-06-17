@@ -17,9 +17,12 @@ public static class ErrorResults
             _ => StatusCodes.Status500InternalServerError,
         };
 
-        return Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: status);
+        return Json(error, status);
     }
 
     public static IResult ToBadRequest(this Error error) =>
-        Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: StatusCodes.Status400BadRequest);
+        Json(error, StatusCodes.Status400BadRequest);
+
+    private static IResult Json(Error error, int statusCode) =>
+        Results.Json(new ErrorResponse(error.Code, error.Message), statusCode: statusCode);
 }
