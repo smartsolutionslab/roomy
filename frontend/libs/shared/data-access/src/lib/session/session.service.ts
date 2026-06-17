@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, of } from 'rxjs';
 
 import { CurrentUser } from './current-user';
@@ -16,6 +16,9 @@ export class SessionService {
 
   readonly currentUser = this.currentUserState.asReadonly();
   readonly loaded = this.loadedState.asReadonly();
+  readonly isAdministrator = computed(
+    () => this.currentUserState()?.roles.includes('administrator') ?? false,
+  );
 
   load(): void {
     void this.ensureLoaded();

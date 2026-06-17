@@ -1,4 +1,4 @@
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { computed, provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter, withDisabledInitialNavigation } from '@angular/router';
 import { CurrentUser, SessionService } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
@@ -16,7 +16,18 @@ async function renderHome(session: CurrentUser | null) {
       // The dashboard cards are built from the same nav model as the sidebar, so the test needs the
       // real routes; initial navigation is disabled to keep it isolated from the feature pages.
       provideRouter(appRoutes, withDisabledInitialNavigation()),
-      { provide: SessionService, useValue: { currentUser: signal(session) } },
+      {
+        provide: SessionService,
+        useValue: (() => {
+          const currentUser = signal(session);
+          return {
+            currentUser,
+            isAdministrator: computed(
+              () => currentUser()?.roles.includes('administrator') ?? false,
+            ),
+          };
+        })(),
+      },
     ],
   });
 }

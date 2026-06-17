@@ -1,4 +1,4 @@
-import { provideZonelessChangeDetection, signal, WritableSignal } from '@angular/core';
+import { computed, provideZonelessChangeDetection, signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Routes } from '@angular/router';
 import { CurrentUser, SessionService } from '@roomy/shared-data-access';
@@ -54,7 +54,13 @@ function setup(user: CurrentUser | null) {
     providers: [
       provideZonelessChangeDetection(),
       provideRouter(routes),
-      { provide: SessionService, useValue: { currentUser } },
+      {
+        provide: SessionService,
+        useValue: {
+          currentUser,
+          isAdministrator: computed(() => currentUser()?.roles.includes('administrator') ?? false),
+        },
+      },
     ],
   });
   return { service: TestBed.inject(NavigationService), currentUser };

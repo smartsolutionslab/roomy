@@ -10,7 +10,7 @@ export const adminGuard: CanActivateFn = async () => {
   const router = inject(Router);
 
   await session.ensureLoaded();
-  if (session.currentUser()?.roles.includes('administrator')) {
+  if (session.isAdministrator()) {
     return true;
   }
 

@@ -1,4 +1,4 @@
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { computed, provideZonelessChangeDetection, signal } from '@angular/core';
 import { CurrentUser, SessionService } from '@roomy/shared-data-access';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
@@ -10,13 +10,17 @@ import { UserMenu } from './user-menu';
 async function renderMenu(
   user: CurrentUser | null = { name: 'Ada Lovelace', roles: ['employee'] },
 ) {
+  const currentUser = signal(user);
   return render(UserMenu, {
     imports: [importSharedTestTransloco()],
     providers: [
       provideZonelessChangeDetection(),
       {
         provide: SessionService,
-        useValue: { currentUser: signal(user) } as unknown as SessionService,
+        useValue: {
+          currentUser,
+          isAdministrator: computed(() => currentUser()?.roles.includes('administrator') ?? false),
+        } as unknown as SessionService,
       },
     ],
   });

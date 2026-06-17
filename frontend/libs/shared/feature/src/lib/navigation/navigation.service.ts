@@ -38,7 +38,7 @@ export class NavigationService {
   );
 
   readonly items = computed<readonly NavItem[]>(() => {
-    const isAdministrator = this.session.currentUser()?.roles.includes('administrator') ?? false;
+    const isAdministrator = this.session.isAdministrator();
     return this.allItems.filter((item) => isAdministrator || !item.requiresAdmin);
   });
 
