@@ -1,7 +1,7 @@
 name: User story
 description: A product feature framed from a user's perspective, with testable acceptance criteria.
-title: "<CODE-N>: <short title>"
-labels: ["user-story"]
+title: '<CODE-N>: <short title>'
+labels: ['user-story']
 body:
   - type: markdown
     attributes:
@@ -13,7 +13,7 @@ body:
     attributes:
       label: Story
       description: The user-facing intent.
-      placeholder: "As an administrator I want to ... so that ..."
+      placeholder: 'As an administrator I want to ... so that ...'
     validations:
       required: true
   - type: textarea
@@ -42,7 +42,7 @@ body:
     attributes:
       label: Spec
       description: Path to the owning Spec Kit spec.
-      placeholder: "specs/001-identity-access/spec.md"
+      placeholder: 'specs/001-identity-access/spec.md'
     validations:
       required: true
   - type: textarea

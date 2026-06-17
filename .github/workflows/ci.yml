@@ -23,9 +23,9 @@ permissions:
 
 # Trim CLI startup overhead across every .NET step.
 env:
-  DOTNET_NOLOGO: "true"
-  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
 
 jobs:
   # .NET gate suite, part 1 of 2: restore, build ONCE, and run the build-only gates
@@ -75,19 +75,19 @@ jobs:
           dotnet build Roomy.slnx --configuration Release --no-restore -warnaserror
           -p:OpenApiGenerateDocumentsOnBuild=true
         env:
-          OpenApi__EmitDocument: "true"
-          ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
-          ConnectionStrings__organization: "Host=localhost;Database=organization;Username=ci;Password=ci"
-          ConnectionStrings__attendance: "Host=localhost;Database=attendance;Username=ci;Password=ci"
-          ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
-          Attendance__CompanyId: "00000000-0000-0000-0000-000000000001"
-          Keycloak__BaseAddress: "http://localhost:8080"
-          Keycloak__AdminUsername: "ci"
-          Keycloak__AdminPassword: "ci"
-          Keycloak__Realm: "roomy"
-          DefaultAdmin__Email: "ci@roomy.local"
-          DefaultAdmin__DisplayName: "CI"
-          DefaultAdmin__InitialPassword: "ci-password-123"
+          OpenApi__EmitDocument: 'true'
+          ConnectionStrings__identity: 'Host=localhost;Database=identity;Username=ci;Password=ci'
+          ConnectionStrings__organization: 'Host=localhost;Database=organization;Username=ci;Password=ci'
+          ConnectionStrings__attendance: 'Host=localhost;Database=attendance;Username=ci;Password=ci'
+          ConnectionStrings__rabbitmq: 'amqp://guest:guest@localhost:5672'
+          Attendance__CompanyId: '00000000-0000-0000-0000-000000000001'
+          Keycloak__BaseAddress: 'http://localhost:8080'
+          Keycloak__AdminUsername: 'ci'
+          Keycloak__AdminPassword: 'ci'
+          Keycloak__Realm: 'roomy'
+          DefaultAdmin__Email: 'ci@roomy.local'
+          DefaultAdmin__DisplayName: 'CI'
+          DefaultAdmin__InitialPassword: 'ci-password-123'
 
       # The specs were emitted by the build above; fail if any committed spec drifted.
       - name: Verify the OpenAPI specs are current
@@ -132,19 +132,19 @@ jobs:
 
           exit $drift
         env:
-          ConnectionStrings__identity: "Host=localhost;Database=identity;Username=ci;Password=ci"
-          ConnectionStrings__organization: "Host=localhost;Database=organization;Username=ci;Password=ci"
-          ConnectionStrings__attendance: "Host=localhost;Database=attendance;Username=ci;Password=ci"
-          ConnectionStrings__rabbitmq: "amqp://guest:guest@localhost:5672"
-          Keycloak__BaseAddress: "http://localhost:8080"
-          Keycloak__AdminUsername: "ci"
-          Keycloak__AdminPassword: "ci"
-          Keycloak__Realm: "roomy"
-          Company__Name: "Roomy"
-          Attendance__CompanyId: "0199a0b0-0000-7000-8000-000000000001"
-          DefaultAdmin__Email: "ci@roomy.local"
-          DefaultAdmin__DisplayName: "CI"
-          DefaultAdmin__InitialPassword: "ci-password-123"
+          ConnectionStrings__identity: 'Host=localhost;Database=identity;Username=ci;Password=ci'
+          ConnectionStrings__organization: 'Host=localhost;Database=organization;Username=ci;Password=ci'
+          ConnectionStrings__attendance: 'Host=localhost;Database=attendance;Username=ci;Password=ci'
+          ConnectionStrings__rabbitmq: 'amqp://guest:guest@localhost:5672'
+          Keycloak__BaseAddress: 'http://localhost:8080'
+          Keycloak__AdminUsername: 'ci'
+          Keycloak__AdminPassword: 'ci'
+          Keycloak__Realm: 'roomy'
+          Company__Name: 'Roomy'
+          Attendance__CompanyId: '0199a0b0-0000-7000-8000-000000000001'
+          DefaultAdmin__Email: 'ci@roomy.local'
+          DefaultAdmin__DisplayName: 'CI'
+          DefaultAdmin__InitialPassword: 'ci-password-123'
 
       - name: Verify formatting
         run: dotnet format Roomy.slnx --verify-no-changes --no-restore

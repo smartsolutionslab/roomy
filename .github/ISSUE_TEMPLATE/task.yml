@@ -1,7 +1,7 @@
 name: Task / chore
 description: Tooling, setup, infrastructure, CI, or other non-feature work.
-title: "<short summary>"
-labels: ["chore"]
+title: '<short summary>'
+labels: ['chore']
 body:
   - type: markdown
     attributes:
