@@ -1,4 +1,5 @@
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
+using SmartSolutionsLab.Roomy.Organization.Domain.Employees.Events;
 using SmartSolutionsLab.Roomy.SharedKernel;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
@@ -41,17 +42,22 @@ public sealed class Employee : Aggregate
         string initialPassword)
     {
         var employee = new Employee(EmployeeIdentifier.New(), company, user, name, email, role);
-        employee.RaiseDomainEvent(new EmployeeHired(employee.Identifier, company, user, name, email, role, initialPassword));
+        employee.RaiseDomainEvent(new EmployeeHired(
+            employee.Identifier,
+            company,
+            user,
+            name,
+            email,
+            role,
+            initialPassword));
         return employee;
     }
 
     public Result CompleteProvisioning()
     {
-        if (State == ProvisioningState.Active)
-            return Result.Success();
+        if (State == ProvisioningState.Active) return Result.Success();
 
-        if (State == ProvisioningState.Failed)
-            return Error.Conflict("employee.terminal", "A failed employee cannot be activated.");
+        if (State == ProvisioningState.Failed) return Error.Conflict("employee.terminal", "A failed employee cannot be activated.");
 
         State = ProvisioningState.Active;
         return Result.Success();
@@ -59,11 +65,9 @@ public sealed class Employee : Aggregate
 
     public Result FailProvisioning(ProvisioningFailureReason reason)
     {
-        if (State == ProvisioningState.Failed)
-            return Result.Success();
+        if (State == ProvisioningState.Failed) return Result.Success();
 
-        if (State == ProvisioningState.Active)
-            return Error.Conflict("employee.terminal", "An active employee cannot be failed.");
+        if (State == ProvisioningState.Active) return Error.Conflict("employee.terminal", "An active employee cannot be failed.");
 
         State = ProvisioningState.Failed;
         FailureReason = reason;
@@ -72,12 +76,18 @@ public sealed class Employee : Aggregate
 
     public Result RetryProvisioning(string initialPassword)
     {
-        if (State == ProvisioningState.Active)
-            return Result.Success();
+        if (State == ProvisioningState.Active) return Result.Success();
 
         State = ProvisioningState.Provisioning;
         FailureReason = null;
-        RaiseDomainEvent(new EmployeeHired(Identifier, CompanyIdentifier, UserIdentifier, Name, Email, Role, initialPassword));
+        RaiseDomainEvent(new EmployeeHired(
+            Identifier,
+            CompanyIdentifier,
+            UserIdentifier,
+            Name,
+            Email,
+            Role,
+            initialPassword));
         return Result.Success();
     }
 }

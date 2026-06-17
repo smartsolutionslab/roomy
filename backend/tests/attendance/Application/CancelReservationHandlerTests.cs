@@ -4,6 +4,7 @@ using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.TestSupport;
 

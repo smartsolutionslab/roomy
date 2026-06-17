@@ -1,5 +1,6 @@
 using Shouldly;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.Identity.Domain.Users.Events;
 
 namespace SmartSolutionsLab.Roomy.Identity.Tests.Domain.Users;
 

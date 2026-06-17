@@ -1,3 +1,4 @@
+using SmartSolutionsLab.Roomy.Identity.Domain.Users.Events;
 using SmartSolutionsLab.Roomy.SharedKernel;
 
 namespace SmartSolutionsLab.Roomy.Identity.Domain.Users;

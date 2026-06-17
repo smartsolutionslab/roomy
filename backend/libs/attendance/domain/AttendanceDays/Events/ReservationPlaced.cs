@@ -1,4 +1,4 @@
-namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+namespace SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 
 public sealed record ReservationPlaced(
     Guid ReservationId,

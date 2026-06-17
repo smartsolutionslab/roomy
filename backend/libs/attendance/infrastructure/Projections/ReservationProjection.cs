@@ -1,4 +1,4 @@
-using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays;
+using SmartSolutionsLab.Roomy.Attendance.Domain.AttendanceDays.Events;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Persistence;
 using ReservationRow = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Reservations.Reservation;
 
@@ -25,8 +25,7 @@ public sealed class ReservationProjection(AttendanceDbContext context) : IReserv
                     break;
 
                 case ReservationCancelled cancelled:
-                    var row = await context.Reservations
-                        .FindAsync([cancelled.ReservationId], cancellationToken).ConfigureAwait(false);
+                    var row = await context.Reservations.FindAsync([cancelled.ReservationId], cancellationToken).ConfigureAwait(false);
                     if (row is not null)
                     {
                         context.Reservations.Remove(row);
