@@ -11,10 +11,14 @@
     <button
       type="button"
       class="roomy-tile"
+      [class.tile-group__tile--stacked]="!!option.detail"
       [attr.aria-pressed]="option.value === value()"
       (click)="selected.emit(option.value)"
     >
-      {{ option.label }}
+      @if (option.detail; as detail) {
+      <span class="tile-group__primary">{{ option.label }}</span>
+      <span class="tile-group__detail">{{ detail }}</span>
+      } @else { {{ option.label }} }
     </button>
     }
   </div>
@@ -28,7 +32,9 @@
     @if (placeholder(); as text) {
     <option value="" [selected]="!value()">{{ text }}</option>
     } @for (option of options(); track option.value) {
-    <option [value]="option.value" [selected]="option.value === value()">{{ option.label }}</option>
+    <option [value]="option.value" [selected]="option.value === value()">
+      {{ option.detail ? option.label + ' ' + option.detail : option.label }}
+    </option>
     }
   </select>
 </div>

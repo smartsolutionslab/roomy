@@ -26,7 +26,7 @@
       [placeholder]="translate('attendance.reserve.dayPlaceholder')"
       [options]="dayOptions()"
       [value]="selectedDay()"
-      (daySelected)="chooseDay($event)"
+      (selected)="chooseDay($event)"
     />
 
     @if (selectedOffice(); as office) {

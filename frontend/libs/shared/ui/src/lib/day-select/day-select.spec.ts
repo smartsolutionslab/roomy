@@ -11,7 +11,7 @@ import { DayOption, DaySelect } from './day-select';
     [placeholder]="placeholder"
     [options]="options"
     [value]="value"
-    (daySelected)="chosen = $event"
+    (selected)="chosen = $event"
   />`,
 })
 class HostComponent {

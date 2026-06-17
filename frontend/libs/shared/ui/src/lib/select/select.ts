@@ -11,9 +11,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormField } from '../form-field/form-field';
 
 // One option of a roomy-select: an opaque value plus its already-translated (or data-derived) label.
+// `detail` is an optional secondary line a tile renders under the label (used by the day picker).
 export interface SelectOption {
   readonly value: string;
   readonly label: string;
+  readonly detail?: string;
 }
 
 // A labelled dropdown built on FormField: a placeholder followed by the given options. The caller passes
