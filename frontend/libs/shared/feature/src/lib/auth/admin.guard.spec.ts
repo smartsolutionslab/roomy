@@ -15,7 +15,11 @@ function configure(currentUser: CurrentUser | null) {
       provideRouter([]),
       {
         provide: SessionService,
-        useValue: { currentUser: () => currentUser, ensureLoaded: () => Promise.resolve() },
+        useValue: {
+          currentUser: () => currentUser,
+          isAdministrator: () => currentUser?.roles.includes('administrator') ?? false,
+          ensureLoaded: () => Promise.resolve(),
+        },
       },
     ],
   });
