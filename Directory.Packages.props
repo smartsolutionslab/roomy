@@ -43,7 +43,7 @@
     <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.13.1" />
     <!-- Gateway / API docs -->
     <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
-    <PackageVersion Include="Scalar.Aspire" Version="0.10.2" />
+    <PackageVersion Include="Scalar.Aspire" Version="0.10.4" />
     <!-- Telemetry -->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
