@@ -8,7 +8,7 @@
   <ItemGroup>
     <!--
       Aspire integration packages provisioning the local infrastructure (issue #17).
-      Versions are pinned to the AppHost's Aspire version (13.4.2, see the SDK above) so the
+      Versions are pinned to the AppHost's Aspire version (13.4.6, see the SDK above) so the
       resource graph stays consistent. The Keycloak integration only ships as a preview at
       this Aspire version, hence the -preview suffix on that package alone.
     -->
