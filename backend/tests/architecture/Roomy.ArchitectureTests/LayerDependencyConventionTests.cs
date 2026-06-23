@@ -74,9 +74,7 @@ public sealed class LayerDependencyConventionTests
 
         foreach (var assembly in RoomyAssemblies.All)
         {
-            var predicate = Types.InAssembly(assembly)
-                .That()
-                .ResideInNamespaceContaining(layerSegment);
+            var predicate = Types.InAssembly(assembly).That().ResideInNamespaceContaining(layerSegment);
 
             matchedTypes += predicate.GetTypes().Count();
 

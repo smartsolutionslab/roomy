@@ -27,10 +27,7 @@ internal static class RoomyAssemblies
 
             foreach (var reference in current.GetReferencedAssemblies())
             {
-                if (!IsRoomy(reference.Name) || seen.ContainsKey(reference.Name!))
-                {
-                    continue;
-                }
+                if (!IsRoomy(reference.Name) || seen.ContainsKey(reference.Name!)) continue;
 
                 try
                 {
@@ -51,10 +48,7 @@ internal static class RoomyAssemblies
         {
             var name = assembly.GetName().Name;
 
-            if (!IsRoomy(name) || !seen.TryAdd(name!, assembly))
-            {
-                return;
-            }
+            if (!IsRoomy(name) || !seen.TryAdd(name!, assembly)) return;
 
             queue.Enqueue(assembly);
         }
