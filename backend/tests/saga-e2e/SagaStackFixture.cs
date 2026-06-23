@@ -177,10 +177,7 @@ public sealed class SagaStackFixture : IAsyncLifetime
         using var fetch = new HttpRequestMessage(HttpMethod.Get, $"admin/realms/{Realm}/users/{userId}");
         fetch.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
         using var fetchResponse = await Keycloak.SendAsync(fetch, cancellationToken);
-        if (await fetchResponse.Content.ReadFromJsonAsync<JsonObject>(cancellationToken) is not { } user)
-        {
-            return;
-        }
+        if (await fetchResponse.Content.ReadFromJsonAsync<JsonObject>(cancellationToken) is not { } user) return;
 
         user["requiredActions"] = new JsonArray();
         user["emailVerified"] = true;
