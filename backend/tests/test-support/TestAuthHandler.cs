@@ -34,8 +34,7 @@ public sealed class TestAuthHandler(
         if (Request.Headers.TryGetValue(RolesHeader, out var roles) && !string.IsNullOrEmpty(roles))
         {
             var separators = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-            claims.AddRange(
-                roles.ToString().Split(',', separators).Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(roles.ToString().Split(',', separators).Select(role => new Claim(ClaimTypes.Role, role)));
         }
 
         var identity = new ClaimsIdentity(claims, SchemeName);

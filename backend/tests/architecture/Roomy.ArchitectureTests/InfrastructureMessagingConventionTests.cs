@@ -34,8 +34,7 @@ public sealed class InfrastructureMessagingConventionTests
             .NotHaveDependencyOn("MediatR")
             .GetResult();
 
-        result.IsSuccessful.ShouldBeTrue(
-            SharedKernelPurityTests.FailureMessage("messaging infrastructure must not depend on MediatR (ADR-0005)", result));
+        result.IsSuccessful.ShouldBeTrue(SharedKernelPurityTests.FailureMessage("messaging infrastructure must not depend on MediatR (ADR-0005)", result));
     }
 
     [Fact]

@@ -60,17 +60,10 @@ public sealed class SagaStackFixture : IAsyncLifetime
         {
             await ClearRequiredActionsAsync(username, cancellationToken);
             var (token, error) = await RequestUserTokenAsync(username, password, cancellationToken);
-            if (token is not null)
-            {
-                return token;
-            }
+            if (token is not null) return token;
 
             lastError = error;
-            if (attempt >= 30)
-            {
-                throw new InvalidOperationException(
-                    $"Could not acquire a token for '{username}' after retries. Last response: {lastError}");
-            }
+            if (attempt >= 30) throw new InvalidOperationException($"Could not acquire a token for '{username}' after retries. Last response: {lastError}");
 
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
         }
@@ -91,10 +84,7 @@ public sealed class SagaStackFixture : IAsyncLifetime
             var employee = await new EmployeeRepository(context)
                 .GetByIdentifierAsync(EmployeeIdentifier.From(employeeId), cancellationToken);
 
-            if (employee.IsSuccess && employee.Value.State != ProvisioningState.Provisioning)
-            {
-                return employee.Value;
-            }
+            if (employee.IsSuccess && employee.Value.State != ProvisioningState.Provisioning) return employee.Value;
 
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
         }
@@ -139,24 +129,16 @@ public sealed class SagaStackFixture : IAsyncLifetime
     public async Task<bool> KeycloakUserExistsAsync(string email, CancellationToken cancellationToken)
     {
         var adminToken = await AcquireMasterAdminTokenAsync(cancellationToken);
-        using var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"admin/realms/{Realm}/users?exact=true&email={Uri.EscapeDataString(email)}");
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"admin/realms/{Realm}/users?exact=true&email={Uri.EscapeDataString(email)}");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
         using var response = await Keycloak.SendAsync(request, cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            return false;
-        }
+        if (!response.IsSuccessStatusCode) return false;
 
         var users = await response.Content.ReadFromJsonAsync<JsonArray>(cancellationToken) ?? [];
         return users.Count > 0;
     }
 
-    private async Task<(string? Token, string Error)> RequestUserTokenAsync(
-        string username,
-        string password,
-        CancellationToken cancellationToken)
+    private async Task<(string? Token, string Error)> RequestUserTokenAsync(string username, string password, CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, $"realms/{Realm}/protocol/openid-connect/token")
         {
@@ -172,10 +154,7 @@ public sealed class SagaStackFixture : IAsyncLifetime
 
         using var response = await Keycloak.SendAsync(request, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            return (null, $"{(int)response.StatusCode} {body}");
-        }
+        if (!response.IsSuccessStatusCode) return (null, $"{(int)response.StatusCode} {body}");
 
         var payload = JsonNode.Parse(body);
         return (payload?["access_token"]?.GetValue<string>(), body);
@@ -185,21 +164,13 @@ public sealed class SagaStackFixture : IAsyncLifetime
     {
         var adminToken = await AcquireMasterAdminTokenAsync(cancellationToken);
 
-        using var lookup = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"admin/realms/{Realm}/users?exact=true&username={Uri.EscapeDataString(username)}");
+        using var lookup = new HttpRequestMessage(HttpMethod.Get, $"admin/realms/{Realm}/users?exact=true&username={Uri.EscapeDataString(username)}");
         lookup.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
         using var lookupResponse = await Keycloak.SendAsync(lookup, cancellationToken);
-        if (!lookupResponse.IsSuccessStatusCode)
-        {
-            return;
-        }
+        if (!lookupResponse.IsSuccessStatusCode) return;
 
         var users = await lookupResponse.Content.ReadFromJsonAsync<JsonArray>(cancellationToken) ?? [];
-        if (users.FirstOrDefault() is not JsonObject brief)
-        {
-            return;
-        }
+        if (users.FirstOrDefault() is not JsonObject brief) return;
 
         var userId = brief["id"]!.GetValue<string>();
 
@@ -213,10 +184,7 @@ public sealed class SagaStackFixture : IAsyncLifetime
 
         user["requiredActions"] = new JsonArray();
         user["emailVerified"] = true;
-        if (user["lastName"] is null)
-        {
-            user["lastName"] = "Test";
-        }
+        user["lastName"] ??= "Test";
 
         using var update = new HttpRequestMessage(HttpMethod.Put, $"admin/realms/{Realm}/users/{userId}")
         {
@@ -266,8 +234,7 @@ public sealed class SagaStackFixture : IAsyncLifetime
         using var response = await Keycloak.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
         var payload = await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken);
-        return payload?["access_token"]?.GetValue<string>()
-            ?? throw new InvalidOperationException("Keycloak returned no admin token.");
+        return payload?["access_token"]?.GetValue<string>() ?? throw new InvalidOperationException("Keycloak returned no admin token.");
     }
 
     private OrganizationDbContext CreateOrganizationContext() =>

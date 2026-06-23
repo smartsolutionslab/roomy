@@ -27,10 +27,8 @@ builder.Services.AddKeycloakIdentityProvider(
     new KeycloakAdminOptions
     {
         Realm = keycloakRealm,
-        AdminUsername = keycloak["AdminUsername"]
-            ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
-        AdminPassword = keycloak["AdminPassword"]
-            ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
+        AdminUsername = keycloak["AdminUsername"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
+        AdminPassword = keycloak["AdminPassword"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
     });
 
 builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);

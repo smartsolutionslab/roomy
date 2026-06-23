@@ -18,8 +18,7 @@ public static class KeycloakJwtBearerExtensions
                 options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{realm}";
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters.ValidateAudience = false;
-
-                options.Events = new JwtBearerEvents
+                options.Events = new()
                 {
                     OnTokenValidated = context =>
                     {
