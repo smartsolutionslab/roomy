@@ -24,7 +24,7 @@ builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm)
 
 builder.Services.AddRoomyExceptionHandling();
 
-var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+var emittingOpenApiDocument = builder.Configuration.IsEmittingOpenApiDocument();
 if (emittingOpenApiDocument)
 {
     JasperFxEnvironment.AutoStartHost = true;
@@ -33,22 +33,13 @@ if (emittingOpenApiDocument)
 if (!emittingOpenApiDocument)
 {
     builder.AddRoomyMessaging(
-        new MessagingOptions
-        {
-            Transport = MessagingTransport.RabbitMq,
-            PostgresConnectionString = connectionString,
-            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
-        },
-        applicationAssembly: typeof(OrganizationApiHost).Assembly,
+        connectionString,
+        typeof(OrganizationApiHost).Assembly,
         typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserRegisteredConsumer).Assembly);
 
     builder.Services.AddIntegrationEventOutbox();
 
-    var company = builder.Configuration.GetSection(CompanyOptions.SectionName);
-    builder.Services.AddSingleton(new CompanyOptions
-    {
-        Name = company["Name"] ?? throw new InvalidOperationException("Missing configuration 'Company:Name'."),
-    });
+    builder.Services.AddValidatedOptions<CompanyOptions>(builder.Configuration, CompanyOptions.SectionName);
     builder.Services
         .AddScoped<CompanySeeder>()
         .AddHostedService<CompanySeederHostedService>();
@@ -56,13 +47,7 @@ if (!emittingOpenApiDocument)
     // The seeded administrator is hired here so it becomes a first-class employee (ADR-0059). Registered
     // after the company seeder so it runs once the seeded Company exists; the hire saga provisions the
     // identity User + Keycloak and the attendance directory row.
-    var defaultAdmin = builder.Configuration.GetSection(DefaultAdminOptions.SectionName);
-    builder.Services.AddSingleton(new DefaultAdminOptions
-    {
-        Email = defaultAdmin["Email"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:Email'."),
-        DisplayName = defaultAdmin["DisplayName"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:DisplayName'."),
-        InitialPassword = defaultAdmin["InitialPassword"] ?? throw new InvalidOperationException("Missing configuration 'DefaultAdmin:InitialPassword'."),
-    });
+    builder.Services.AddValidatedOptions<DefaultAdminOptions>(builder.Configuration, DefaultAdminOptions.SectionName);
     builder.Services
         .AddScoped<DefaultAdminSeeder>()
         .AddHostedService<DefaultAdminSeederHostedService>();

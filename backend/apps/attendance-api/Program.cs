@@ -21,7 +21,7 @@ builder.Services.AddAttendancePersistence(attendanceConnectionString)
 
 builder.Services.AddRoomyExceptionHandling();
 
-var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+var emittingOpenApiDocument = builder.Configuration.IsEmittingOpenApiDocument();
 
 if (emittingOpenApiDocument)
 {
@@ -33,23 +33,18 @@ var messagingEnabled = builder.Configuration.GetValue("Messaging:Enabled", true)
 if (!emittingOpenApiDocument && messagingEnabled)
 {
     builder.AddRoomyMessaging(
-        new MessagingOptions
-        {
-            Transport = MessagingTransport.RabbitMq,
-            PostgresConnectionString = attendanceConnectionString,
-            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
-        },
-        applicationAssembly: typeof(AttendanceApiHost).Assembly,
+        attendanceConnectionString,
+        typeof(AttendanceApiHost).Assembly,
         typeof(RoomAddedConsumer).Assembly);
 }
 
-var attendance = builder.Configuration.GetSection(AttendanceApiOptions.SectionName);
-builder.Services.AddSingleton(new AttendanceApiOptions
-{
-    CompanyId = Guid.Parse(attendance["CompanyId"] ?? throw new InvalidOperationException("Missing configuration 'Attendance:CompanyId'."))
-});
+builder.Services.AddValidatedOptions<AttendanceApiOptions>(
+    builder.Configuration,
+    AttendanceApiOptions.SectionName,
+    options => options.CompanyId != Guid.Empty,
+    "Missing configuration 'Attendance:CompanyId'.");
 
-var businessZone = BusinessTimeZone.Resolve(attendance["TimeZone"]);
+var businessZone = BusinessTimeZone.Resolve(builder.Configuration.GetSection(AttendanceApiOptions.SectionName)["TimeZone"]);
 builder.Services.AddSingleton<IBusinessClock>(serviceProvider => new BusinessClock(serviceProvider.GetRequiredService<TimeProvider>(), businessZone));
 
 var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();

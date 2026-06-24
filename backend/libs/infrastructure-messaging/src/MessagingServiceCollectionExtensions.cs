@@ -18,6 +18,25 @@ public static class MessagingServiceCollectionExtensions
 {
     public static IHostApplicationBuilder AddRoomyMessaging(
         this IHostApplicationBuilder builder,
+        string postgresConnectionString,
+        Assembly applicationAssembly,
+        params Assembly[] handlerAssemblies)
+    {
+        Ensure.That((IHostApplicationBuilder?)builder).IsNotNull();
+
+        return builder.AddRoomyMessaging(
+            new MessagingOptions
+            {
+                Transport = MessagingTransport.RabbitMq,
+                PostgresConnectionString = postgresConnectionString,
+                ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
+            },
+            applicationAssembly,
+            handlerAssemblies);
+    }
+
+    public static IHostApplicationBuilder AddRoomyMessaging(
+        this IHostApplicationBuilder builder,
         MessagingOptions options,
         Assembly? applicationAssembly = null,
         params Assembly[] handlerAssemblies)

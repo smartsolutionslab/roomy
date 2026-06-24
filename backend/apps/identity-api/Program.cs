@@ -17,21 +17,11 @@ var identityConnectionString = builder.Configuration.GetIdentityConnectionString
 
 builder.Services.AddIdentityPersistence(identityConnectionString);
 
-var keycloak = builder.Configuration.GetSection("Keycloak");
-var keycloakBaseAddress = new Uri(keycloak["BaseAddress"]
-    ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
-var keycloakRealm = keycloak["Realm"] ?? "roomy";
+var (keycloakBaseAddress, keycloakAdmin) = builder.Configuration.ReadKeycloakAdmin();
 
-builder.Services.AddKeycloakIdentityProvider(
-    keycloakBaseAddress,
-    new KeycloakAdminOptions
-    {
-        Realm = keycloakRealm,
-        AdminUsername = keycloak["AdminUsername"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
-        AdminPassword = keycloak["AdminPassword"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
-    });
+builder.Services.AddKeycloakIdentityProvider(keycloakBaseAddress, keycloakAdmin);
 
-builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakAdmin.Realm);
 
 builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
@@ -45,7 +35,7 @@ builder.Services.AddIdentityUseCases();
 // startup are unaffected. The document is built from endpoint metadata alone, so during an emit the
 // messaging runtime — the startup that opens a broker/database connection — is skipped, letting the
 // spec emit with no Postgres or RabbitMQ.
-var emittingOpenApiDocument = builder.Configuration.GetValue<bool>("OpenApi:EmitDocument");
+var emittingOpenApiDocument = builder.Configuration.IsEmittingOpenApiDocument();
 if (emittingOpenApiDocument)
 {
     JasperFxEnvironment.AutoStartHost = true;
@@ -54,13 +44,8 @@ if (emittingOpenApiDocument)
 if (!emittingOpenApiDocument)
 {
     builder.AddRoomyMessaging(
-        new MessagingOptions
-        {
-            Transport = MessagingTransport.RabbitMq,
-            PostgresConnectionString = identityConnectionString,
-            ConnectionString = builder.Configuration.GetRabbitMqConnectionString(),
-        },
-        applicationAssembly: typeof(IdentityApiHost).Assembly,
+        identityConnectionString,
+        typeof(IdentityApiHost).Assembly,
         typeof(EmployeeHiredConsumer).Assembly);
 }
 

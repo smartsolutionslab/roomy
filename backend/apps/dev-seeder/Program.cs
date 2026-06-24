@@ -17,16 +17,8 @@ builder.Services.AddOrganizationPersistence(organizationConnectionString);
 var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
 builder.Services.AddAttendancePersistence(attendanceConnectionString);
 
-var keycloak = builder.Configuration.GetSection("Keycloak");
-var keycloakBaseAddress = new Uri(keycloak["BaseAddress"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:BaseAddress'."));
-builder.Services.AddKeycloakIdentityProvider(
-    keycloakBaseAddress,
-    new KeycloakAdminOptions
-    {
-        Realm = keycloak["Realm"] ?? "roomy",
-        AdminUsername = keycloak["AdminUsername"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminUsername'."),
-        AdminPassword = keycloak["AdminPassword"] ?? throw new InvalidOperationException("Missing configuration 'Keycloak:AdminPassword'."),
-    });
+var (keycloakBaseAddress, keycloakAdmin) = builder.Configuration.ReadKeycloakAdmin();
+builder.Services.AddKeycloakIdentityProvider(keycloakBaseAddress, keycloakAdmin);
 
 var seed = builder.Configuration.GetSection("Seed");
 var companyId = Guid.Parse(seed["CompanyId"] ?? throw new InvalidOperationException("Missing configuration 'Seed:CompanyId'."));
