@@ -6,6 +6,7 @@ using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Organization.Api.Seeding;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure;
+using SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,10 +33,7 @@ if (emittingOpenApiDocument)
 
 if (!emittingOpenApiDocument)
 {
-    builder.AddRoomyMessaging(
-        connectionString,
-        typeof(OrganizationApiHost).Assembly,
-        typeof(SmartSolutionsLab.Roomy.Organization.Infrastructure.Messaging.UserRegisteredConsumer).Assembly);
+    builder.AddRoomyMessaging(connectionString, typeof(OrganizationApiHost).Assembly, typeof(UserRegisteredConsumer).Assembly);
 
     builder.Services.AddIntegrationEventOutbox();
 

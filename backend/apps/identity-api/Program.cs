@@ -43,10 +43,7 @@ if (emittingOpenApiDocument)
 
 if (!emittingOpenApiDocument)
 {
-    builder.AddRoomyMessaging(
-        identityConnectionString,
-        typeof(IdentityApiHost).Assembly,
-        typeof(EmployeeHiredConsumer).Assembly);
+    builder.AddRoomyMessaging(identityConnectionString, typeof(IdentityApiHost).Assembly, typeof(EmployeeHiredConsumer).Assembly);
 }
 
 var app = builder.Build();

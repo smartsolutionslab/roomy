@@ -32,10 +32,7 @@ var messagingEnabled = builder.Configuration.GetValue("Messaging:Enabled", true)
 
 if (!emittingOpenApiDocument && messagingEnabled)
 {
-    builder.AddRoomyMessaging(
-        attendanceConnectionString,
-        typeof(AttendanceApiHost).Assembly,
-        typeof(RoomAddedConsumer).Assembly);
+    builder.AddRoomyMessaging(attendanceConnectionString, typeof(AttendanceApiHost).Assembly, typeof(RoomAddedConsumer).Assembly);
 }
 
 builder.Services.AddValidatedOptions<AttendanceApiOptions>(
