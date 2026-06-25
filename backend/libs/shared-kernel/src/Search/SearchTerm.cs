@@ -17,10 +17,7 @@ public sealed record SearchTerm : IValueObject
         var trimmed = value?.Trim() ?? string.Empty;
         if (trimmed.Length == 0) return None;
 
-        if (trimmed.Length > MaxLength)
-        {
-            throw new ArgumentOutOfRangeException(nameof(value), $"The search term must be at most {MaxLength} characters.");
-        }
+        if (trimmed.Length > MaxLength) throw new ArgumentOutOfRangeException(nameof(value), $"The search term must be at most {MaxLength} characters.");
 
         return new SearchTerm(trimmed);
     }
