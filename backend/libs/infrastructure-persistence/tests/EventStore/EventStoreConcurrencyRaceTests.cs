@@ -22,7 +22,7 @@ public sealed class EventStoreConcurrencyRaceTests(PostgresEventStoreFixture fix
     [Fact]
     public async Task Two_concurrent_first_appends_let_exactly_one_win_via_the_unique_index()
     {
-        var streamId = StreamId.From(Guid.NewGuid());
+        var streamId = StreamId.New();
 
         var first = AppendFirstEventAsync(streamId);
         var second = AppendFirstEventAsync(streamId);

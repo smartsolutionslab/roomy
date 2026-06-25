@@ -61,7 +61,7 @@ public sealed class UserTests
     public void Activate_completes_provisioning_and_links_the_keycloak_subject()
     {
         var user = RegisterEmployee();
-        var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
+        var subject = KeycloakSubjectIdentifier.New();
 
         user.Activate(subject);
 
@@ -73,10 +73,10 @@ public sealed class UserTests
     public void Activate_rejects_an_account_that_is_not_provisioning()
     {
         var user = RegisterEmployee();
-        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+        user.Activate(KeycloakSubjectIdentifier.New());
 
         Should.Throw<InvalidOperationException>(
-            () => user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid())));
+            () => user.Activate(KeycloakSubjectIdentifier.New()));
     }
 
     [Fact]

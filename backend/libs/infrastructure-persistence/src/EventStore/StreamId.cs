@@ -8,6 +8,8 @@ public readonly record struct StreamId
 
     public Guid Value { get; }
 
+    public static StreamId New() => new(Guid.CreateVersion7());
+
     public static StreamId From(Guid value)
     {
         Ensure.That(value).Satisfies(static id => id != Guid.Empty, "Stream id must not be empty.");

@@ -6,6 +6,8 @@ public readonly record struct KeycloakSubjectIdentifier : IValueObject
 {
     public Guid Value { get; private init; }
 
+    public static KeycloakSubjectIdentifier New() => new() { Value = Guid.CreateVersion7() };
+
     public static KeycloakSubjectIdentifier From(Guid value) =>
         TryParse(value)
         ?? throw new ArgumentException("KeycloakSubjectIdentifier must not be empty.", nameof(value));

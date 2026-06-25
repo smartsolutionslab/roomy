@@ -53,7 +53,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
             Email.From($"admin-ep-{Guid.NewGuid():N}@example.com"),
             DisplayName.From("Test User"),
             role);
-        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+        user.Activate(KeycloakSubjectIdentifier.New());
 
         await using var context = fixture.CreateContext();
         context.Users.Add(user);
@@ -67,7 +67,7 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
             Email.From(email),
             DisplayName.From("Test User"),
             Role.Employee);
-        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+        user.Activate(KeycloakSubjectIdentifier.New());
 
         await using var context = fixture.CreateContext();
         context.Users.Add(user);

@@ -60,7 +60,7 @@ public sealed class EmployeeLoginTests : IClassFixture<PostgresDatabaseFixture>,
 
     private async Task<KeycloakSubjectIdentifier> SeedActiveEmployeeAsync()
     {
-        var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
+        var subject = KeycloakSubjectIdentifier.New();
         var user = User.Register(
             Email.From($"employee-login-{Guid.NewGuid():N}@example.com"),
             DisplayName.From("Test Employee"),

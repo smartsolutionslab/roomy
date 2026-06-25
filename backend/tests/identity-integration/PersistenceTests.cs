@@ -43,7 +43,7 @@ public sealed class PersistenceTests(PostgresDatabaseFixture fixture) : IClassFi
             Email.From("admin@example.com"),
             DisplayName.From("Grace Hopper"),
             Role.Employee.GrantAdministrator());
-        var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
+        var subject = KeycloakSubjectIdentifier.New();
         user.Activate(subject);
         await PersistAsync(user);
 
@@ -92,7 +92,7 @@ public sealed class PersistenceTests(PostgresDatabaseFixture fixture) : IClassFi
     [Fact]
     public async Task Rejects_two_accounts_linked_to_the_same_keycloak_subject()
     {
-        var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
+        var subject = KeycloakSubjectIdentifier.New();
 
         var first = RegisterEmployee("subject-one@example.com");
         first.Activate(subject);

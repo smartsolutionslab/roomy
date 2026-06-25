@@ -20,7 +20,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
     [Fact]
     public async Task Append_then_read_replays_events_in_version_order()
     {
-        var streamId = StreamId.From(Guid.NewGuid());
+        var streamId = StreamId.New();
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
         var released = new DeskReleased(booked.DeskId, "ada");
 
@@ -54,7 +54,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
 
-        var stream = await store.ReadStreamAsync(StreamId.From(Guid.NewGuid()), CancellationToken.None);
+        var stream = await store.ReadStreamAsync(StreamId.New(), CancellationToken.None);
 
         stream.ShouldBeEmpty();
     }
@@ -62,7 +62,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
     [Fact]
     public async Task Appending_no_events_is_a_no_op()
     {
-        var streamId = StreamId.From(Guid.NewGuid());
+        var streamId = StreamId.New();
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
 
@@ -78,7 +78,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
     [Fact]
     public async Task Append_with_a_stale_expected_version_is_rejected()
     {
-        var streamId = StreamId.From(Guid.NewGuid());
+        var streamId = StreamId.New();
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
 
         await using (var context = fixture.CreateContext())
@@ -113,7 +113,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
     [Fact]
     public async Task A_second_writer_on_the_same_expected_version_loses_and_one_append_survives()
     {
-        var streamId = StreamId.From(Guid.NewGuid());
+        var streamId = StreamId.New();
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
 
         await using var first = fixture.CreateContext();
@@ -147,7 +147,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
     [Fact]
     public async Task Append_preserves_event_metadata()
     {
-        var streamId = StreamId.From(Guid.NewGuid());
+        var streamId = StreamId.New();
         var metadata = new EventMetadata(Guid.NewGuid(), Guid.NewGuid(), "ada");
         var booked = new DeskBooked(Guid.NewGuid(), "ada", new DateOnly(2026, 6, 8));
 
