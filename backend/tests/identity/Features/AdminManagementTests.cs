@@ -18,7 +18,7 @@ public sealed class AdminManagementTests
             Email.From("ada@example.com"),
             DisplayName.From("Ada Lovelace"),
             Role.Employee);
-        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+        user.Activate(KeycloakSubjectIdentifier.New());
         return user;
     }
 
@@ -55,7 +55,7 @@ public sealed class AdminManagementTests
             Email.From("grace@example.com"),
             DisplayName.From("Grace Hopper"),
             Role.Employee.GrantAdministrator());
-        user.Activate(KeycloakSubjectIdentifier.From(Guid.NewGuid()));
+        user.Activate(KeycloakSubjectIdentifier.New());
         var users = Substitute.For<IUserRepository>();
         users.GetByIdentifierAsync(Arg.Any<UserIdentifier>(), Arg.Any<CancellationToken>()).Returns(Result.Success(user));
         var identityProvider = Substitute.For<IIdentityProviderPort>();

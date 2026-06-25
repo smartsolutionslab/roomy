@@ -24,7 +24,7 @@ public sealed class ProvisioningTests
     [Fact]
     public async Task Provisioning_an_employee_persists_an_active_account_and_publishes_user_registered()
     {
-        var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
+        var subject = KeycloakSubjectIdentifier.New();
         var added = new List<User>();
         var users = Substitute.For<IUserRepository>();
         _ = users.AddAsync(Arg.Do<User>(added.Add), Arg.Any<CancellationToken>());
@@ -58,7 +58,7 @@ public sealed class ProvisioningTests
         _ = publisher.PublishAsync(Arg.Do<IIntegrationEvent>(published.Add), Arg.Any<CancellationToken>());
         var handler = new RegisterUserHandler(
             Substitute.For<IUserRepository>(),
-            IdentityProviderSucceeding(KeycloakSubjectIdentifier.From(Guid.NewGuid())),
+            IdentityProviderSucceeding(KeycloakSubjectIdentifier.New()),
             publisher,
             TimeProvider.System);
 
