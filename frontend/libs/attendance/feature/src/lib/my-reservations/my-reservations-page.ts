@@ -49,24 +49,16 @@ export class MyReservationsPage {
   protected readonly past = this.schedule.past;
 
   protected cancel(reservation: MyReservation): void {
-    this.result.set(null);
-    this.errorKey.set(null);
-
-    this.gateway
-      .cancel(reservation.id, reservation.date)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.list.update((items) => items.filter((candidate) => candidate.id !== reservation.id));
-          this.result.set({ key: 'attendance.mine.cancelled' });
-        },
-        error: (error: HttpErrorResponse) => this.handleCancelError(error),
-      });
+    this.cancelThen(reservation, () => this.result.set({ key: 'attendance.mine.cancelled' }));
   }
 
   // Change = cancel + re-reserve: cancel the existing reservation, then go to the reserve flow to book
   // the new room/office/day. There is no single combined edit step.
   protected change(reservation: MyReservation): void {
+    this.cancelThen(reservation, () => this.goToReserve());
+  }
+
+  private cancelThen(reservation: MyReservation, onSuccess: () => void): void {
     this.result.set(null);
     this.errorKey.set(null);
 
@@ -76,7 +68,7 @@ export class MyReservationsPage {
       .subscribe({
         next: () => {
           this.list.update((items) => items.filter((candidate) => candidate.id !== reservation.id));
-          this.goToReserve();
+          onSuccess();
         },
         error: (error: HttpErrorResponse) => this.handleCancelError(error),
       });
