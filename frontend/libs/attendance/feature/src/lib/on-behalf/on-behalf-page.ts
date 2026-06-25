@@ -100,15 +100,13 @@ export class OnBehalfPage {
     this.query.set(query);
     this.selectedEmployeeId.set(null);
     this.reservationsList.clear();
-    this.result.set(null);
-    this.errorKey.set(null);
+    this.clearFeedback();
     this.employeesList.reset();
   }
 
   protected chooseEmployee(employeeValue: string): void {
     this.selectedEmployeeId.set(employeeValue || null);
-    this.result.set(null);
-    this.errorKey.set(null);
+    this.clearFeedback();
     if (this.selectedEmployee() === null) {
       this.reservationsList.clear();
     } else {
@@ -123,8 +121,7 @@ export class OnBehalfPage {
   }
 
   protected cancel(reservation: MyReservation): void {
-    this.result.set(null);
-    this.errorKey.set(null);
+    this.clearFeedback();
 
     this.gateway
       .cancel(reservation.id, reservation.date)
@@ -139,5 +136,10 @@ export class OnBehalfPage {
         error: (error: HttpErrorResponse) =>
           this.errorKey.set(cancelErrorKey(error, 'attendance.onBehalf')),
       });
+  }
+
+  private clearFeedback(): void {
+    this.result.set(null);
+    this.errorKey.set(null);
   }
 }
