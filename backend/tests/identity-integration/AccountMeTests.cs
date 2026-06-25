@@ -43,7 +43,7 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
 
     private async Task<KeycloakSubjectIdentifier> SeedActiveUserAsync(Email email, Role role)
     {
-        var subject = KeycloakSubjectIdentifier.From(Guid.NewGuid());
+        var subject = KeycloakSubjectIdentifier.New();
         var user = User.Register(email, DisplayName.From("Test User"), role);
         user.Activate(subject);
 
@@ -63,9 +63,10 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
     [Fact]
     public async Task Returns_the_administrator_projection_for_an_authenticated_admin()
     {
-        var subject = await SeedActiveUserAsync(
-            Email.From($"me-admin-{Guid.NewGuid():N}@example.com"),
-            Role.Employee.GrantAdministrator());
+        var eMail = Email.From($"me-admin-{Guid.NewGuid():N}@example.com");
+        var role = Role.Employee.GrantAdministrator();
+
+        var subject = await SeedActiveUserAsync(eMail, role);
 
         var response = await ClientForSubject(subject).GetAsync("/account/me", TestContext.Current.CancellationToken);
 
@@ -78,9 +79,10 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
     [Fact]
     public async Task Returns_the_employee_projection_for_an_authenticated_employee()
     {
-        var subject = await SeedActiveUserAsync(
-            Email.From($"me-employee-{Guid.NewGuid():N}@example.com"),
-            Role.Employee);
+        var eMail = Email.From($"me-employee-{Guid.NewGuid():N}@example.com");
+        var role = Role.Employee;
+
+        var subject = await SeedActiveUserAsync(eMail, role);
 
         var response = await ClientForSubject(subject).GetAsync("/account/me", TestContext.Current.CancellationToken);
 
@@ -101,7 +103,8 @@ public sealed class AccountMeTests : IClassFixture<PostgresDatabaseFixture>, IDi
     [Fact]
     public async Task Returns_404_when_the_authenticated_subject_has_no_account()
     {
-        var response = await ClientForSubject(KeycloakSubjectIdentifier.From(Guid.NewGuid())).GetAsync("/account/me", TestContext.Current.CancellationToken);
+        var subjectId = KeycloakSubjectIdentifier.New();
+        var response = await ClientForSubject(subjectId).GetAsync("/account/me", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
