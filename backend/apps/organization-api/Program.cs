@@ -38,8 +38,7 @@ if (!emittingOpenApiDocument)
     builder.Services.AddIntegrationEventOutbox();
 
     builder.Services.AddValidatedOptions<CompanyOptions>(builder.Configuration, CompanyOptions.SectionName);
-    builder.Services
-        .AddScoped<CompanySeeder>()
+    builder.Services.AddScoped<CompanySeeder>()
         .AddHostedService<CompanySeederHostedService>();
 
     // The seeded administrator is hired here so it becomes a first-class employee (ADR-0059). Registered

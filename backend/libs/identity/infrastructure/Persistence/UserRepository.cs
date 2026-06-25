@@ -45,11 +45,7 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-        return Page<User>.FromProbe(
-            rows,
-            request.Limit,
-            row => row,
-            row => new UserCursor(row.Email.Value));
+        return Page<User>.FromProbe(rows, request.Limit, row => row, row => new UserCursor(row.Email.Value));
     }
 
     public async Task AddAsync(User user, CancellationToken cancellationToken) =>
