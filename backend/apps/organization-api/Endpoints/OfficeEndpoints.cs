@@ -83,7 +83,7 @@ public static class OfficeEndpoints
         return office.ToOk(found => found.ToResponse());
     }
 
-    private static async Task<IResult> RenameOfficeAsync(
+    private static Task<IResult> RenameOfficeAsync(
         Guid officeId,
         Request.RenameOffice request,
         ICommandHandler<RenameOffice> commandHandler,
@@ -94,14 +94,10 @@ public static class OfficeEndpoints
         var command = new RenameOffice(
             officeIdentifier,
             OfficeName.From(request.Name));
-        var result = await commandHandler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure) return result.Error.ToHttpResult();
-
-        var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
-        return office.ToOk(found => found.ToResponse());
+        return HandleAndReturnOfficeAsync(officeIdentifier, command, commandHandler, offices, cancellationToken);
     }
 
-    private static async Task<IResult> ChangeLocationAsync(
+    private static Task<IResult> ChangeLocationAsync(
         Guid officeId,
         Request.RelocateOffice request,
         ICommandHandler<ChangeOfficeLocation> commandHandler,
@@ -112,11 +108,7 @@ public static class OfficeEndpoints
         var command = new ChangeOfficeLocation(
             officeIdentifier,
             Location.From(request.Location));
-        var result = await commandHandler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure) return result.Error.ToHttpResult();
-
-        var office = await offices.GetByIdentifierAsync(officeIdentifier, cancellationToken);
-        return office.ToOk(found => found.ToResponse());
+        return HandleAndReturnOfficeAsync(officeIdentifier, command, commandHandler, offices, cancellationToken);
     }
 
     private static async Task<IResult> AddRoomAsync(
@@ -144,7 +136,7 @@ public static class OfficeEndpoints
             : Results.NotFound();
     }
 
-    private static async Task<IResult> RenameRoomAsync(
+    private static Task<IResult> RenameRoomAsync(
         Guid officeId,
         Guid roomId,
         Request.RenameRoom request,
@@ -157,6 +149,17 @@ public static class OfficeEndpoints
             officeIdentifier,
             RoomIdentifier.From(roomId),
             RoomName.From(request.Name));
+        return HandleAndReturnOfficeAsync(officeIdentifier, command, commandHandler, offices, cancellationToken);
+    }
+
+    private static async Task<IResult> HandleAndReturnOfficeAsync<TCommand>(
+        OfficeIdentifier officeIdentifier,
+        TCommand command,
+        ICommandHandler<TCommand> commandHandler,
+        IOfficeRepository offices,
+        CancellationToken cancellationToken)
+        where TCommand : ICommand
+    {
         var result = await commandHandler.HandleAsync(command, cancellationToken);
         if (result.IsFailure) return result.Error.ToHttpResult();
 
