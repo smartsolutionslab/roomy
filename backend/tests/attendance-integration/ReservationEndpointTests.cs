@@ -269,8 +269,7 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
 
     private async Task<Guid> CreateReservationAsync(Guid subject, DateOnly date)
     {
-        var response = await ClientForSubject(subject)
-            .PostAsJsonAsync("/reservations", Booking(date), TestContext.Current.CancellationToken);
+        var response = await ClientForSubject(subject).PostAsJsonAsync("/reservations", Booking(date), TestContext.Current.CancellationToken);
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         var created = await response.Content.ReadFromJsonAsync<ReservationDto>(TestContext.Current.CancellationToken);
         return created!.ReservationId;
