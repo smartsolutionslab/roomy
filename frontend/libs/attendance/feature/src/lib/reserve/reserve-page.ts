@@ -102,13 +102,15 @@ export class ReservePage {
 
   protected chooseOffice(officeId: string): void {
     this.selectedOfficeId.set(officeId || null);
-    this.selectedRoomId.set(null);
-    this.availability.set(null);
-    this.loadAvailability();
+    this.resetRoomAndReload();
   }
 
   protected chooseDay(day: string): void {
     this.selectedDay.set(day || null);
+    this.resetRoomAndReload();
+  }
+
+  private resetRoomAndReload(): void {
     this.selectedRoomId.set(null);
     this.availability.set(null);
     this.loadAvailability();
