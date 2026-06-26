@@ -10,8 +10,8 @@
     @if (availability(); as availability) {
     <span class="reserve__room-figure">
       @if (availability.isFull) { {{ translate('attendance.reserve.full') }} } @else { {{
-      translate('attendance.reserve.free', { remaining: remaining(), capacity: room().capacity }) }}
-      }
+      translate('attendance.reserve.free', { remaining: availableSlots(), capacity: room().capacity
+      }) }} }
     </span>
     <roomy-usage-bar
       class="reserve__room-meter"

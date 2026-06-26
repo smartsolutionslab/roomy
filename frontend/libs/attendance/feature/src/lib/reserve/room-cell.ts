@@ -18,7 +18,7 @@ export class RoomCell {
 
   protected readonly isFull = computed(() => this.availability()?.isFull ?? false);
 
-  protected readonly remaining = computed(() => {
+  protected readonly availableSlots = computed(() => {
     const availability = this.availability();
     return availability ? availability.capacity - availability.occupied : this.room().capacity;
   });
