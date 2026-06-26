@@ -32,13 +32,13 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
                 StreamVersion.None,
                 [booked, released],
                 EventMetadata.None,
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
         }
 
         await using (var context = fixture.CreateContext())
         {
             var store = fixture.CreateEventStore(context, serializer);
-            var stream = await store.ReadStreamAsync(streamId, CancellationToken.None);
+            var stream = await store.ReadStreamAsync(streamId, TestContext.Current.CancellationToken);
 
             stream.Count.ShouldBe(2);
             stream[0].Version.Value.ShouldBe(1);
@@ -54,7 +54,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
         await using var context = fixture.CreateContext();
         var store = fixture.CreateEventStore(context, serializer);
 
-        var stream = await store.ReadStreamAsync(StreamId.New(), CancellationToken.None);
+        var stream = await store.ReadStreamAsync(StreamId.New(), TestContext.Current.CancellationToken);
 
         stream.ShouldBeEmpty();
     }
@@ -70,9 +70,9 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
             streamId,
             StreamVersion.None,
             [], EventMetadata.None,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
-        (await store.ReadStreamAsync(streamId, CancellationToken.None)).ShouldBeEmpty();
+        (await store.ReadStreamAsync(streamId, TestContext.Current.CancellationToken)).ShouldBeEmpty();
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
                 StreamVersion.None,
                 [booked],
                 EventMetadata.None,
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
         }
 
         await using (var context = fixture.CreateContext())
@@ -102,7 +102,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
                     StreamVersion.None,
                     [booked],
                     EventMetadata.None,
-                    CancellationToken.None));
+                    TestContext.Current.CancellationToken));
 
             conflict.StreamId.ShouldBe(streamId);
             conflict.ExpectedVersion.ShouldBe(StreamVersion.None);
@@ -126,7 +126,7 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
             StreamVersion.None,
             [booked],
             EventMetadata.None,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Sequential here: the second writer re-reads version 1, so the in-code version check rejects it.
         // The true concurrent race (both reading 0, the DB unique index rejecting the loser via SQLSTATE
@@ -137,11 +137,11 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
                 StreamVersion.None,
                 [booked],
                 EventMetadata.None,
-                CancellationToken.None));
+                TestContext.Current.CancellationToken));
 
         await using var verify = fixture.CreateContext();
         var verifyStore = fixture.CreateEventStore(verify, serializer);
-        (await verifyStore.ReadStreamAsync(streamId, CancellationToken.None)).ShouldHaveSingleItem();
+        (await verifyStore.ReadStreamAsync(streamId, TestContext.Current.CancellationToken)).ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -158,9 +158,9 @@ public sealed class EfCoreEventStoreTests(PostgresEventStoreFixture fixture)
             StreamVersion.None,
             [booked],
             metadata,
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
-        var stream = await store.ReadStreamAsync(streamId, CancellationToken.None);
+        var stream = await store.ReadStreamAsync(streamId, TestContext.Current.CancellationToken);
 
         stream.ShouldHaveSingleItem().Metadata.ShouldBe(metadata);
     }

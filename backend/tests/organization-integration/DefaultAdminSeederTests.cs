@@ -23,7 +23,7 @@ public sealed class DefaultAdminSeederTests
         var retry = new RecordingRetry();
 
         await new DefaultAdminSeeder(new StubEmployees(exists: false), hire, retry, Options())
-            .SeedAsync(CancellationToken.None);
+            .SeedAsync(TestContext.Current.CancellationToken);
 
         hire.Calls.ShouldBe(1);
         hire.Last.ShouldNotBeNull();
@@ -40,7 +40,7 @@ public sealed class DefaultAdminSeederTests
         var retry = new RecordingRetry();
 
         await new DefaultAdminSeeder(new StubEmployees(exists: true), hire, retry, Options())
-            .SeedAsync(CancellationToken.None);
+            .SeedAsync(TestContext.Current.CancellationToken);
 
         hire.Calls.ShouldBe(0);
         retry.Calls.ShouldBe(1);

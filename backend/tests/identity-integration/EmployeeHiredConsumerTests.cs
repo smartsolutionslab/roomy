@@ -23,7 +23,7 @@ public sealed class EmployeeHiredConsumerTests
             InitialPassword: "correct horse",
             OccurredAt: DateTimeOffset.UtcNow);
 
-        await consumer.Handle(employeeHired, CancellationToken.None);
+        await consumer.Handle(employeeHired, TestContext.Current.CancellationToken);
 
         var command = capturing.Command.ShouldNotBeNull();
         command.UserIdentifier.Value.ShouldBe(employeeHired.UserId);
@@ -48,7 +48,7 @@ public sealed class EmployeeHiredConsumerTests
             InitialPassword: "correct horse",
             OccurredAt: DateTimeOffset.UtcNow);
 
-        await consumer.Handle(employeeHired, CancellationToken.None);
+        await consumer.Handle(employeeHired, TestContext.Current.CancellationToken);
 
         capturing.Command.ShouldNotBeNull().Role.IsAdministrator.ShouldBeFalse();
     }
@@ -66,7 +66,7 @@ public sealed class EmployeeHiredConsumerTests
             InitialPassword: "correct horse",
             OccurredAt: DateTimeOffset.UtcNow);
 
-        await Should.ThrowAsync<Exception>(() => consumer.Handle(employeeHired, CancellationToken.None));
+        await Should.ThrowAsync<Exception>(() => consumer.Handle(employeeHired, TestContext.Current.CancellationToken));
     }
 
     private sealed class CapturingHandler : ICommandHandler<RegisterUser>
