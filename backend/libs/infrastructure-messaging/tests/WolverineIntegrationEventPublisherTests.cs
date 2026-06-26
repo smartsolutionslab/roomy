@@ -24,7 +24,7 @@ public sealed class WolverineIntegrationEventPublisherTests
         var publisher = new WolverineIntegrationEventPublisher(host.Services.GetRequiredService<IMessageBus>());
         var integrationEvent = new TestIntegrationEvent(Guid.NewGuid());
 
-        var session = await host.TrackActivity().ExecuteAndWaitAsync(_ => publisher.PublishAsync(integrationEvent, CancellationToken.None));
+        var session = await host.TrackActivity().ExecuteAndWaitAsync(_ => publisher.PublishAsync(integrationEvent, TestContext.Current.CancellationToken));
 
         var published = session.Sent.SingleMessage<TestIntegrationEvent>();
         published.ShouldBe(integrationEvent);
@@ -36,7 +36,7 @@ public sealed class WolverineIntegrationEventPublisherTests
         using var host = await StartHostAsync();
         var publisher = new WolverineIntegrationEventPublisher(host.Services.GetRequiredService<IMessageBus>());
 
-        await Should.ThrowAsync<ArgumentNullException>(() => publisher.PublishAsync(null!, CancellationToken.None));
+        await Should.ThrowAsync<ArgumentNullException>(() => publisher.PublishAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]

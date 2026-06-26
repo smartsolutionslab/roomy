@@ -22,7 +22,7 @@ public class ReservePlaceHandlerTests
         var repository = RepositoryThatApplies();
         var handler = new ReservePlaceHandler(repository, RoomDirectoryWith(capacity: 8), ClockAt(now, bookingDate));
 
-        var result = await handler.HandleAsync(NewCommand(), CancellationToken.None);
+        var result = await handler.HandleAsync(NewCommand(), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.Value.ShouldNotBe(Guid.Empty);
@@ -37,7 +37,7 @@ public class ReservePlaceHandlerTests
         var repository = Substitute.For<IAttendanceDayRepository>();
         var handler = new ReservePlaceHandler(repository, RoomDirectoryWith(capacity: null), ClockAt(now, bookingDate));
 
-        var result = await handler.HandleAsync(NewCommand(), CancellationToken.None);
+        var result = await handler.HandleAsync(NewCommand(), TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("unknown_room");
@@ -53,7 +53,7 @@ public class ReservePlaceHandlerTests
         var handler = new ReservePlaceHandler(repository, RoomDirectoryWith(capacity: 8), ClockAt(now, bookingDate));
         var onBehalf = NewCommand() with { Employee = EmployeeIdentifier.New(), ActorIsAdmin = false };
 
-        var result = await handler.HandleAsync(onBehalf, CancellationToken.None);
+        var result = await handler.HandleAsync(onBehalf, TestContext.Current.CancellationToken);
 
         result.Error.Code.ShouldBe("not_authorized");
         result.Error.Type.ShouldBe(ErrorType.Forbidden);
@@ -69,7 +69,7 @@ public class ReservePlaceHandlerTests
         var handler = new ReservePlaceHandler(repository, RoomDirectoryWith(capacity: 8), ClockAt(now, bookingDate));
         var onBehalf = NewCommand() with { Employee = EmployeeIdentifier.New(), ActorIsAdmin = true };
 
-        var result = await handler.HandleAsync(onBehalf, CancellationToken.None);
+        var result = await handler.HandleAsync(onBehalf, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         await repository.Received(1).MutateAsync(

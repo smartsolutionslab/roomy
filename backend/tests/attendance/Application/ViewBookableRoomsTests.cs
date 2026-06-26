@@ -24,7 +24,7 @@ public class ViewBookableRoomsTests
         readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<CancellationToken>()).Returns(rooms);
         var handler = new ViewBookableRoomsHandler(readModel);
 
-        var result = await handler.HandleAsync(new ViewBookableRooms(company), CancellationToken.None);
+        var result = await handler.HandleAsync(new ViewBookableRooms(company), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldHaveSingleItem().ShouldBe(room);
@@ -40,7 +40,7 @@ public class ViewBookableRoomsTests
         readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<CancellationToken>()).Returns(rooms);
         var handler = new ViewBookableRoomsHandler(readModel);
 
-        var result = await handler.HandleAsync(new ViewBookableRooms(company), CancellationToken.None);
+        var result = await handler.HandleAsync(new ViewBookableRooms(company), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldBeEmpty();

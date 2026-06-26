@@ -20,7 +20,7 @@ public class ViewEmployeesTests
             .Returns(new Page<EmployeeView>([employee], null));
         var handler = new ViewEmployeesHandler(catalog);
 
-        var result = await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(SearchTerm.None, FirstPage)), CancellationToken.None);
+        var result = await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(SearchTerm.None, FirstPage)), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.ShouldHaveSingleItem().ShouldBe(employee);
@@ -34,7 +34,7 @@ public class ViewEmployeesTests
             .Returns(new Page<EmployeeView>([], null));
         var handler = new ViewEmployeesHandler(catalog);
 
-        var result = await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(SearchTerm.None, FirstPage)), CancellationToken.None);
+        var result = await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(SearchTerm.None, FirstPage)), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.ShouldBeEmpty();
@@ -49,7 +49,7 @@ public class ViewEmployeesTests
             .Returns(new Page<EmployeeView>([], null));
         var handler = new ViewEmployeesHandler(catalog);
 
-        await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(term, FirstPage)), CancellationToken.None);
+        await handler.HandleAsync(new ViewEmployees(new EmployeeFilter(term, FirstPage)), TestContext.Current.CancellationToken);
 
         await catalog.Received(1).GetAsync(term, Arg.Any<PageRequest>(), Arg.Any<CancellationToken>());
     }

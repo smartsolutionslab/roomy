@@ -27,7 +27,7 @@ public class ViewMyReservationsTests
         var handler = new ViewMyReservationsHandler(readModel);
 
         var result = await handler.HandleAsync(
-            new ViewMyReservations(employee, FirstPage), CancellationToken.None);
+            new ViewMyReservations(employee, FirstPage), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.ShouldHaveSingleItem().ShouldBe(reservation);
@@ -44,7 +44,7 @@ public class ViewMyReservationsTests
         var handler = new ViewMyReservationsHandler(readModel);
 
         var result = await handler.HandleAsync(
-            new ViewMyReservations(employee, FirstPage), CancellationToken.None);
+            new ViewMyReservations(employee, FirstPage), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.ShouldBeEmpty();
