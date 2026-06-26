@@ -126,7 +126,7 @@ export class OfficesPage {
   }
 
   protected saveOfficeName(office: OfficeId): void {
-    if (this.textForm.invalid) {
+    if (this.textFormInvalid()) {
       return;
     }
     this.submitOfficeChange(
@@ -135,7 +135,7 @@ export class OfficesPage {
   }
 
   protected saveOfficeLocation(office: OfficeId): void {
-    if (this.textForm.invalid) {
+    if (this.textFormInvalid()) {
       return;
     }
     this.submitOfficeChange(
@@ -144,7 +144,7 @@ export class OfficesPage {
   }
 
   protected saveRoomName(office: OfficeId, room: RoomId): void {
-    if (this.textForm.invalid) {
+    if (this.textFormInvalid()) {
       return;
     }
     const name = this.textForm.getRawValue().value;
@@ -200,6 +200,10 @@ export class OfficesPage {
       },
       error: (error: HttpErrorResponse) => this.handleEditError(error),
     });
+  }
+
+  private textFormInvalid(): boolean {
+    return this.textForm.invalid;
   }
 
   private clearEditFeedback(): void {
