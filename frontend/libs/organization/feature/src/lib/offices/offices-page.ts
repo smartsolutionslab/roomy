@@ -129,25 +129,21 @@ export class OfficesPage {
     if (this.textFormInvalid()) {
       return;
     }
-    this.submitOfficeChange(
-      this.officesGateway.renameOffice(office, this.textForm.getRawValue().value),
-    );
+    this.submitOfficeChange(this.officesGateway.renameOffice(office, this.textValue()));
   }
 
   protected saveOfficeLocation(office: OfficeId): void {
     if (this.textFormInvalid()) {
       return;
     }
-    this.submitOfficeChange(
-      this.officesGateway.relocateOffice(office, this.textForm.getRawValue().value),
-    );
+    this.submitOfficeChange(this.officesGateway.relocateOffice(office, this.textValue()));
   }
 
   protected saveRoomName(office: OfficeId, room: RoomId): void {
     if (this.textFormInvalid()) {
       return;
     }
-    const name = this.textForm.getRawValue().value;
+    const name = this.textValue();
     this.submitOfficeChange(this.officesGateway.renameRoom(office, room, name), {
       key: 'organization.rooms.renamed',
       params: { name },
@@ -204,6 +200,10 @@ export class OfficesPage {
 
   private textFormInvalid(): boolean {
     return this.textForm.invalid;
+  }
+
+  private textValue(): string {
+    return this.textForm.getRawValue().value;
   }
 
   private clearEditFeedback(): void {
