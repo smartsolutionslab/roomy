@@ -137,7 +137,7 @@ public class ViewOccupancyTests
             .Returns(Result.Failure<OccupancyData>(Error.NotFound("unknown_office", "no such office")));
         var handler = new ViewOccupancyHandler(readModel, ClockAt(now, BookingDate.From(today)));
 
-        var result = await handler.HandleAsync(NewQuery(today, today), CancellationToken.None);
+        var result = await handler.HandleAsync(NewQuery(today, today), TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("unknown_office");
@@ -149,7 +149,7 @@ public class ViewOccupancyTests
         readModel.GetAsync(Arg.Any<CompanyIdentifier>(), Arg.Any<OccupancyScope>(), Arg.Any<BookingDateRange>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success(data));
         var handler = new ViewOccupancyHandler(readModel, ClockAt(now, BookingDate.From(today)));
-        var result = await handler.HandleAsync(NewQuery(from, to), CancellationToken.None);
+        var result = await handler.HandleAsync(NewQuery(from, to), TestContext.Current.CancellationToken);
         result.IsSuccess.ShouldBeTrue();
         return result.Value;
     }

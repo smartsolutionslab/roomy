@@ -37,7 +37,7 @@ public sealed class AdminManagementTests
             .Returns(Result.Success());
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         user.IsAdministrator.ShouldBeTrue();
@@ -61,7 +61,7 @@ public sealed class AdminManagementTests
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         await identityProvider.DidNotReceive().AssignAdministratorRoleAsync(Arg.Any<KeycloakSubjectIdentifier>(), Arg.Any<CancellationToken>());
@@ -78,7 +78,7 @@ public sealed class AdminManagementTests
         var identityProvider = Substitute.For<IIdentityProviderPort>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(UserIdentifier.New()), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(UserIdentifier.New()), TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Type.ShouldBe(ErrorType.NotFound);
@@ -96,7 +96,7 @@ public sealed class AdminManagementTests
             .Returns(Result.Failure(new Error("provider_error", "sync failed")));
         var unitOfWork = Substitute.For<IUnitOfWork>();
 
-        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), CancellationToken.None);
+        var result = await Handler(users, identityProvider, unitOfWork).HandleAsync(new GrantAdministrator(user.Identifier), TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         await unitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());

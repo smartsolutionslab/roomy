@@ -14,7 +14,7 @@ public class ArgumentExceptionHandlerTests
     {
         var context = ContextWithBodyBuffer();
 
-        var handled = await handler.TryHandleAsync(context, new ArgumentException("WorkEmail must be a valid email address.", "value"), CancellationToken.None);
+        var handled = await handler.TryHandleAsync(context, new ArgumentException("WorkEmail must be a valid email address.", "value"), TestContext.Current.CancellationToken);
 
         handled.ShouldBeTrue();
         context.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
@@ -29,7 +29,7 @@ public class ArgumentExceptionHandlerTests
     {
         var context = ContextWithBodyBuffer();
 
-        var handled = await handler.TryHandleAsync(context, new ArgumentOutOfRangeException("limit", "The page limit must be between 1 and 100."), CancellationToken.None);
+        var handled = await handler.TryHandleAsync(context, new ArgumentOutOfRangeException("limit", "The page limit must be between 1 and 100."), TestContext.Current.CancellationToken);
 
         handled.ShouldBeTrue();
         context.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
@@ -40,7 +40,7 @@ public class ArgumentExceptionHandlerTests
     {
         var context = ContextWithBodyBuffer();
 
-        var handled = await handler.TryHandleAsync(context, new InvalidOperationException("boom"), CancellationToken.None);
+        var handled = await handler.TryHandleAsync(context, new InvalidOperationException("boom"), TestContext.Current.CancellationToken);
 
         handled.ShouldBeFalse();
         context.Response.StatusCode.ShouldBe(StatusCodes.Status200OK);

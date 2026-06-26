@@ -27,7 +27,7 @@ public class CancelReservationHandlerTests
 
         var result = await handler.HandleAsync(
             new CancelReservation(company, reservationId, bookingDate, owner, ActorIsAdmin: false),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         await repository.Received(1).MutateAsync(
@@ -43,7 +43,7 @@ public class CancelReservationHandlerTests
 
         var result = await handler.HandleAsync(
             new CancelReservation(company, ReservationIdentifier.New(), bookingDate, EmployeeIdentifier.New(), ActorIsAdmin: false),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("reservation_not_found");

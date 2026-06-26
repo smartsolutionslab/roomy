@@ -28,7 +28,7 @@ public sealed class CreateOfficeTests
             new CreateOffice(
                 OfficeName.From("HQ"),
                 Location.From("Berlin")),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         saved.ShouldHaveSingleItem().CompanyIdentifier.ShouldBe(company.Identifier);
@@ -50,7 +50,7 @@ public sealed class CreateOfficeTests
             new CreateOffice(
                 OfficeName.From("HQ"),
                 Location.From("Munich")),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Type.ShouldBe(ErrorType.Conflict);

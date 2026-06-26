@@ -34,7 +34,7 @@ public sealed class ProvisioningTests
         var handler = new RegisterUserHandler(users, IdentityProviderSucceeding(subject), publisher, TimeProvider.System);
         var command = Command(Role.Employee);
 
-        var result = await handler.HandleAsync(command, CancellationToken.None);
+        var result = await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         var saved = added.ShouldHaveSingleItem();
@@ -62,7 +62,7 @@ public sealed class ProvisioningTests
             publisher,
             TimeProvider.System);
 
-        await handler.HandleAsync(Command(Role.Employee.GrantAdministrator()), CancellationToken.None);
+        await handler.HandleAsync(Command(Role.Employee.GrantAdministrator()), TestContext.Current.CancellationToken);
 
         var registered = published.ShouldHaveSingleItem().ShouldBeOfType<UserRegistered>();
         registered.Role.ShouldBe(AccountRole.Administrator);
@@ -88,7 +88,7 @@ public sealed class ProvisioningTests
             TimeProvider.System);
         var command = Command(Role.Employee);
 
-        var result = await handler.HandleAsync(command, CancellationToken.None);
+        var result = await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         await users.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
@@ -112,7 +112,7 @@ public sealed class ProvisioningTests
             publisher,
             TimeProvider.System);
 
-        var result = await handler.HandleAsync(Command(Role.Employee), CancellationToken.None);
+        var result = await handler.HandleAsync(Command(Role.Employee), TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         await users.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());

@@ -27,7 +27,7 @@ public sealed class HireEmployeeTests
                 EmployeeName.From("Ada"),
                 WorkEmail.From("ada@example.com"),
                 EmployeeRole.Employee, "pw"),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.Employee.Value.ShouldNotBe(Guid.Empty);
@@ -49,7 +49,7 @@ public sealed class HireEmployeeTests
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var handler = new CompleteEmployeeProvisioningHandler(employees, unitOfWork);
 
-        var result = await handler.HandleAsync(new CompleteEmployeeProvisioning(employee.Identifier), CancellationToken.None);
+        var result = await handler.HandleAsync(new CompleteEmployeeProvisioning(employee.Identifier), TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         employee.State.ShouldBe(ProvisioningState.Active);
@@ -68,7 +68,7 @@ public sealed class HireEmployeeTests
 
         var result = await handler.HandleAsync(
             new FailEmployeeProvisioning(employee.Identifier, ProvisioningFailureReason.EmailTaken),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         employee.State.ShouldBe(ProvisioningState.Failed);
@@ -83,7 +83,7 @@ public sealed class HireEmployeeTests
             .Returns(Result.Failure<Employee>(Error.NotFound("employee.not_found", "No employee has that identifier.")));
         var handler = new CompleteEmployeeProvisioningHandler(employees, Substitute.For<IUnitOfWork>());
 
-        var result = await handler.HandleAsync(new CompleteEmployeeProvisioning(EmployeeIdentifier.New()), CancellationToken.None);
+        var result = await handler.HandleAsync(new CompleteEmployeeProvisioning(EmployeeIdentifier.New()), TestContext.Current.CancellationToken);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Type.ShouldBe(ErrorType.NotFound);
