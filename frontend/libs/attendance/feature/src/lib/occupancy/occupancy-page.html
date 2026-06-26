@@ -1,8 +1,8 @@
 <ng-container *transloco="let translate">
   <roomy-occupancy-shell
     [titleKey]="'attendance.occupancy.title'"
-    [offices]="offices()"
-    [loadFailed]="loadFailed()"
+    [offices]="catalogue.offices()"
+    [loadFailed]="catalogue.loadFailed()"
     [errorKey]="errorKey()"
     (scopeChange)="onScope($event)"
   >

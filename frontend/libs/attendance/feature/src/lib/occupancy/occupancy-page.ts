@@ -44,9 +44,7 @@ export class OccupancyPage {
 
   readonly today = input<string>(todayInBerlin());
 
-  private readonly catalogue = bookableOfficesCatalogue();
-  protected readonly offices = this.catalogue.offices;
-  protected readonly loadFailed = this.catalogue.loadFailed;
+  protected readonly catalogue = bookableOfficesCatalogue();
 
   protected readonly scope = signal<OccupancyScope | null>(null);
   protected readonly preset = signal<RangePreset>('day');
