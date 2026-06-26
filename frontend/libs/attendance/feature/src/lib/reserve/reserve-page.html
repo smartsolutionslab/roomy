@@ -8,9 +8,9 @@
 
     @if (errorKey(); as key) {
     <roomy-message variant="error">{{ translate(key) }}</roomy-message>
-    } @if (loadFailed()) {
+    } @if (catalogue.loadFailed()) {
     <roomy-message variant="error">{{ translate('attendance.reserve.loadError') }}</roomy-message>
-    } @else if (offices(); as items) { @if (items.length === 0) {
+    } @else if (catalogue.offices(); as items) { @if (items.length === 0) {
     <p>{{ translate('attendance.reserve.empty') }}</p>
     } @else {
     <roomy-tile-group

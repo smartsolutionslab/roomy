@@ -65,9 +65,7 @@ export class ReservePage {
   // self-service route.
   readonly reserved = output<void>();
 
-  private readonly catalogue = bookableOfficesCatalogue();
-  protected readonly offices = this.catalogue.offices;
-  protected readonly loadFailed = this.catalogue.loadFailed;
+  protected readonly catalogue = bookableOfficesCatalogue();
 
   protected readonly selectedOfficeId = signal<string | null>(null);
   protected readonly selectedDay = signal<string | null>(null);
@@ -94,10 +92,10 @@ export class ReservePage {
     });
   });
   protected readonly selectedOffice = computed<BookableOffice | null>(
-    () => this.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
+    () => this.catalogue.offices()?.find((office) => office.id === this.selectedOfficeId()) ?? null,
   );
   protected readonly officeOptions = computed<SelectOption[]>(() =>
-    (this.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
+    (this.catalogue.offices() ?? []).map((office) => ({ value: office.id, label: office.name })),
   );
 
   protected chooseOffice(officeId: string): void {
