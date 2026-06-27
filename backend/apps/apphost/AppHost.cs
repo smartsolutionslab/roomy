@@ -36,7 +36,7 @@ var keycloakPassword = builder.AddParameter(
 var demoPassword = builder.AddParameter("demo-password", "Test1234!", secret: true);
 
 // The well-known seeded company id, shared by the attendance context and the dev seeder.
-const string seedCompanyId = "0199a0b0-0000-7000-8000-000000000001";
+const string SeedCompanyId = "0199a0b0-0000-7000-8000-000000000001";
 
 var keycloak = builder.AddKeycloak("keycloak", adminUsername: keycloakUser, adminPassword: keycloakPassword)
     .WithDataVolume("roomy-keycloak-data")
@@ -86,7 +86,7 @@ var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendanc
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak)
     .WithKeycloakConnection(keycloak)
-    .WithEnvironment("Attendance__CompanyId", seedCompanyId);
+    .WithEnvironment("Attendance__CompanyId", SeedCompanyId);
 
 _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithExplicitStart()
@@ -98,7 +98,7 @@ _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithKeycloakConnection(keycloak)
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
     .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
-    .WithEnvironment("Seed__CompanyId", seedCompanyId)
+    .WithEnvironment("Seed__CompanyId", SeedCompanyId)
     .WithEnvironment("Seed__EmployeePassword", demoPassword);
 
 _ = builder.AddScalarApiReference()
