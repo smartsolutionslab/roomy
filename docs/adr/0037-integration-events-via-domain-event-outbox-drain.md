@@ -100,3 +100,15 @@ We choose **Option A**. Concretely:
 - Attendance consumes the two events at its messaging edge into the `Rooms` read model (003 US2,
   T017/T018), replacing the temporary `UnprovisionedRoomDirectory`.
 - If a third state-based publisher appears, consider lifting the drain into a shared base unit of work.
+
+## Update (023, identity is the second state-based publisher)
+
+Identity became the second state-based publisher, so the anticipated follow-up landed: the commit-time
+drain was lifted out of `OrganizationUnitOfWork` into a shared `OutboxUnitOfWork` base (in
+`infrastructure-messaging`) that owns "collect `DomainEvents` → map → stage in the outbox enrolled on the
+same `DbContext` → clear". Both `OrganizationUnitOfWork` and `IdentityUnitOfWork` now derive from it and
+supply only their per-context domain→integration map (the infrastructure-edge glue stays per context,
+ADR-0031). This closes the silent-drop gap in identity — `User.GrantAdministrator` raised
+`AdministratorGranted` but the bare identity unit of work never drained it — and publishes
+`AdministratorGranted` (a new identity integration contract) through the same atomic seam. One drain
+implementation, so the two contexts cannot drift.
