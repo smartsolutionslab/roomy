@@ -13,7 +13,7 @@ public static class OfficeEndpoints
             .RequireAdministrator()
             .WithName("CreateOffice")
             .Produces<Response.Office>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesError(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
         endpoints.MapGet("/offices", ListOfficesAsync)
             .RequireAuthorization()
@@ -28,27 +28,27 @@ public static class OfficeEndpoints
             .RequireAdministrator()
             .WithName("RenameOffice")
             .Produces<Response.Office>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesError(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
         endpoints.MapPatch("/offices/{officeId:guid}/location", ChangeLocationAsync)
             .RequireAdministrator()
             .WithName("ChangeOfficeLocation")
             .Produces<Response.Office>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesError(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         endpoints.MapPost("/offices/{officeId:guid}/rooms", AddRoomAsync)
             .RequireAdministrator()
             .WithName("AddRoom")
             .Produces<Response.Room>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesError(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
         endpoints.MapPatch("/offices/{officeId:guid}/rooms/{roomId:guid}/name", RenameRoomAsync)
             .RequireAdministrator()
             .WithName("RenameRoom")
             .Produces<Response.Office>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesError(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict);
 

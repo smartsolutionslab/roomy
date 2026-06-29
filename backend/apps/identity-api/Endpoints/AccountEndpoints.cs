@@ -11,7 +11,7 @@ public static class AccountEndpoints
             .RequireAuthorization()
             .WithName("GetCurrentAccount")
             .Produces<Response.Account>()
-            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status401Unauthorized)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         return endpoints;
     }

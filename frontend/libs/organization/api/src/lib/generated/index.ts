@@ -12,7 +12,6 @@ export type { ErrorResponse } from './models/error-response';
 export type { HiredEmployeeResponse } from './models/hired-employee-response';
 export type { HireEmployeeRequest } from './models/hire-employee-request';
 export type { OfficeResponse } from './models/office-response';
-export type { ProblemDetails } from './models/problem-details';
 export type { RelocateOfficeRequest } from './models/relocate-office-request';
 export type { RenameOfficeRequest } from './models/rename-office-request';
 export type { RenameRoomRequest } from './models/rename-room-request';

@@ -13,7 +13,7 @@ public static class AdminUserEndpoints
             .RequireAdministrator()
             .WithName("ListUsers")
             .Produces<Response.Page.AdminUser>()
-            .ProducesProblem(StatusCodes.Status400BadRequest);
+            .ProducesError(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/admin/users/{userId:guid}", GetAccountAsync)
             .RequireAdministrator()
             .WithName("GetUser")
