@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 
@@ -10,13 +12,20 @@ namespace SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 // BFF's concern; this only validates the token and shapes claims. Shared by every context API host (ADR-0045).
 public static class KeycloakJwtBearerExtensions
 {
-    public static IServiceCollection AddKeycloakJwtBearer(this IServiceCollection services, Uri keycloakBaseAddress, string realm)
+    public static IServiceCollection AddKeycloakJwtBearer(
+        this IServiceCollection services,
+        Uri keycloakBaseAddress,
+        string realm,
+        IHostEnvironment environment,
+        IConfiguration configuration)
     {
+        var requireHttpsMetadata = ResolveRequireHttpsMetadata(environment, configuration);
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
                 options.Authority = $"{keycloakBaseAddress.ToString().TrimEnd('/')}/realms/{realm}";
-                options.RequireHttpsMetadata = false;
+                options.RequireHttpsMetadata = requireHttpsMetadata;
                 options.TokenValidationParameters.ValidateAudience = false;
                 options.Events = new()
                 {
@@ -31,4 +40,13 @@ public static class KeycloakJwtBearerExtensions
 
         return services;
     }
+
+    // Secure by default: a non-Development resource server must fetch Keycloak signing-key metadata over
+    // HTTPS (ADR-0013). Development relaxes it so local Keycloak over plain http works under Aspire. An
+    // explicit Keycloak:RequireHttpsMetadata wins either way; a malformed value falls back to the
+    // environment default rather than silently disabling the requirement.
+    private static bool ResolveRequireHttpsMetadata(IHostEnvironment environment, IConfiguration configuration) =>
+        bool.TryParse(configuration["Keycloak:RequireHttpsMetadata"], out var configured)
+            ? configured
+            : !environment.IsDevelopment();
 }

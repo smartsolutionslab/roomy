@@ -46,7 +46,7 @@ builder.Services.AddSingleton<IBusinessClock>(serviceProvider => new BusinessClo
 
 var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
 
-builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm);
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm, builder.Environment, builder.Configuration);
 
 var app = builder.Build();
 
