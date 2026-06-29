@@ -76,7 +76,13 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
             "pw",
             occurredAt));
         await ConsumeAsync(new EmployeeHired(
-            employeeId, userId, "ada@example.com", "Ada, Countess of Lovelace", HiredRole.Employee, "pw", occurredAt));
+            employeeId,
+            userId,
+            "ada@example.com",
+            "Ada, Countess of Lovelace",
+            HiredRole.Employee,
+            "pw",
+            occurredAt));
 
         await using var query = fixture.CreateDbContext();
         var stored = await query.Employees.SingleAsync(employee => employee.EmployeeId == employeeId, TestContext.Current.CancellationToken);
@@ -85,7 +91,14 @@ public sealed class EmployeeDirectoryTests(PostgresEventStoreFixture fixture) : 
     }
 
     private static EmployeeHired Hired(Guid employeeId, Guid userId) =>
-        new(employeeId, userId, "ada@example.com", "Ada Lovelace", HiredRole.Employee, "transient-pw", occurredAt);
+        new(
+            employeeId,
+            userId,
+            "ada@example.com",
+            "Ada Lovelace",
+            HiredRole.Employee,
+            "transient-pw",
+            occurredAt);
 
     private async Task ConsumeAsync(EmployeeHired message)
     {

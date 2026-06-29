@@ -36,6 +36,37 @@ public class CancelReservationHandlerTests
     }
 
     [Fact]
+    public async Task A_non_admin_cancelling_anothers_reservation_is_forbidden()
+    {
+        var reservationId = ReservationIdentifier.New();
+        var day = SeededDay(reservationId, EmployeeIdentifier.New());
+        var repository = RepositoryApplyingAgainst(day);
+        var handler = new CancelReservationHandler(repository, ClockAt(now, bookingDate));
+
+        var result = await handler.HandleAsync(
+            new CancelReservation(company, reservationId, bookingDate, EmployeeIdentifier.New(), ActorIsAdmin: false),
+            TestContext.Current.CancellationToken);
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe("not_authorized");
+        day.UncommittedEvents.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task An_administrator_can_cancel_anothers_reservation()
+    {
+        var reservationId = ReservationIdentifier.New();
+        var repository = RepositoryApplyingAgainst(SeededDay(reservationId, EmployeeIdentifier.New()));
+        var handler = new CancelReservationHandler(repository, ClockAt(now, bookingDate));
+
+        var result = await handler.HandleAsync(
+            new CancelReservation(company, reservationId, bookingDate, EmployeeIdentifier.New(), ActorIsAdmin: true),
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task An_unknown_reservation_is_rejected()
     {
         var repository = RepositoryApplyingAgainst(AttendanceDay.For(company, bookingDate));

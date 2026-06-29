@@ -41,7 +41,7 @@ public sealed class ReservationProjectionTests(PostgresEventStoreFixture fixture
         var reservationId = await ReserveAsync(company, employee, room);
 
         var day = await fixture.CreateRepository().LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
-        day.Cancel(reservationId, employee, actorIsAdmin: false, bookingDate, occurredAt).IsSuccess.ShouldBeTrue();
+        day.Cancel(reservationId, bookingDate, occurredAt).IsSuccess.ShouldBeTrue();
         (await fixture.CreateRepository().SaveAsync(day, TestContext.Current.CancellationToken)).IsSuccess.ShouldBeTrue();
 
         await using var query = fixture.CreateDbContext();

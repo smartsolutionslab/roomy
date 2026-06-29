@@ -22,7 +22,7 @@ Drive the `AttendanceDay` aggregate directly with explicit `capacity` and `today
 - Second reservation same day (any room) ⇒ `already_reserved_today` (scenario 4).
 - Past / Saturday / `today+15` ⇒ `not_bookable` (scenarios 5–7).
 - Cancel own future reservation ⇒ `ReservationCancelled`; freed place re-bookable (8–9).
-- Cancel another's reservation as a non-admin ⇒ `not_owner` (11); as admin ⇒ ok (10).
+- Cancel another's reservation as a non-admin ⇒ `not_authorized` (11); as admin ⇒ ok (10).
 - Cancel a past-day reservation ⇒ `past_immutable` (FR-009).
 - `BookingWindow.IsBookable` truth table: Mon–Fri within `[today, today+14]`.
 

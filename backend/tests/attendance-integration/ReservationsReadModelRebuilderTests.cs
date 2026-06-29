@@ -22,7 +22,7 @@ public sealed class ReservationsReadModelRebuilderTests(PostgresEventStoreFixtur
 
         var cancelledEmployee = EmployeeIdentifier.New();
         var toCancel = await ReserveAsync(company, cancelledEmployee, room);
-        await CancelAsync(company, toCancel, cancelledEmployee);
+        await CancelAsync(company, toCancel);
 
         var otherCompany = CompanyIdentifier.New();
         await ReserveAsync(otherCompany, EmployeeIdentifier.New(), SomeRoom());
@@ -60,10 +60,10 @@ public sealed class ReservationsReadModelRebuilderTests(PostgresEventStoreFixtur
         return decision.Value;
     }
 
-    private async Task CancelAsync(CompanyIdentifier company, ReservationIdentifier reservation, EmployeeIdentifier employee)
+    private async Task CancelAsync(CompanyIdentifier company, ReservationIdentifier reservation)
     {
         var day = await fixture.CreateRepository().LoadAsync(company, bookingDate, TestContext.Current.CancellationToken);
-        day.Cancel(reservation, employee, actorIsAdmin: false, bookingDate, occurredAt).IsSuccess.ShouldBeTrue();
+        day.Cancel(reservation, bookingDate, occurredAt).IsSuccess.ShouldBeTrue();
         (await fixture.CreateRepository().SaveAsync(day, TestContext.Current.CancellationToken)).IsSuccess.ShouldBeTrue();
     }
 
