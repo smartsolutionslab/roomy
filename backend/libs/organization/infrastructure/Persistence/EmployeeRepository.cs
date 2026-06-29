@@ -6,8 +6,11 @@ namespace SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
 
 public sealed class EmployeeRepository(OrganizationDbContext context) : IEmployeeRepository
 {
-    public async Task AddAsync(Employee employee, CancellationToken cancellationToken) =>
-        await context.Employees.AddAsync(employee, cancellationToken);
+    public Task AddAsync(Employee employee, CancellationToken cancellationToken)
+    {
+        context.Employees.Add(employee);
+        return Task.CompletedTask;
+    }
 
     public async Task<Result<Employee>> GetByIdentifierAsync(EmployeeIdentifier identifier, CancellationToken cancellationToken)
     {

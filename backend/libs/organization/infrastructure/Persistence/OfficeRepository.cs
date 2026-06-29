@@ -22,6 +22,9 @@ public sealed class OfficeRepository(OrganizationDbContext context) : IOfficeRep
     public async Task<IReadOnlyList<Office>> GetAllAsync(CancellationToken cancellationToken) =>
         await context.Offices.AsNoTracking().ToListAsync(cancellationToken);
 
-    public async Task AddAsync(Office office, CancellationToken cancellationToken) =>
-        await context.Offices.AddAsync(office, cancellationToken);
+    public Task AddAsync(Office office, CancellationToken cancellationToken)
+    {
+        context.Offices.Add(office);
+        return Task.CompletedTask;
+    }
 }

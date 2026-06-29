@@ -9,8 +9,11 @@ public sealed class CompanyRepository(OrganizationDbContext context) : ICompanyR
     public Task<bool> ExistsAsync(CancellationToken cancellationToken) =>
         context.Companies.AnyAsync(cancellationToken);
 
-    public async Task AddAsync(Company company, CancellationToken cancellationToken) =>
-        await context.Companies.AddAsync(company, cancellationToken);
+    public Task AddAsync(Company company, CancellationToken cancellationToken)
+    {
+        context.Companies.Add(company);
+        return Task.CompletedTask;
+    }
 
     public async Task<Result<Company>> GetSeededAsync(CancellationToken cancellationToken)
     {
