@@ -13,7 +13,7 @@ public static class EmployeeEndpoints
             .RequireAdministrator()
             .WithName("HireEmployee")
             .Produces<Response.HiredEmployee>(StatusCodes.Status202Accepted)
-            .ProducesProblem(StatusCodes.Status400BadRequest);
+            .ProducesError(StatusCodes.Status400BadRequest);
 
         return endpoints;
     }

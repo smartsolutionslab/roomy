@@ -62,6 +62,35 @@ public sealed class OpenApiDocumentTests : IDisposable
         operationId.ShouldBe("GetCurrentAccount");
     }
 
+    [Fact]
+    public async Task Declares_no_problem_details_error_bodies()
+    {
+        var json = await app.CreateClient().GetStringAsync("/openapi/v1.json", TestContext.Current.CancellationToken);
+
+        json.ShouldNotContain("application/problem+json");
+    }
+
+    [Fact]
+    public async Task Types_the_unauthorized_account_response_as_empty()
+    {
+        using var document = await GetDocumentAsync();
+
+        var unauthorized = document.RootElement.GetProperty("paths").GetProperty("/account/me").GetProperty("get")
+            .GetProperty("responses").GetProperty("401");
+        unauthorized.TryGetProperty("content", out _).ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Types_the_admin_users_bad_request_as_error_response()
+    {
+        using var document = await GetDocumentAsync();
+
+        var badRequest = document.RootElement.GetProperty("paths").GetProperty("/admin/users").GetProperty("get")
+            .GetProperty("responses").GetProperty("400");
+        badRequest.GetProperty("content").GetProperty("application/json").GetProperty("schema").GetProperty("$ref").GetString()
+            .ShouldBe("#/components/schemas/ErrorResponse");
+    }
+
     private async Task<JsonDocument> GetDocumentAsync() =>
         JsonDocument.Parse(await app.CreateClient()
             .GetStringAsync("/openapi/v1.json", TestContext.Current.CancellationToken));

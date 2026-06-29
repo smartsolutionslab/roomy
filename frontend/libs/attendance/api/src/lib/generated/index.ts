@@ -15,7 +15,6 @@ export type { MyReservationResponse } from './models/my-reservation-response';
 export type { OccupancyDayResponse } from './models/occupancy-day-response';
 export type { OccupantResponse } from './models/occupant-response';
 export type { OfficeOccupancyResponse } from './models/office-occupancy-response';
-export type { ProblemDetails } from './models/problem-details';
 export type { ReservationPage } from './models/reservation-page';
 export type { ReservationResponse } from './models/reservation-response';
 export type { ReserveRequest } from './models/reserve-request';

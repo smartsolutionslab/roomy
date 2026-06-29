@@ -15,7 +15,7 @@ public static class OccupancyEndpoints
             .RequireAuthorization()
             .WithName("ViewOccupancy")
             .Produces<IEnumerable<Response.OccupancyDay>>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesError(StatusCodes.Status400BadRequest)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
         return endpoints;
     }

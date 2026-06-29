@@ -18,7 +18,7 @@ public static class ReservationEndpoints
             .RequireAuthorization()
             .WithName("Reserve")
             .Produces<Response.Reservation>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesError(StatusCodes.Status403Forbidden)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status409Conflict)
             .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
@@ -26,7 +26,7 @@ public static class ReservationEndpoints
             .RequireAuthorization()
             .WithName("CancelReservation")
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesError(StatusCodes.Status403Forbidden)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
             .Produces<ErrorResponse>(StatusCodes.Status422UnprocessableEntity);
         endpoints.MapGet("/reservations", ViewAsync)
@@ -37,19 +37,19 @@ public static class ReservationEndpoints
             .RequireAuthorization()
             .WithName("ViewMyReservations")
             .Produces<Response.Page.MyReservation>()
-            .ProducesProblem(StatusCodes.Status400BadRequest);
+            .ProducesError(StatusCodes.Status400BadRequest);
         endpoints.MapGet("/reservations/employees", ViewEmployeesAsync)
             .RequireAdministrator()
             .WithName("ViewEmployees")
             .Produces<Response.Page.Employee>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status403Forbidden);
+            .ProducesError(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden);
         endpoints.MapGet("/reservations/by-employee/{employeeId:guid}", ViewForEmployeeAsync)
             .RequireAdministrator()
             .WithName("ViewReservationsForEmployee")
             .Produces<Response.Page.MyReservation>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status403Forbidden);
+            .ProducesError(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden);
         return endpoints;
     }
 
