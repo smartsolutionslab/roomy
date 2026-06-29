@@ -68,6 +68,19 @@ public class ViewOccupancyTests
     }
 
     [Fact]
+    public async Task An_office_with_no_rooms_has_zero_capacity_and_is_not_full()
+    {
+        var data = new OccupancyData(office, "Munich", [], []);
+
+        var day = (await ViewAsync(data, today, today)).Single();
+
+        day.Office.Occupied.ShouldBe(0);
+        day.Office.Capacity.ShouldBe(0);
+        day.Office.IsFull.ShouldBeFalse();
+        day.Rooms.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task A_room_with_no_reservations_is_zero_and_still_counts_toward_the_rollup()
     {
         var booked = RoomIdentifier.New();

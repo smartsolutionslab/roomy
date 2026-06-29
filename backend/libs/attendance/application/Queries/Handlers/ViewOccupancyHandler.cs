@@ -18,19 +18,21 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, IBusines
         var today = clock.Today.Value;
         var tomorrow = today.AddDays(1);
 
+        var bookings = data.Value.Occupants.ToLookup(occupant => (occupant.Room, occupant.Date));
+
         var views = new List<OccupancyView>();
         foreach (var date in range.Days())
         {
             var showNames = date.Value == today || date.Value == tomorrow;
-            views.Add(BuildDay(date, data.Value, showNames));
+            views.Add(BuildDay(date, data.Value, bookings, showNames));
         }
 
         return Result.Success<IReadOnlyList<OccupancyView>>(views);
     }
 
-    private static OccupancyView BuildDay(BookingDate date, OccupancyData data, bool showNames)
+    private static OccupancyView BuildDay(BookingDate date, OccupancyData data, ILookup<(RoomIdentifier Room, BookingDate Date), OccupantRecord> bookings, bool showNames)
     {
-        var rooms = data.Rooms.Select(room => BuildRoom(date, room, data.Occupants, showNames)).ToList();
+        var rooms = data.Rooms.Select(room => BuildRoom(date, room, bookings, showNames)).ToList();
 
         var occupiedTotal = rooms.Sum(room => room.Occupied);
         var capacityTotal = rooms.Sum(room => room.Capacity);
@@ -44,17 +46,19 @@ public sealed class ViewOccupancyHandler(IOccupancyReadModel readModel, IBusines
         return new OccupancyView(date, office, rooms);
     }
 
-    private static RoomOccupancy BuildRoom(BookingDate date, RoomDescriptor room, IReadOnlyList<OccupantRecord> occupants, bool showNames)
+    private static RoomOccupancy BuildRoom(BookingDate date, RoomDescriptor room, ILookup<(RoomIdentifier Room, BookingDate Date), OccupantRecord> bookings, bool showNames)
     {
-        var booked = occupants.Where(occupant => occupant.Room == room.Room && occupant.Date == date)
-            .ToList();
+        var booked = bookings[(room.Room, date)].ToList();
+        var capacity = room.Capacity.Value;
 
+        // Zero capacity means not bookable, so never full — the same rule the office rollup applies. A
+        // real room is always >= 1 (RoomCapacity), so the guard is defensive symmetry, not a live branch.
         return new RoomOccupancy(
             room.Room,
             room.RoomName,
             booked.Count,
-            room.Capacity.Value,
-            IsFull: booked.Count >= room.Capacity.Value,
+            capacity,
+            IsFull: capacity > 0 && booked.Count >= capacity,
             Occupants: showNames
                 ? booked.Select(occupant => new Occupant(occupant.Employee, occupant.EmployeeName)).ToList()
                 : null);
