@@ -20,7 +20,8 @@ public class OptimisticWriteTests
         var result = await OptimisticWrite.ExecuteAsync(
             Load(() => loads++),
             _ => Result.Success(value),
-            _ => Save(() => saves++, Result.Success()));
+            _ => Save(() => saves++, Result.Success()),
+            TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldBe(value);
@@ -37,7 +38,8 @@ public class OptimisticWriteTests
         var result = await OptimisticWrite.ExecuteAsync(
             Load(() => loads++),
             _ => Result.Failure<ReservationIdentifier>(Error.Conflict("room_full", "full")),
-            _ => Save(() => saves++, Result.Success()));
+            _ => Save(() => saves++, Result.Success()),
+            TestContext.Current.CancellationToken);
 
         result.Error.Code.ShouldBe("room_full");
         loads.ShouldBe(1);
@@ -55,7 +57,8 @@ public class OptimisticWriteTests
         var result = await OptimisticWrite.ExecuteAsync(
             Load(() => loads++),
             _ => { decisions++; return Result.Success(ReservationIdentifier.New()); },
-            _ => Save(() => saves++, saveResults.Dequeue()));
+            _ => Save(() => saves++, saveResults.Dequeue()),
+            TestContext.Current.CancellationToken);
 
         result.IsSuccess.ShouldBeTrue();
         loads.ShouldBe(2);
@@ -71,10 +74,52 @@ public class OptimisticWriteTests
         var result = await OptimisticWrite.ExecuteAsync(
             Load(() => { }),
             _ => Result.Success(ReservationIdentifier.New()),
-            _ => Save(() => saves++, Conflict()));
+            _ => Save(() => saves++, Conflict()),
+            TestContext.Current.CancellationToken);
 
         result.Error.Code.ShouldBe("concurrency_retry_exhausted");
         saves.ShouldBe(OptimisticWrite.MaxAttempts);
+    }
+
+    [Fact]
+    public async Task A_non_conflict_save_error_propagates_immediately_without_retrying()
+    {
+        var loads = 0;
+        var saves = 0;
+
+        var result = await OptimisticWrite.ExecuteAsync(
+            Load(() => loads++),
+            _ => Result.Success(ReservationIdentifier.New()),
+            _ => Save(() => saves++, Error.Validation("save_failed", "the write failed for an unrelated reason")),
+            TestContext.Current.CancellationToken);
+
+        result.Error.Code.ShouldBe("save_failed");
+        result.Error.Type.ShouldBe(ErrorType.Validation);
+        result.Error.Code.ShouldNotBe("concurrency_retry_exhausted");
+        loads.ShouldBe(1);
+        saves.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Cancellation_between_attempts_stops_before_the_next_reload()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var loads = 0;
+        var saves = 0;
+
+        await Should.ThrowAsync<OperationCanceledException>(() => OptimisticWrite.ExecuteAsync(
+            Load(() => loads++),
+            _ => Result.Success(ReservationIdentifier.New()),
+            _ =>
+            {
+                saves++;
+                cancellation.Cancel();
+                return Task.FromResult(Conflict());
+            },
+            cancellation.Token));
+
+        loads.ShouldBe(1);
+        saves.ShouldBe(1);
     }
 
     [Fact]
@@ -83,14 +128,16 @@ public class OptimisticWriteTests
         var ok = await OptimisticWrite.ExecuteAsync(
             Load(() => { }),
             _ => Result.Success(),
-            _ => Task.FromResult(Result.Success()));
+            _ => Task.FromResult(Result.Success()),
+            TestContext.Current.CancellationToken);
         ok.IsSuccess.ShouldBeTrue();
 
         var saves = 0;
         var exhausted = await OptimisticWrite.ExecuteAsync(
             Load(() => { }),
             _ => Result.Success(),
-            _ => Save(() => saves++, Conflict()));
+            _ => Save(() => saves++, Conflict()),
+            TestContext.Current.CancellationToken);
         exhausted.Error.Code.ShouldBe("concurrency_retry_exhausted");
         saves.ShouldBe(OptimisticWrite.MaxAttempts);
     }

@@ -55,7 +55,8 @@ public sealed class AttendanceDayRepository(IEventStore eventStore, IReservation
         OptimisticWrite.ExecuteAsync(
             () => LoadAsync(company, date, cancellationToken),
             decide,
-            attendanceDay => SaveAsync(attendanceDay, cancellationToken));
+            attendanceDay => SaveAsync(attendanceDay, cancellationToken),
+            cancellationToken);
 
     public Task<Result> MutateAsync(
         CompanyIdentifier company,
@@ -65,5 +66,6 @@ public sealed class AttendanceDayRepository(IEventStore eventStore, IReservation
         OptimisticWrite.ExecuteAsync(
             () => LoadAsync(company, date, cancellationToken),
             decide,
-            attendanceDay => SaveAsync(attendanceDay, cancellationToken));
+            attendanceDay => SaveAsync(attendanceDay, cancellationToken),
+            cancellationToken);
 }
