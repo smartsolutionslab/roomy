@@ -44,6 +44,8 @@ if (emittingOpenApiDocument)
 if (!emittingOpenApiDocument)
 {
     builder.AddRoomyMessaging(identityConnectionString, typeof(IdentityApiHost).Assembly, typeof(EmployeeHiredConsumer).Assembly);
+
+    builder.Services.AddIntegrationEventOutbox();
 }
 
 var app = builder.Build();

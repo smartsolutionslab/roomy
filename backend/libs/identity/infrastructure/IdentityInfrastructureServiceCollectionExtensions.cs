@@ -22,6 +22,8 @@ public static class IdentityInfrastructureServiceCollectionExtensions
             .AddScoped<IUserRepository, UserRepository>()
             .AddScoped<IUnitOfWork, IdentityUnitOfWork>();
 
+        services.TryAddSingleton(TimeProvider.System);
+
         return services;
     }
 

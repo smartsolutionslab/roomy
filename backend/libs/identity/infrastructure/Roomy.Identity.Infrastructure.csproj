@@ -11,6 +11,11 @@
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
     <!-- The shared EF Core baseline: RoomyDbContext, snake_case naming, Npgsql registration (ADR-0012). -->
     <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- The transactional outbox seam (ADR-0037): the shared OutboxUnitOfWork drains identity's domain
+         events to the outbox here. This context's published language is mapped at this edge. -->
+    <ProjectReference Include="../../infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
+    <!-- This context's own published language: AdministratorGranted is mapped to its contract here (ADR-0031). -->
+    <ProjectReference Include="../contracts/Roomy.Contracts.Identity.csproj" />
     <!-- Organization's published language, consumed at the messaging edge: EmployeeHired (ADR-0031). -->
     <ProjectReference Include="../../organization/contracts/Roomy.Contracts.Organization.csproj" />
   </ItemGroup>
