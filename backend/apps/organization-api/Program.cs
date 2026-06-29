@@ -1,5 +1,3 @@
-using JasperFx;
-using JasperFx.CommandLine;
 using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
@@ -11,27 +9,15 @@ using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-
-var connectionString = builder.Configuration.GetOrganizationConnectionString();
-
-builder.Services.AddOrganizationPersistence(connectionString);
-
 var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
 
-builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm, builder.Environment, builder.Configuration)
-    .AddOrganizationUseCases()
-    .AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
+builder.AddRoomyApiDefaults(keycloakBaseAddress, keycloakRealm);
 
-builder.Services.AddRoomyExceptionHandling();
+var connectionString = builder.Configuration.GetOrganizationConnectionString();
+builder.Services.AddOrganizationPersistence(connectionString)
+    .AddOrganizationUseCases();
 
-var emittingOpenApiDocument = builder.Configuration.IsEmittingOpenApiDocument();
-if (emittingOpenApiDocument)
-{
-    JasperFxEnvironment.AutoStartHost = true;
-}
-
-if (!emittingOpenApiDocument)
+if (!builder.Configuration.IsEmittingOpenApiDocument())
 {
     builder.AddRoomyMessaging(connectionString, typeof(OrganizationApiHost).Assembly, typeof(UserRegisteredConsumer).Assembly);
 
@@ -52,18 +38,7 @@ if (!emittingOpenApiDocument)
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
-
-app.UseExceptionHandler();
-
-app.UseAuthentication()
-    .UseAuthorization();
-
 app.MapOfficeEndpoints()
     .MapEmployeeEndpoints();
 
-// Serves the document at /openapi/v1.json. The service is internal — the gateway has no /openapi
-// route (ADR-0030) — so it is mapped in every environment for local tooling and the codegen emit.
-app.MapOpenApi();
-
-return await app.RunJasperFxCommands(args);
+return await app.UseRoomyApiPipeline(args);
