@@ -75,15 +75,15 @@ public sealed class OccupancyReadModel(AttendanceDbContext context) : IOccupancy
         }
 
         var officeId = scope.Office!.Value;
-        var officeIsKnown = await context.Offices.AsNoTracking()
-            .AnyAsync(office => office.OfficeId.Equals(officeId), cancellationToken).ConfigureAwait(false);
-        if (!officeIsKnown) return Error.NotFound("unknown_office", "The office is not known to the attendance service yet.");
+        var office = await context.Offices.AsNoTracking()
+            .SingleOrDefaultAsync(candidate => candidate.OfficeId.Equals(officeId), cancellationToken).ConfigureAwait(false);
+        if (office is null) return Error.NotFound("unknown_office", "The office is not known to the attendance service yet.");
 
         var officeRooms = await context.Rooms.AsNoTracking()
             .Where(candidate => candidate.OfficeId.Equals(officeId))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        return (officeId, await OfficeNameAsync(officeId, cancellationToken).ConfigureAwait(false), officeRooms);
+        return (officeId, office.Name, officeRooms);
     }
 
     private async Task<string> OfficeNameAsync(Guid officeId, CancellationToken cancellationToken)
