@@ -14,9 +14,9 @@ public class AttendanceDayCancelTests
     [Fact]
     public void Cancelling_a_reservation_raises_reservation_cancelled_and_removes_it()
     {
-        var (day, reservationId, owner, _) = DayWithReservation(today);
+        var (day, reservationId, _, _) = DayWithReservation(today);
 
-        var result = day.Cancel(reservationId, owner, actorIsAdmin: false, today, occurredAt);
+        var result = day.Cancel(reservationId, today, occurredAt);
 
         result.IsSuccess.ShouldBeTrue();
         day.UncommittedEvents.Count.ShouldBe(1);
@@ -27,8 +27,8 @@ public class AttendanceDayCancelTests
     [Fact]
     public void A_cancelled_place_can_be_reserved_again()
     {
-        var (day, reservationId, owner, room) = DayWithReservation(today);
-        day.Cancel(reservationId, owner, actorIsAdmin: false, today, occurredAt);
+        var (day, reservationId, _, room) = DayWithReservation(today);
+        day.Cancel(reservationId, today, occurredAt);
 
         var reserveAgain = day.Reserve(EmployeeIdentifier.New(), room, RoomCapacity.From(1), today, occurredAt);
 
@@ -42,7 +42,7 @@ public class AttendanceDayCancelTests
         var employee = EmployeeIdentifier.New();
         var placed = day.Reserve(employee, SomeRoom(), RoomCapacity.From(8), today, occurredAt);
 
-        var result = day.Cancel(placed.Value, employee, actorIsAdmin: false, today, occurredAt);
+        var result = day.Cancel(placed.Value, today, occurredAt);
 
         result.IsSuccess.ShouldBeTrue();
         day.Reservations.ShouldBeEmpty();
@@ -52,9 +52,9 @@ public class AttendanceDayCancelTests
     public void Cancelling_a_past_day_is_rejected()
     {
         var pastDay = BookingDate.From(today.Value.AddDays(-3));
-        var (day, reservationId, owner, _) = DayWithReservation(pastDay);
+        var (day, reservationId, _, _) = DayWithReservation(pastDay);
 
-        var result = day.Cancel(reservationId, owner, actorIsAdmin: false, today, occurredAt);
+        var result = day.Cancel(reservationId, today, occurredAt);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("past_immutable");
@@ -66,32 +66,10 @@ public class AttendanceDayCancelTests
     {
         var day = AttendanceDay.For(company, today);
 
-        var result = day.Cancel(ReservationIdentifier.New(), EmployeeIdentifier.New(), actorIsAdmin: false, today, occurredAt);
+        var result = day.Cancel(ReservationIdentifier.New(), today, occurredAt);
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Code.ShouldBe("reservation_not_found");
-    }
-
-    [Fact]
-    public void A_non_owner_cannot_cancel_anothers_reservation()
-    {
-        var (day, reservationId, _, _) = DayWithReservation(today);
-
-        var result = day.Cancel(reservationId, EmployeeIdentifier.New(), actorIsAdmin: false, today, occurredAt);
-
-        result.IsFailure.ShouldBeTrue();
-        result.Error.Code.ShouldBe("not_owner");
-        day.UncommittedEvents.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public void An_administrator_can_cancel_on_behalf_of_anyone()
-    {
-        var (day, reservationId, _, _) = DayWithReservation(today);
-
-        var result = day.Cancel(reservationId, EmployeeIdentifier.New(), actorIsAdmin: true, today, occurredAt);
-
-        result.IsSuccess.ShouldBeTrue();
     }
 
     private static (AttendanceDay Day, ReservationIdentifier ReservationId, EmployeeIdentifier Owner, RoomReference Room)

@@ -149,7 +149,7 @@ public sealed class ReservationEndpointTests : IClassFixture<PostgresEventStoreF
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
         var error = await response.Content.ReadFromJsonAsync<ErrorDto>(TestContext.Current.CancellationToken);
-        error!.Code.ShouldBe("not_owner");
+        error!.Code.ShouldBe("not_authorized");
     }
 
     [Fact]

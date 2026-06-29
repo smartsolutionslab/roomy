@@ -60,8 +60,6 @@ public sealed class AttendanceDay : EventSourcedAggregate
 
     public Result Cancel(
         ReservationIdentifier reservation,
-        EmployeeIdentifier actor,
-        bool actorIsAdmin,
         BookingDate today,
         DateTimeOffset occurredAt)
     {
@@ -69,11 +67,6 @@ public sealed class AttendanceDay : EventSourcedAggregate
         if (existing is null) return Error.NotFound("reservation_not_found", "No such reservation for this day.");
 
         if (Date.Value < today.Value) return Error.Validation("past_immutable", "A reservation in the past cannot be cancelled.");
-
-        if (!MayCancel(existing, actor, actorIsAdmin))
-        {
-            return Error.Forbidden("not_owner", "Only the reservation's owner or an administrator may cancel it.");
-        }
 
         Raise(new ReservationCancelled(
             existing.Identifier.Value,
@@ -85,9 +78,6 @@ public sealed class AttendanceDay : EventSourcedAggregate
 
         return Result.Success();
     }
-
-    private static bool MayCancel(Reservation reservation, EmployeeIdentifier actor, bool actorIsAdmin) =>
-        actorIsAdmin || reservation.Employee == actor;
 
     protected override void Apply(object @event)
     {

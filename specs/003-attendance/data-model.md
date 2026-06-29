@@ -41,7 +41,7 @@ day; the consistency boundary for *no-overbooking* and *one-reservation-per-empl
 - `Result Cancel(ReservationIdentifier reservation, EmployeeIdentifier actor, bool actorIsAdmin,
   BookingDate today)` — the reservation must exist (`Error.NotFound`), its `Date` must not be
   past (`Error.Validation` `past_immutable`, FR-009, scenario edge), and the actor must be the
-  owner **or** an admin (`Error.Forbidden` `not_owner`, FR-012, scenario 11). On success raises
+  owner **or** an admin (`Error.Forbidden` `not_authorized`, FR-012, scenario 11). On success raises
   `ReservationCancelled` (FR-008, scenarios 8–9).
 
 > The aggregate is handed `capacity` and `today` — it never reads master data or a clock
@@ -138,7 +138,7 @@ Actor→employee resolution for authorization (research R3).
 | `room_full` | Conflict | 409 | FR-004/FR-007 (scenarios 3, 12) |
 | `past_immutable` | Validation | 422 | FR-009 (cancel edge) |
 | `reservation_not_found` | NotFound | 404 | cancel a non-existent reservation |
-| `not_owner` | Forbidden | 403 | FR-012 (scenario 11) |
+| `not_authorized` | Forbidden | 403 | FR-012 (scenario 11) |
 | `not_authorized` | Forbidden | 403 | FR-011 (non-admin reserving on behalf of another) |
 | `unknown_room` / `unknown_employee` | NotFound | 404 | read-model miss |
 | `concurrency_retry_exhausted` | Conflict | 409 | FR-007 (scenario 12 fallback) |

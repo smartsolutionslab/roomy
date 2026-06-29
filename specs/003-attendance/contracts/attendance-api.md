@@ -36,7 +36,7 @@ Cancel a reservation, freeing the place (FR-008, scenarios 8–9).
   warranted (e.g. occupancy `004`).
 - **Auth:** the **owner** or an **administrator** (FR-012, scenario 11).
 - **204:** cancelled; the place is freed (raises `ReservationCancelled`).
-- **403 `not_owner`:** an employee cancelling another's reservation.
+- **403 `not_authorized`:** an employee cancelling another's reservation.
 - **404 `reservation_not_found`:** no such reservation for that company-day.
 - **422 `past_immutable`:** the reservation's day is in the past (FR-009).
 

@@ -18,7 +18,16 @@ public sealed class CancelReservationHandler(IAttendanceDayRepository attendance
         return await attendanceDays.MutateAsync(
             company,
             bookingDate,
-            attendanceDay => attendanceDay.Cancel(reservation, actor, actorIsAdmin, today, occurredAt),
+            attendanceDay =>
+            {
+                var existing = attendanceDay.Reservations.SingleOrDefault(held => held.Identifier == reservation);
+                if (existing is not null && !(actorIsAdmin || existing.Employee == actor))
+                {
+                    return Error.Forbidden("not_authorized", "Only an administrator may cancel another employee's reservation.");
+                }
+
+                return attendanceDay.Cancel(reservation, today, occurredAt);
+            },
             cancellationToken);
     }
 }

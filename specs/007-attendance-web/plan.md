@@ -50,7 +50,7 @@ ADR-0024), Angular CDK for accessible behaviours (ADR-0024). Generated client vi
   `404 unknown_room` (already implemented). `onBehalfOf` is omitted (self-service only).
 - `GET /reservations/mine` → `[{ reservationId, officeId, officeName, roomId, roomName, date }]`
   (already implemented, `004`).
-- `DELETE /reservations/{id}?date={day}` → `204` / `403 not_owner` / `404 reservation_not_found` /
+- `DELETE /reservations/{id}?date={day}` → `204` / `403 not_authorized` / `404 reservation_not_found` /
   `422 past_immutable` (already implemented).
 
 **Target Platform**: browser SPA served through the gateway (single origin, ADR-0030).
