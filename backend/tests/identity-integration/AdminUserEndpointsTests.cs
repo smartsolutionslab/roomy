@@ -8,9 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Shouldly;
+using SmartSolutionsLab.Roomy.Application.Contracts.Integration;
 using SmartSolutionsLab.Roomy.Identity.Api;
 using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.TestSupport;
 using Response = SmartSolutionsLab.Roomy.Identity.Api.Endpoints.Response;
@@ -38,6 +40,8 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
 
             webHost.ConfigureTestServices(services =>
             {
+                services.RemoveAll<IIntegrationEventOutbox>();
+                services.AddScoped<IIntegrationEventOutbox, SavingOnlyOutbox>();
                 services.RemoveAll<IHostedService>()
                     .RemoveAll<IIdentityProviderPort>()
                     .AddSingleton<IIdentityProviderPort>(identityProvider)
@@ -276,6 +280,12 @@ public sealed class AdminUserEndpointsTests : IClassFixture<PostgresDatabaseFixt
     public void Dispose() => app.Dispose();
 
     private sealed record ErrorDto(string Code, string Message);
+
+    private sealed class SavingOnlyOutbox : IIntegrationEventOutbox
+    {
+        public Task SaveAndPublishAsync(DbContext context, IReadOnlyCollection<IIntegrationEvent> integrationEvents, CancellationToken cancellationToken)
+            => context.SaveChangesAsync(cancellationToken);
+    }
 
     private sealed class RecordingIdentityProvider : IIdentityProviderPort
     {
