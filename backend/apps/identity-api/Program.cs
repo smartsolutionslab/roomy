@@ -21,7 +21,7 @@ var (keycloakBaseAddress, keycloakAdmin) = builder.Configuration.ReadKeycloakAdm
 
 builder.Services.AddKeycloakIdentityProvider(keycloakBaseAddress, keycloakAdmin);
 
-builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakAdmin.Realm);
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakAdmin.Realm, builder.Environment, builder.Configuration);
 
 builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 

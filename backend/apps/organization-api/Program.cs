@@ -19,7 +19,7 @@ builder.Services.AddOrganizationPersistence(connectionString);
 
 var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
 
-builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm)
+builder.Services.AddKeycloakJwtBearer(keycloakBaseAddress, keycloakRealm, builder.Environment, builder.Configuration)
     .AddOrganizationUseCases()
     .AddOpenApi(options => options.CreateSchemaReferenceId = EndpointSchemaIds.ForEndpointDto);
 
