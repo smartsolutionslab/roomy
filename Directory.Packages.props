@@ -36,6 +36,9 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
     <!-- Messaging (Wolverine) -->
+    <!-- JasperFx hosts the command-line dispatch (RunJasperFxCommands) + the OpenAPI-emit/codegen
+         AutoStartHost toggle the shared API-host bootstrap drives; pinned to the version Wolverine resolves. -->
+    <PackageVersion Include="JasperFx" Version="2.13.1" />
     <PackageVersion Include="WolverineFx" Version="6.14.0" />
     <PackageVersion Include="WolverineFx.EntityFrameworkCore" Version="6.14.0" />
     <PackageVersion Include="WolverineFx.Postgresql" Version="6.14.0" />

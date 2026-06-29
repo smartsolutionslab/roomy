@@ -13,10 +13,17 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <!-- The shared API-host bootstrap drives JasperFx command dispatch + the OpenAPI-emit AutoStartHost toggle. -->
+    <PackageReference Include="JasperFx" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <!-- The shared API-host bootstrap composes the Aspire service defaults and the Keycloak JWT bearer
+         wiring (ADR-0045) once for every context host; both reference no other Roomy project, so this
+         stays acyclic and web-http takes no domain/application/context-infrastructure dependency. -->
+    <ProjectReference Include="../../service-defaults/Roomy.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../infrastructure-authentication/src/Roomy.Infrastructure.Authentication.csproj" />
   </ItemGroup>
 
 </Project>
