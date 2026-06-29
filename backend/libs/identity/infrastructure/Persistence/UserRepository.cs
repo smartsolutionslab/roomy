@@ -48,6 +48,9 @@ public sealed class UserRepository(IdentityDbContext context) : IUserRepository
         return Page<User>.FromProbe(rows, request.Limit, row => row, row => new UserCursor(row.Email.Value));
     }
 
-    public async Task AddAsync(User user, CancellationToken cancellationToken) =>
-        await context.Users.AddAsync(user, cancellationToken);
+    public Task AddAsync(User user, CancellationToken cancellationToken)
+    {
+        context.Users.Add(user);
+        return Task.CompletedTask;
+    }
 }
