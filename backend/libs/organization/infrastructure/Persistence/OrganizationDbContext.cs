@@ -15,6 +15,8 @@ public sealed class OrganizationDbContext(DbContextOptions<OrganizationDbContext
 
     protected override void ConfigureContext(ModelBuilder modelBuilder)
     {
+        base.ConfigureContext(modelBuilder);
+
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new OfficeConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
