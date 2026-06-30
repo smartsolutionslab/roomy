@@ -21,8 +21,7 @@ public sealed class IdentityInfrastructureRegistrationTests
     {
         var services = new ServiceCollection();
 
-        services.AddIdentityPersistence(
-            "Host=localhost;Database=identity;Username=postgres;Password=postgres");
+        services.AddIdentityPersistence("Host=localhost;Database=identity;Username=postgres;Password=postgres");
         services.AddKeycloakIdentityProvider(
             new Uri("http://keycloak.localhost"),
             new KeycloakAdminOptions { AdminUsername = "admin", AdminPassword = "secret" });
@@ -36,8 +35,7 @@ public sealed class IdentityInfrastructureRegistrationTests
 
         scope.ServiceProvider.GetRequiredService<IUserRepository>().ShouldBeOfType<UserRepository>();
         scope.ServiceProvider.GetRequiredService<IUnitOfWork>().ShouldBeOfType<IdentityUnitOfWork>();
-        scope.ServiceProvider.GetRequiredService<IIdentityProviderPort>()
-            .ShouldBeOfType<KeycloakIdentityProvider>();
+        scope.ServiceProvider.GetRequiredService<IIdentityProviderPort>().ShouldBeOfType<KeycloakIdentityProvider>();
     }
 
     [Fact]
@@ -47,8 +45,7 @@ public sealed class IdentityInfrastructureRegistrationTests
 
         services.AddIdentityUseCases();
 
-        var registration = services
-            .Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<RegisterUser>));
+        var registration = services.Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<RegisterUser>));
         registration.ImplementationType.ShouldBe(typeof(RegisterUserHandler));
         registration.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }
@@ -60,8 +57,7 @@ public sealed class IdentityInfrastructureRegistrationTests
 
         services.AddIdentityUseCases();
 
-        var registration = services
-            .Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<GrantAdministrator>));
+        var registration = services.Single(descriptor => descriptor.ServiceType == typeof(ICommandHandler<GrantAdministrator>));
         registration.ImplementationType.ShouldBe(typeof(GrantAdministratorHandler));
         registration.Lifetime.ShouldBe(ServiceLifetime.Scoped);
     }

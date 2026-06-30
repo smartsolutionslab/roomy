@@ -45,22 +45,17 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
                 AdminPassword = AdminPassword,
             });
 
-    public async Task<IReadOnlyList<string>> GetRealmRoleNamesAsync(
-        KeycloakSubjectIdentifier subject,
-        CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<string>> GetRealmRoleNamesAsync(KeycloakSubjectIdentifier subject, CancellationToken cancellationToken)
     {
         var token = await AcquireAdminTokenAsync(cancellationToken);
 
-        using var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"admin/realms/{Realm}/users/{subject.Value}/role-mappings/realm");
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"admin/realms/{Realm}/users/{subject.Value}/role-mappings/realm");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         using var response = await Client.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var roles = await response.Content.ReadFromJsonAsync<JsonArray>(cancellationToken)
-            ?? new JsonArray();
+        var roles = await response.Content.ReadFromJsonAsync<JsonArray>(cancellationToken) ?? new JsonArray();
         return roles
             .Select(role => role?["name"]?.GetValue<string>())
             .Where(name => name is not null)
@@ -68,10 +63,7 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
             .ToList();
     }
 
-    public async Task<string?> GetUserAttributeAsync(
-        KeycloakSubjectIdentifier subject,
-        string attribute,
-        CancellationToken cancellationToken)
+    public async Task<string?> GetUserAttributeAsync(KeycloakSubjectIdentifier subject, string attribute, CancellationToken cancellationToken)
     {
         var token = await AcquireAdminTokenAsync(cancellationToken);
 
@@ -90,9 +82,7 @@ public sealed class KeycloakRealmFixture : IAsyncLifetime
 
     private async Task<string> AcquireAdminTokenAsync(CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            "realms/master/protocol/openid-connect/token")
+        using var request = new HttpRequestMessage(HttpMethod.Post, "realms/master/protocol/openid-connect/token")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {

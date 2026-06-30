@@ -42,9 +42,7 @@ export class HireEmployeePage {
 
   protected hire(): void {
     this.attempted.set(true);
-    if (this.hireForm.invalid) {
-      return;
-    }
+    if (this.hireForm.invalid) return;
 
     this.invalid.set(false);
     this.failed.set(false);

@@ -22,9 +22,7 @@ export function toAccount(response: AccountResponse): Account {
 }
 
 export function toAccountRole(value: string): AccountRole {
-  if (value === 'employee' || value === 'administrator') {
-    return value;
-  }
+  if (value === 'employee' || value === 'administrator') return value;
 
   throw new Error(`Unexpected account role: ${value}`);
 }

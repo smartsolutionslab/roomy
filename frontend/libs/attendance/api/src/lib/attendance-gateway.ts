@@ -69,7 +69,12 @@ export class AttendanceGateway {
     onBehalfOf?: EmployeeId,
   ): Observable<ReservationId> {
     return reserve(this.http, this.config.rootUrl, {
-      body: { officeId: office, roomId: room, date, onBehalfOf },
+      body: {
+        officeId: office,
+        roomId: room,
+        date,
+        onBehalfOf,
+      },
     }).pipe(map((response) => reservationId(response.body.reservationId)));
   }
 
