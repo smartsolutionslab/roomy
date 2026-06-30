@@ -21,7 +21,6 @@ public sealed class User : Aggregate
     public KeycloakSubjectIdentifier? KeycloakSubjectIdentifier { get; private set; }
     public UserStatus Status { get; private set; }
 
-    public bool IsEmployee => true;
     public bool IsAdministrator => Role.IsAdministrator;
 
     public static User Register(Email email, DisplayName displayName, Role role) =>
