@@ -1,4 +1,3 @@
-using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
@@ -9,9 +8,7 @@ using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
-
-builder.AddRoomyApiDefaults(keycloakBaseAddress, keycloakRealm);
+builder.AddRoomyApiDefaults();
 
 var connectionString = builder.Configuration.GetOrganizationConnectionString();
 builder.Services.AddOrganizationPersistence(connectionString)

@@ -13,7 +13,6 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-    <!-- The shared API-host bootstrap drives JasperFx command dispatch + the OpenAPI-emit AutoStartHost toggle. -->
     <PackageReference Include="JasperFx" />
   </ItemGroup>
 

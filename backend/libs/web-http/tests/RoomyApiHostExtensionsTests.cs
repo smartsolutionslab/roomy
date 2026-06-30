@@ -30,17 +30,23 @@ public class RoomyApiHostExtensionsTests
     [Fact]
     public void AddRoomyApiDefaults_applies_the_emit_toggle_only_when_emitting()
     {
+        // AutoStartHost is a process-global static; restore it in a finally so a failing assertion never
+        // leaks a toggled value into the rest of the assembly run.
         JasperFxEnvironment.AutoStartHost = false;
+        try
+        {
+            var notEmitting = WebApplication.CreateBuilder();
+            notEmitting.AddRoomyApiDefaults(keycloak, "roomy");
+            JasperFxEnvironment.AutoStartHost.ShouldBeFalse();
 
-        var notEmitting = WebApplication.CreateBuilder();
-        notEmitting.AddRoomyApiDefaults(keycloak, "roomy");
-        JasperFxEnvironment.AutoStartHost.ShouldBeFalse();
-
-        var emitting = WebApplication.CreateBuilder();
-        emitting.Configuration["OpenApi:EmitDocument"] = "true";
-        emitting.AddRoomyApiDefaults(keycloak, "roomy");
-        JasperFxEnvironment.AutoStartHost.ShouldBeTrue();
-
-        JasperFxEnvironment.AutoStartHost = false;
+            var emitting = WebApplication.CreateBuilder();
+            emitting.Configuration["OpenApi:EmitDocument"] = "true";
+            emitting.AddRoomyApiDefaults(keycloak, "roomy");
+            JasperFxEnvironment.AutoStartHost.ShouldBeTrue();
+        }
+        finally
+        {
+            JasperFxEnvironment.AutoStartHost = false;
+        }
     }
 }
