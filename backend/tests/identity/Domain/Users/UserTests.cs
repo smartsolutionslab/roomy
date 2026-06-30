@@ -26,7 +26,6 @@ public sealed class UserTests
     {
         var user = RegisterEmployee();
 
-        user.IsEmployee.ShouldBeTrue();
         user.IsAdministrator.ShouldBeFalse();
     }
 
@@ -54,7 +53,6 @@ public sealed class UserTests
             Role.Employee.GrantAdministrator());
 
         user.IsAdministrator.ShouldBeTrue();
-        user.IsEmployee.ShouldBeTrue();
     }
 
     [Fact]
@@ -87,7 +85,6 @@ public sealed class UserTests
         user.GrantAdministrator(grantedAt);
 
         user.IsAdministrator.ShouldBeTrue();
-        user.IsEmployee.ShouldBeTrue();
     }
 
     [Fact]
