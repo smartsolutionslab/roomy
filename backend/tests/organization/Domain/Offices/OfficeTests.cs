@@ -40,6 +40,28 @@ public sealed class OfficeTests
     }
 
     [Fact]
+    public void Rename_to_the_current_name_is_a_no_op()
+    {
+        var office = NewOffice();
+        var originalName = office.Name;
+
+        office.Rename(OfficeName.From("HQ"));
+
+        office.Name.ShouldBeSameAs(originalName);
+    }
+
+    [Fact]
+    public void RelocateTo_the_current_location_is_a_no_op()
+    {
+        var office = NewOffice();
+        var originalLocation = office.Location;
+
+        office.RelocateTo(Location.From("Berlin"));
+
+        office.Location.ShouldBeSameAs(originalLocation);
+    }
+
+    [Fact]
     public void AddRoom_appends_a_room_and_contributes_to_capacity()
     {
         var office = NewOffice();
