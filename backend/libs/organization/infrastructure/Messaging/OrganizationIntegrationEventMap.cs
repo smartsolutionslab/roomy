@@ -33,7 +33,7 @@ internal static class OrganizationIntegrationEventMap
                 hired.Email.Value,
                 hired.Name.Value,
                 ToHiredRole(hired.Role),
-                hired.InitialPassword,
+                hired.InitialCredential.Value,
                 occurredAt),
 
             _ => null,

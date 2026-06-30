@@ -1,3 +1,4 @@
+using SmartSolutionsLab.Roomy.Infrastructure.Cryptography;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Api;
 using SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
@@ -13,6 +14,7 @@ builder.AddRoomyApiDefaults();
 var connectionString = builder.Configuration.GetOrganizationConnectionString();
 builder.Services.AddOrganizationPersistence(connectionString)
     .AddOrganizationUseCases();
+builder.Services.AddCredentialEncryption(builder.Configuration);
 
 if (!builder.Configuration.IsEmittingOpenApiDocument())
 {

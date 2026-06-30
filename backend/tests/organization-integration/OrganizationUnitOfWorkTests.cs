@@ -43,13 +43,13 @@ public sealed class OrganizationUnitOfWorkTests
     }
 
     [Fact]
-    public async Task Saving_drains_employee_hired_to_the_outbox_with_the_user_and_password()
+    public async Task Saving_drains_employee_hired_to_the_outbox_with_the_user_and_encrypted_credential()
     {
         await using var context = NewContext();
         var user = UserIdentifier.New();
         var employee = Employee.Hire(
             CompanyIdentifier.New(), user, EmployeeName.From("Ada"), WorkEmail.From("ada@example.com"),
-            EmployeeRole.Administrator, "transient-pw");
+            EmployeeRole.Administrator, EncryptedCredential.From("encrypted-credential"));
         context.Add(employee);
         var outbox = new CapturingOutbox();
 
@@ -61,7 +61,7 @@ public sealed class OrganizationUnitOfWorkTests
         hired.Email.ShouldBe("ada@example.com");
         hired.DisplayName.ShouldBe("Ada");
         hired.Role.ShouldBe(Contracts.Organization.HiredRole.Administrator);
-        hired.InitialPassword.ShouldBe("transient-pw");
+        hired.EncryptedInitialPassword.ShouldBe("encrypted-credential");
         hired.OccurredAt.ShouldBe(occurredAt);
         employee.DomainEvents.ShouldBeEmpty();
     }

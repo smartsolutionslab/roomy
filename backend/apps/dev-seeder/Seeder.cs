@@ -6,6 +6,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Projections;
 using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.Infrastructure.Cryptography;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EventStore;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
@@ -16,6 +17,7 @@ using OrgCompanyId = SmartSolutionsLab.Roomy.Organization.Domain.Companies.Compa
 using OrgEmployee = SmartSolutionsLab.Roomy.Organization.Domain.Employees.Employee;
 using OrgEmployeeName = SmartSolutionsLab.Roomy.Organization.Domain.Employees.EmployeeName;
 using OrgEmployeeRole = SmartSolutionsLab.Roomy.Organization.Domain.Employees.EmployeeRole;
+using OrgEncryptedCredential = SmartSolutionsLab.Roomy.Organization.Domain.Employees.EncryptedCredential;
 using OrgUserId = SmartSolutionsLab.Roomy.Organization.Domain.Employees.UserIdentifier;
 using OrgWorkEmail = SmartSolutionsLab.Roomy.Organization.Domain.Employees.WorkEmail;
 using ReadModelEmployee = SmartSolutionsLab.Roomy.Attendance.Infrastructure.ReadModels.Employees.Employee;
@@ -29,6 +31,7 @@ internal sealed class Seeder(
     IdentityDbContext identityDb,
     AttendanceDbContext attendanceDb,
     IIdentityProviderPort identityProvider,
+    ICredentialCipher credentialCipher,
     IEventStore eventStore,
     ReservationsReadModelRebuilder rebuilder,
     SeedOptions options,
@@ -119,7 +122,8 @@ internal sealed class Seeder(
                 company, OrgUserId.From(userId),
                 OrgEmployeeName.From(seed.DisplayName),
                 OrgWorkEmail.From(email),
-                OrgEmployeeRole.Employee, options.EmployeePassword);
+                OrgEmployeeRole.Employee,
+                OrgEncryptedCredential.From(credentialCipher.Encrypt(options.EmployeePassword)));
             employee.CompleteProvisioning();
             organizationDb.Employees.Add(employee);
 

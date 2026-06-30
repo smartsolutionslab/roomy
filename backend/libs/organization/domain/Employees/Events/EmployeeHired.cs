@@ -10,4 +10,4 @@ public sealed record EmployeeHired(
     EmployeeName Name,
     WorkEmail Email,
     EmployeeRole Role,
-    string InitialPassword) : IDomainEvent;
+    EncryptedCredential InitialCredential) : IDomainEvent;

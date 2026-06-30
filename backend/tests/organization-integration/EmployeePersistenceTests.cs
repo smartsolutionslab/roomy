@@ -63,5 +63,5 @@ public sealed class EmployeePersistenceTests(PostgresDatabaseFixture fixture)
             EmployeeName.From("Ada Lovelace"),
             WorkEmail.From("ada@example.com"),
             EmployeeRole.Employee,
-            "transient-pw");
+            EncryptedCredential.From("transient-credential"));
 }

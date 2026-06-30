@@ -25,7 +25,7 @@ public sealed class EmployeeTests
         hired.Name.ShouldBe(employee.Name);
         hired.Email.ShouldBe(employee.Email);
         hired.Role.ShouldBe(EmployeeRole.Employee);
-        hired.InitialPassword.ShouldBe("transient-pw");
+        hired.InitialCredential.Value.ShouldBe("transient-credential");
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public sealed class EmployeeTests
         var employee = Hire(user);
         employee.ClearDomainEvents();
 
-        employee.RetryProvisioning("fresh-pw").IsSuccess.ShouldBeTrue();
+        employee.RetryProvisioning(EncryptedCredential.From("fresh-credential")).IsSuccess.ShouldBeTrue();
 
         employee.State.ShouldBe(ProvisioningState.Provisioning);
         var hired = employee.DomainEvents.OfType<EmployeeHired>().ShouldHaveSingleItem();
@@ -113,7 +113,7 @@ public sealed class EmployeeTests
         hired.Name.ShouldBe(employee.Name);
         hired.Email.ShouldBe(employee.Email);
         hired.Role.ShouldBe(EmployeeRole.Employee);
-        hired.InitialPassword.ShouldBe("fresh-pw");
+        hired.InitialCredential.Value.ShouldBe("fresh-credential");
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public sealed class EmployeeTests
         employee.FailProvisioning(ProvisioningFailureReason.ProviderError);
         employee.ClearDomainEvents();
 
-        employee.RetryProvisioning("fresh-pw").IsSuccess.ShouldBeTrue();
+        employee.RetryProvisioning(EncryptedCredential.From("fresh-pw")).IsSuccess.ShouldBeTrue();
 
         employee.State.ShouldBe(ProvisioningState.Provisioning);
         employee.FailureReason.ShouldBeNull();
@@ -137,7 +137,7 @@ public sealed class EmployeeTests
         employee.CompleteProvisioning();
         employee.ClearDomainEvents();
 
-        employee.RetryProvisioning("fresh-pw").IsSuccess.ShouldBeTrue();
+        employee.RetryProvisioning(EncryptedCredential.From("fresh-pw")).IsSuccess.ShouldBeTrue();
 
         employee.State.ShouldBe(ProvisioningState.Active);
         employee.DomainEvents.ShouldBeEmpty();
@@ -150,5 +150,5 @@ public sealed class EmployeeTests
             EmployeeName.From("Ada Lovelace"),
             WorkEmail.From("ada@example.com"),
             EmployeeRole.Employee,
-            "transient-pw");
+            EncryptedCredential.From("transient-credential"));
 }

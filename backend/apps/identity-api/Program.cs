@@ -3,6 +3,7 @@ using SmartSolutionsLab.Roomy.Identity.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
+using SmartSolutionsLab.Roomy.Infrastructure.Cryptography;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Web.Http;
 
@@ -16,6 +17,7 @@ var identityConnectionString = builder.Configuration.GetIdentityConnectionString
 builder.Services.AddIdentityPersistence(identityConnectionString);
 builder.Services.AddKeycloakIdentityProvider(keycloakBaseAddress, keycloakAdmin);
 builder.Services.AddIdentityUseCases();
+builder.Services.AddCredentialEncryption(builder.Configuration);
 
 if (!builder.Configuration.IsEmittingOpenApiDocument())
 {

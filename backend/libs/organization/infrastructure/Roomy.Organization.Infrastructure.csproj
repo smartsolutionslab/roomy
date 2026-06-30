@@ -11,6 +11,9 @@
     <ProjectReference Include="../../shared-kernel/src/Roomy.SharedKernel.csproj" />
     <!-- The shared EF Core baseline: RoomyDbContext, snake_case naming, Npgsql registration (ADR-0012). -->
     <ProjectReference Include="../../infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
+    <!-- The shared AES-GCM credential cipher (ADR-0063): encrypts the initial password at this edge so it
+         never reaches the outbox/broker/inbox in plaintext. The wire-facing EncryptedCredential is built here. -->
+    <ProjectReference Include="../../infrastructure-cryptography/src/Roomy.Infrastructure.Cryptography.csproj" />
     <!-- The transactional outbox seam (ADR-0037) + the owned IIntegrationEvent marker; the unit of work
          drains domain events to the outbox here. This context's published language is mapped at this edge. -->
     <ProjectReference Include="../../infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />

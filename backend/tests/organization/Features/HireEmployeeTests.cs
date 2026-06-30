@@ -1,10 +1,12 @@
 using NSubstitute;
 using Shouldly;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
+using SmartSolutionsLab.Roomy.Organization.Application;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
+using SmartSolutionsLab.Roomy.Organization.Domain.Employees.Events;
 using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Tests.Features;
@@ -20,7 +22,7 @@ public sealed class HireEmployeeTests
         var employees = Substitute.For<IEmployeeRepository>();
         _ = employees.AddAsync(Arg.Do<Employee>(saved.Add), Arg.Any<CancellationToken>());
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var handler = new HireEmployeeHandler(SeededCompany(), employees, unitOfWork);
+        var handler = new HireEmployeeHandler(SeededCompany(), employees, EncryptingTo("encrypted-pw"), unitOfWork);
 
         var result = await handler.HandleAsync(
             new HireEmployee(
@@ -36,6 +38,8 @@ public sealed class HireEmployeeTests
         employee.CompanyIdentifier.ShouldBe(company.Identifier);
         employee.UserIdentifier.ShouldBe(result.Value.User);
         employee.State.ShouldBe(ProvisioningState.Provisioning);
+        employee.DomainEvents.OfType<EmployeeHired>().ShouldHaveSingleItem()
+            .InitialCredential.ShouldBe(EncryptedCredential.From("encrypted-pw"));
         await unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -95,12 +99,19 @@ public sealed class HireEmployeeTests
             UserIdentifier.New(),
             EmployeeName.From("Ada"),
             WorkEmail.From("ada@example.com"),
-            EmployeeRole.Employee, "pw");
+            EmployeeRole.Employee, EncryptedCredential.From("pw"));
 
     private static ICompanyRepository SeededCompany()
     {
         var companies = Substitute.For<ICompanyRepository>();
         companies.GetSeededAsync(Arg.Any<CancellationToken>()).Returns(Result.Success(company));
         return companies;
+    }
+
+    private static IInitialCredentialEncryptor EncryptingTo(string ciphertext)
+    {
+        var encryptor = Substitute.For<IInitialCredentialEncryptor>();
+        encryptor.Encrypt(Arg.Any<string>()).Returns(EncryptedCredential.From(ciphertext));
+        return encryptor;
     }
 }

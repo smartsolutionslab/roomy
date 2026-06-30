@@ -19,6 +19,7 @@ namespace SmartSolutionsLab.Roomy.Organization.IntegrationTests;
 public sealed class EmployeeEndpointsTests : IClassFixture<PostgresDatabaseFixture>, IDisposable
 {
     private readonly WebApplicationFactory<OrganizationApiHost> app;
+    private readonly CapturingOutbox outbox = new();
 
     public EmployeeEndpointsTests(PostgresDatabaseFixture fixture)
     {
@@ -34,12 +35,14 @@ public sealed class EmployeeEndpointsTests : IClassFixture<PostgresDatabaseFixtu
             webHost.UseSetting("DefaultAdmin:Email", "default-admin@roomy.test");
             webHost.UseSetting("DefaultAdmin:DisplayName", "Default Admin");
             webHost.UseSetting("DefaultAdmin:InitialPassword", "default-admin-password");
+            webHost.UseSetting("CredentialEncryption:ActiveKeyId", "test");
+            webHost.UseSetting("CredentialEncryption:Keys:test", "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=");
 
             webHost.ConfigureTestServices(services =>
             {
                 services.RemoveAll<IHostedService>();
                 services.RemoveAll<IIntegrationEventOutbox>();
-                services.AddScoped<IIntegrationEventOutbox, SavingOnlyOutbox>();
+                services.AddSingleton<IIntegrationEventOutbox>(outbox);
                 services.AddAuthentication(TestAuthHandler.SchemeName)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
             });
@@ -58,6 +61,19 @@ public sealed class EmployeeEndpointsTests : IClassFixture<PostgresDatabaseFixtu
         hired.EmployeeId.ShouldNotBe(Guid.Empty);
         hired.UserId.ShouldNotBe(Guid.Empty);
         hired.State.ShouldBe("Provisioning");
+    }
+
+    [Fact]
+    public async Task The_published_hire_carries_the_initial_credential_only_as_ciphertext()
+    {
+        await ClientWithRoles("administrator")
+            .PostAsJsonAsync("/employees", Hire("ada@example.com"), TestContext.Current.CancellationToken);
+
+        var hired = outbox.Published
+            .OfType<SmartSolutionsLab.Roomy.Contracts.Organization.EmployeeHired>()
+            .ShouldHaveSingleItem();
+        hired.EncryptedInitialPassword.ShouldNotBe("transient-pw");
+        hired.EncryptedInitialPassword.ShouldNotContain("transient-pw");
     }
 
     [Fact]
@@ -121,12 +137,18 @@ public sealed class EmployeeEndpointsTests : IClassFixture<PostgresDatabaseFixtu
         context.SaveChanges();
     }
 
-    private sealed class SavingOnlyOutbox : IIntegrationEventOutbox
+    private sealed class CapturingOutbox : IIntegrationEventOutbox
     {
+        public List<IIntegrationEvent> Published { get; } = [];
+
         public Task SaveAndPublishAsync(
             DbContext context,
             IReadOnlyCollection<IIntegrationEvent> integrationEvents,
-            CancellationToken cancellationToken) => context.SaveChangesAsync(cancellationToken);
+            CancellationToken cancellationToken)
+        {
+            Published.AddRange(integrationEvents);
+            return context.SaveChangesAsync(cancellationToken);
+        }
     }
 
     private sealed record HireDto(string DisplayName, string Email, string Role, string InitialPassword);

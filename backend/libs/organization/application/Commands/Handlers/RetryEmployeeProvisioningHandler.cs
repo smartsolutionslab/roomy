@@ -4,7 +4,10 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 
-public sealed class RetryEmployeeProvisioningHandler(IEmployeeRepository employees, IUnitOfWork unitOfWork)
+public sealed class RetryEmployeeProvisioningHandler(
+    IEmployeeRepository employees,
+    IInitialCredentialEncryptor credentialEncryptor,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<RetryEmployeeProvisioning>
 {
     public async Task<Result> HandleAsync(RetryEmployeeProvisioning command, CancellationToken cancellationToken)
@@ -13,7 +16,7 @@ public sealed class RetryEmployeeProvisioningHandler(IEmployeeRepository employe
         var employee = await employees.GetByWorkEmailAsync(email, cancellationToken);
         if (employee.IsFailure) return employee.Error;
 
-        var transition = employee.Value.RetryProvisioning(initialPassword);
+        var transition = employee.Value.RetryProvisioning(credentialEncryptor.Encrypt(initialPassword));
         if (transition.IsFailure) return transition.Error;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

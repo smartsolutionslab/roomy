@@ -39,7 +39,7 @@ public sealed class Employee : Aggregate
         EmployeeName name,
         WorkEmail email,
         EmployeeRole role,
-        string initialPassword)
+        EncryptedCredential initialCredential)
     {
         var employee = new Employee(EmployeeIdentifier.New(), company, user, name, email, role);
         employee.RaiseDomainEvent(new EmployeeHired(
@@ -49,7 +49,7 @@ public sealed class Employee : Aggregate
             name,
             email,
             role,
-            initialPassword));
+            initialCredential));
         return employee;
     }
 
@@ -74,7 +74,7 @@ public sealed class Employee : Aggregate
         return Result.Success();
     }
 
-    public Result RetryProvisioning(string initialPassword)
+    public Result RetryProvisioning(EncryptedCredential initialCredential)
     {
         if (State == ProvisioningState.Active) return Result.Success();
 
@@ -87,7 +87,7 @@ public sealed class Employee : Aggregate
             Name,
             Email,
             Role,
-            initialPassword));
+            initialCredential));
         return Result.Success();
     }
 }
