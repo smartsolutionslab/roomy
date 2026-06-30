@@ -94,6 +94,12 @@ public sealed class AttendanceDay : EventSourcedAggregate
             case ReservationCancelled cancelled:
                 reservations.RemoveAll(held => held.Identifier == ReservationIdentifier.From(cancelled.ReservationId));
                 break;
+
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(@event),
+                    @event,
+                    $"Unknown event type '{@event.GetType().Name}' cannot be applied to an AttendanceDay.");
         }
     }
 }
