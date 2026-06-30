@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands;
 using SmartSolutionsLab.Roomy.Attendance.Application.Commands.Handlers;
@@ -30,7 +29,6 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
 
         services.AddSingleton(AttendanceEventTypeRegistry.Build());
         services.AddSingleton<IEventSerializer, JsonEventSerializer>();
-        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IEventStore, EfCoreEventStore>();
 
         services.AddScoped<IReservationProjection, ReservationProjection>();
@@ -50,7 +48,6 @@ public static class AttendanceInfrastructureServiceCollectionExtensions
 
     public static IServiceCollection AddAttendanceUseCases(this IServiceCollection services)
     {
-        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ICommandHandler<ReservePlace, ReservationIdentifier>, ReservePlaceHandler>();
         services.AddScoped<ICommandHandler<CancelReservation>, CancelReservationHandler>();
         services.AddScoped<IQueryHandler<ViewDayReservations, IReadOnlyList<ReservationView>>, ViewDayReservationsHandler>();

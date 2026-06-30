@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
 using SmartSolutionsLab.Roomy.Organization.Application;
@@ -25,8 +24,6 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
             .AddScoped<ICompanyRepository, CompanyRepository>()
             .AddScoped<IEmployeeRepository, EmployeeRepository>()
             .AddScoped<IUnitOfWork, OrganizationUnitOfWork>();
-
-        services.TryAddSingleton(TimeProvider.System);
 
         return services;
     }

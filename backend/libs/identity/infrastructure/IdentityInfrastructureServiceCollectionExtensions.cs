@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Identity.Application;
 using SmartSolutionsLab.Roomy.Identity.Application.Commands;
@@ -22,8 +21,6 @@ public static class IdentityInfrastructureServiceCollectionExtensions
             .AddScoped<IUserRepository, UserRepository>()
             .AddScoped<IUnitOfWork, IdentityUnitOfWork>();
 
-        services.TryAddSingleton(TimeProvider.System);
-
         return services;
     }
 
@@ -37,7 +34,6 @@ public static class IdentityInfrastructureServiceCollectionExtensions
 
     public static IServiceCollection AddIdentityUseCases(this IServiceCollection services)
     {
-        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ICommandHandler<RegisterUser>, RegisterUserHandler>()
             .AddScoped<ICommandHandler<GrantAdministrator>, GrantAdministratorHandler>();
 

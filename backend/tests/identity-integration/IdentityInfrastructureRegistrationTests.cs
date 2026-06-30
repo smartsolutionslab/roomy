@@ -36,6 +36,7 @@ public sealed class IdentityInfrastructureRegistrationTests
         scope.ServiceProvider.GetRequiredService<IUserRepository>().ShouldBeOfType<UserRepository>();
         scope.ServiceProvider.GetRequiredService<IUnitOfWork>().ShouldBeOfType<IdentityUnitOfWork>();
         scope.ServiceProvider.GetRequiredService<IIdentityProviderPort>().ShouldBeOfType<KeycloakIdentityProvider>();
+        scope.ServiceProvider.GetRequiredService<TimeProvider>().ShouldBeSameAs(TimeProvider.System);
     }
 
     [Fact]
