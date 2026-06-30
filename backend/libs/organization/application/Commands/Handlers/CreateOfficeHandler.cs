@@ -14,10 +14,7 @@ public sealed class CreateOfficeHandler(ICompanyRepository companies, IOfficeRep
         var company = await companies.GetSeededAsync(cancellationToken);
         if (company.IsFailure) return company.Error;
 
-        if (await offices.ExistsByNameAsync(company.Value.Identifier, name, cancellationToken))
-        {
-            return OfficeErrors.NameTaken(name);
-        }
+        if (await offices.ExistsByNameAsync(company.Value.Identifier, name, cancellationToken)) return OfficeErrors.NameTaken(name);
 
         var office = Office.Create(company.Value.Identifier, name, location);
         await offices.AddAsync(office, cancellationToken);

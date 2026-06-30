@@ -121,9 +121,7 @@ export class ReservePage {
   private loadAvailability(): void {
     const office = this.selectedOffice();
     const day = this.selectedDay();
-    if (office === null || day === null) {
-      return;
-    }
+    if (office === null || day === null) return;
 
     this.gateway
       .occupancyForOffice(office.id, day)
@@ -149,9 +147,7 @@ export class ReservePage {
     const office = this.selectedOffice();
     const room = this.selectedRoomId();
     const day = this.selectedDay();
-    if (office === null || room === null || day === null) {
-      return;
-    }
+    if (office === null || room === null || day === null) return;
 
     this.result.set(null);
     this.errorKey.set(null);

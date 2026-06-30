@@ -15,8 +15,7 @@ public sealed class KeycloakRealmRolesTests
     [Fact]
     public void Flattens_realm_access_roles_into_role_claims()
     {
-        var principal = PrincipalWith(
-            new Claim("realm_access", """{"roles":["employee","administrator"]}"""));
+        var principal = PrincipalWith(new Claim("realm_access", """{"roles":["employee","administrator"]}"""));
 
         KeycloakRealmRoles.AddRoleClaims(principal);
 

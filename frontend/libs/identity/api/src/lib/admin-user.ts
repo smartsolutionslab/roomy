@@ -26,9 +26,7 @@ export function toAdminUser(response: AdminUserResponse): AdminUser {
 }
 
 function toAccountStatus(value: string): AccountStatus {
-  if (value === 'provisioning' || value === 'active') {
-    return value;
-  }
+  if (value === 'provisioning' || value === 'active') return value;
 
   throw new Error(`Unexpected account status: ${value}`);
 }

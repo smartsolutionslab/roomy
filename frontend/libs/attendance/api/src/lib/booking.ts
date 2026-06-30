@@ -54,7 +54,11 @@ export function toBookableOffices(rooms: readonly BookableRoomResponse[]): Booka
   for (const room of rooms) {
     let office = offices.get(room.officeId);
     if (office === undefined) {
-      office = { id: officeId(room.officeId), name: room.officeName, rooms: [] };
+      office = {
+        id: officeId(room.officeId),
+        name: room.officeName,
+        rooms: [],
+      };
       offices.set(room.officeId, office);
     }
     office.rooms.push({
@@ -68,9 +72,8 @@ export function toBookableOffices(rooms: readonly BookableRoomResponse[]): Booka
 
 export function toRoomAvailability(days: readonly OccupancyDayResponse[]): RoomAvailability[] {
   const day = days[0];
-  if (day === undefined) {
-    return [];
-  }
+  if (day === undefined) return [];
+
   return day.rooms.map((room) => ({
     roomId: roomId(room.roomId),
     occupied: Number(room.occupied),

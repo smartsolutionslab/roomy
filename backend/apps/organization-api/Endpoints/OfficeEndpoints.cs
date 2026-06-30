@@ -1,7 +1,6 @@
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
-using SmartSolutionsLab.Roomy.SharedKernel.Results;
 using SmartSolutionsLab.Roomy.Web.Http;
 namespace SmartSolutionsLab.Roomy.Organization.Api.Endpoints;
 

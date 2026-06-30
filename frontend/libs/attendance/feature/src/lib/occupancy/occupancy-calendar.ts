@@ -100,9 +100,8 @@ export class OccupancyCalendar {
   // the month or not yet loaded) so the cell stays untinted.
   protected occupancyRatio(date: string): number | null {
     const day = this.occupancyByDate().get(date);
-    if (day === undefined) {
-      return null;
-    }
+    if (day === undefined) return null;
+
     return day.office.capacity > 0 ? day.office.occupied / day.office.capacity : 0;
   }
 
@@ -112,9 +111,7 @@ export class OccupancyCalendar {
 
   private load(): void {
     const scope = this.scope();
-    if (scope === null) {
-      return;
-    }
+    if (scope === null) return;
 
     const { from, to } = rangeFor('month', this.month());
 

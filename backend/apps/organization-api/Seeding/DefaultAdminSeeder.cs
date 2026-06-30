@@ -23,10 +23,7 @@ public sealed class DefaultAdminSeeder(
         if (await employees.ExistsByWorkEmailAsync(email, cancellationToken))
         {
             var retry = await retryProvisioning.HandleAsync(new RetryEmployeeProvisioning(email, options.InitialPassword), cancellationToken);
-            if (retry.IsFailure)
-            {
-                throw new InvalidOperationException($"DefaultAdmin re-provisioning failed: {retry.Error.Code} — {retry.Error.Message}");
-            }
+            if (retry.IsFailure) throw new InvalidOperationException($"DefaultAdmin re-provisioning failed: {retry.Error.Code} — {retry.Error.Message}");
 
             return;
         }
@@ -38,9 +35,6 @@ public sealed class DefaultAdminSeeder(
             options.InitialPassword);
 
         var result = await hireEmployee.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            throw new InvalidOperationException($"DefaultAdmin seeding failed: {result.Error.Code} — {result.Error.Message}");
-        }
+        if (result.IsFailure) throw new InvalidOperationException($"DefaultAdmin seeding failed: {result.Error.Code} — {result.Error.Message}");
     }
 }
