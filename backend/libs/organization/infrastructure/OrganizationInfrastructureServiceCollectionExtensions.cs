@@ -2,12 +2,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Infrastructure.Persistence.EfCore;
+using SmartSolutionsLab.Roomy.Organization.Application;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands;
 using SmartSolutionsLab.Roomy.Organization.Application.Commands.Handlers;
 using SmartSolutionsLab.Roomy.Organization.Domain.Companies;
 using SmartSolutionsLab.Roomy.Organization.Domain.Employees;
 using SmartSolutionsLab.Roomy.Organization.Domain.Offices;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure.Persistence;
+using SmartSolutionsLab.Roomy.Organization.Infrastructure.Security;
 using SmartSolutionsLab.Roomy.SharedKernel.Guards;
 
 namespace SmartSolutionsLab.Roomy.Organization.Infrastructure;
@@ -40,6 +42,8 @@ public static class OrganizationInfrastructureServiceCollectionExtensions
             .AddScoped<ICommandHandler<CompleteEmployeeProvisioning>, CompleteEmployeeProvisioningHandler>()
             .AddScoped<ICommandHandler<FailEmployeeProvisioning>, FailEmployeeProvisioningHandler>()
             .AddScoped<ICommandHandler<RetryEmployeeProvisioning>, RetryEmployeeProvisioningHandler>();
+
+        services.AddScoped<IInitialCredentialEncryptor, CredentialEncryptor>();
 
         return services;
     }

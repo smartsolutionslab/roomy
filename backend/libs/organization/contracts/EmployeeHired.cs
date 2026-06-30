@@ -8,5 +8,5 @@ public sealed record EmployeeHired(
     string Email,
     string DisplayName,
     HiredRole Role,
-    string InitialPassword,
+    string EncryptedInitialPassword,
     DateTimeOffset OccurredAt) : IIntegrationEvent;

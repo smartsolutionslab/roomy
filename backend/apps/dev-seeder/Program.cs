@@ -2,6 +2,7 @@ using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 using SmartSolutionsLab.Roomy.DevSeeder;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure;
 using SmartSolutionsLab.Roomy.Identity.Infrastructure.Keycloak;
+using SmartSolutionsLab.Roomy.Infrastructure.Cryptography;
 using SmartSolutionsLab.Roomy.Organization.Infrastructure;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddAttendancePersistence(attendanceConnectionString);
 
 var (keycloakBaseAddress, keycloakAdmin) = builder.Configuration.ReadKeycloakAdmin();
 builder.Services.AddKeycloakIdentityProvider(keycloakBaseAddress, keycloakAdmin);
+builder.Services.AddCredentialEncryption(builder.Configuration);
 
 var seed = builder.Configuration.GetSection("Seed");
 var companyId = Guid.Parse(seed["CompanyId"] ?? throw new InvalidOperationException("Missing configuration 'Seed:CompanyId'."));

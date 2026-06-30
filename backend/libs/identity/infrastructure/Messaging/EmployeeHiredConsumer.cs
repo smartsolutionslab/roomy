@@ -2,10 +2,11 @@ using SmartSolutionsLab.Roomy.Application.Contracts.Messaging;
 using SmartSolutionsLab.Roomy.Contracts.Organization;
 using SmartSolutionsLab.Roomy.Identity.Application.Commands;
 using SmartSolutionsLab.Roomy.Identity.Domain.Users;
+using SmartSolutionsLab.Roomy.Infrastructure.Cryptography;
 
 namespace SmartSolutionsLab.Roomy.Identity.Infrastructure.Messaging;
 
-public sealed class EmployeeHiredConsumer(ICommandHandler<RegisterUser> registerUser)
+public sealed class EmployeeHiredConsumer(ICommandHandler<RegisterUser> registerUser, ICredentialCipher credentialCipher)
 {
     public async Task Handle(EmployeeHired message, CancellationToken cancellationToken)
     {
@@ -19,7 +20,7 @@ public sealed class EmployeeHiredConsumer(ICommandHandler<RegisterUser> register
             Email.From(message.Email),
             DisplayName.From(message.DisplayName),
             role,
-            message.InitialPassword);
+            credentialCipher.Decrypt(message.EncryptedInitialPassword));
 
         var result = await registerUser.HandleAsync(command, cancellationToken);
         if (result.IsFailure)

@@ -35,6 +35,12 @@ var keycloakPassword = builder.AddParameter(
 // default so local sign-in is predictable; override per environment via the `demo-password` parameter.
 var demoPassword = builder.AddParameter("demo-password", "Test1234!", secret: true);
 
+// Shared AES-GCM key for encrypting the initial employee credential on the bus (ADR-0063): organization
+// encrypts before publishing and identity decrypts at the Keycloak call with the SAME key, so no plaintext
+// credential reaches the outbox, broker, or inbox. A fixed local-dev key; override per environment as a secret.
+var credentialEncryptionKey = builder.AddParameter(
+    "credential-encryption-key", "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=", secret: true);
+
 // The well-known seeded company id, shared by the attendance context and the dev seeder.
 const string SeedCompanyId = "0199a0b0-0000-7000-8000-000000000001";
 
@@ -64,7 +70,8 @@ var identityApi = builder.AddProject<Projects.Roomy_Identity_Api>("identity-api"
     .WithReference(keycloak).WaitFor(keycloak)
     .WithKeycloakConnection(keycloak)
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
-    .WithEnvironment("Keycloak__AdminPassword", keycloakPassword);
+    .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
+    .WithCredentialEncryption(credentialEncryptionKey);
 
 // Wait for Keycloak so organization-api starts alongside identity-api (which also waits for it),
 // not 30-60s earlier: the startup DefaultAdminSeeder must not publish EmployeeHired before identity
@@ -78,7 +85,8 @@ var organizationApi = builder.AddProject<Projects.Roomy_Organization_Api>("organ
     .WithEnvironment("Company__Name", "Roomy")
     .WithEnvironment("DefaultAdmin__Email", "admin@roomy.local")
     .WithEnvironment("DefaultAdmin__DisplayName", "Default Admin")
-    .WithEnvironment("DefaultAdmin__InitialPassword", demoPassword);
+    .WithEnvironment("DefaultAdmin__InitialPassword", demoPassword)
+    .WithCredentialEncryption(credentialEncryptionKey);
 
 var attendanceApi = builder.AddProject<Projects.Roomy_Attendance_Api>("attendance-api")
     .WithHttpEndpoint()
@@ -99,7 +107,8 @@ _ = builder.AddProject<Projects.Roomy_DevSeeder>("dev-seeder")
     .WithEnvironment("Keycloak__AdminUsername", keycloakUser)
     .WithEnvironment("Keycloak__AdminPassword", keycloakPassword)
     .WithEnvironment("Seed__CompanyId", SeedCompanyId)
-    .WithEnvironment("Seed__EmployeePassword", demoPassword);
+    .WithEnvironment("Seed__EmployeePassword", demoPassword)
+    .WithCredentialEncryption(credentialEncryptionKey);
 
 _ = builder.AddScalarApiReference()
     .WithApiReference(identityApi)
@@ -149,4 +158,11 @@ internal static class AppHostKeycloakExtensions
         builder
             .WithEnvironment("Keycloak__BaseAddress", keycloak.GetEndpoint("http"))
             .WithEnvironment("Keycloak__Realm", Realm);
+
+    public static IResourceBuilder<ProjectResource> WithCredentialEncryption(
+        this IResourceBuilder<ProjectResource> builder,
+        IResourceBuilder<ParameterResource> key) =>
+        builder
+            .WithEnvironment("CredentialEncryption__ActiveKeyId", "dev")
+            .WithEnvironment("CredentialEncryption__Keys__dev", key);
 }
