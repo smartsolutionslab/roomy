@@ -3,15 +3,12 @@ using SmartSolutionsLab.Roomy.Attendance.Api.Endpoints;
 using SmartSolutionsLab.Roomy.Attendance.Application.Ports;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure;
 using SmartSolutionsLab.Roomy.Attendance.Infrastructure.Messaging;
-using SmartSolutionsLab.Roomy.Infrastructure.Authentication;
 using SmartSolutionsLab.Roomy.Infrastructure.Messaging;
 using SmartSolutionsLab.Roomy.Web.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var (keycloakBaseAddress, keycloakRealm) = builder.Configuration.ReadKeycloak();
-
-builder.AddRoomyApiDefaults(keycloakBaseAddress, keycloakRealm);
+builder.AddRoomyApiDefaults();
 
 var attendanceConnectionString = builder.Configuration.GetAttendanceConnectionString();
 builder.Services.AddAttendancePersistence(attendanceConnectionString)

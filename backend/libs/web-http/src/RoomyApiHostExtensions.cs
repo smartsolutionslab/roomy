@@ -10,6 +10,14 @@ namespace SmartSolutionsLab.Roomy.Web.Http;
 
 public static class RoomyApiHostExtensions
 {
+    // The default-realm host bootstrap: reads the Keycloak base address + realm from configuration
+    // (the identity host uses the typed overload instead, because it needs the admin realm/credentials).
+    public static WebApplicationBuilder AddRoomyApiDefaults(this WebApplicationBuilder builder)
+    {
+        var (keycloakBaseAddress, realm) = builder.Configuration.ReadKeycloak();
+        return builder.AddRoomyApiDefaults(keycloakBaseAddress, realm);
+    }
+
     public static WebApplicationBuilder AddRoomyApiDefaults(this WebApplicationBuilder builder, Uri keycloakBaseAddress, string realm)
     {
         builder.AddServiceDefaults();
