@@ -35,9 +35,19 @@ public sealed class Office : Aggregate
         return office;
     }
 
-    public void Rename(OfficeName name) => Name = name;
+    public void Rename(OfficeName name)
+    {
+        if (name == Name) return;
 
-    public void RelocateTo(Location location) => Location = location;
+        Name = name;
+    }
+
+    public void RelocateTo(Location location)
+    {
+        if (location == Location) return;
+
+        Location = location;
+    }
 
     public Result<Room> AddRoom(RoomName name, Capacity capacity)
     {
