@@ -1,7 +1,7 @@
 # Feature Specification: Domain and infrastructure cleanups (a basket of small fixes)
 
 **Feature Branch:** `refactor/036-domain-and-infra-cleanups`
-**Status:** Draft
+**Status:** Implemented
 **Created:** 2026-06-27
 
 ## Summary
@@ -221,16 +221,16 @@ written and verified in any order.
   `RoomyDbContext`'s (currently empty) base configuration content.
 
 ## Review & Acceptance Checklist
-- [ ] Each of the six items has at least one test written before its fix (or, for item 1, a structural
+- [x] Each of the six items has at least one test written before its fix (or, for item 1, a structural
       removal verified by a clean build)
-- [ ] `IsEmployee` and its three test references are gone; no reference remains
-- [ ] `AttendanceDay.Apply` throws on an unknown replayed event; known-event replay unchanged
-- [ ] `Office.Rename`/`RelocateTo` short-circuit on the same value; different values still update; the
+- [x] `IsEmployee` and its three test references are gone; no reference remains
+- [x] `AttendanceDay.Apply` throws on an unknown replayed event; known-event replay unchanged
+- [x] `Office.Rename`/`RelocateTo` short-circuit on the same value; different values still update; the
       missing-events follow-up is recorded, not implemented
-- [ ] `SingleOrNotFoundAsync` extracted; the five predicate fetches use it with identical error
+- [x] `SingleOrNotFoundAsync` extracted; the five predicate fetches use it with identical error
       codes/messages; `GetSeededAsync` handled per FR-004c
-- [ ] `TimeProvider.System` registered in exactly one shared place; every current composition still
+- [x] `TimeProvider.System` registered in exactly one shared place; every current composition still
       resolves it
-- [ ] `OrganizationDbContext.ConfigureContext` calls `base`; model and behaviour unchanged
-- [ ] Wire contract unchanged; no OpenAPI re-emit, no client regen
-- [ ] All gates green; no suppressions, no skipped/deleted tests
+- [x] `OrganizationDbContext.ConfigureContext` calls `base`; model and behaviour unchanged
+- [x] Wire contract unchanged; no OpenAPI re-emit, no client regen
+- [x] All gates green; no suppressions, no skipped/deleted tests
