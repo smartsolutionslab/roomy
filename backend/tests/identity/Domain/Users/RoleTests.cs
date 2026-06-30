@@ -26,6 +26,13 @@ public sealed class RoleTests
     }
 
     [Fact]
+    public void Is_built_from_the_administrator_flag()
+    {
+        Role.From(isAdministrator: true).ShouldBe(Role.Employee.GrantAdministrator());
+        Role.From(isAdministrator: false).ShouldBe(Role.Employee);
+    }
+
+    [Fact]
     public void Equality_is_by_value()
     {
         Role.Employee.ShouldBe(Role.Employee);

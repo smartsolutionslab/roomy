@@ -10,24 +10,22 @@ public sealed class EmployeeHiredConsumer(ICommandHandler<RegisterUser> register
 {
     public async Task Handle(EmployeeHired message, CancellationToken cancellationToken)
     {
-        var role = message.Role == HiredRole.Administrator
-            ? Role.Employee.GrantAdministrator()
-            : Role.Employee;
+        var (employeeId, userId, email, displayName, hiredRole, encryptedInitialPassword, _) = message;
+        var role = Role.From(isAdministrator: hiredRole == HiredRole.Administrator);
 
         var command = new RegisterUser(
-            UserIdentifier.From(message.UserId),
-            message.EmployeeId,
-            Email.From(message.Email),
-            DisplayName.From(message.DisplayName),
+            UserIdentifier.From(userId),
+            employeeId, Email.From(email),
+            DisplayName.From(displayName),
             role,
-            credentialCipher.Decrypt(message.EncryptedInitialPassword));
+            credentialCipher.Decrypt(encryptedInitialPassword));
 
         var result = await registerUser.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
         {
             // A failed registration here is transient (a terminal failure is compensated inside the
             // handler and reported as success). Surface it so the message is retried rather than lost.
-            throw new InvalidOperationException($"User provisioning failed for employee {message.EmployeeId}: {result.Error.Code} — {result.Error.Message}");
+            throw new InvalidOperationException($"User provisioning failed for employee {employeeId}: {result.Error.Code} — {result.Error.Message}");
         }
     }
 }

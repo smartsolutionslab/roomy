@@ -35,7 +35,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("IsAdministrator")
             .HasConversion(
                 role => role.IsAdministrator,
-                isAdministrator => isAdministrator ? Role.Employee.GrantAdministrator() : Role.Employee)
+                isAdministrator => Role.From(isAdministrator))
             .IsRequired();
 
         builder.Property(user => user.Status)
