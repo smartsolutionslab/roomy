@@ -51,6 +51,8 @@
   </Folder>
   <Folder Name="/_Common/Infrastructure/">
     <Project Path="backend/libs/infrastructure-authentication/src/Roomy.Infrastructure.Authentication.csproj" />
+    <Project Path="backend/libs/infrastructure-cryptography/src/Roomy.Infrastructure.Cryptography.csproj" />
+    <Project Path="backend/libs/infrastructure-cryptography/tests/Roomy.Infrastructure.Cryptography.Tests.csproj" />
     <Project Path="backend/libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <Project Path="backend/libs/infrastructure-messaging/tests/Roomy.Infrastructure.Messaging.Tests.csproj" />
     <Project Path="backend/libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
