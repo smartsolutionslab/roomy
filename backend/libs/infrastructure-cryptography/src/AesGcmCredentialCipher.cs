@@ -19,15 +19,9 @@ public sealed class AesGcmCredentialCipher : ICredentialCipher
         Ensure.That((CredentialEncryptionOptions?)options).IsNotNull();
         activeKeyId = Ensure.That(options.ActiveKeyId).IsNotNullOrWhiteSpace().Value;
 
-        keysById = options.Keys.ToDictionary(
-            entry => entry.Key,
-            entry => DecodeKey(entry.Key, entry.Value));
+        keysById = options.Keys.ToDictionary(entry => entry.Key, entry => DecodeKey(entry.Key, entry.Value));
 
-        if (!keysById.ContainsKey(activeKeyId))
-        {
-            throw new InvalidOperationException(
-                $"The active credential-encryption key '{activeKeyId}' is not present in the configured key ring.");
-        }
+        if (!keysById.ContainsKey(activeKeyId)) throw new InvalidOperationException($"The active credential-encryption key '{activeKeyId}' is not present in the configured key ring.");
     }
 
     public string Encrypt(string plaintext)
@@ -56,17 +50,10 @@ public sealed class AesGcmCredentialCipher : ICredentialCipher
         Ensure.That(ciphertext).IsNotNullOrWhiteSpace();
 
         var separator = ciphertext.IndexOf(KeyIdSeparator, StringComparison.Ordinal);
-        if (separator <= 0)
-        {
-            throw new FormatException("The encrypted credential is not in the expected '<keyId>.<payload>' format.");
-        }
+        if (separator <= 0) throw new FormatException("The encrypted credential is not in the expected '<keyId>.<payload>' format.");
 
         var keyId = ciphertext[..separator];
-        if (!keysById.TryGetValue(keyId, out var key))
-        {
-            throw new InvalidOperationException(
-                $"The credential was encrypted with key '{keyId}', which is not in the configured key ring.");
-        }
+        if (!keysById.TryGetValue(keyId, out var key)) throw new InvalidOperationException($"The credential was encrypted with key '{keyId}', which is not in the configured key ring.");
 
         var frame = Convert.FromBase64String(ciphertext[(separator + 1)..]);
         var nonce = frame.AsSpan(0, NonceSizeInBytes);
@@ -92,11 +79,7 @@ public sealed class AesGcmCredentialCipher : ICredentialCipher
             throw new InvalidOperationException($"The credential-encryption key '{keyId}' is not valid base64.", exception);
         }
 
-        if (key.Length != KeySizeInBytes)
-        {
-            throw new InvalidOperationException(
-                $"The credential-encryption key '{keyId}' must be {KeySizeInBytes} bytes (AES-256); it was {key.Length}.");
-        }
+        if (key.Length != KeySizeInBytes) throw new InvalidOperationException($"The credential-encryption key '{keyId}' must be {KeySizeInBytes} bytes (AES-256); it was {key.Length}.");
 
         return key;
     }
