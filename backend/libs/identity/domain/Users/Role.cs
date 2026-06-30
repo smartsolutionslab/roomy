@@ -8,5 +8,7 @@ public readonly record struct Role : IValueObject
 
     public static Role Employee => new() { IsAdministrator = false };
 
+    public static Role From(bool isAdministrator) => new() { IsAdministrator = isAdministrator };
+
     public Role GrantAdministrator() => this with { IsAdministrator = true };
 }
