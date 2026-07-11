@@ -69,5 +69,10 @@
          (NU1903) fails the warnings-as-errors restore. Pin the patched version; drop once the Aspire/
          StreamJsonRpc chain resolves >= 2.5.301 on its own. -->
     <PackageVersion Include="MessagePack" Version="2.5.302" />
+    <!-- Microsoft.OpenApi < 2.7.5 has GHSA-v5pm-xwqc-g5wc (high): circular schema references can terminate
+         OpenAPI parsing. It arrives transitively via Microsoft.AspNetCore.OpenApi (10.0.9 -> 2.0.0), and NuGet
+         audit (NU1903) fails the warnings-as-errors restore. Pin the patched version; drop once the
+         AspNetCore.OpenApi chain resolves >= 2.7.5 on its own. -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.7.5" />
   </ItemGroup>
 </Project>
