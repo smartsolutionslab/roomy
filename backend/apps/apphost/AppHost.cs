@@ -124,7 +124,7 @@ foreach (var api in new[] { identityApi, organizationApi, attendanceApi })
     });
 }
 
-var gateway = builder.AddProject<Projects.Roomy_Gateway>("gateway")
+var gateway = builder.AddProject<Projects.Roomy_Gateway>("gateway", launchProfileName: "https")
     .WithReference(keycloak)
     .WaitFor(keycloak)
     .WithEnvironment("Authentication__Keycloak__Authority", keycloak.GetEndpoint("http"))
