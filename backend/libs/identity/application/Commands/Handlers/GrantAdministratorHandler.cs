@@ -4,7 +4,11 @@ using SmartSolutionsLab.Roomy.SharedKernel.Results;
 
 namespace SmartSolutionsLab.Roomy.Identity.Application.Commands.Handlers;
 
-public sealed class GrantAdministratorHandler(IUserRepository users, IIdentityProviderPort identityProvider, IUnitOfWork unitOfWork, TimeProvider timeProvider) : ICommandHandler<GrantAdministrator>
+public sealed class GrantAdministratorHandler(
+    IUserRepository users,
+    IIdentityProviderPort identityProvider,
+    IUnitOfWork unitOfWork,
+    TimeProvider timeProvider) : ICommandHandler<GrantAdministrator>
 {
     public async Task<Result> HandleAsync(GrantAdministrator command, CancellationToken cancellationToken)
     {
