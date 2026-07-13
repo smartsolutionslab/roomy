@@ -24,6 +24,12 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <!-- WebApplicationFactory, to boot the organization host in-process for the office endpoint tests. -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <!-- A broker-less in-memory Wolverine runtime supplies a real IMessageBus + IDbContextOutbox for the
+         outbox adapter's transaction-ownership test; the real DbContext transaction comes from Postgres. -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="WolverineFx" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" />
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>
 
   <ItemGroup>
