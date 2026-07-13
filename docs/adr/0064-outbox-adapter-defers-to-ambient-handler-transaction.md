@@ -105,12 +105,10 @@ the same mechanism identity's `WolverineIntegrationEventPublisher` already relie
   HTTP handlers are plain minimal APIs with no ambient transaction (verified) and Wolverine's
   middleware always begins one; if an HTTP path ever opens its own transaction it must own the commit,
   which is the correct semantics anyway.
-- Consumers still **ignore the command `Result`** (unlike identity's, which throws on failure). That is
-  a separate latent bug — a genuine domain failure is swallowed — and is left for a follow-up; this ADR
-  only removes the transaction conflict.
-
 **Follow-ups**
-- Make `UserRegisteredConsumer`/`UserProvisioningFailedConsumer` act on the handler `Result` (throw to
-  retry on transient failure) so real failures are not silently dropped.
+- ~~Make `UserRegisteredConsumer`/`UserProvisioningFailedConsumer` act on the handler `Result`~~ —
+  done: both consumers now throw on a failed `Result` so Wolverine retries and, if it persists,
+  dead-letters (ADR-0060), instead of silently abandoning the saga. The domain returns
+  `Result.Success()` for idempotent re-application, so ordinary retries do not dead-letter.
 - A real Postgres + broker outbox round-trip remains deferred to the Testcontainers suite (#68); the
   transaction-ownership contract is covered by the in-memory harness here.
