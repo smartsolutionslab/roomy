@@ -7,41 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
     <!--
-      The identity context layers (#13, CLAUDE.md): referenced so the convention-based rules
-      genuinely load and inspect them. Without this the layer rules would pass vacuously for
-      identity. The layers are empty today; the conventions activate as types are added.
+      A reference here makes an assembly copy-local, and RoomyAssemblies discovers every
+      SmartSolutionsLab.Roomy.*.dll in the output directory — so referencing a project is what
+      guarantees its inspection. RoomyAssembliesTests pins the expected set; extend both when
+      adding a library (tests/architecture/README).
     -->
+    <ProjectReference Include="../../../libs/application-contracts/src/Roomy.Application.Contracts.csproj" />
     <ProjectReference Include="../../../libs/identity/domain/Roomy.Identity.Domain.csproj" />
     <ProjectReference Include="../../../libs/identity/application/Roomy.Identity.Application.csproj" />
     <ProjectReference Include="../../../libs/identity/infrastructure/Roomy.Identity.Infrastructure.csproj" />
-    <!--
-      The organization context: its domain is referenced so the layer rules inspect it (the
-      application/infrastructure layers join here as they land — CLAUDE.md, tests/architecture/README).
-    -->
     <ProjectReference Include="../../../libs/organization/domain/Roomy.Organization.Domain.csproj" />
     <ProjectReference Include="../../../libs/organization/application/Roomy.Organization.Application.csproj" />
     <ProjectReference Include="../../../libs/organization/infrastructure/Roomy.Organization.Infrastructure.csproj" />
-    <!--
-      Per-context published-language contracts (ADR-0031): referenced so the convention rules load and
-      inspect them, and so the cross-context isolation rule observes that consuming a producer's
-      contracts is allowed while referencing its internal types is not.
-    -->
     <ProjectReference Include="../../../libs/identity/contracts/Roomy.Contracts.Identity.csproj" />
     <ProjectReference Include="../../../libs/organization/contracts/Roomy.Contracts.Organization.csproj" />
-    <!--
-      The attendance context layers (#13, CLAUDE.md): referenced so the convention-based rules
-      genuinely load and inspect them rather than passing vacuously. Empty today; the layer and
-      no-MediatR rules activate as the event-sourced aggregate, handlers, and adapters are added.
-    -->
     <ProjectReference Include="../../../libs/attendance/domain/Roomy.Attendance.Domain.csproj" />
     <ProjectReference Include="../../../libs/attendance/application/Roomy.Attendance.Application.csproj" />
     <ProjectReference Include="../../../libs/attendance/infrastructure/Roomy.Attendance.Infrastructure.csproj" />
+    <ProjectReference Include="../../../libs/infrastructure-authentication/src/Roomy.Infrastructure.Authentication.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-cryptography/src/Roomy.Infrastructure.Cryptography.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-messaging/src/Roomy.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="../../../libs/infrastructure-persistence/src/Roomy.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="../../../libs/shared-kernel/src/Roomy.SharedKernel.csproj" />
+    <ProjectReference Include="../../../libs/web-http/src/Roomy.Web.Http.csproj" />
   </ItemGroup>
 
   <ItemGroup>
