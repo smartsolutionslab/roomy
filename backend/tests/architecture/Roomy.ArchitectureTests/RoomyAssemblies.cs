@@ -6,55 +6,28 @@ internal static class RoomyAssemblies
 {
     internal static IReadOnlyCollection<Assembly> All { get; } = Discover();
 
-    private static Assembly[] Discover()
-    {
-        var seen = new Dictionary<string, Assembly>(StringComparer.Ordinal);
-        var queue = new Queue<Assembly>();
-
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            Enqueue(assembly);
-        }
-
-        Enqueue(ArchitectureConventions.SharedKernelAssembly);
-        Enqueue(ArchitectureConventions.ApplicationContractsAssembly);
-        Enqueue(ArchitectureConventions.InfrastructurePersistenceAssembly);
-        Enqueue(ArchitectureConventions.InfrastructureMessagingAssembly);
-
-        while (queue.Count > 0)
-        {
-            var current = queue.Dequeue();
-
-            foreach (var reference in current.GetReferencedAssemblies())
-            {
-                if (!IsRoomy(reference.Name) || seen.ContainsKey(reference.Name!)) continue;
-
-                try
-                {
-                    Enqueue(Assembly.Load(reference));
-                }
-                catch (Exception ex) when (ex is FileNotFoundException or BadImageFormatException)
-                {
-                }
-            }
-        }
-
-        return seen.Values
+    private static Assembly[] Discover() =>
+        Directory
+            .EnumerateFiles(AppContext.BaseDirectory, $"{ArchitectureConventions.RootNamespace}.*.dll")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Where(assemblyName => assemblyName is not null)
+            .OrderBy(assemblyName => assemblyName, StringComparer.Ordinal)
+            .Select(assemblyName => Load(assemblyName!))
             .Where(assembly => assembly != Assembly.GetExecutingAssembly())
-            .OrderBy(assembly => assembly.GetName().Name, StringComparer.Ordinal)
             .ToArray();
 
-        void Enqueue(Assembly assembly)
+    private static Assembly Load(string assemblyName)
+    {
+        try
         {
-            var name = assembly.GetName().Name;
-
-            if (!IsRoomy(name) || !seen.TryAdd(name!, assembly)) return;
-
-            queue.Enqueue(assembly);
+            return Assembly.Load(new AssemblyName(assemblyName));
+        }
+        catch (Exception exception)
+        {
+            throw new InvalidOperationException(
+                $"Roomy assembly '{assemblyName}' is present in the test output directory but "
+                + "could not be loaded; its architecture rules would silently not run.",
+                exception);
         }
     }
-
-    private static bool IsRoomy(string? simpleName) =>
-        simpleName is not null
-        && simpleName.StartsWith(ArchitectureConventions.RootNamespace, StringComparison.Ordinal);
 }

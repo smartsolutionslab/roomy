@@ -39,12 +39,10 @@ public sealed class CrossContextIsolationConventionTests
             }
         }
 
-        if (inspectedContextTypes == 0)
-        {
-            inspectedContextTypes.ShouldBe(
-                0,
-                "Forward-looking cross-context isolation rule is dormant: 0 context types found "
-                + $"across {RoomyAssemblies.All.Count} Roomy assembly(ies).");
-        }
+        inspectedContextTypes.ShouldBeGreaterThan(
+            0,
+            "Cross-context isolation rule inspected no types: 0 context types found across "
+            + $"{RoomyAssemblies.All.Count} Roomy assembly(ies) — assembly discovery is broken "
+            + "and the rule is passing vacuously.");
     }
 }

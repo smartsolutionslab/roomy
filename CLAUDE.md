@@ -209,12 +209,13 @@ lint failures (ADR-0002/0003). The .NET side mirrors this with architecture test
 
 **Architecture tests (`backend/tests/architecture`).** The .NET counterpart enforces the same
 dependency rule (plus "no MediatR" / no-framework-in-core) via NetArchTest. Its
-convention-based rules inspect every *loaded* `SmartSolutionsLab.Roomy.*` assembly, and an
-assembly is only loaded if `Roomy.ArchitectureTests` references it. **When you create a
-context, you MUST add its `domain`/`application`/`infrastructure` projects as
-`ProjectReference`s to `Roomy.ArchitectureTests`** — otherwise its layers are never
-inspected and the rules pass *vacuously* (green but enforcing nothing). Adding the
-reference is part of creating a context. See `backend/tests/architecture/README.md`.
+convention-based rules inspect every `SmartSolutionsLab.Roomy.*` assembly discovered in the
+test output directory — a `ProjectReference` from `Roomy.ArchitectureTests` is what makes an
+assembly copy-local and therefore inspected. **When you create a context (or any Roomy
+library), add its projects as `ProjectReference`s to `Roomy.ArchitectureTests` AND add their
+assembly names to the expected set in `RoomyAssembliesTests`** — the canary fails loudly on a
+silently dropped assembly, and a rule that inspects zero types fails rather than passing
+vacuously. See `backend/tests/architecture/README.md`.
 
 ---
 
@@ -362,7 +363,7 @@ When you change a convention or make an architectural call, update the relevant 
 the same change. Documentation drift is a defect.
 
 <!-- SPECKIT START -->
-Active feature plan: `specs/019-admin-as-employee/plan.md` (with `research.md`,
-`data-model.md`, `contracts/`, `quickstart.md`). For technologies, project structure,
-and other important details for the current slice, read that plan and its design artifacts.
+Active feature plan: `specs/037-non-vacuous-architecture-tests/plan.md` (with `research.md`,
+`quickstart.md`). For technologies, project structure, and other important details for
+the current slice, read that plan and its design artifacts.
 <!-- SPECKIT END -->

@@ -27,28 +27,33 @@ rule and the related invariants on the .NET side — the counterpart to the Nx
   `InfrastructureMessagingConventionTests`.
 - No Roomy assembly anywhere references MediatR ("no MediatR", ADR-0005).
 
-**Forward-looking** (convention-based, by namespace — active as soon as a matching assembly
-is *loaded*; see the caveat below):
+**Convention-based** (by namespace, across every discovered assembly):
 
 - `*.Domain` depends on nothing outside itself / shared (no `*.Application`, no
   `*.Infrastructure`, no framework).
 - `*.Application` depends only on `*.Domain` and shared (no `*.Infrastructure`, no framework).
 - A context never references another context's types (cross-context only by ID + events).
 
-## ⚠️ Adding a new context — required step
+## How assemblies are discovered
 
-The convention rules inspect every **loaded** `SmartSolutionsLab.Roomy.*` assembly. An
-assembly is loaded only if `Roomy.ArchitectureTests` (transitively) **references** it.
-NetArchTest does not scan the build output.
+`RoomyAssemblies` scans the test output directory for `SmartSolutionsLab.Roomy.*.dll`
+and loads every match — so a `<ProjectReference>` from `Roomy.ArchitectureTests.csproj`
+(which makes the assembly copy-local) is what guarantees inspection. Two safety nets
+keep the suite honest:
 
-> **When you create a bounded context, add its `domain`, `application`, and
-> `infrastructure` projects as `<ProjectReference>`s in
-> `tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj`.**
+- `RoomyAssembliesTests` pins the expected assembly set by name; a silently dropped
+  assembly fails that canary loudly.
+- A convention rule that inspects **zero** types fails outright — a vacuous pass is
+  treated as broken discovery, never as green.
 
-If you skip this, the forward-looking rules match zero types for that context and pass
-**vacuously** — green, but enforcing nothing. The tests deliberately report when a
-convention rule inspected zero types so a dormant rule is visible rather than silent, but
-the reference is still your responsibility.
+## ⚠️ Adding a new context — required steps
+
+> **When you create a bounded context (or any new Roomy library), add its projects as
+> `<ProjectReference>`s in `tests/architecture/Roomy.ArchitectureTests/Roomy.ArchitectureTests.csproj`
+> _and_ add their assembly names to the expected set in `RoomyAssembliesTests`.**
+
+The reference makes the assembly discoverable; the canary entry makes a future silent
+drop-out (e.g. a removed reference) fail loudly instead of shrinking coverage.
 
 ## Running
 
